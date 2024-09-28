@@ -1,0 +1,65 @@
+.spaces-container {
+    font-family: Arial, sans-serif;
+    background-color: #f4e3a1; /* Matching the yellow background */
+    padding: 20px;
+  }
+  
+  .spaces-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .spaces-text {
+    flex: 1;
+    margin-right: 20px; /* Adds space between the text and the image */
+  }
+  
+  .spaces-text h1 {
+    color: #0a2f52; /* Dark blue text color */
+    font-size: 32px;
+    margin-bottom: 20px;
+  }
+  
+  .spaces-text p {
+    color: #333333; /* Dark gray text */
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+  
+  .spaces-text .learn-more {
+    color: #1a73e8; /* Blue link color */
+    font-size: 18px;
+    text-decoration: none;
+  }
+  
+  .spaces-image {
+    flex: 0 0 400px; /* Fixed width for the image container */
+    margin-left: 20px;
+  }
+  
+  .spaces-image img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 10px; /* Adding a slight border-radius for the image */
+  }
+  
+  .spaces-footer {
+    margin-top: 40px;
+    background-color: #ffffff; /* White background */
+    padding: 20px;
+    border-radius: 10px; /* Rounded corners for the footer */
+    text-align: center;
+  }
+  
+  .spaces-footer h2 {
+    color: #0a2f52; /* Dark blue text color */
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  .spaces-footer p {
+    color: #333333; /* Dark gray text */
+    font-size: 18px;
+  }
+  
