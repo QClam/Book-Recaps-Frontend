@@ -1,0 +1,59 @@
+/* Header.css */
+.header {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background-color: #ffffff;
+    border-bottom: 1px solid #e5e5e5;
+  }
+  
+  .search-bar {
+    flex-grow: 1;
+    margin: 0 20px;
+    padding: 10px;
+    border: 1px solid #e5e5e5;
+    border-radius: 5px;
+  }
+  
+  .user-options {
+    display: flex;
+    align-items: center;
+  }
+  
+  .write-button {
+    margin-right: 15px;
+    padding: 10px 20px;
+    background-color: #000000;
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .icon {
+    margin-left: 15px;
+    cursor: pointer;
+  }
+  
+  .dropdown-menu {
+    position: absolute;
+    top: 60px;
+    right: 10px;
+    background-color: #ffffff;
+    border: 1px solid #e5e5e5;
+    border-radius: 5px;
+    width: 200px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .dropdown-item {
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+  
+  .dropdown-icon {
+    margin-right: 10px;
+  }
+  

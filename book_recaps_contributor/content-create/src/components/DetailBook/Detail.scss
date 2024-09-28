@@ -1,0 +1,275 @@
+/* Container and Header Styles */
+.detail-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: #f5f2ee;
+  min-height: 100vh;
+}
+
+.detail-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+}
+
+.studio-logo {
+  height: 50px;
+}
+
+.feedback-button,
+.exit-button {
+  background-color: transparent;
+  border: none;
+  font-size: 14px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.feedback-button {
+  color: #3d3d3d;
+}
+
+.exit-button {
+  color: #ff5a5f;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+}
+
+/* Book Detail Section */
+.book-detail {
+  display: flex;
+  align-items: center;
+  margin-top: 40px;
+}
+
+.book-image {
+  flex-shrink: 0;
+}
+
+.book-cover {
+  width: 180px;
+  height: auto;
+  border-radius: 8px;
+}
+
+.book-meta {
+  margin-left: 20px;
+}
+
+.book-title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.book-authors {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 15px;
+}
+
+/* Publish and Options Buttons */
+.publish-container {
+  position: relative;
+  display: inline-block; /* Ensures the draft-status box positions correctly */
+}
+
+.publish-button,
+.options-button {
+  background-color: #d3d3d3;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.options-button {
+  font-size: 24px;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Draft Status Box */
+.draft-status {
+  position: absolute;
+  top: 50%;
+  left: calc(100% + 7cm); /* Positioning 10cm to the right */
+  transform: translateY(-50%);
+  width: 200px;
+  background-color: #f5f2ee;
+  padding: 15px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  font-size: 14px;
+}
+.draft-status p {
+  margin: 5px 0;
+}
+
+.checkmark {
+  color: green;
+}
+
+.cross {
+  color: red;
+}
+
+.empty {
+  color: #ddd;
+}
+
+/* Options Menu */
+.options-menu {
+  position: absolute;
+  top: 100%; /* Positions the menu below the options button */
+  left: 0;
+  margin-top: 3px;
+  background-color: #f4f4f4;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px;
+  cursor: pointer;
+  color: #333;
+}
+
+.menu-item i {
+  margin-right: 8px;
+}
+
+.delete-item {
+  color: red;
+}
+
+/* Context Section */
+.context-section {
+  width: 100%;
+  max-width: 600px;
+  margin-top: 90px;
+}
+
+.context-textarea {
+  width: 100%;
+  padding: 10px;
+  border: none;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.context-buttons {
+  margin-top: 20px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.context-button {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Text UI Section Styling */
+.text-ui-section {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 20px;
+  margin-top: 30px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 600px;
+}
+
+.add-image-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #ccc;
+  border-radius: 8px;
+  padding: 10px;
+  cursor: pointer;
+  margin-bottom: 15px;
+}
+
+.add-image-container i {
+  margin-right: 10px;
+  color: #9c9c9c;
+}
+
+.idea-title {
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  border: none;
+  outline: none;
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+.idea-description {
+  font-size: 16px;
+  color: #666;
+  width: 100%;
+  border: none;
+  outline: none;
+  min-height: 100px;
+  margin-bottom: 10px;
+}
+
+.character-count {
+  text-align: right;
+  font-size: 14px;
+  color: #999;
+}
+
+.idea-options {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.idea-option-button {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 14px;
+  cursor: pointer;
+  flex-grow: 1;
+  margin: 0 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.idea-option-button i {
+  margin-right: 8px;
+  color: #9c9c9c;
+}
