@@ -1,0 +1,63 @@
+.Content {
+  margin-left: 250px;
+  padding: 20px;
+}
+@media (max-width: 768px) {
+  .Content {
+    margin-left: 200px;
+  }
+}
+@media (max-width: 480px) {
+  .Content {
+    margin-left: 150px;
+  }
+}
+.Content .selected-container {
+  display: flex;
+  background-color: #fff3e0;
+  padding: 20px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 600px;
+}
+.Content .selected-container .card-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+.Content .selected-container .card-content .text-section {
+  flex: 1;
+  padding-right: 20px;
+}
+.Content .selected-container .card-content .text-section h2 {
+  font-size: 1rem;
+  color: #03396c;
+}
+.Content .selected-container .card-content .image-section {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+.Content .selected-container .card-content .image-section .book-cover {
+  width: 150px;
+  height: auto;
+  margin-right: 10px;
+}
+.Content .selected-container .card-content .image-section .book-details {
+  margin-right: 20px;
+}
+.Content .selected-container .card-content .image-section .book-details h3 {
+  font-size: 1rem;
+  color: #03396c;
+}
+.Content .selected-container .card-content .image-section .book-details p {
+  font-size: 0.875rem;
+  color: #666;
+}
+.Content .selected-container .card-content .image-section .book-details .MuiSvgIcon-root {
+  font-size: 2rem;
+  color: #000;
+  vertical-align: middle;
+  margin-right: 5px;
+}/*# sourceMappingURL=ForYou.css.map */

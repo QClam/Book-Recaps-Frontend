@@ -1,0 +1,52 @@
+.popular-books-detail-container {
+    // background-color: #1f2b36;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 1200px;
+    margin: auto;
+  }
+  
+  .book-grid-detail {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 20px;
+  }
+  
+  .book-item-detail {
+    background-color: #2e3b47;
+    border-radius: 10px;
+    padding: 10px;
+    text-align: center;
+    color: white;
+    transition: transform 0.3s;
+  
+    &:hover {
+      transform: scale(1.05);
+    }
+  
+    .book-cover-detail {
+      width: 100%;
+      height: auto;
+      border-radius: 5px;
+      margin-bottom: 15px;
+    }
+  
+    .book-title-detail {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+  
+    .book-author-detail {
+      font-size: 14px;
+      color: #b0bec5;
+      margin-bottom: 10px;
+    }
+  
+    .book-price-detail {
+      font-size: 14px;
+      font-weight: 600;
+      color: #ffda68;
+    }
+  }
+  

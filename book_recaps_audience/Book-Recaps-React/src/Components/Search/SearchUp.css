@@ -1,0 +1,154 @@
+@charset "UTF-8";
+.data-filter-container {
+  width: 400px;
+  background-color: #fff;
+  border: 1px solid #e6e6e6;
+  border-radius: 8px;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  margin-left: 800px;
+  position: relative; /* Ensure relative positioning for dropdown */
+  overflow: visible;
+}
+
+.book-results {
+  position: absolute; /* Đặt kết quả tìm kiếm phía trên */
+  top: 100px; /* Khoảng cách từ phía trên của container */
+  left: 0;
+  right: 0;
+  z-index: 1000; /* Đảm bảo kết quả tìm kiếm nằm trên các lớp khác */
+  background-color: white; /* Màu nền của kết quả */
+  border: 1px solid #e6e6e6; /* Đường viền cho phần kết quả */
+  border-radius: 8px;
+  max-height: 400px; /* Giới hạn chiều cao của khối kết quả */
+  overflow-y: auto; /* Thêm thanh cuộn nếu kết quả vượt quá chiều cao */
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng cho khối kết quả */
+}
+
+.book-item {
+  padding: 10px;
+  border-bottom: 1px solid #e6e6e6;
+}
+.book-item:last-child {
+  border-bottom: none; /* Loại bỏ viền dưới của phần tử cuối cùng */
+}
+.book-item h3 {
+  font-size: 16px;
+  margin-bottom: 5px;
+  color: #333;
+}
+.book-item p {
+  font-size: 14px;
+  color: #666;
+}
+.book-item img {
+  width: 60px;
+  height: auto;
+  margin-top: 5px;
+}
+
+.filter-content {
+  display: flex;
+  z-index: 999; /* Đảm bảo thanh filter nằm dưới */
+}
+
+.filter-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  margin-right: 20px;
+}
+.filter-header h2 {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #333;
+}
+.filter-header .search-filter-input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #e6e6e6;
+  font-size: 14px;
+  background-color: #f7f7f7;
+  z-index: 10;
+}
+
+.filter-sidebar {
+  flex: 1;
+  background-color: #fff;
+  border-right: 1px solid #e6e6e6;
+  padding-right: 20px;
+}
+.filter-sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.filter-sidebar ul li {
+  padding: 10px 0;
+  cursor: pointer;
+  font-size: 14px;
+  color: #333;
+}
+.filter-sidebar ul li:hover {
+  color: #007bff;
+}
+.filter-sidebar ul li.active {
+  color: #007bff;
+  font-weight: bold;
+}
+
+.filter-main {
+  flex: 2;
+  padding-left: 20px;
+}
+.filter-main h4 {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 15px;
+  color: #333;
+}
+.filter-main .filter-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.filter-main .filter-options .filter-option {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+.filter-main .filter-options .filter-option input {
+  margin-right: 8px;
+  accent-color: #007bff;
+}
+
+.filter-footer {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #e6e6e6;
+  padding-top: 15px;
+  margin-top: 20px;
+}
+.filter-footer .clear-button {
+  background-color: transparent;
+  border: none;
+  color: #007bff;
+  font-size: 14px;
+  cursor: pointer;
+}
+.filter-footer .results-text {
+  font-size: 14px;
+  color: #333;
+}
+.filter-footer .apply-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+}/*# sourceMappingURL=SearchUp.css.map */

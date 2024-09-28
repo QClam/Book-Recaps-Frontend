@@ -1,0 +1,128 @@
+@charset "UTF-8";
+/* Toàn bộ container chính */
+.free-book-container {
+  font-family: "Roboto", sans-serif;
+  text-align: center;
+  padding: 40px 20px;
+  background-color: #f9fafc;
+  color: #0a2f52;
+}
+
+/* Tiêu đề chính */
+.free-book-container h1 {
+  font-size: 36px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+/* Dòng chữ nhỏ dưới tiêu đề */
+.subtext {
+  color: #5a7184;
+  font-size: 18px;
+  margin-bottom: 30px;
+}
+
+/* Phần card bao quanh nội dung */
+.book-card {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 30px;
+  border: 5px solid #b84343; /* Thêm viền dày 2px bao quanh book-card */
+  border-radius: 12px;
+  background: none; /* Loại bỏ nền */
+  box-shadow: none; /* Loại bỏ hiệu ứng bóng */
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  flex-direction: row; /* Đảm bảo hình ảnh nằm bên trái và văn bản nằm bên phải */
+}
+
+/* Phần hình ảnh sách */
+.book-image {
+  flex: 1;
+  max-width: 40%; /* Hình ảnh chiếm 40% chiều rộng của thẻ */
+}
+
+.book-image img {
+  width: 100%;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Phần chi tiết sách */
+.book-details {
+  flex: 2;
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.book-summary {
+  font-size: 14px;
+  color: #a1a9b7;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.book-details h2 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #0a2f52;
+  margin: 5px 0;
+}
+
+.book-author {
+  font-size: 16px;
+  color: #5a7184;
+  margin-bottom: 15px;
+}
+
+.book-description {
+  font-size: 14px;
+  color: #7a8a99;
+  margin-bottom: 20px;
+}
+
+/* Phần thông tin thêm */
+.book-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  color: #7a8a99;
+  font-size: 14px;
+  margin-bottom: 25px;
+}
+
+.book-info span {
+  margin-bottom: 10px;
+}
+
+/* Nút bấm */
+.start-now-button {
+  background-color: #32c96d;
+  color: white;
+  padding: 12px 25px;
+  border: none;
+  border-radius: 25px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  margin-top: 10px;
+  align-self: flex-start;
+}
+
+.start-now-button:hover {
+  background-color: #28a85a;
+}
+
+/* Dòng chữ miễn phí */
+.free-text {
+  color: #7a8a99;
+  font-size: 14px;
+  margin-top: 15px;
+  align-self: flex-start;
+}/*# sourceMappingURL=FreeBook.css.map */

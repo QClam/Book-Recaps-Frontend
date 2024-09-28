@@ -1,0 +1,91 @@
+/* Adjusting the dropdown to be positioned under the Text size button */
+.text-size-dropdown {
+  position: absolute;
+  top: 100%; /* Positions it directly below the Text size button */
+  left: 0;
+  background-color: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000; /* Ensures it stays on top */
+}
+
+/* Horizontal alignment of the text size options */
+.text-size-options {
+  display: flex;
+  justify-content: center; /* Center the options */
+  width: 100%;
+  margin-bottom: 10px;
+}
+
+/* Styling each text size option with a square border */
+.text-size-option {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 40px; /* Adjust width to your preference */
+  height: 40px; /* Adjust height to your preference */
+  border: 1px solid #ccc; /* Square border */
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  font-size: 16px; /* Default font size */
+}
+
+/* Align text size options on the same baseline */
+.text-size-option:nth-child(1) {
+  font-size: 14px; /* Small size */
+}
+
+.text-size-option:nth-child(2) {
+  font-size: 18px; /* Medium size */
+}
+
+.text-size-option:nth-child(3) {
+  font-size: 22px; /* Large size */
+}
+
+/* Hover effect for text size options */
+.text-size-option:hover {
+  background-color: #f0f0f0;
+}
+
+/* Styling for the reset text size link */
+.reset-text-size {
+  text-decoration: none;
+  color: #007bff;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+/* Container for the theme color options */
+/* Container for the theme color options */
+.themeOption {
+  display: flex; /* Aligns the buttons horizontally */
+  justify-content: space-between; /* Even spacing between buttons */
+  margin-top: 10px;
+}
+
+/* Styling for each button */
+.themeOption button {
+  width: 30px; /* Width of each color button */
+  height: 30px; /* Height of each color button */
+  border-radius: 50%; /* Makes the buttons circular */
+  border: none; /* Removes the default button border */
+  cursor: pointer; /* Changes cursor to pointer on hover */
+  transition: transform 0.3s ease, outline 0.3s ease; /* Adds transition for smooth effects */
+}
+
+/* Scaling the button on hover */
+.themeOption button:hover {
+  transform: scale(1.1); /* Slightly enlarges the button on hover */
+}
+
+/* Circular border for the button when clicked */
+.themeOption button:focus {
+  outline: 2px solid #000; /* Adds a black circular border when focused */
+  outline-offset: 2px; /* Adjusts the space between the button and the border */
+}/*# sourceMappingURL=TextSizeDropdown.css.map */

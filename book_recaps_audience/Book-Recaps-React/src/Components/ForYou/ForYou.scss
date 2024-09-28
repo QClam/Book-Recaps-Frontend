@@ -1,0 +1,297 @@
+// .Content {
+//   margin-left: 250px;
+//   padding: 20px;
+
+// @media (max-width: 1024px) {
+//   margin-left: 200px;
+// }
+
+// @media (max-width: 768px) {
+//   margin-left: 150px;
+// }
+
+// @media (max-width: 480px) {
+//   margin-left: 0;
+//   padding: 10px;
+// }
+
+//   .selected-container {
+//     display: flex;
+//     background-color: #fff3e0;
+//     padding: 20px;
+//     border-radius: 8px;
+//     width: 100%;
+//     max-width: 600px;
+//     flex-direction: column;
+
+//     @media (min-width: 480px) {
+//       flex-direction: row;
+//     }
+
+//     .card-content {
+//       display: flex;
+//       flex-direction: column;
+//       width: 100%;
+
+//       @media (min-width: 480px) {
+//         flex-direction: row;
+//         justify-content: space-between;
+//         align-items: center;
+//       }
+
+//       .text-section {
+//         padding-bottom: 20px;
+
+//         @media (min-width: 480px) {
+//           padding-bottom: 0;
+//           padding-right: 20px;
+//         }
+
+//         h2 {
+//           font-size: 1.25rem;
+//           color: #03396c;
+
+//           @media (max-width: 768px) {
+//             font-size: 1rem;
+//           }
+
+//           @media (max-width: 480px) {
+//             font-size: 0.875rem;
+//           }
+//         }
+//       }
+
+//       .image-section {
+//         display: flex;
+//         align-items: center;
+//         justify-content: center;
+
+//         @media (min-width: 480px) {
+//           justify-content: flex-start;
+//         }
+
+//         .book-cover {
+//           width: 100px;
+//           height: auto;
+//           margin-right: 10px;
+
+//           @media (min-width: 768px) {
+//             width: 150px;
+//           }
+//         }
+
+//         .book-details {
+//           text-align: center;
+
+//           @media (min-width: 480px) {
+//             text-align: left;
+//             margin-right: 20px;
+//           }
+
+//           h3 {
+//             font-size: 1rem;
+//             color: #03396c;
+
+//             @media (max-width: 480px) {
+//               font-size: 0.875rem;
+//             }
+//           }
+
+//           p {
+//             font-size: 0.875rem;
+//             color: #666;
+
+//             @media (max-width: 480px) {
+//               font-size: 0.75rem;
+//             }
+//           }
+
+//           .MuiSvgIcon-root {
+//             font-size: 2rem;
+//             color: #000;
+//             vertical-align: middle;
+//             margin-right: 5px;
+
+//             @media (max-width: 480px) {
+//               font-size: 1.5rem;
+//             }
+//           }
+//         }
+//       }
+//     }
+//   }
+
+//   .recommend-container {
+//     margin-top: 40px;
+
+//     h2 {
+//       font-size: 1.5rem;
+
+//       @media (max-width: 480px) {
+//         font-size: 1.25rem;
+//       }
+//     }
+
+//     p {
+//       font-size: 1rem;
+//       color: #666;
+
+//       @media (max-width: 480px) {
+//         font-size: 0.875rem;
+//       }
+//     }
+
+//     .MuiGrid-container {
+//       flex-wrap: nowrap;
+//       overflow-x: auto;
+
+//       @media (max-width: 480px) {
+//         justify-content: center;
+//       }
+//     }
+
+//     .MuiGrid-item {
+//       min-width: 150px;
+
+//       @media (max-width: 480px) {
+//         min-width: 120px;
+//       }
+//     }
+
+//     .MuiBox-root {
+//       background-color: #fff;
+//       text-align: center;
+//       max-height: 300px;
+//       padding: 10px;
+
+//       @media (max-width: 480px) {
+//         padding: 5px;
+//       }
+//     }
+//   }
+// }
+
+.for-you-content {
+  display: flex;
+  padding-top: 1.5rem;
+  flex-direction: column;
+  width: 100%;
+  max-width: 80rem;
+  margin-left: auto;
+  margin-right: auto;
+
+  @media (max-width: 1024px) {
+    margin-left: 20px;
+    margin-right: 20px;
+  }
+
+  @media (max-width: 768px) {
+    margin-left: 10px;
+    margin-right: 10px;
+  }
+
+  @media (max-width: 480px) {
+    margin-left: 0;
+    margin-right: 0;
+    padding: 10px;
+  }
+
+  .selected-container {
+    margin-left: 1rem;
+    margin-right: 1rem;
+    margin-bottom: 3rem;
+
+    @media (max-width: 480px) {
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    .selected-card {
+      display: block;
+      width: 768px;
+      padding: 1.5rem;
+      border-radius: 0.25rem;
+      background-color: blanchedalmond;
+
+      @media (min-width: 768px) {
+        width: 66.666667%;
+      }
+      .selected-content {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .card-content {
+        display: flex;
+        flex-direction: row;
+        flex-shrink: 0;
+        gap: 1rem;
+
+        @media (max-width: 768px) {
+          flex-direction: column;
+        }
+
+        .image-section {
+          object-fit: contain;
+          border-radius: 0.25rem;
+          width: 8rem;
+          height: 8rem;
+
+          @media (max-width: 480px) {
+            width: 6rem;
+            height: 6rem;
+          }
+        }
+      }
+
+      .button-section {
+        display: flex;
+        flex-direction: row;
+        gap: 0.5rem;
+        align-items: center;
+
+        @media (max-width: 480px) {
+          justify-content: center;
+        }
+      }
+    }
+  }
+
+  .recommend-title {
+    display: flex;
+    margin-left: 1rem;
+    margin-right: 1rem;
+    margin-bottom: 2rem;
+    flex-direction: row;
+  }
+
+  .recommend-card {
+    display: flex;
+    overflow: hidden;
+    width: 100%;
+
+    .recommend-list {
+      display: flex;
+      overflow-x: auto;
+      position: relative;
+      padding-bottom: 2rem;
+      margin-bottom: -2rem;
+      flex-direction: row;
+      gap: 2rem;
+      scroll-snap-type: x var(--tw-scroll-snap-strictness);
+      --tw-scroll-snap-strictness: mandatory;
+
+      .recommend-item {
+        scroll-snap-align: start;
+      }
+
+      .recommend-image {
+        object-fit: contain;
+        border-radius: 0.25rem;
+        width: 11rem;
+        height: 11rem;
+      }
+    }
+  }
+}
