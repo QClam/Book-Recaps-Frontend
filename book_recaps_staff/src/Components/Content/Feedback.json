@@ -1,0 +1,34 @@
+[
+  {
+    "version_number": "1",
+    "comments": [
+      {
+        "target_text": "Đây là một tập truyện quan trọng, bởi nó đặt nền tảng cho 6 tập tiếp theo.",
+        "start_index": 96,
+        "end_index": 2,
+        "sentence_index": 0,
+        "feedback": "Cách mở đầu kích thích trí tò mò",
+        "id": "1",
+        "section_index": 0
+      },
+      {
+        "target_text": "Nó giúp ta bước đầu khám phá thế giới Pháp thuật của Harry Potter, làm quen với các nhân vật chính, địa điểm, với một số thuật ngữ...",
+        "start_index": 37,
+        "end_index": 45,
+        "sentence_index": 1,
+        "feedback": "Giới thiệu tốt",
+        "id": "2",
+        "section_index": 0
+      },
+      {
+        "target_text": "Và có lẽ nó sẽ đi theo một cách vòng vo, nhưng tôi hy vọng những gì tôi nói sẽ có giá trị và mục đích.",
+        "start_index": 30,
+        "end_index": 24,
+        "sentence_index": 4,
+        "feedback": "U gud, bro?",
+        "id": "3",
+        "section_index": 1
+      }
+    ]
+  }
+]
