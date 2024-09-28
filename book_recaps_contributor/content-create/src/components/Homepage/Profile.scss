@@ -1,0 +1,59 @@
+/* Profile.css */
+
+.profile-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    min-height: 100vh;
+  }
+  
+  .profile-content {
+    display: flex;
+    padding: 20px;
+  }
+  
+  .profile-info {
+    width: 300px;
+    padding: 20px;
+    border-right: 1px solid #ddd;
+  }
+  
+  .profile-avatar img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+  }
+  
+  .profile-details {
+    margin-top: 20px;
+  }
+  
+  .edit-profile-button {
+    display: block;
+    margin: 10px 0;
+    padding: 8px 16px;
+    background-color: #eee;
+    border: none;
+    cursor: pointer;
+  }
+  
+  .social-links {
+    margin: 10px 0;
+  }
+  
+  .profile-blogs {
+    flex-grow: 1;
+    padding: 20px;
+  }
+  
+  .no-blogs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    color: #888;
+  }
+  
