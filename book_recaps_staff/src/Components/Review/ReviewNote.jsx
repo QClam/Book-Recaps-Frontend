@@ -43,7 +43,7 @@
 //         );
 //         setComments(response.data);
 //         console.log(response.data);
-        
+
 //       } catch (error) {
 //         console.log("Error fetching comments:", error);
 //       }
@@ -59,7 +59,7 @@
 //     const existingComment = comments.find(
 //       (comment) =>
 //         comment.section_index === section_index &&
-//         comment.sentence_index === sentence_index 
+//         comment.sentence_index === sentence_index
 //     );
 
 //     if (existingComment) {
@@ -106,7 +106,7 @@
 //           comment.section_index === selectedIndex.section_index &&
 //           comment.sentence_index === selectedIndex.sentence_index
 //       );
-        
+
 //       const targetText = data.transcriptSections[selectedIndex.section_index].transcriptSentences[selectedIndex.sentence_index].value.html;
 
 //       if (commentIndex > -1) {
@@ -131,12 +131,12 @@
 //         // Send a POST request to create a new comment
 //         await axios.post("https://66e3e75ed2405277ed124249.mockapi.io/noteData", newComment);
 //       }
-  
+
 //       setComments(updatedComments);
 //       setCurrentComment("");
 //       setShowInput(false);
 //     }
-//   };  
+//   };
 
 //   const toggleCommentVisibility = (section_index, sentence_index, event) => {
 //     const iconElement = event.target.getBoundingClientRect(); // Get icon position
@@ -255,14 +255,11 @@
 
 // export default ReviewNote;
 
-
 import React, { useEffect, useState } from "react";
 import data from "../../data/read_along_output-final.json";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-
-import { ref, onValue, set, update } from "firebase/database";
-import { database } from '../../firebase'; // adjust the path as necessary
+import { Hourglass } from "react-loader-spinner";
 
 import "./ReviewNote.scss";
 
@@ -305,7 +302,6 @@ function ReviewNote() {
         const commentsData = response.data[0]?.comments || []; // Adjust to match new structure
         setComments(commentsData);
         console.log(commentsData);
-        
       } catch (error) {
         console.log("Error fetching comments:", error);
       }
@@ -335,55 +331,77 @@ function ReviewNote() {
 
   const handleAddComment = async () => {
     if (currentComment.trim()) {
-        // Fetch the current object (assumed to be by ID `1` or dynamic based on your setup)
-        const contentId = id; // You can replace this with the actual ID logic if needed
-        try {
-            const response = await axios.get(`https://66ebd9352b6cf2b89c5c0bb9.mockapi.io/feedback/${contentId}`);
-            const currentData = response.data;
+      const contentId = id; // Lấy ID hiện tại
 
-            const updatedComments = [...currentData.comments];
-            const commentIndex = updatedComments.findIndex(
-                (comment) =>
-                    comment.section_index === selectedIndex.sectionIndex &&
-                    comment.sentence_index === selectedIndex.sentenceIndex
-            );
+      try {
+        // Lấy dữ liệu hiện tại từ API
+        const response = await axios.get(
+          `https://66ebd9352b6cf2b89c5c0bb9.mockapi.io/feedback/${contentId}`
+        );
+        const currentData = response.data;
 
-            const targetText = data.transcriptSections[selectedIndex.sectionIndex].transcriptSentences[selectedIndex.sentenceIndex].value.html;
+        // Sao chép các comment hiện tại
+        const updatedComments = [...currentData.comments];
+        const commentIndex = updatedComments.findIndex(
+          (comment) =>
+            comment.section_index === selectedIndex.sectionIndex &&
+            comment.sentence_index === selectedIndex.sentenceIndex
+        );
 
-            if (commentIndex > -1) {
-                // Update existing comment
-                updatedComments[commentIndex].feedback = currentComment;
-                updatedComments[commentIndex].target_text = targetText;
-            } else {
-                // Add new comment to the comments array
-                const newComment = {
-                    section_index: selectedIndex.sectionIndex,
-                    sentence_index: selectedIndex.sentenceIndex,
-                    feedback: currentComment,
-                    target_text: targetText,
-                    start_index: data.transcriptSections[selectedIndex.sectionIndex].transcriptSentences[selectedIndex.sentenceIndex].value.start,
-                    end_index: data.transcriptSections[selectedIndex.sectionIndex].transcriptSentences[selectedIndex.sentenceIndex].value.end
-                };
-                updatedComments.push(newComment);
-            }
+        // Lấy câu đã chọn
+        const selectedSentence =
+          data.transcriptSections[selectedIndex.sectionIndex]
+            ?.transcriptSentences[selectedIndex.sentenceIndex];
 
-            // Send a PUT request to update the entire object with the updated comments array
-            await axios.put(`https://66ebd9352b6cf2b89c5c0bb9.mockapi.io/feedback/${contentId}`, {
-                ...currentData,
-                comments: updatedComments // Update the comments array in the object
-            });
-
-            setComments(updatedComments); // Update local state with the new comments
-            setCurrentComment(""); // Clear comment input
-            setShowInput(false); // Hide input field
-
-        } catch (error) {
-            console.error("Error updating comments:", error);
+        // Kiểm tra dữ liệu từ selectedSentence
+        if (!selectedSentence) {
+          console.error(
+            "Selected sentence is undefined. Check the structure of data."
+          );
+          return;
         }
+
+        // Lấy nội dung câu và chỉ số bắt đầu/kết thúc
+        const targetText = selectedSentence.value.html;
+        const startIndex = 0; // Vị trí đầu tiên của câu
+        const endIndex = targetText.length - 1; // Vị trí cuối cùng của câu
+
+        if (commentIndex > -1) {
+          // Cập nhật comment hiện tại
+          updatedComments[commentIndex].feedback = currentComment;
+          updatedComments[commentIndex].target_text = targetText;
+          updatedComments[commentIndex].start_index = startIndex;
+          updatedComments[commentIndex].end_index = endIndex;
+        } else {
+          // Thêm comment mới
+          const newComment = {
+            section_index: selectedIndex.sectionIndex,
+            sentence_index: selectedIndex.sentenceIndex,
+            feedback: currentComment,
+            target_text: targetText,
+            start_index: startIndex,
+            end_index: endIndex,
+          };
+          updatedComments.push(newComment);
+        }
+
+        // Gửi PUT request để cập nhật dữ liệu
+        await axios.put(
+          `https://66ebd9352b6cf2b89c5c0bb9.mockapi.io/feedback/${contentId}`,
+          {
+            ...currentData,
+            comments: updatedComments,
+          }
+        );
+
+        setComments(updatedComments); // Cập nhật state với comment mới
+        setCurrentComment(""); // Xóa nội dung ô nhập comment
+        setShowInput(false); // Ẩn ô nhập comment
+      } catch (error) {
+        console.error("Error updating comments:", error);
+      }
     }
-};
-
-
+  };
 
   const toggleCommentVisibility = (sectionIndex, sentenceIndex, event) => {
     const iconElement = event.target.getBoundingClientRect(); // Get icon position
@@ -401,12 +419,27 @@ function ReviewNote() {
     ) {
       setVisibleComment(null); // Hide comment
     } else {
-      setVisibleComment({ section_index: sectionIndex, sentence_index: sentenceIndex }); // Show comment
+      setVisibleComment({
+        section_index: sectionIndex,
+        sentence_index: sentenceIndex,
+      }); // Show comment
     }
   };
 
   if (loading) {
-    return <div style={{ marginLeft: 250 }}>Loading ...</div>;
+    return (
+      <div className="loading">
+        <Hourglass
+          visible={true}
+          height="80"
+          width="80"
+          ariaLabel="hourglass-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+          colors={["#306cce", "#72a1ed"]}
+        />
+      </div>
+    );
   }
 
   if (!content) {
@@ -418,7 +451,7 @@ function ReviewNote() {
   }
 
   return (
-    <div style={{ marginLeft: 250 }}>
+    <div>
       <h1>{content.title}</h1>
       <p>{content.description}</p>
       <p style={{ fontWeight: "bold" }}>Status: {content.status}</p>
@@ -488,11 +521,13 @@ function ReviewNote() {
           }}
         >
           <p>
-            {comments.find(
-              (comment) =>
-                comment.section_index === visibleComment.section_index &&
-                comment.sentence_index === visibleComment.sentence_index
-            )?.feedback}
+            {
+              comments.find(
+                (comment) =>
+                  comment.section_index === visibleComment.section_index &&
+                  comment.sentence_index === visibleComment.sentence_index
+              )?.feedback
+            }
           </p>
         </div>
       )}

@@ -7,3 +7,9 @@ https://66eb9ee32b6cf2b89c5b1714.mockapi.io/ContentItems
 
 Users 
 https://66e3e75ed2405277ed124249.mockapi.io/users
+
+{
+  "email": "contributor@root.com",
+  "password": "123Pa$$word!",
+  "captchaToken": "9PA}rTVa^9*1tCyiNTk?ix=.dq)6kW"
+}

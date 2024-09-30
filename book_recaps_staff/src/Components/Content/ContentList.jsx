@@ -1,8 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './Content.scss';
 // import { sampleData } from './ContentItems';
 import { Link } from 'react-router-dom';
+import { Hourglass } from 'react-loader-spinner'
+
+import './Content.scss';
+import '../Loading.scss'
 
 function truncateText(text, maxLength) {
   if (text.length > maxLength) {
@@ -21,7 +24,7 @@ function ContentList() {
         const response = await axios.get('https://66eb9ee32b6cf2b89c5b1714.mockapi.io/ContentItems');
         setContentItems(response.data);
         console.log("Data: ", response.data);
-        
+
       } catch (error) {
         console.log("Error fetching data, using sample data as fallback:", error);
         // setContentItems(sampleData); // Use sampleData as a fallback
@@ -35,7 +38,17 @@ function ContentList() {
 
   if (loading) {
     return (
-      <div style={{ marginLeft: 250 }}>Loading...</div>
+      <div className='loading'>
+        <Hourglass
+          visible={true}
+          height="80"
+          width="80"
+          ariaLabel="hourglass-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+          colors={['#306cce', '#72a1ed']}
+        />
+      </div>
     );
   }
 

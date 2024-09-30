@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Link, useParams } from 'react-router-dom';
 import FeedbackContent from '../Content/FeedbackContent';
 import Swal from 'sweetalert2';
+import { Hourglass } from 'react-loader-spinner';
 
 function Review() {
   const [contentItem, setContentItem] = useState(null);
@@ -60,15 +61,25 @@ function Review() {
   };
 
   if (loading) {
-    return <div style={{ marginLeft: 250 }}>Loading ...</div>;
+    return <div className='loading'>
+    <Hourglass
+        visible={true}
+        height="80"
+        width="80"
+        ariaLabel="hourglass-loading"
+        wrapperStyle={{}}
+        wrapperClass=""
+        colors={['#306cce', '#72a1ed']}
+    />
+</div>;
   }
 
   if (!contentItem) {
-    return <div style={{ marginLeft: 250 }}>No content found for id {id}</div>;
+    return <div>No content found for id {id}</div>;
   }
 
   return (
-    <div style={{ marginLeft: 250 }}>
+    <div>
       <h1>{contentItem.title}</h1>
       <p>{contentItem.description}</p>
       <p>Status: {contentItem.status}</p>
