@@ -264,13 +264,13 @@ import { Hourglass } from "react-loader-spinner";
 import "./ReviewNote.scss";
 
 function ReviewNote() {
-  const { id } = useParams(); // Get the ID from URL params
-  const [comments, setComments] = useState([]); // Store comments
-  const [showInput, setShowInput] = useState(false); // Show/hide comment input
-  const [currentComment, setCurrentComment] = useState(""); // Current comment text
-  const [selectedIndex, setSelectedIndex] = useState(null); // Track selected sentence for comment
-  const [visibleComment, setVisibleComment] = useState(null); // Display comment
-  const [commentPosition, setCommentPosition] = useState({ top: 0, left: 0 }); // Position of the comment box
+  const { id } = useParams(); // Lấy id từ URL params
+  const [comments, setComments] = useState([]); // Lưu comment vào state
+  const [showInput, setShowInput] = useState(false); // Ẩn/hiện ô nhập comment
+  const [currentComment, setCurrentComment] = useState(""); // Lấy comment trong ô input
+  const [selectedIndex, setSelectedIndex] = useState(null); // Lấy sentence cần comment
+  const [visibleComment, setVisibleComment] = useState(null); // Ẩn/hiện comment
+  const [commentPosition, setCommentPosition] = useState({ top: 0, left: 0 }); // Vị trí của comment
 
   const [loading, setLoading] = useState(true);
   const [content, setContent] = useState(null);
@@ -292,14 +292,14 @@ function ReviewNote() {
     fetchContent();
   }, [id]);
 
-  // Fetch comments when the component mounts
+  // Fetch comments
   useEffect(() => {
     const fetchComments = async () => {
       try {
         const response = await axios.get(
-          "https://66ebd9352b6cf2b89c5c0bb9.mockapi.io/feedback" // Assuming this is the API for comments
+          "https://66ebd9352b6cf2b89c5c0bb9.mockapi.io/feedback"
         );
-        const commentsData = response.data[0]?.comments || []; // Adjust to match new structure
+        const commentsData = response.data[0]?.comments || [];
         setComments(commentsData);
         console.log(commentsData);
       } catch (error) {
@@ -311,7 +311,7 @@ function ReviewNote() {
   }, []);
 
   const handleRightClick = (e, sectionIndex, sentenceIndex) => {
-    e.preventDefault(); // Prevent the default context menu
+    e.preventDefault(); // Chặn menu chuột trái default của Broswer
     setSelectedIndex({ sectionIndex, sentenceIndex });
 
     const existingComment = comments.find(
@@ -321,14 +321,15 @@ function ReviewNote() {
     );
 
     if (existingComment) {
-      setCurrentComment(existingComment.feedback); // Show existing comment
+      setCurrentComment(existingComment.feedback); // Nếu có comment thì hiện trong ô input
     } else {
-      setCurrentComment(""); // Clear comment if new
+      setCurrentComment("");
     }
 
-    setShowInput(true); // Show comment input box
+    setShowInput(true);
   };
 
+  // Thêm nhận xét
   const handleAddComment = async () => {
     if (currentComment.trim()) {
       const contentId = id; // Lấy ID hiện tại
@@ -395,20 +396,48 @@ function ReviewNote() {
         );
 
         setComments(updatedComments); // Cập nhật state với comment mới
-        setCurrentComment(""); // Xóa nội dung ô nhập comment
-        setShowInput(false); // Ẩn ô nhập comment
+        setCurrentComment("");
+        setShowInput(false);
       } catch (error) {
         console.error("Error updating comments:", error);
       }
     }
   };
 
-  const toggleCommentVisibility = (sectionIndex, sentenceIndex, event) => {
-    const iconElement = event.target.getBoundingClientRect(); // Get icon position
+  // Xóa nhận xét
+  const handleDeleteComment = async (sectionIndex, sentenceIndex) => {
+    const contentId = id;
 
-    // Calculate the position for the comment box
-    const topPosition = iconElement.top + window.scrollY + 20; // Adjust the top position (above the icon)
-    const leftPosition = iconElement.left + window.scrollX; // Position to the left of the icon
+    try {
+      const response = await axios.get(
+        `https://66ebd9352b6cf2b89c5c0bb9.mockapi.io/feedback/${contentId}`
+      );
+      const currentData = response.data;
+
+      // Lọc ra các comment không phải là comment cần xóa, filter dùng để lọc các comment hiện có
+      //  nếu có thì loại khỏi danh sách cần xóa
+      const updatedComments = currentData.comments.filter(
+        (comment) =>
+          !(
+            comment.section_index === sectionIndex &&
+            comment.sentence_index === sentenceIndex
+          )
+      );
+      await axios.put(
+        `https://66ebd9352b6cf2b89c5c0bb9.mockapi.io/feedback/${contentId}`,
+        { ...currentData, comments: updatedComments }
+      );
+      setComments(updatedComments);
+    } catch (error) {
+      console.log("Error Deleting comment", error);
+    }
+  };
+
+  const toggleCommentVisibility = (sectionIndex, sentenceIndex, event) => {
+    const iconElement = event.target.getBoundingClientRect(); // Lấy vị trí icon
+
+    const topPosition = iconElement.bottom + window.scrollY; // vị trí dưới icon
+    const leftPosition = iconElement.left + window.scrollX; // vị trí trái icon
 
     setCommentPosition({ top: topPosition, left: leftPosition });
 
@@ -417,12 +446,12 @@ function ReviewNote() {
       visibleComment.section_index === sectionIndex &&
       visibleComment.sentence_index === sentenceIndex
     ) {
-      setVisibleComment(null); // Hide comment
+      setVisibleComment(null);
     } else {
       setVisibleComment({
         section_index: sectionIndex,
         sentence_index: sentenceIndex,
-      }); // Show comment
+      });
     }
   };
 
@@ -478,14 +507,27 @@ function ReviewNote() {
                 >
                   {sentence.value.html + " "}
                   {hasComment && (
-                    <span
-                      style={{ marginLeft: "2px", color: "#00aaff" }}
-                      onClick={(e) =>
-                        toggleCommentVisibility(sectionIndex, sentenceIndex, e)
-                      }
-                    >
-                      💬
-                    </span>
+                    <>
+                      <span
+                        style={{ marginLeft: "2px", color: "#00aaff" }}
+                        onClick={(e) =>
+                          toggleCommentVisibility(
+                            sectionIndex,
+                            sentenceIndex,
+                            e
+                          )
+                        }
+                      >
+                        💬
+                      </span>
+                      <button
+                        onClick={() =>
+                          handleDeleteComment(sectionIndex, sentenceIndex)
+                        }
+                      >
+                        Xóa
+                      </button>
+                    </>
                   )}
                 </span>
               );
@@ -500,35 +542,44 @@ function ReviewNote() {
             value={currentComment}
             onChange={(e) => setCurrentComment(e.target.value)}
             placeholder="Add a comment"
+            style={{
+              width: "50%",
+              height: 60,
+              marginTop: 10
+            }}
           />
-          <button onClick={handleAddComment}>Add Comment</button>
+          <div style={{marginBottom: 10}}>
+          <button onClick={handleAddComment} style={{marginRight: 10}}>Add Comment</button>
           <button onClick={() => setShowInput(false)}>Cancel</button>
+          </div>
         </div>
       )}
 
       {visibleComment && (
-        <div
-          style={{
-            position: "absolute",
-            background: "aqua",
-            padding: "5px",
-            border: "1px solid #ccc",
-            top: commentPosition.top, // Use calculated top position
-            left: commentPosition.left, // Use calculated left position
-            zIndex: 1,
-            color: "black",
-            width: "150px",
-          }}
-        >
-          <p>
-            {
-              comments.find(
-                (comment) =>
-                  comment.section_index === visibleComment.section_index &&
-                  comment.sentence_index === visibleComment.sentence_index
-              )?.feedback
-            }
-          </p>
+        <div>
+          <div
+            style={{
+              position: "absolute",
+              background: "aqua",
+              padding: "5px",
+              border: "1px solid #ccc",
+              top: commentPosition.top + 15,
+              left: commentPosition.left,
+              zIndex: 1,
+              color: "black",
+              width: "auto",
+            }}
+          >
+            <p>
+              {
+                comments.find(
+                  (comment) =>
+                    comment.section_index === visibleComment.section_index &&
+                    comment.sentence_index === visibleComment.sentence_index
+                )?.feedback
+              }
+            </p>
+          </div>
         </div>
       )}
     </div>
