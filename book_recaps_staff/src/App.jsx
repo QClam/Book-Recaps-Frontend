@@ -8,6 +8,7 @@ import Review from "./Components/Review/Review";
 import ReviewNote from "./Components/Review/ReviewNote";
 import Login from "./Components/Auth/Login";
 import "./App.css";
+import UsersList from "./Components/Users/UsersList";
 
 function App() {
   // const [highlightedSentences, setHighlightedSentences] = useState([]);
@@ -25,6 +26,7 @@ function App() {
         <Route path="/overview" element={<Overview />} />
         <Route path="/feedback" element={<FeedbackContent />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/users" element={<UsersList />} />
         <Route
           path="/review/content_version/:id"
           element={<Review />}
