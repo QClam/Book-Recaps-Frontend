@@ -12,9 +12,6 @@ import UsersList from "./Components/Users/UsersList";
 import "./App.css";
 
 function App() {
-  // const [highlightedSentences, setHighlightedSentences] = useState([]);
-
-  // Custom hook to determine if the current route is the login page
   const location = useLocation();
   const isLoginPage = location.pathname === "/login";
 
@@ -44,8 +41,9 @@ function App() {
 }
 
 function AppWrapper() {
+  const recaptchaKey = import.meta.env.VITE_RECAPTCHA_KEY;
   return (
-    <GoogleReCaptchaProvider reCaptchaKey="6LdFTgMqAAAAAPMELcBY4rySQ1UpT5ZcXvVcj-_J">
+    <GoogleReCaptchaProvider reCaptchaKey={recaptchaKey}>
       <Router>
         <App />
       </Router>

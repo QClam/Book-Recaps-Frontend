@@ -90,7 +90,7 @@ function Login() {
 
       console.log("Login successfully", response.data);
     } catch (error) {
-      setError("Đăng nhập thất bại");
+      setError("Đăng nhập thất bại", error);
     }
   };
 
