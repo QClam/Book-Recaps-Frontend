@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
+import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3'
 import Sidebar from "./Components/Sidebar/Sidebar";
 import ContentList from "./Components/Content/ContentList";
 import Overview from "./Components/Overview/Overview";
@@ -7,13 +8,10 @@ import FeedbackContent from "./Components/Content/FeedbackContent";
 import Review from "./Components/Review/Review";
 import ReviewNote from "./Components/Review/ReviewNote";
 import Login from "./Components/Auth/Login";
-import "./App.css";
 import UsersList from "./Components/Users/UsersList";
+import "./App.css";
 
 function App() {
-  // const [highlightedSentences, setHighlightedSentences] = useState([]);
-
-  // Custom hook to determine if the current route is the login page
   const location = useLocation();
   const isLoginPage = location.pathname === "/login";
 
@@ -43,10 +41,13 @@ function App() {
 }
 
 function AppWrapper() {
+  const recaptchaKey = import.meta.env.VITE_RECAPTCHA_KEY;
   return (
-    <Router>
-      <App />
-    </Router>
+    <GoogleReCaptchaProvider reCaptchaKey={recaptchaKey}>
+      <Router>
+        <App />
+      </Router>
+    </GoogleReCaptchaProvider>
   );
 }
 
