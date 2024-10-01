@@ -8,6 +8,9 @@ https://66eb9ee32b6cf2b89c5b1714.mockapi.io/ContentItems
 Users 
 https://66e3e75ed2405277ed124249.mockapi.io/users
 
+Swagger
+https://160.25.80.100:7124/index.html
+
 {
   "email": "contributor@root.com",
   "password": "123Pa$$word!",

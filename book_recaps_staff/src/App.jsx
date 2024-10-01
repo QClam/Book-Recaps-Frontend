@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
+import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3'
 import Sidebar from "./Components/Sidebar/Sidebar";
 import ContentList from "./Components/Content/ContentList";
 import Overview from "./Components/Overview/Overview";
@@ -7,8 +8,8 @@ import FeedbackContent from "./Components/Content/FeedbackContent";
 import Review from "./Components/Review/Review";
 import ReviewNote from "./Components/Review/ReviewNote";
 import Login from "./Components/Auth/Login";
-import "./App.css";
 import UsersList from "./Components/Users/UsersList";
+import "./App.css";
 
 function App() {
   // const [highlightedSentences, setHighlightedSentences] = useState([]);
@@ -44,9 +45,11 @@ function App() {
 
 function AppWrapper() {
   return (
-    <Router>
-      <App />
-    </Router>
+    <GoogleReCaptchaProvider reCaptchaKey="6LdFTgMqAAAAAPMELcBY4rySQ1UpT5ZcXvVcj-_J">
+      <Router>
+        <App />
+      </Router>
+    </GoogleReCaptchaProvider>
   );
 }
 
