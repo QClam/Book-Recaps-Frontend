@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3'
 import Sidebar from "./Components/Sidebar/Sidebar";
@@ -9,11 +8,12 @@ import Review from "./Components/Review/Review";
 import ReviewNote from "./Components/Review/ReviewNote";
 import Login from "./Components/Auth/Login";
 import UsersList from "./Components/Users/UsersList";
+import ConfirmEmail from "./Components/Auth/ConfirmEmail";
 import "./App.css";
 
 function App() {
   const location = useLocation();
-  const isLoginPage = location.pathname === "/login";
+  const isLoginPage = location.pathname === "/login" || location.pathname === "/auth/confirm-email";
 
   return (
     <main>
@@ -24,6 +24,7 @@ function App() {
         <Route path="/overview" element={<Overview />} />
         <Route path="/feedback" element={<FeedbackContent />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/auth/confirm-email" element={<ConfirmEmail />} />
         <Route path="/users" element={<UsersList />} />
         <Route
           path="/review/content_version/:id"

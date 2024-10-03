@@ -2,20 +2,23 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import "./Login.scss";
+import { useNavigate } from "react-router-dom";
 
 function Login() {
   const [isActive, setIsActive] = useState(false);
+  const navigate = useNavigate();
   const [registerForm, setRegisterForm] = useState({
-    username: "",
+    fullName: "",
+    email: "",
     password: "",
-    year_of_birth: "",
-    image: "",
-    earnings: "",
+    confirmPassword: "",
+    phoneNumber: "",
+
   });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
-  const { executeRecaptcha } = useGoogleReCaptcha(); 
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
   const handleRegisterClick = () => {
     setIsActive(true);
@@ -31,38 +34,90 @@ function Login() {
     console.log(value);
   };
 
+  const validateForm = () => {
+    const fullNameRegex = /^[a-zA-ZÀ-ỹ\s]+$/; // Chỉ chấp nhận chữ cái và khoảng trắng
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Định dạng email hợp lệ
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/; // Mật khẩu chứa ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường, 1 số, và 1 ký tự đặc biệt
+    const phoneRegex = /^\d{10,11}$/; // Số điện thoại gồm 10 hoặc 11 chữ số
+
+    if (!fullNameRegex.test(registerForm.fullName)) {
+      setError("Họ và tên không hợp lệ.");
+      return false;
+    }
+
+    if (!emailRegex.test(registerForm.email)) {
+      setError("Email không hợp lệ.");
+      return false;
+    }
+
+    if (!passwordRegex.test(registerForm.password)) {
+      setError("Mật khẩu phải chứa ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.");
+      return false;
+    }
+
+    if (registerForm.password !== registerForm.confirmPassword) {
+      setError("Mật khẩu xác nhận không khớp.");
+      return false;
+    }
+
+    if (!phoneRegex.test(registerForm.phoneNumber)) {
+      setError("Số điện thoại không hợp lệ.");
+      return false;
+    }
+
+    setError(null); // Không có lỗi
+    return true;
+  };
+
   const handleSignUp = async (e) => {
     e.preventDefault();
 
-    const newUser = {
-      username: registerForm.username,
-      password: registerForm.password,
-      role: "audience",
-      isContributor: false,
-      year_of_birth: registerForm.year_of_birth,
-      image: registerForm.image,
-      earnings: parseInt(registerForm.earnings, 10),
-      create_at: Date.now(),
-      update_at: Date.now(),
-      id: Date.now().toString(),
-    };
+    if (!validateForm()) {
+      return; // Nếu form không hợp lệ, dừng lại
+    }
+
+    if (!executeRecaptcha) {
+      setError("reCAPTCHA chưa được khởi tạo");
+      return;
+    }
 
     try {
+
+      const token = await executeRecaptcha("signup")
+
+      const newUser = {
+        fullName: registerForm.fullName,
+        email: registerForm.email,
+        password: registerForm.password,
+        confirmPassword: registerForm.confirmPassword,
+        phoneNumber: registerForm.phoneNumber,
+        captchaToken: token,
+      };
+
       const response = await axios.post(
-        "https://66e3e75ed2405277ed124249.mockapi.io/users",
+        "https://160.25.80.100:7124/api/register",
         newUser
       );
       console.log("Register Successfully", newUser);
+      console.log("Link: ", response.data.message);
+      navigate("/auth/confirm-email", {
+        state: {
+          email: registerForm.email,
+          message: response.data.message,
+        },
+      });
 
       setRegisterForm({
-        username: "",
+        fullName: "",
+        email: "",
         password: "",
-        year_of_birth: "",
-        image: "",
-        earnings: "",
+        confirmPassword: "",
+        phoneNumber: "",
       });
+      setError(null); // Reset error state
     } catch (error) {
       console.error("Error registering user:", error);
+      setError("Đăng ký thất bại.");
     }
   };
 
@@ -82,9 +137,9 @@ function Login() {
       const response = await axios.post(
         "https://160.25.80.100:7124/api/tokens",
         {
-            email,
-            password,
-            captchaToken: token,
+          email,
+          password,
+          captchaToken: token,
         }
       );
 
@@ -110,13 +165,23 @@ function Login() {
             </div>
             <span>hoặc sử dụng email để đăng ký</span>
             <input
+              required
               type="text"
-              placeholder="Tài khoản"
-              name="username"
-              value={registerForm.username}
+              placeholder="Họ và Tên"
+              name="fullName"
+              value={registerForm.fullName}
               onChange={handleInputChange}
             />
             <input
+              required
+              type="email"
+              placeholder="Email"
+              name="email"
+              value={registerForm.email}
+              onChange={handleInputChange}
+            />
+            <input
+              required
               type="password"
               placeholder="Mật khẩu"
               name="password"
@@ -124,27 +189,23 @@ function Login() {
               onChange={handleInputChange}
             />
             <input
-              type="text"
-              placeholder="Năm sinh"
-              name="year_of_birth"
-              value={registerForm.year_of_birth}
+              required
+              type="password"
+              name="confirmPassword"
+              placeholder="Xác minh Mật khẩu"
+              value={registerForm.confirmPassword}
               onChange={handleInputChange}
             />
             <input
+              required
               type="text"
-              name="image"
-              placeholder="Ảnh đại diện"
-              value={registerForm.image}
-              onChange={handleInputChange}
-            />
-            <input
-              type="text"
-              name="earnings"
-              placeholder="Thu nhập"
-              value={registerForm.earnings}
+              name="phoneNumber"
+              placeholder="Số điện thoại"
+              value={registerForm.phoneNumber}
               onChange={handleInputChange}
             />
             <button type="submit">Đăng ký</button>
+            {error && <p style={{ color: 'red' }}>{error}</p>}
           </form>
         </div>
 
