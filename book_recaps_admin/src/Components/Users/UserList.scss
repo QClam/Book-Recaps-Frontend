@@ -1,0 +1,103 @@
+/* Đặt cho container */
+.userlist-container {
+    margin: 0 auto;
+    padding: 20px;
+    width: 80vw;
+
+    .content-table {
+
+        width: 100%;
+    
+        img {
+            border-radius: 50%;
+            width: 42px;
+            height: 42px;
+        }
+    
+        th:nth-child(2), th:nth-child(3) {
+            text-align: center;
+        }
+        
+        /* Căn phải cho cột "Năm sinh" */
+        th:nth-child(4) {
+            text-align: right;
+        }
+        
+        td:nth-child(2), td:nth-child(3) {
+            text-align: center;
+        }
+        
+        /* Căn phải cho cột "Năm sinh" */
+        td:nth-child(4) {
+            text-align: right;
+        }
+    }
+}
+
+.content-container {
+    // margin-left: 250px;
+    width: 100%;
+    padding: 20px;
+}
+  .content-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .content-table th,
+  .content-table td {
+    // border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+  }
+  
+  .content-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }
+  
+//   .content-table tr:nth-child(even) {
+//     background-color: #f9f9f9;
+//   }
+  
+  // .content-table tr:hover {
+  //   background-color: #f1f1f1;
+  //   color: black;
+  // }
+  
+  .content-table th {
+    padding-top: 12px;
+    padding-bottom: 12px;
+    background-color: #1f1f1f;
+    // color: white;
+  }
+  
+  h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  
+  @media (max-width: 768px) {
+    .content-table th, .content-table td {
+      font-size: 14px;
+      padding: 8px;
+    }
+  }
+  
+
+/* Responsive cho màn hình nhỏ hơn */
+@media (max-width: 768px) {
+    th, td {
+        font-size: 12px;
+    }
+
+    table {
+        font-size: 14px;
+    }
+
+    /* Tạo khả năng cuộn ngang cho bảng khi cần */
+    div {
+        overflow-x: auto;
+    }
+}
