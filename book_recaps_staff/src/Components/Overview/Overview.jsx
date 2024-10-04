@@ -15,7 +15,7 @@ function Overview() {
                     <img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQV4yWihrnwBCaQNXCMF_zSIAPDMidcLtnR3g&s' />
                     <p>{sampleData[1].description}</p>
                 </div>
-                <div className='overview-content-card'>Hello</div>
+                <div className='overview-content-card'>Comming soon</div>
             </div>
         </div>
     )

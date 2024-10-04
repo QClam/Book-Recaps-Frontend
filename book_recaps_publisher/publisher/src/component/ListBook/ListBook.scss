@@ -1,0 +1,92 @@
+.list-book-container {
+    padding: 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-left: 250px;
+  }
+  
+  h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.8rem;
+    color: #333;
+  }
+  
+  .book-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  
+    th, td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+  
+    th {
+      background-color: #f4f4f4;
+      color: #666;
+      text-transform: uppercase;
+      font-size: 0.9rem;
+      letter-spacing: 0.1em;
+    }
+  
+    td {
+      font-size: 0.9rem;
+      color: #555;
+    }
+  
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+  
+    tr:hover {
+      background-color: #f1f1f1;
+    }
+  
+    input[type='checkbox'] {
+      width: 16px;
+      height: 16px;
+    }
+  
+    .tag {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: #fff;
+      text-align: center;
+    }
+  
+    .fiction { background-color: #ff9e9e; }
+    .non-fiction { background-color: #ffb36b; }
+    .memoir { background-color: #f7ce68; }
+    .dystopia { background-color: #f47777; }
+    .historical { background-color: #68bdf7; }
+    .climate { background-color: #68f77e; }
+    .unknown { background-color: #ccc; }
+  }
+  
+  .submit-approve-container {
+    text-align: center;
+    margin-top: 20px;
+  }
+  
+  .submit-approve-btn {
+    background-color: #28a745;
+    color: #fff;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  
+  .submit-approve-btn:hover {
+    background-color: #218838;
+  }
