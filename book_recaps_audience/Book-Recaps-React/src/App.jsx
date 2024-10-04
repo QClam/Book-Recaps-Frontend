@@ -109,7 +109,7 @@ function App() {
                 {/* Book list by category detail */}
                 <Route path="/bookbycategory/:id" element={<BookByCategoryDetail />} />
                 
-         
+                <Route path="/book-api-detail" element={<BookApiDetail />} />
               </Route>
 
                 {/* Route không có sidebar */}
@@ -130,7 +130,7 @@ function App() {
                <Route path="/read" element={<ReadBook key={new Date().getTime()} />} />
                {/* <Route path="/read" element={<NoteReadBook />} /> */}
 
-               <Route path="/book-api-detail" element={<BookApiDetail />} />
+              
 
               </Routes>
             )}
