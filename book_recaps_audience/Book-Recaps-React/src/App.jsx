@@ -42,6 +42,7 @@ import CustomCategory from "./Components/Explore/NewCategory/Category";
 import ExploreCategory from "./Components/Explore/ExploreCategory";
 import PopularBookDetail from "./Components/Explore/PopularBook/PopularBookDetail";
 import NoteReadBook from "./Components/TodayFreeRead/NoteReadBook/NoteReadBook";
+import BookApiDetail from "./Components/Explore/BookApi/BookApiDetail";
 
 function App() {
   const [completedOnboarding, setCompletedOnboarding] = useState(false);
@@ -108,7 +109,7 @@ function App() {
                 {/* Book list by category detail */}
                 <Route path="/bookbycategory/:id" element={<BookByCategoryDetail />} />
                 
-         
+                <Route path="/book-api-detail" element={<BookApiDetail />} />
               </Route>
 
                 {/* Route không có sidebar */}
@@ -128,6 +129,8 @@ function App() {
                {/* <Route path="/read-book" element={<ReadBook />} /> */}
                <Route path="/read" element={<ReadBook key={new Date().getTime()} />} />
                {/* <Route path="/read" element={<NoteReadBook />} /> */}
+
+              
 
               </Routes>
             )}
