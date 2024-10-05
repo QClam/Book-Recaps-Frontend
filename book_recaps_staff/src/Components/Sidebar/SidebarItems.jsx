@@ -2,7 +2,6 @@ import React from "react";
 
 import {
   Home,
-  Search,
   Bookmark,
   SpaceDashboard,
   BorderColor,
@@ -13,7 +12,8 @@ import {
   GifBox,
   LibraryBooks,
   Widgets,
-  Notes
+  Notes,
+  Groups
 } from "@mui/icons-material";
 
 export const SidebarItems = [
@@ -28,9 +28,9 @@ export const SidebarItems = [
     link: "/content",
   },
   {
-    title: "Note",
-    icon: <Notes />,
-    link: "/note",
+    title: "Quản lý người dùng",
+    icon: <Groups />,
+    link: "/users",
   },
   {
     title: "Cài đặt",

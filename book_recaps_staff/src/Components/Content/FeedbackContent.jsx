@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { ThreeDots } from 'react-loader-spinner';
 
 const FeedbackContent = ({ version_number }) => {
   const [noteData, setNoteData] = useState([]);
@@ -25,7 +26,16 @@ const FeedbackContent = ({ version_number }) => {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <ThreeDots
+    visible={true}
+    height="40"
+    width="40"
+    color="#306cce"
+    radius="9"
+    ariaLabel="three-dots-loading"
+    wrapperStyle={{}}
+    wrapperClass=""
+    />;
   }
 
   return (
