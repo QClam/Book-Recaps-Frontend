@@ -69,7 +69,7 @@ function ConfirmEmail() {
     // Open the confirmation link in a new tab
     window.open(confirmationLink, "_blank");
 
-    // After opening the link, wait for 5 seconds before showing SweetAlert
+    // After opening the link, wait for 3 seconds before showing SweetAlert
     setTimeout(() => {
       Swal.fire({
         title: "Email Confirmation",
@@ -79,7 +79,7 @@ function ConfirmEmail() {
       }).then(() => {
         navigate("/login"); // Redirect after SweetAlert is confirmed
       });
-    }, 5000); // Delay of 5 seconds
+    }, 3000);
   };
 
   return (
