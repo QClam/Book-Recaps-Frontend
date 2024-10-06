@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-
+import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3'
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import './App.css';
 import Onboarding from './Components/Onboarding/Onboarding';
@@ -43,6 +43,10 @@ import ExploreCategory from "./Components/Explore/ExploreCategory";
 import PopularBookDetail from "./Components/Explore/PopularBook/PopularBookDetail";
 import NoteReadBook from "./Components/TodayFreeRead/NoteReadBook/NoteReadBook";
 import BookApiDetail from "./Components/Explore/BookApi/BookApiDetail";
+import BookDetailItem from "./Components/Explore/BookApi/BookDetailItem";
+import AuthorApi from "./Components/Space/AuthorApi/AuthorApi";
+import RecapDetails from "./Components/ReadListenBook/RecapDetails";
+import Login from "./Components/Auth/Login";
 
 function App() {
   const [completedOnboarding, setCompletedOnboarding] = useState(false);
@@ -89,7 +93,8 @@ function App() {
                 <Route path="/book-trending-detail" element={<BookTrendingDetail />} />
                 <Route path="/library" element={<LibraryBook />} />
                 <Route path="/all-books" element={<AllBooks />} />
-                <Route path="/spaces" element={<AuthorBy />} />
+                <Route path="/author" element={<AuthorBy />} />
+                {/* <Route path="/author" element={<AuthorApi />} /> */}
                 {/*trong muc space co Author, Author by r bam vao hien ra list author */}
                 <Route path="/author-detail" element={<AuthorDetail />} />
                 {/* List author r bam vao xem detail author life bio */}
@@ -100,7 +105,7 @@ function App() {
 
                 <Route path="/highlights" element={<HighLight />} />
                 <Route path="/highlight-details" element={<HighlightDetails />} />
-                <Route path="/today" element={<BookFree />} />
+                <Route path="/books" element={<BookFree />} />
                 <Route path="/popular-books-detail" element={<PopularBookDetail />} />
                 <Route path="/book/:id" element={<BookDetail />} />
                 
@@ -110,6 +115,8 @@ function App() {
                 <Route path="/bookbycategory/:id" element={<BookByCategoryDetail />} />
                 
                 <Route path="/book-api-detail" element={<BookApiDetail />} />
+                <Route path="/book/:id" element={<BookDetailItem />} />
+                <Route path="/recap/:bookId" element={<RecapDetails />} /> {/* Route cho trang RecapDetails */}
               </Route>
 
                 {/* Route không có sidebar */}
@@ -130,7 +137,7 @@ function App() {
                <Route path="/read" element={<ReadBook key={new Date().getTime()} />} />
                {/* <Route path="/read" element={<NoteReadBook />} /> */}
 
-              
+              <Route path="/login" element={<Login />} />
 
               </Routes>
             )}
@@ -142,4 +149,15 @@ function App() {
   );
 }
 
-export default App;
+function AppWrapper() {
+  const recaptchaKey = import.meta.env.VITE_RECAPTCHA_KEY;
+  return (
+    <GoogleReCaptchaProvider reCaptchaKey={recaptchaKey}>
+     
+        <App />
+      
+    </GoogleReCaptchaProvider>
+  );
+}
+
+export default AppWrapper;

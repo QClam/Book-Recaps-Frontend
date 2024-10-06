@@ -16,7 +16,7 @@ export const SidebarItems = [
     {
         title: "Books",
         icon: <MenuBook />,  // Icon cho Books
-        link: "/today",
+        link: "/books",
     },
     {
         title: "Categories",  // Thêm title "Categories"
@@ -26,7 +26,7 @@ export const SidebarItems = [
     {
         title: "Author",
         icon: <Person />,  // Icon cho Author
-        link: "/spaces",
+        link: "/author",
     },
     {
         title: "Library",

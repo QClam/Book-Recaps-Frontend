@@ -1,6 +1,19 @@
 .lastest-container {
   width: 1000px;
   padding: 20px;
+  margin-left: 150px;
+}
+
+.lastest-container h2 {
+  font-size: 30px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.lastest-container p {
+  font-size: 20px;
+  text-align: center;
+  margin-bottom: 10px;
 }
 
 .lastest-item {

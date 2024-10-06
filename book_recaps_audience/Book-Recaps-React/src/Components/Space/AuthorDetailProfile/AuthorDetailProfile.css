@@ -1,0 +1,163 @@
+@charset "UTF-8";
+.author-profile-container {
+  width: 100%;
+  max-width: 700px; /* Increased width for a modern, card-centered look */
+  margin: 40px auto; /* Added margin for centering and breathing space */
+  padding: 30px;
+  background-color: #fafafa; /* Softer white for a neutral look */
+  border-radius: 15px; /* Softer and more modern corners */
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.05); /* Light shadow for a floating effect */
+  transition: box-shadow 0.3s ease-in-out; /* Smooth hover effect */
+}
+
+.author-profile-container:hover {
+  box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.1); /* Slight hover effect for depth */
+}
+
+.author-header {
+  display: flex;
+  flex-direction: column; /* Bố trí theo chiều dọc */
+  align-items: center; /* Canh giữa các phần tử */
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.author-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-bottom: 10px; /* Khoảng cách giữa ảnh và tên */
+  border: 3px solid #00d8a9;
+}
+
+.author-image img {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
+.author-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Canh giữa các thông tin */
+}
+
+.author-info h2 {
+  font-size: 28px;
+  color: #333;
+  font-weight: 600;
+  margin-bottom: 10px; /* Khoảng cách giữa tên tác giả và số người theo dõi */
+}
+
+.author-follow-details {
+  display: flex;
+  flex-direction: column; /* Bố trí số followers và nút follow theo chiều dọc */
+  align-items: center;
+  gap: 10px; /* Khoảng cách giữa số người theo dõi và nút follow */
+}
+
+.author-info p {
+  font-size: 16px;
+  color: #666; /* Subtle, light grey for description */
+}
+
+.followers-count {
+  font-size: 16px; /* Giữ kích thước chữ nhỏ hơn tên tác giả */
+  color: #666;
+}
+
+.follow-button {
+  background-color: #00d8a9;
+  color: #fff;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 50px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.follow-button:hover {
+  background-color: #00b28a;
+}
+
+.tabs {
+  display: flex;
+  justify-content: space-between; /* Tabs spread out evenly */
+  margin-bottom: 25px;
+  border-bottom: 2px solid #e5e5e5; /* Thin bottom border for tabs */
+  padding-bottom: 10px;
+}
+
+.tab-button {
+  background-color: transparent;
+  border: none;
+  padding: 10px 15px;
+  font-size: 16px;
+  cursor: pointer;
+  color: #777;
+  transition: color 0.3s ease, border-bottom 0.3s ease;
+  font-weight: 500;
+}
+
+.tab-button.active {
+  color: #00d8a9;
+  border-bottom: 2px solid #00d8a9; /* Active tab indicator */
+  font-weight: bold;
+}
+
+.tab-button:hover {
+  color: #333;
+}
+
+.tab-content {
+  background-color: #ffffff; /* Contrast background for content */
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0px 3px 12px rgba(0, 0, 0, 0.03); /* Light shadow for floating effect */
+  transition: all 0.3s ease;
+}
+
+.bio-section, .life-section {
+  margin-bottom: 20px;
+}
+
+.bio-section h3, .life-section h3 {
+  font-size: 24px;
+  margin-bottom: 12px;
+  color: #333;
+  font-weight: bold;
+}
+
+.bio-section p, .life-section p {
+  font-size: 18px;
+  color: #444;
+  line-height: 1.8; /* Better readability for longer paragraphs */
+}
+
+.books-list {
+  list-style-type: none;
+  padding-left: 0;
+  margin-top: 20px;
+}
+
+.books-list li {
+  font-size: 17px;
+  margin: 10px 0;
+  color: #333;
+  position: relative;
+  padding-left: 20px;
+}
+
+.books-list li::before {
+  content: "•"; /* Bullet points for the book list */
+  position: absolute;
+  left: 0;
+  top: 0;
+  color: #00d8a9;
+  font-size: 20px;
+}/*# sourceMappingURL=AuthorDetailProfile.css.map */
