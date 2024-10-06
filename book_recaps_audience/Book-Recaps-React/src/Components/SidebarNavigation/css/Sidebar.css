@@ -1,62 +1,111 @@
 .Sidebar {
   display: flex;
+  align-items: center; /* Aligns items vertically in the center */
+  justify-content: space-between; /* Ensures even spacing between sections */
+  height: 60px;
+  padding: 0 20px;
+}
+
+.Sidebar-bar {
+  display: flex;
   align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  background-color: transparent;
-  padding: 10px 20px;
+  flex: 1; /* Make the logo and the list take available space */
+}
+
+.SidebarLogo {
+  display: flex;
+  align-items: center;
+  margin-right: 30px; /* Adjust space between logo and list */
 }
 
 .SidebarLogo img {
   width: 50px;
-  height: 50px;
+  height: auto;
 }
 
 .SidebarList {
   display: flex;
-  flex-direction: row; /* Horizontal layout */
   align-items: center;
-  justify-content: flex-start;
+  list-style: none;
+  margin: 0;
   padding: 0;
-  margin-left: 20px;
 }
 
-.row {
+.SidebarList .row {
+  margin-right: 30px;
   display: flex;
   align-items: center;
-  margin-right: 30px;
-  list-style-type: none;
+  color: #fff;
   cursor: pointer;
-  transition: color 0.3s ease;
+  font-size: 16px;
+}
+
+.SidebarList .row.active {
+  border-bottom: 3px solid #f1c40f;
 }
 
 #icon {
   margin-right: 8px;
-  color: #ff6f61;
-  transition: color 0.3s ease;
 }
 
-#title {
-  font-size: 1rem;
-  color: #ff6f61;
+.filter-sectionme {
+  display: flex;
+  align-items: center;
+  margin-left: 30px; /* Ensures the search bar and user info align to the right */
+  width: 300px; /* This can be kept if you want the whole section to be that width */
 }
 
-.row:hover #icon, .row:hover #title {
-  color: #e64a19;
+.search-formme {
+  display: flex;
+  align-items: center;
+  width: 44.5cm; /* Set the width of the form to approximately 4.5cm */
+  background-color: #9ad6eb;
+  border-radius: 20px;
+  padding: 5px;
 }
 
-#active {
-  color: #ff6f61;
-  font-weight: bold;
+.search-inputme {
+  background: transparent;
+  border: none;
+  color: white;
+  outline: none;
+  padding: 7px; /* Minimal padding */
+  width: 200px; /* Ensure the input takes up the full width of the search form */
 }
 
-@media (max-width: 768px) {
-  .SidebarList {
-    flex-direction: column;
-  }
-
-  .row {
-    margin-right: 0;
-    margin-bottom: 10px;
-  }
+.search-buttonme {
+  background: none;
+  border: none;
+  color: white;
+  cursor: pointer;
 }
+
+.user-info {
+  display: flex;
+  align-items: center;
+  margin-left: 30px;
+}
+
+.iconHeader {
+  color: #f1c40f;
+  font-size: 20px;
+  margin: 0 30px;
+  cursor: pointer;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+}
+
+.user-name {
+  color: white;
+  font-size: 16px;
+  margin-right: 10px;
+}
+
+.user-avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+}/*# sourceMappingURL=Sidebar.css.map */

@@ -1,17 +1,35 @@
-.book-container {
+.book-container-trend {
   width: 1000px;
   padding: 20px;
+  margin-left: 130px;
+  margin-top: -70px;
 }
 
-.book-item {
+.book-container-trend h2 {
+  font-size: 30px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.book-container-trend p {
+  text-align: center;
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.book-item-trend {
   padding: 10px;
+  text-align: center;
+  margin-left: -40px;
 }
 
-.book-item img {
-  max-width: 100%;
-  height: auto;
-  background-size: cover;
-  background-position: center;
+.book-item-trend img {
+  width: 100%; /* Make image responsive */
+  max-width: 150px; /* Max width for larger screens */
+  height: auto; /* Adjust height proportionally */
+  -o-object-fit: cover;
+     object-fit: cover;
+  margin: 0 auto;
 }
 
 .book-item h3 {
@@ -20,7 +38,6 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  margin-right: 50px;
 }
 
 .book-item p {
@@ -54,4 +71,16 @@
 
 .slick-next {
   right: -60px !important;
+}
+
+/* Media queries for responsiveness */
+@media (max-width: 1024px) {
+  .book-container-trend {
+    max-width: 900px;
+  }
+}
+@media (max-width: 768px) {
+  .book-container-trend {
+    max-width: 700px;
+  }
 }/*# sourceMappingURL=BookTrending.css.map */

@@ -109,8 +109,10 @@
 
 .text-size-option {
   cursor: pointer;
-  font-size: 18px;
+  font-size: 10px;
   transition: transform 0.3s ease;
+  width: 23px;
+  height: 13px;
 }
 
 .text-size-option:hover {
@@ -174,6 +176,7 @@
   margin: 0;
   font-size: 18px;
   color: #555;
+  cursor: pointer;
 }
 
 .transcriptt {
@@ -182,6 +185,12 @@
   color: var(--text-color);
   margin-top: 20px;
   padding-bottom: 80px; /* Đảm bảo có đủ khoảng trống cho thanh audio */
+}
+
+.section-start-time {
+  font-weight: bold;
+  color: #444;
+  cursor: pointer;
 }
 
 .transcriptt-word {

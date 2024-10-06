@@ -1,7 +1,8 @@
+@charset "UTF-8";
 .book-library-container {
   padding: 20px;
-  margin-left: 250px;
-  padding: 20px;
+  margin-right: 250px;
+  padding: 30px;
 }
 @media (max-width: 768px) {
   .book-library-container {
@@ -30,11 +31,12 @@
 .book-library-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 20px;
+  gap: 1.5cm; /* Điều chỉnh khoảng cách giữa các quyển sách */
+  margin-left: 20px;
 }
 
 .book-library-card {
-  width: 150px;
+  width: 170px;
   height: 350px; /* Fixed height for uniformity */
   display: flex;
   flex-direction: column;
@@ -45,6 +47,7 @@
   background-color: #fff;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-left: 20px;
 }
 
 .book-library-image {

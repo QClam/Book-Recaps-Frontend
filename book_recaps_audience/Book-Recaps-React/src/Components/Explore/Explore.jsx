@@ -8,6 +8,7 @@ import ListCategory from './ListCategory/ListCategory';
 import CustomCategory from './NewCategory/Category';
 import BookApi from './BookApi/BookApi';
 import BookApiCategory from './BookApiCategory/BookApiCategory';
+import BookTrendingApi from './BookTrendingApi/BookTrendingApi';
 //import BookCarousel from '../ForYou/BookCarousel';
 
 const Explore = () => {
@@ -15,13 +16,14 @@ const Explore = () => {
         <div>
             {/* <SearchBook /> */}
             <BookApi />
-            <BookApiCategory />
-            <BookTrending />
-            <Categories />
+            <BookTrendingApi />
+            {/* <BookApiCategory /> */}
+            {/* <BookTrending /> */}
+            {/* <Categories /> */}
             <LatestBook />
             <Collection />
-            <ListCategory />
-            <CustomCategory />
+            {/* <ListCategory />
+            <CustomCategory /> */}
             {/* <BookCarousel /> */}
         </div>
     );

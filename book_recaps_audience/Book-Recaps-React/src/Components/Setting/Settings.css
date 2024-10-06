@@ -57,6 +57,10 @@ body {
   transition: color 0.3s, border-bottom 0.3s;
 }
 
+.settings-nav p {
+  margin-top: -1px;
+}
+
 .settings-nav li.active {
   color: #51c634;
   font-weight: bold;
