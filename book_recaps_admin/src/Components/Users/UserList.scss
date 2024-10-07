@@ -1,103 +1,209 @@
 /* Đặt cho container */
 .userlist-container {
-    margin: 0 auto;
-    padding: 20px;
-    width: 80vw;
+  margin: 0 auto;
+  padding: 20px;
+  width: 80vw;
 
-    .content-table {
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 
-        width: 100%;
-    
-        img {
-            border-radius: 50%;
-            width: 42px;
-            height: 42px;
-        }
-    
-        th:nth-child(2), th:nth-child(3) {
-            text-align: center;
-        }
-        
-        /* Căn phải cho cột "Năm sinh" */
-        th:nth-child(4) {
-            text-align: right;
-        }
-        
-        td:nth-child(2), td:nth-child(3) {
-            text-align: center;
-        }
-        
-        /* Căn phải cho cột "Năm sinh" */
-        td:nth-child(4) {
-            text-align: right;
-        }
+    .add-button {
+      margin-left: auto;
     }
+  }
+
+  .content-table {
+    width: 100%;
+
+    img {
+      border-radius: 50%;
+      width: 42px;
+      height: 42px;
+    }
+
+    th:nth-child(2),
+    th:nth-child(3),
+    th:nth-child(4) {
+      text-align: center;
+    }
+
+    /* Căn phải cho cột "Năm sinh" */
+    th:nth-child(5),
+    th:nth-child(6) {
+      text-align: right;
+    }
+
+    td:nth-child(2),
+    td:nth-child(3),
+    td:nth-child(4) {
+      text-align: center;
+    }
+
+    /* Căn phải cho cột "Năm sinh" */
+    td:nth-child(5),
+    td:nth-child(6) {
+      text-align: right;
+    }
+  }
 }
 
 .content-container {
-    // margin-left: 250px;
-    width: 100%;
-    padding: 20px;
+  // margin-left: 250px;
+  width: 100%;
+  padding: 20px;
 }
-  .content-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-  }
-  
-  .content-table th,
-  .content-table td {
-    // border: 1px solid #ddd;
-    padding: 12px;
-    text-align: left;
-  }
-  
-  .content-table th {
-    background-color: #f4f4f4;
-    font-weight: bold;
-  }
-  
+.content-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.content-table th,
+.content-table td {
+  // border: 1px solid #ddd;
+  padding: 12px;
+  text-align: left;
+}
+
+.content-table th {
+  background-color: #f4f4f4;
+  font-weight: bold;
+}
+
 //   .content-table tr:nth-child(even) {
 //     background-color: #f9f9f9;
 //   }
-  
-  // .content-table tr:hover {
-  //   background-color: #f1f1f1;
-  //   color: black;
-  // }
-  
-  .content-table th {
-    padding-top: 12px;
-    padding-bottom: 12px;
-    background-color: #1f1f1f;
-    // color: white;
+
+// .content-table tr:hover {
+//   background-color: #f1f1f1;
+//   color: black;
+// }
+
+.content-table th {
+  padding-top: 12px;
+  padding-bottom: 12px;
+  // background-color: #1f1f1f;
+  // color: white;
+}
+
+h2 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  transition: transform 0.3s ease; /* Smooth animation */
+
+  &:hover {
+    transform: scale(1.1); /* Scale the button to 110% */
   }
-  
-  h2 {
-    font-size: 24px;
-    margin-bottom: 20px;
-  }
-  
-  @media (max-width: 768px) {
-    .content-table th, .content-table td {
-      font-size: 14px;
-      padding: 8px;
+}
+
+.modal {
+  background: white;
+  padding: 20px;
+  width: 400px;
+  margin: auto;
+  border-radius: 8px;
+  box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+
+  form {
+    display: flex;
+    flex-direction: column;
+
+    input {
+      margin-bottom: 15px;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 100%;
+      box-sizing: border-box;
+
+      &::placeholder {
+        color: #888;
+      }
+    }
+
+    button {
+      padding: 10px 20px;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-right: 10px;
+      background-color: #007bff;
+      transition: transform 0.2s ease-in-out;
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+
+    .cancel-button {
+      background-color: #6c757d;
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: flex-end;
     }
   }
-  
+}
+
+.modal form .input-group {
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal form .input-group input {
+  width: 48%;
+}
+
+.modal-overlay {
+  background: rgba(0, 0, 0, 0.75);
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .content-table th,
+  .content-table td {
+    font-size: 14px;
+    padding: 8px;
+  }
+}
 
 /* Responsive cho màn hình nhỏ hơn */
 @media (max-width: 768px) {
-    th, td {
-        font-size: 12px;
-    }
+  th,
+  td {
+    font-size: 12px;
+  }
 
-    table {
-        font-size: 14px;
-    }
+  table {
+    font-size: 14px;
+  }
 
-    /* Tạo khả năng cuộn ngang cho bảng khi cần */
-    div {
-        overflow-x: auto;
-    }
+  /* Tạo khả năng cuộn ngang cho bảng khi cần */
+  div {
+    overflow-x: auto;
+  }
 }
