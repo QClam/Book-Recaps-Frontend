@@ -1,8 +1,10 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
-import "./Login.scss";
 import { useNavigate } from "react-router-dom";
+import { setupAxiosInterceptors } from "./AxiosInterceptors";
+
+import "./Login.scss";
 
 function Login() {
   const [isActive, setIsActive] = useState(false);
@@ -13,12 +15,15 @@ function Login() {
     password: "",
     confirmPassword: "",
     phoneNumber: "",
-
   });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const { executeRecaptcha } = useGoogleReCaptcha();
+
+  useEffect(() => {
+    setupAxiosInterceptors(navigate);
+  }, [navigate])
 
   const handleRegisterClick = () => {
     setIsActive(true);
@@ -31,13 +36,15 @@ function Login() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setRegisterForm({ ...registerForm, [name]: value });
+    setError(null);
     console.log(value);
   };
 
   const validateForm = () => {
     const fullNameRegex = /^[a-zA-ZÀ-ỹ\s]+$/; // Chỉ chấp nhận chữ cái và khoảng trắng
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Định dạng email hợp lệ
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/; // Mật khẩu chứa ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường, 1 số, và 1 ký tự đặc biệt
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/; // Mật khẩu chứa ít nhất 8 ký tự, 1 chữ hoa, 1 chữ thường, 1 số, và 1 ký tự đặc biệt
     const phoneRegex = /^\d{10,11}$/; // Số điện thoại gồm 10 hoặc 11 chữ số
 
     if (!fullNameRegex.test(registerForm.fullName)) {
@@ -51,7 +58,9 @@ function Login() {
     }
 
     if (!passwordRegex.test(registerForm.password)) {
-      setError("Mật khẩu phải chứa ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.");
+      setError(
+        "Mật khẩu phải chứa ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt."
+      );
       return false;
     }
 
@@ -82,8 +91,7 @@ function Login() {
     }
 
     try {
-
-      const token = await executeRecaptcha("signup")
+      const token = await executeRecaptcha("signup");
 
       const newUser = {
         fullName: registerForm.fullName,
@@ -116,8 +124,12 @@ function Login() {
       });
       setError(null);
     } catch (error) {
-        // Bắt lỗi và back-end trả về 
-      if (error.response && error.response.status === 400 && error.response.data.message) {
+      // Bắt lỗi và back-end trả về
+      if (
+        error.response &&
+        error.response.status === 400 &&
+        error.response.data.message
+      ) {
         // Kiểm tra thông báo lỗi
         setError("Email đã tồn tại, vui lòng sử dụng Email khác để đăng ký.");
       } else {
@@ -126,6 +138,9 @@ function Login() {
       }
     }
   };
+
+
+  
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -148,6 +163,11 @@ function Login() {
         }
       );
 
+      const { accessToken, refreshToken } = response.data.message.token;
+      localStorage.setItem("access_token", accessToken);
+      localStorage.setItem("refresh_token", refreshToken);
+      
+      navigate("/content")
       console.log("Login successfully", response.data);
     } catch (error) {
       setError("Đăng nhập thất bại", error);
@@ -215,7 +235,7 @@ function Login() {
               onFocus={() => setError(null)}
             />
             <button type="submit">Đăng ký</button>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {error && <p style={{ color: "red" }}>{error}</p>}
           </form>
         </div>
 
@@ -248,7 +268,7 @@ function Login() {
               onFocus={() => setError(null)}
             />
             <button type="submit">Đăng nhập</button>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+            {error && <p style={{ color: "red" }}>{error}</p>}
           </form>
         </div>
 
@@ -259,7 +279,12 @@ function Login() {
               <p>
                 Nhập thông tin cá nhân để sử dụng các chức năng của trang web
               </p>
-              <button className="hidden" id="login" onClick={handleLoginClick} onFocus={() => setError(null)}>
+              <button
+                className="hidden"
+                id="login"
+                onClick={handleLoginClick}
+                onFocus={() => setError(null)}
+              >
                 Đăng nhập
               </button>
             </div>
@@ -275,6 +300,14 @@ function Login() {
                 onFocus={() => setError(null)}
               >
                 Đăng ký
+              </button>
+              <button
+                className="hidden"
+                id="register"
+                // onClick={}
+                onFocus={() => setError(null)}
+              >
+                Refresh
               </button>
             </div>
           </div>

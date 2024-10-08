@@ -4,6 +4,7 @@ import { SidebarItems } from "./SidebarItems";
 
 import avatar from "../../data/avatar.png"
 import "../Sidebar/Sidebar.scss";
+import { Logout } from "@mui/icons-material";
 
 function Sidebar() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -12,6 +13,12 @@ function Sidebar() {
   const toggleSidebar = () => {
     setIsSidebarOpen(!isSidebarOpen);
   };
+
+  const handleLogout = () => {
+    localStorage.removeItem('access_token');
+
+    navigate("/login");
+  }
 
   return (
     <>
@@ -40,6 +47,10 @@ function Sidebar() {
               </li>
             );
           })}
+          <li onClick={handleLogout} className="row">
+                <div id="icon"><Logout /></div>
+                <div id="title">Đăng xuất</div>
+          </li>
         </ul>
       </div>
     </>

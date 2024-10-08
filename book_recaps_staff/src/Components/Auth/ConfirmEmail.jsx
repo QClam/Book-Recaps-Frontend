@@ -85,39 +85,43 @@ function ConfirmEmail() {
   return (
     <div>
       {loading ? (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <InfinitySpin
-            visible={true}
-            width="200"
-            color="#4fa94d"
-            ariaLabel="infinity-spin-loading"
-          />
-          <p>
-            Chúng tôi đang xác nhận Email {email}, vui lòng chờ trong giây
-            lát...
-          </p>
-          <p>
-            {confirmationLink ? (
-              <a
-                href={confirmationLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={handleLinkClick}
-                style={{ color: "blue", cursor: "pointer" }}
-              >
-                Bấm vào đây để xác nhận Email
-              </a>
-            ) : (
-              "Link not available"
-            )}
-          </p>{" "}
-          {/* Hyperlink for confirmation */}
+        <div>
+          <div>
+            <InfinitySpin
+              visible={true}
+              width="200"
+              color="#4fa94d"
+              ariaLabel="infinity-spin-loading"
+            />
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <p>
+              Chúng tôi đang xác nhận Email {email}, vui lòng chờ trong giây
+              lát...
+            </p>
+            <p>
+              {confirmationLink ? (
+                <a
+                  href={confirmationLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={handleLinkClick}
+                  style={{ color: "blue", cursor: "pointer" }}
+                >
+                  Bấm vào đây để xác nhận Email
+                </a>
+              ) : (
+                "Link not available"
+              )}
+            </p>{" "}
+            {/* Hyperlink for confirmation */}
+          </div>
         </div>
       ) : (
         <p>{message}</p>
