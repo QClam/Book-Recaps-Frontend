@@ -69,7 +69,7 @@ function ConfirmEmail() {
     // Open the confirmation link in a new tab
     window.open(confirmationLink, "_blank");
 
-    // After opening the link, wait for 5 seconds before showing SweetAlert
+    // After opening the link, wait for 3 seconds before showing SweetAlert
     setTimeout(() => {
       Swal.fire({
         title: "Email Confirmation",
@@ -79,45 +79,49 @@ function ConfirmEmail() {
       }).then(() => {
         navigate("/login"); // Redirect after SweetAlert is confirmed
       });
-    }, 5000); // Delay of 5 seconds
+    }, 3000);
   };
 
   return (
     <div>
       {loading ? (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <InfinitySpin
-            visible={true}
-            width="200"
-            color="#4fa94d"
-            ariaLabel="infinity-spin-loading"
-          />
-          <p>
-            Chúng tôi đang xác nhận Email {email}, vui lòng chờ trong giây
-            lát...
-          </p>
-          <p>
-            {confirmationLink ? (
-              <a
-                href={confirmationLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={handleLinkClick}
-                style={{ color: "blue", cursor: "pointer" }}
-              >
-                Bấm vào đây để xác nhận Email
-              </a>
-            ) : (
-              "Link not available"
-            )}
-          </p>{" "}
-          {/* Hyperlink for confirmation */}
+        <div>
+          <div>
+            <InfinitySpin
+              visible={true}
+              width="200"
+              color="#4fa94d"
+              ariaLabel="infinity-spin-loading"
+            />
+          </div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <p>
+              Chúng tôi đang xác nhận Email {email}, vui lòng chờ trong giây
+              lát...
+            </p>
+            <p>
+              {confirmationLink ? (
+                <a
+                  href={confirmationLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={handleLinkClick}
+                  style={{ color: "blue", cursor: "pointer" }}
+                >
+                  Bấm vào đây để xác nhận Email
+                </a>
+              ) : (
+                "Link not available"
+              )}
+            </p>{" "}
+            {/* Hyperlink for confirmation */}
+          </div>
         </div>
       ) : (
         <p>{message}</p>

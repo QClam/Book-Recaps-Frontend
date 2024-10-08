@@ -9,6 +9,8 @@ import ReviewNote from "./Components/Review/ReviewNote";
 import Login from "./Components/Auth/Login";
 import UsersList from "./Components/Users/UsersList";
 import ConfirmEmail from "./Components/Auth/ConfirmEmail";
+import PrivateRoute from "./Components/Auth/PrivateRoute";
+
 import "./App.css";
 
 function App() {
@@ -19,21 +21,20 @@ function App() {
     <main>
       {!isLoginPage && <Sidebar />}
       <Routes>
-        <Route path="/" element={<ContentList />} />
-        <Route path="/content" element={<ContentList />} />
-        <Route path="/overview" element={<Overview />} />
-        <Route path="/feedback" element={<FeedbackContent />} />
+        <Route path="/" element={<PrivateRoute> <ContentList /> </PrivateRoute>} />
+        <Route path="/content" element={<PrivateRoute> <ContentList /> </PrivateRoute>} />
+        <Route path="/overview" element={<PrivateRoute> <Overview /> </PrivateRoute>} />
+        <Route path="/feedback" element={<PrivateRoute> <FeedbackContent /> </PrivateRoute>} />
         <Route path="/login" element={<Login />} />
         <Route path="/auth/confirm-email" element={<ConfirmEmail />} />
-        <Route path="/users" element={<UsersList />} />
+        <Route path="/users" element={<PrivateRoute> <UsersList /> </PrivateRoute>} />
         <Route
           path="/review/content_version/:id"
-          element={<Review />}
-        />
+          element={<PrivateRoute> <Review /> </PrivateRoute>} />
         <Route
           path="/note/content_version/:id"
           element={
-            <ReviewNote />
+            <PrivateRoute> <ReviewNote /> </PrivateRoute>
           }
         />
       </Routes>
