@@ -5,6 +5,7 @@ import { Add } from "@mui/icons-material";
 import Modal from "react-modal";
 import Swal from "sweetalert2";
 
+import avatar from "../../data/avarta.png"
 import "./UserList.scss";
 import "../Loading.scss";
 
@@ -294,7 +295,7 @@ function UsersList() {
                 <td>{val.email}</td>
                 <td>
                   <img
-                    src="https://media.discordapp.net/attachments/817692367535472670/1251566810898366526/ugoira.png?ex=67020b2c&is=6700b9ac&hm=42e1d7007d833b36a4c7c9172abb1885e14645ce2012d376d3eaabcfdb8c60a7&=&format=webp&quality=lossless&width=750&height=500"
+                    src={avatar}
                     alt="avatar"
                     style={{ width: 70, height: 60 }}
                   />
