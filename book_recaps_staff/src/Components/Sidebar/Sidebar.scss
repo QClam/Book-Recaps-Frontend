@@ -8,7 +8,7 @@
     flex-direction: column;
     width: 240px;
     height: 100%;
-    background-color: #5c5c5c;
+    background-color: #f1f1f1;
     transition: transform 0.3s ease-in-out;
     transform: translateX(0); // Default sidebar visible
   
@@ -77,7 +77,7 @@
     &:hover {
       cursor: pointer;
       font-weight: bold;
-      background-color: #1f1f1f;
+      background-color: RGBA( 0, 255, 255, 0.2 );
       border-radius: 5px;
     }
   
@@ -94,7 +94,7 @@
   
     &#active {
       font-weight: bold;
-      background-color: #1f1f1f;
+      background-color: RGBA( 0, 255, 255, 0.2 );
       border-radius: 5px;
     //   width: 100px;
     }
