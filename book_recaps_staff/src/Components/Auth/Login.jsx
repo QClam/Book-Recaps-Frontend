@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { useNavigate } from "react-router-dom";
-import { setupAxiosInterceptors } from "./AxiosInterceptors";
 
 import "./Login.scss";
 
@@ -20,10 +19,6 @@ function Login() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
   const { executeRecaptcha } = useGoogleReCaptcha();
-
-  useEffect(() => {
-    setupAxiosInterceptors(navigate);
-  }, [navigate])
 
   const handleRegisterClick = () => {
     setIsActive(true);
@@ -300,14 +295,6 @@ function Login() {
                 onFocus={() => setError(null)}
               >
                 Đăng ký
-              </button>
-              <button
-                className="hidden"
-                id="register"
-                // onClick={}
-                onFocus={() => setError(null)}
-              >
-                Refresh
               </button>
             </div>
           </div>

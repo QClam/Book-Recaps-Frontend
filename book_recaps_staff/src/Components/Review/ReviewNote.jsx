@@ -54,7 +54,7 @@ function ReviewNote() {
   }, []);
 
   const handleRightClick = (e, sectionIndex, sentenceIndex) => {
-    e.preventDefault(); // Chặn menu chuột trái default của Broswer
+    e.preventDefault(); // Chặn menu chuột phải mặc định
     setSelectedIndex({ sectionIndex, sentenceIndex });
 
     const existingComment = comments.find(
@@ -69,8 +69,9 @@ function ReviewNote() {
       setCurrentComment("");
     }
 
-    setShowInput(true);
+    setShowInput(true); // Hiển thị ô nhập comment
   };
+
 
   // Thêm nhận xét
   const handleAddComment = async () => {
@@ -171,6 +172,7 @@ function ReviewNote() {
         { ...currentData, comments: updatedComments }
       );
       setComments(updatedComments);
+      setVisibleComment(false)
     } catch (error) {
       console.log("Error Deleting comment", error);
     }
@@ -229,75 +231,82 @@ function ReviewNote() {
       <p style={{ fontWeight: "bold" }}>Status: {content.status}</p>
       <br />
       <div>
-        {data.transcriptSections.map((section, sectionIndex) => (
-          <div key={sectionIndex}>
-            {section.transcriptSentences.map((sentence, sentenceIndex) => {
-              const hasComment = comments.find(
-                (comment) =>
-                  comment.section_index === sectionIndex &&
-                  comment.sentence_index === sentenceIndex &&
-                  comment.feedback
-              );
+      {data.transcriptSections.map((section, sectionIndex) => (
+  <div key={sectionIndex}>
+    <span>
+      {section.transcriptSentences.map((sentence, sentenceIndex) => {
+        const hasComment = comments.find(
+          (comment) =>
+            comment.section_index === sectionIndex &&
+            comment.sentence_index === sentenceIndex &&
+            comment.feedback
+        );
 
-              return (
-                <span
-                  key={sentenceIndex}
-                  id={`word-${sectionIndex}-${sentenceIndex}`}
-                  onContextMenu={(e) =>
-                    handleRightClick(e, sectionIndex, sentenceIndex)
-                  }
-                  style={{ cursor: "pointer", marginRight: "4px" }}
-                >
-                  {sentence.value.html + " "}
-                  {hasComment && (
-                    <>
-                      <span
-                        style={{ marginLeft: "2px", color: "#00aaff" }}
-                        onClick={(e) =>
-                          toggleCommentVisibility(
-                            sectionIndex,
-                            sentenceIndex,
-                            e
-                          )
-                        }
-                      >
-                        💬
-                      </span>
-                      <button
-                        onClick={() =>
-                          handleDeleteComment(sectionIndex, sentenceIndex)
-                        }
-                      >
-                        Xóa
-                      </button>
-                    </>
-                  )}
-                </span>
-              );
-            })}
-          </div>
-        ))}
+        return (
+          <span key={sentenceIndex}>
+            <span
+              id={`word-${sectionIndex}-${sentenceIndex}`}
+              onContextMenu={(e) =>
+                handleRightClick(e, sectionIndex, sentenceIndex)
+              }
+              style={{ cursor: "pointer", marginRight: "4px" }}
+            >
+              {sentence.value.html + " "}
+              {hasComment && (
+                <>
+                  <span
+                    style={{ marginLeft: "2px", color: "#00aaff" }}
+                    onClick={(e) =>
+                      toggleCommentVisibility(
+                        sectionIndex,
+                        sentenceIndex,
+                        e
+                      )
+                    }
+                  >
+                    💬
+                  </span>
+                </>
+              )}
+            </span>
+
+            {/* Hiển thị ô nhập comment dưới câu được chọn */}
+            {showInput &&
+              selectedIndex &&
+              selectedIndex.sectionIndex === sectionIndex &&
+              selectedIndex.sentenceIndex === sentenceIndex && (
+                <div>
+                  <textarea
+                    value={currentComment}
+                    onChange={(e) => setCurrentComment(e.target.value)}
+                    placeholder="Add a comment"
+                    style={{
+                      width: "50%",
+                      height: 60,
+                      marginTop: 10,
+                      backgroundColor: "#f1f1f1"
+                    }}
+                  />
+                  <div style={{ marginBottom: 10 }}>
+                    <button
+                      onClick={handleAddComment}
+                      style={{ marginRight: 10 }}
+                    >
+                      Add Comment
+                    </button>
+                    <button onClick={() => setShowInput(false)}>Cancel</button>
+                  </div>
+                </div>
+              )}
+          </span>
+        );
+      })}
+    </span>
+  </div>
+))}
       </div>
 
-      {showInput && (
-        <div>
-          <textarea
-            value={currentComment}
-            onChange={(e) => setCurrentComment(e.target.value)}
-            placeholder="Add a comment"
-            style={{
-              width: "50%",
-              height: 60,
-              marginTop: 10
-            }}
-          />
-          <div style={{marginBottom: 10}}>
-          <button onClick={handleAddComment} style={{marginRight: 10}}>Add Comment</button>
-          <button onClick={() => setShowInput(false)}>Cancel</button>
-          </div>
-        </div>
-      )}
-
+      
       {visibleComment && (
         <div>
           <div
@@ -323,6 +332,24 @@ function ReviewNote() {
               }
             </p>
           </div>
+          <button
+            onClick={() =>
+              handleDeleteComment(
+                visibleComment.section_index,
+                visibleComment.sentence_index
+              )
+            }
+            style={{
+              marginTop: "5px", backgroundColor: "red", color: "white", position: "absolute",
+              padding: "5px",
+              top: commentPosition.top + 50,
+              left: commentPosition.left,
+              zIndex: 1,
+              width: "auto",
+            }}
+          >
+            Xóa
+          </button>
         </div>
       )}
     </div>
