@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarItems } from "./SidebarItems";
 
-import avatar from "../../data/avatar.png"
+import avatar from "../../data/avarta.png"
 import "../Sidebar/Sidebar.scss";
+import { Logout } from "@mui/icons-material";
 
 function Sidebar() {
 
@@ -14,6 +15,12 @@ function Sidebar() {
     setIsSidebarOpen(!isSidebarOpen);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    navigate("/auth");
+  }
+
   return (
     <>
       <button className="sidebar-toggle" onClick={toggleSidebar}>
@@ -21,10 +28,10 @@ function Sidebar() {
       </button>
 
       <div className={`Sidebar ${isSidebarOpen ? "open" : ""}`}>
-      <div className="SidebarLogo">
-        <img src={avatar} alt="Pio NFT" />
-        <h2>Admin</h2>
-      </div>
+        <div className="SidebarLogo">
+          <img src={avatar} alt="Pio NFT" />
+          <h2>Admin</h2>
+        </div>
         <ul className="SidebarList">
           {SidebarItems.map((val, key) => {
             return (
@@ -42,6 +49,11 @@ function Sidebar() {
               </li>
             );
           })}
+
+          <li onClick={handleLogout} className="row">
+            <div id="icon"><Logout /></div>
+            <div id="title">Đăng xuất</div>
+          </li>
         </ul>
       </div>
     </>
