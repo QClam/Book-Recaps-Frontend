@@ -4,8 +4,9 @@ import { Hourglass } from "react-loader-spinner";
 import { Add } from "@mui/icons-material";
 import Modal from "react-modal";
 import Swal from "sweetalert2";
+import ReactPaginate from 'react-paginate';
 
-import avatar from "../../data/avarta.png"
+import api from '../Auth/AxiosInterceptors'
 import "./UserList.scss";
 import "../Loading.scss";
 
@@ -15,6 +16,9 @@ function UsersList() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalIsOpen, setModalIsOpen] = useState(false); // Modal visibility state
+  const [currentPage, setCurrentPage] = useState(0);
+  const usersPerPage = 5;
+
   const [error, setError] = useState(null); // Error state
   const [registerForm, setRegisterForm] = useState({
     fullName: "",
@@ -25,14 +29,21 @@ function UsersList() {
   });
   const [editingUserId, setEditingUserId] = useState(null);
 
+  const token = localStorage.getItem('access_token');
+
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios.get(
-          "https://66e3e75ed2405277ed124249.mockapi.io/users"
-        );
-        setUsers(response.data);
-        console.log("Users: ", response.data);
+        const response = await api.get('/users/getalluser', 
+          {
+              headers: {
+                  'accept' : "*/*",
+                  Authorization: `Bearer ${token}`
+              }
+          }
+      )
+      setUsers(response.data.$values);
+      console.log("Users: ", response.data);
       } catch (error) {
         console.log("Error fetching", error);
       } finally {
@@ -41,6 +52,11 @@ function UsersList() {
     };
     fetchUsers();
   }, []);
+
+  const displayUsers = users.slice(currentPage * usersPerPage, (currentPage + 1) * usersPerPage);
+  const handlePageClick = (data) => {
+      setCurrentPage(data.selected);
+  }
 
   const validateForm = () => {
     const fullNameRegex = /^[a-zA-ZÀ-ỹ\s]+$/;
@@ -289,13 +305,13 @@ function UsersList() {
             </tr>
           </thead>
           <tbody>
-            {users.map((val) => (
+            {displayUsers.map((val) => (
               <tr key={val.id}>
                 <td>{val.fullName}</td>
                 <td>{val.email}</td>
                 <td>
                   <img
-                    src={avatar}
+                    src={val.imageUrl}
                     alt="avatar"
                     style={{ width: 70, height: 60 }}
                   />
@@ -323,7 +339,18 @@ function UsersList() {
             ))}
           </tbody>
         </table>
-      </div>
+      </div>  
+      <ReactPaginate
+                prevPageRel={'Previous'}
+                nextLabel={'Next'}
+                breakLabel={'...'}
+                pageCount={Math.ceil(users.length / usersPerPage)} // Tổng trang 
+                marginPagesDisplayed={2}
+                pageRangeDisplayed={3}
+                onPageChange={handlePageClick}
+                containerClassName={'pagination'}
+                activeClassName={'active'}
+            />
     </div>
   );
 }

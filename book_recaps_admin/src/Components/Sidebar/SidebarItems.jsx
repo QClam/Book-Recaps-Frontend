@@ -37,9 +37,4 @@ export const SidebarItems = [
         icon: <Settings />,
         link: "/settings",
     },
-    {
-        title: "Đăng xuất",
-        icon: <Logout />,
-        link: "/logout",
-    },
 ];
