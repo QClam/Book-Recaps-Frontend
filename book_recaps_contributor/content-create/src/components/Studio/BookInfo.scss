@@ -1,0 +1,39 @@
+.book-info-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .book-info-container h2 {
+    text-align: center;
+  }
+  
+  .book-info-container label {
+    display: block;
+    margin-bottom: 10px;
+  }
+  
+  .book-info-container input,
+  .book-info-container textarea,
+  .book-info-container select {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    border: 1px solid #ccc;
+  }
+  
+  .book-info-container button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    display: block;
+    width: 100%;
+  }
+  
+  .book-info-container button:hover {
+    background-color: #0056b3;
+  }
+  

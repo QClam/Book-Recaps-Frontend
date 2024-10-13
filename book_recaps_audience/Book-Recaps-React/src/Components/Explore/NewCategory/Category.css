@@ -1,0 +1,109 @@
+@charset "UTF-8";
+.custom-category-wrapper {
+  padding: 20px;
+  font-family: "Arial", sans-serif;
+}
+.custom-category-wrapper .custom-category-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  margin-left: 20px;
+}
+.custom-category-wrapper .custom-category-header .custom-title {
+  font-size: 2rem;
+  color: #fff;
+  background-color: #4caf50;
+  padding: 10px 20px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  margin-bottom: 10px;
+}
+.custom-category-wrapper .custom-category-header .custom-category-buttons {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 1.5cm;
+  overflow-x: auto;
+  width: 100%;
+}
+.custom-category-wrapper .custom-category-header .custom-category-buttons .custom-button {
+  background-color: #ffeb3b;
+  color: #333;
+  border: 2px solid #ff9800;
+  border-radius: 20px;
+  padding: 8px 12px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+.custom-category-wrapper .custom-category-header .custom-category-buttons .custom-button:hover {
+  background-color: #f57c00;
+  color: white;
+  transform: scale(1.1);
+}
+.custom-category-wrapper .custom-category-header .custom-category-buttons .custom-button.active {
+  background-color: #ff5722;
+  color: white;
+}
+.custom-category-wrapper .custom-books-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* Đảm bảo có 4 cuốn sách mỗi hàng */
+  gap: 20px; /* Khoảng cách giữa các cuốn sách */
+  padding-bottom: 20px;
+}
+.custom-category-wrapper .custom-books-grid .custom-book-card {
+  background-color: #fff;
+  padding: 10px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: pointer;
+  overflow: hidden;
+  width: 4cm; /* Chiều rộng */
+  height: 5cm; /* Chiều dài */
+}
+.custom-category-wrapper .custom-books-grid .custom-book-card:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
+}
+.custom-category-wrapper .custom-books-grid .custom-book-card .custom-book-image {
+  width: 100%;
+  height: 70%; /* 70% chiều cao cho hình ảnh */
+  -o-object-fit: cover;
+     object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+.custom-category-wrapper .custom-books-grid .custom-book-card .custom-book-details {
+  text-align: center;
+}
+.custom-category-wrapper .custom-books-grid .custom-book-card .custom-book-details .custom-book-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.custom-category-wrapper .custom-books-grid .custom-book-card .custom-book-details .custom-book-author {
+  font-size: 0.8rem;
+  color: #777;
+}
+.custom-category-wrapper .custom-books-grid .custom-book-card .custom-book-rating {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  margin-top: 5px;
+}
+.custom-category-wrapper .custom-books-grid .custom-book-card .custom-book-rating .custom-heart {
+  color: red;
+  font-size: 1rem;
+}
+.custom-category-wrapper .custom-books-grid .custom-book-card .custom-book-rating .custom-rating-number {
+  background-color: #ffd700;
+  padding: 3px 6px;
+  border-radius: 5px;
+  font-size: 0.8rem;
+}/*# sourceMappingURL=Category.css.map */

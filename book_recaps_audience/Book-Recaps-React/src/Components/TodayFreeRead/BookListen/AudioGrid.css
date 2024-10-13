@@ -1,0 +1,167 @@
+@charset "UTF-8";
+.audio-grid-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background-color: #fdf8f4;
+  position: relative;
+  overflow: hidden;
+}
+
+.header-section {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+}
+
+.book-cover {
+  width: 100px;
+  height: 150px;
+  -o-object-fit: cover;
+     object-fit: cover;
+  margin-right: 15px;
+}
+
+.title-section h2 {
+  font-size: 1.5em;
+  margin: 0;
+}
+
+.title-section h3 {
+  font-size: 1.2em;
+  color: #555;
+}
+
+.transcript-area {
+  flex-grow: 1;
+  overflow-y: scroll; /* Cho phép cuộn dọc mà không hiển thị thanh cuộn */
+  padding: 20px;
+  background-color: #fff;
+  border-top: 1px solid #ddd;
+  position: relative;
+  height: calc(100vh - 180px); /* Điều chỉnh chiều cao của transcript */
+  scroll-behavior: smooth; /* Tạo hiệu ứng cuộn mượt */
+}
+
+/* Đảm bảo không có giới hạn cứng cho chiều cao */
+.transcript-area::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  pointer-events: none;
+}
+
+/* Ẩn thanh cuộn trên trình duyệt WebKit (Chrome, Safari) */
+.transcript-area::-webkit-scrollbar {
+  display: none;
+}
+
+/* Ẩn thanh cuộn trên Firefox */
+.transcript-area {
+  scrollbar-width: none;
+}
+
+/* Nổi bật phần transcript khi đang được đọc */
+.transcript-part.active {
+  background-color: #f0f8ff;
+  transition: background-color 0.3s ease;
+}
+
+/* Hover mượt mà hơn khi người dùng rê chuột lên từ */
+.transcript-word:hover {
+  background-color: #f3e8c2;
+  transition: background-color 0.2s ease;
+}
+
+.section-start-time {
+  font-weight: bold;
+  color: #444;
+  cursor: pointer;
+}
+
+.transcript-word {
+  cursor: pointer;
+  padding: 0 2px;
+}
+
+/* Highlight của audio đang phát */
+.highlighted-word {
+  background-color: #cce9e2; /* Màu highlight của audio */
+}
+
+/* Highlight thủ công */
+.manually-highlighted-word {
+  background-color: yellow; /* Màu highlight thủ công */
+  color: black;
+}
+
+.transcript-word:hover {
+  background-color: #f3e8c2;
+}
+
+.transcript-area::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100px;
+  pointer-events: none;
+}
+
+.controls-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3);
+}
+
+.audio-player {
+  width: 100%;
+  height: 50px;
+  background-color: #242424;
+  color: white;
+}
+
+.loop-toggle {
+  background-color: transparent;
+  border: none;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.context-menu {
+  position: fixed;
+  background-color: white;
+  border: 1px solid #ccc;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+}
+
+.context-menu button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px 10px;
+  text-align: center;
+  display: flex;
+  align-items: center;
+}
+
+.context-menu button:hover {
+  background-color: #eee;
+}
+
+.context-menu .icon {
+  margin-right: 5px;
+}/*# sourceMappingURL=AudioGrid.css.map */

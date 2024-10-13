@@ -1,0 +1,94 @@
+@charset "UTF-8";
+.book-library-container {
+  padding: 20px;
+  margin-right: 250px;
+  padding: 30px;
+}
+@media (max-width: 768px) {
+  .book-library-container {
+    margin-left: 200px;
+  }
+}
+@media (max-width: 480px) {
+  .book-library-container {
+    margin-left: 150px;
+  }
+}
+
+.book-library-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.book-library-see-all {
+  font-size: 14px;
+  text-decoration: none;
+  color: #007BFF;
+}
+
+.book-library-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1.5cm; /* Điều chỉnh khoảng cách giữa các quyển sách */
+  margin-left: 20px;
+}
+
+.book-library-card {
+  width: 170px;
+  height: 350px; /* Fixed height for uniformity */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  text-align: center;
+  padding: 10px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  margin-left: 20px;
+}
+
+.book-library-image {
+  width: 100px;
+  height: 150px;
+  -o-object-fit: cover;
+     object-fit: cover;
+}
+
+.book-library-title {
+  font-size: 16px;
+  margin: 10px 0 5px;
+  height: 40px; /* Fixed height to ensure alignment */
+  overflow: hidden;
+}
+
+.book-library-author {
+  font-size: 14px;
+  color: gray;
+  margin: 0;
+  height: 20px; /* Fixed height for alignment */
+  overflow: hidden;
+}
+
+.book-library-description {
+  font-size: 12px;
+  color: #333;
+  margin: 5px 0 10px;
+  height: 60px; /* Fixed height for alignment */
+  overflow: hidden;
+}
+
+.book-library-details {
+  display: flex;
+  justify-content: space-around;
+  font-size: 12px;
+  width: 100%;
+  padding-top: 10px;
+}
+
+.book-library-finished {
+  margin-top: 20px;
+  text-align: center;
+}/*# sourceMappingURL=AllBooks.css.map */

@@ -75,9 +75,11 @@ function ContentList() {
                 <td>{truncateText(val.description, 100)}</td>
                 <td>{new Date(val.created_at).toLocaleDateString()}</td>
                 <td>
-                  <Link to={`/review/content_version/${val.id}`}>
+                  <button className="button" style={{ backgroundColor: "green" }}>
+                  <Link to={`/review/content_version/${val.id}`} style={{color: "white"}}>
                     Duyệt
                   </Link>
+                  </button>
                 </td>
                 <td>{val.status}</td>
               </tr>

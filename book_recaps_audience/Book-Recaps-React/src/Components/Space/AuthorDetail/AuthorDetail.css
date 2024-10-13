@@ -1,0 +1,82 @@
+.author-detail-container {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  padding: 20px;
+}
+
+.author-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 200px; /* Adjust width to fit the design */
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  gap: 10px;
+  transition: transform 0.3s ease;
+}
+.author-card:hover {
+  transform: scale(1.05); /* Add hover effect for visual appeal */
+}
+.author-card .author-image {
+  width: 100px; /* Ensure all images have a consistent size */
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.author-card .author-image img {
+  width: 100%;
+  height: 100%;
+  -o-object-fit: cover;
+     object-fit: cover; /* Ensure images maintain aspect ratio */
+}
+.author-card .author-info {
+  text-align: center;
+}
+.author-card .author-info h3 {
+  margin: 0;
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #333;
+}
+.author-card .author-info p {
+  margin: 5px 0;
+  color: #666;
+  font-size: 0.9em;
+}
+.author-card .author-info .author-genres {
+  display: flex;
+  justify-content: center;
+  gap: 5px;
+}
+.author-card .author-info .author-genres .genre {
+  background-color: #f0f0f0;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-size: 0.8em;
+  color: #555;
+}
+.author-card .author-info .author-genres .more-genres {
+  color: #888;
+  font-size: 0.9em;
+  cursor: pointer;
+}
+.author-card .subscribe-button {
+  background-color: #f1f1f1;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 20px;
+  font-size: 1em;
+  color: #333;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.author-card .subscribe-button:hover {
+  background-color: #ddd; /* Button hover effect */
+}/*# sourceMappingURL=AuthorDetail.css.map */

@@ -1,0 +1,109 @@
+.draft-book-container {
+    font-family: Arial, sans-serif;
+    color: #333;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .draft-book-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .deepstash-logo {
+    width: 150px;
+  }
+  
+  .feedback-button, .exit-studio-button {
+    background-color: #f1f1f1;
+    border: none;
+    padding: 10px;
+    margin-left: 10px;
+    cursor: pointer;
+  }
+  
+  .user-avatar {
+    margin-left: auto;
+  }
+  
+  .user-avatar-image {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+  }
+  
+  .book-detail-section {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .book-cover img {
+    width: 150px;
+    border-radius: 10px;
+  }
+  
+  .book-info {
+    margin-left: 20px;
+  }
+  
+  .book-info h1 {
+    font-size: 24px;
+    margin-bottom: 10px;
+  }
+  
+  .book-info p {
+    color: #888;
+    margin-bottom: 20px;
+  }
+  
+  .publish-button {
+    background-color: #888;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .more-options-button {
+    background-color: transparent;
+    border: none;
+    font-size: 18px;
+    margin-left: 10px;
+    cursor: pointer;
+  }
+  
+  .add-context-section {
+    margin-top: 20px;
+  }
+  
+  .add-context-section textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    resize: none;
+    margin-bottom: 10px;
+  }
+  
+  .context-options {
+    display: flex;
+    justify-content: space-around;
+  }
+  
+  .context-option {
+    background-color: #f1f1f1;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .context-option i {
+    margin-right: 5px;
+  }
+  

@@ -1,0 +1,59 @@
+.book-container-trend {
+    padding: 20px;
+    // background-color: #f7f7f7;
+    text-align: center;
+    margin-top: 30px;
+    
+    h2 {
+      font-size: 2.5rem;
+      color: #4a4a4a;
+      margin-bottom: 10px;
+    }
+  
+    p {
+      font-size: 1.2rem;
+      color: #888;
+      margin-bottom: 30px;
+    }
+    
+  
+    .book-item-trend {
+        width: 270px;  // Set a fixed width
+        height: 350px; // Set a fixed height to make all containers equal
+        padding: 20px;
+        border-radius: 10px;
+        //box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between; // Ensures equal space distribution
+        align-items: center; // Centers content
+        margin-right: 20px;  
+  
+      &:hover {
+        transform: translateY(-10px);
+       // box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.2);
+      }
+  
+      img {
+        width: 150px;
+        height: 200px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 15px;
+      }
+  
+      h3 {
+        font-size: 1.3rem;
+        color: #333;
+        margin-bottom: 10px;
+      }
+  
+      p {
+        font-size: 1rem;
+        color: #666;
+      }
+    }
+  }
+  
