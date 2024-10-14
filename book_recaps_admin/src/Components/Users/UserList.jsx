@@ -4,11 +4,11 @@ import { Hourglass } from "react-loader-spinner";
 import { Add } from "@mui/icons-material";
 import Modal from "react-modal";
 import Swal from "sweetalert2";
-import ReactPaginate from 'react-paginate';
 
 import api from '../Auth/AxiosInterceptors'
 import "./UserList.scss";
 import "../Loading.scss";
+import Pagination from '@mui/material/Pagination';
 
 Modal.setAppElement("#root"); // Set the root element for the modal
 
@@ -16,7 +16,8 @@ function UsersList() {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [modalIsOpen, setModalIsOpen] = useState(false); // Modal visibility state
-  const [currentPage, setCurrentPage] = useState(0);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isDarkMode, setIsDarkMode] = useState(true); // State to toggle dark mode
   const usersPerPage = 5;
 
   const [error, setError] = useState(null); // Error state
@@ -31,32 +32,33 @@ function UsersList() {
 
   const token = localStorage.getItem('access_token');
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await api.get('/users/getalluser', 
-          {
-              headers: {
-                  'accept' : "*/*",
-                  Authorization: `Bearer ${token}`
-              }
+  const fetchUsers = async () => {
+    try {
+      const response = await api.get('/users/getalluser',
+        {
+          headers: {
+            'accept': "*/*",
+            Authorization: `Bearer ${token}`
           }
+        }
       )
       setUsers(response.data.$values);
       console.log("Users: ", response.data);
-      } catch (error) {
-        console.log("Error fetching", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+    } catch (error) {
+      console.log("Error fetching", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
     fetchUsers();
   }, []);
 
-  const displayUsers = users.slice(currentPage * usersPerPage, (currentPage + 1) * usersPerPage);
-  const handlePageClick = (data) => {
-      setCurrentPage(data.selected);
-  }
+  const displayUsers = users.slice((currentPage - 1) * usersPerPage, currentPage * usersPerPage); // Adjust slicing for 1-based page indexing
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
 
   const validateForm = () => {
     const fullNameRegex = /^[a-zA-ZÀ-ỹ\s]+$/;
@@ -153,7 +155,7 @@ function UsersList() {
     }
   };
 
-  const handleDeleteUser = async (id) => {
+  const handleDeleteUser = async (userId) => {
     Swal.fire({
       title: "Bạn có chắc chắn muốn xóa?",
       text: "Bạn không thể hoàn tác hành động này!",
@@ -166,11 +168,27 @@ function UsersList() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          await axios.delete(
-            `https://66e3e75ed2405277ed124249.mockapi.io/users/${id}`
+          const response = await axios.delete(
+            `https://160.25.80.100:7124/api/users/delete-user-account`, // Adjusted the URL
+            {
+              headers: {
+                accept: "*/*",
+                Authorization: `Bearer ${token}`,
+              },
+              params: {
+                userId: userId, // Pass the userId as a query parameter
+              },
+            }
           );
-          setUsers(users.filter((user) => user.id !== id));
-          Swal.fire("Đã xóa!", "Người dùng đã được xóa", "success");
+          
+          if (response && response.status === 200) {
+            setUsers(users.filter((user) => user.userId !== userId));
+            Swal.fire("Đã xóa!", "Người dùng đã được xóa", "success");
+            fetchUsers();
+          } else {
+            console.error("Unexpected response:", response);
+            Swal.fire("Thất bại", "Có lỗi xảy ra trong quá trình xóa", "error");
+          }
         } catch (error) {
           console.error("Error deleting user: ", error);
           Swal.fire("Thất bại", "Có lỗi xảy ra trong quá trình xóa", "error");
@@ -235,13 +253,13 @@ function UsersList() {
               }
             />
             <input
-            type="text"
-            placeholder="Số điện thoại"
-            value={registerForm.phoneNumber}
-            onChange={(e) =>
-              setRegisterForm({ ...registerForm, phoneNumber: e.target.value })
-            }
-          />
+              type="text"
+              placeholder="Số điện thoại"
+              value={registerForm.phoneNumber}
+              onChange={(e) =>
+                setRegisterForm({ ...registerForm, phoneNumber: e.target.value })
+              }
+            />
           </div>
           <div className="input-group">
             <input
@@ -264,15 +282,15 @@ function UsersList() {
               }
             />
           </div>
-             <input
-              type="email"
-              placeholder="Email"
-              value={registerForm.email}
-              onChange={(e) =>
-                setRegisterForm({ ...registerForm, email: e.target.value })
-              }
-            />
-          
+          <input
+            type="email"
+            placeholder="Email"
+            value={registerForm.email}
+            onChange={(e) =>
+              setRegisterForm({ ...registerForm, email: e.target.value })
+            }
+          />
+
           {error && <p className="error">{error}</p>}
           <div className="button-container">
             <button
@@ -339,18 +357,33 @@ function UsersList() {
             ))}
           </tbody>
         </table>
-      </div>  
-      <ReactPaginate
-                prevPageRel={'Previous'}
-                nextLabel={'Next'}
-                breakLabel={'...'}
-                pageCount={Math.ceil(users.length / usersPerPage)} // Tổng trang 
-                marginPagesDisplayed={2}
-                pageRangeDisplayed={3}
-                onPageChange={handlePageClick}
-                containerClassName={'pagination'}
-                activeClassName={'active'}
-            />
+      </div>
+      
+        <Pagination
+          className='center'
+          count={Math.ceil(users.length / usersPerPage)} // Total number of pages
+          page={currentPage} // Current page
+          onChange={handlePageChange} // Handle page change
+          color="primary" // Styling options
+          showFirstButton
+          showLastButton
+          sx={{
+            '& .MuiPaginationItem-root': { 
+                color: isDarkMode ? '#fff' : '#000', // Change text color based on theme
+                backgroundColor: isDarkMode ? '#555' : '#f0f0f0', // Button background color based on theme
+            },
+            '& .MuiPaginationItem-root.Mui-selected': { 
+                backgroundColor: isDarkMode ? '#306cce' : '#72a1ed', // Change color of selected page button
+                color: '#fff', // Ensure selected text is white for contrast
+            },
+            '& .MuiPaginationItem-root.Mui-selected:hover': {
+                backgroundColor: isDarkMode ? '#2057a4' : '#5698d3', // Color on hover for selected button
+            },
+            '& .MuiPaginationItem-root:hover': {
+                backgroundColor: isDarkMode ? '#666' : '#e0e0e0', // Color on hover for non-selected buttons
+            },
+        }}
+        />
     </div>
   );
 }
