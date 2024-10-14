@@ -318,6 +318,7 @@ function UsersList() {
               <th>Email</th>
               <th>Ảnh Đại Diện</th>
               <th>Số Điện Thoại</th>
+              <th>Ngày Sinh</th>
               <th></th>
               <th></th>
             </tr>
@@ -335,6 +336,7 @@ function UsersList() {
                   />
                 </td>
                 <td>{val.phoneNumber}</td>
+                <td>{val.birthDate}</td>
                 <td>
                   <button
                     className="button"
