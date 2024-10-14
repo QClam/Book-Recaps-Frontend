@@ -13,7 +13,6 @@ import PrivateRoute from "./Components/Auth/PrivateRoute";
 
 import "./App.css";
 import axios from "axios";
-import BookApi from "./Components/Book/Book";
 
 function App() {
   const location = useLocation();
@@ -126,7 +125,6 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/auth/confirm-email" element={<ConfirmEmail />} />
         <Route path="/users" element={<PrivateRoute> <UsersList /> </PrivateRoute>} />
-        <Route path="/for-you" element={<PrivateRoute> <BookApi /> </PrivateRoute>} />
         <Route
           path="/review/content_version/:id"
           element={<PrivateRoute> <Review /> </PrivateRoute>} />

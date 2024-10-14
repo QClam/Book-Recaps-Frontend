@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import ReactPaginate from 'react-paginate';
-import { Hourglass } from 'react-loader-spinner'
-import api from '../Auth/AxiosInterceptors'
+import { Hourglass } from 'react-loader-spinner';
+import api from '../Auth/AxiosInterceptors';
+import Pagination from '@mui/material/Pagination'; // Import MUI Pagination
 
-import './UsersList.scss'
-import '../Loading.scss'
+import './UsersList.scss';
+import '../Loading.scss';
 
 function UsersList() {
 
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true); // Start loading as true
-    const [currentPage, setCurrentPage] = useState(0);
+    const [currentPage, setCurrentPage] = useState(1); // MUI Pagination uses 1-based indexing
     const usersPerPage = 5;
 
     const token = localStorage.getItem('access_token');
@@ -19,14 +19,14 @@ function UsersList() {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await api.get('/users/getalluser', 
+                const response = await api.get('/users/getalluser',
                     {
                         headers: {
-                            'accept' : "*/*",
+                            'accept': "*/*",
                             Authorization: `Bearer ${token}`
                         }
                     }
-                )
+                );
                 setUsers(response.data.$values);
                 console.log("Users: ", response.data);
             } catch (error) {
@@ -34,14 +34,14 @@ function UsersList() {
             } finally {
                 setLoading(false);
             }
-        }
+        };
         fetchUsers();
     }, [users]);
 
-    const displayUsers = users.slice(currentPage * usersPerPage, (currentPage + 1) * usersPerPage);
-    const handlePageClick = (data) => {
-        setCurrentPage(data.selected);
-    }
+    const displayUsers = users.slice((currentPage - 1) * usersPerPage, currentPage * usersPerPage); // Adjust slicing for 1-based page indexing
+    const handlePageChange = (event, value) => {
+        setCurrentPage(value);
+    };
 
     if (loading) {
         return (
@@ -88,19 +88,17 @@ function UsersList() {
                     </tbody>
                 </table>
             </div>
-            <ReactPaginate
-                prevPageRel={'Previous'}
-                nextLabel={'Next'}
-                breakLabel={'...'}
-                pageCount={Math.ceil(users.length / usersPerPage)} // Tổng trang 
-                marginPagesDisplayed={2}
-                pageRangeDisplayed={3}
-                onPageChange={handlePageClick}
-                containerClassName={'pagination'}
-                activeClassName={'active'}
+            <Pagination
+                className='center'
+                count={Math.ceil(users.length / usersPerPage)} // Total number of pages
+                page={currentPage} // Current page
+                onChange={handlePageChange} // Handle page change
+                color="primary" // Styling options
+                showFirstButton
+                showLastButton
             />
         </div>
-    )
+    );
 }
 
-export default UsersList
+export default UsersList;
