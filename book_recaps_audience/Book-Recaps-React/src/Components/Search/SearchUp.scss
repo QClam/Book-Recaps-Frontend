@@ -1,0 +1,181 @@
+$data-filter-bg: #f7f7f7;
+$sidebar-bg: #fff;
+$border-color: #e6e6e6;
+$blue: #007bff;
+
+.data-filter-container {
+  width: 400px;
+  background-color: $sidebar-bg;
+  border: 1px solid $border-color;
+  border-radius: 8px;
+  padding: 20px;
+  font-family: Arial, sans-serif;
+  margin-left: 800px;
+  position: relative; /* Ensure relative positioning for dropdown */
+  overflow: visible; 
+}
+.book-results {
+  position: absolute; /* Đặt kết quả tìm kiếm phía trên */
+  top: 100px; /* Khoảng cách từ phía trên của container */
+  left: 0;
+  right: 0;
+  z-index: 1000; /* Đảm bảo kết quả tìm kiếm nằm trên các lớp khác */
+  background-color: white; /* Màu nền của kết quả */
+  border: 1px solid $border-color; /* Đường viền cho phần kết quả */
+  border-radius: 8px;
+  max-height: 400px; /* Giới hạn chiều cao của khối kết quả */
+  overflow-y: auto; /* Thêm thanh cuộn nếu kết quả vượt quá chiều cao */
+  padding: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Đổ bóng cho khối kết quả */
+}
+
+.book-item {
+  padding: 10px;
+  border-bottom: 1px solid $border-color;
+
+  &:last-child {
+    border-bottom: none; /* Loại bỏ viền dưới của phần tử cuối cùng */
+  }
+
+  h3 {
+    font-size: 16px;
+    margin-bottom: 5px;
+    color: #333;
+  }
+
+  p {
+    font-size: 14px;
+    color: #666;
+  }
+
+  img {
+    width: 60px;
+    height: auto;
+    margin-top: 5px;
+  }
+}
+
+.filter-content {
+  display: flex;
+  z-index: 999; /* Đảm bảo thanh filter nằm dưới */
+}
+
+.filter-header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  margin-right: 20px;
+
+  h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333;
+  }
+
+  .search-filter-input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid $border-color;
+    font-size: 14px;
+    background-color: $data-filter-bg;
+    z-index: 10; 
+  }
+}
+
+// .filter-content {
+//   display: flex;
+// }
+
+.filter-sidebar {
+  flex: 1;
+  background-color: $sidebar-bg;
+  border-right: 1px solid $border-color;
+  padding-right: 20px;
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    
+    li {
+      padding: 10px 0;
+      cursor: pointer;
+      font-size: 14px;
+      color: #333;
+
+      &:hover {
+        color: $blue;
+      }
+
+      &.active {
+        color: $blue;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+.filter-main {
+  flex: 2;
+  padding-left: 20px;
+
+  h4 {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 15px;
+    color: #333;
+  }
+
+  .filter-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+
+    .filter-option {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      
+      input {
+        margin-right: 8px;
+        accent-color: $blue;
+      }
+    }
+  }
+}
+
+.filter-footer {
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid $border-color;
+  padding-top: 15px;
+  margin-top: 20px;
+
+  .clear-button {
+    background-color: transparent;
+    border: none;
+    color: $blue;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  .results-text {
+    font-size: 14px;
+    color: #333;
+  }
+
+  .apply-button {
+    background-color: $blue;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+
+
+}
+

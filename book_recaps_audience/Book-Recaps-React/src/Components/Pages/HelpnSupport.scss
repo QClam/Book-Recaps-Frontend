@@ -1,0 +1,12 @@
+.Content {
+    margin-left: 250px; /* Offset the content by the width of the sidebar */
+    padding: 20px; /* Add some padding for aesthetics */
+  
+    @media (max-width: 768px) {
+      margin-left: 200px; /* Adjust margin for smaller screens */
+    }
+  
+    @media (max-width: 480px) {
+      margin-left: 150px; /* Further adjust margin for very small screens */
+    }
+}

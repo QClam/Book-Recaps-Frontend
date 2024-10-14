@@ -17,7 +17,7 @@
   }
   
   .content-table th {
-    background-color: #f4f4f4;
+    background-color: #f1f1f1;
     font-weight: bold;
   }
   
@@ -33,13 +33,28 @@
   .content-table th {
     padding-top: 12px;
     padding-bottom: 12px;
-    background-color: #1f1f1f;
+    background-color: #f1f1f1;
     // color: white;
   }
   
   h2 {
     font-size: 24px;
     margin-bottom: 20px;
+  }
+
+  .button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.3s ease; /* Smooth animation */
+  
+    &:hover {
+      transform: scale(1.1); /* Scale the button to 110% */
+    }
   }
   
   @media (max-width: 768px) {

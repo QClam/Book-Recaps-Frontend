@@ -1,0 +1,83 @@
+// Variables for colors and fonts
+$primary-color: #4CAF50;
+$secondary-color: #fff;
+$border-color: #ccc;
+$font-family: 'Arial', sans-serif;
+
+.overview-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  background-color: #f4f6f9;
+  font-family: $font-family;
+  margin-left: 250px;
+}
+
+.overview-title {
+  color: $primary-color;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+.chart-container {
+  background-color: $secondary-color;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  padding: 40px;
+  margin: 0 0 3cm 0; // Add 3cm spacing below each chart
+  width: 10cm; // Set fixed width
+  height: 9cm; // Set fixed height
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  h2 {
+    color: $primary-color;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+  }
+
+  canvas {
+    width: 100% !important; // Ensure the chart canvas takes the full width of the container
+    height: auto !important; // Maintain aspect ratio
+  }
+}
+
+.future-features {
+  margin-top: 50px;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 900px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+
+  h2 {
+    font-size: 1.8rem;
+    color: $primary-color;
+    margin-bottom: 10px;
+  }
+
+  p {
+    font-size: 1rem;
+    color: #666;
+  }
+}
+
+@media (max-width: 768px) {
+  .chart-container {
+    width: 100%; // Make the charts responsive on smaller screens
+    height: auto;
+    margin-bottom: 20px; // Adjust spacing for smaller screens
+  }
+
+  .overview-title {
+    font-size: 2rem;
+  }
+
+  .chart-container h2 {
+    font-size: 1.3rem;
+  }
+}

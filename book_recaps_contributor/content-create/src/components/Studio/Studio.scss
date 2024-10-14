@@ -1,0 +1,240 @@
+/* General styles */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.studio-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: #f7f3ed;
+  color: #333;
+  position: relative; /* Added to help position the modal correctly */
+  z-index: 1;
+}
+
+/* Header styles */
+.studio-header {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1200px;
+  align-items: center;
+  padding: 10px 0;
+  z-index: 1; /* Ensure header stays above other content */
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+}
+
+.logo img {
+  height: 40px;
+  margin-right: 10px;
+}
+
+.studio-title {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #333;
+}
+
+.header-options {
+  display: flex;
+  align-items: center;
+}
+
+.feedback-button,
+.exit-button {
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 8px 15px;
+  margin-left: 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.profile-icon {
+  margin-left: 15px;
+  font-size: 24px;
+}
+
+/* Main section styles */
+.studio-main {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 1200px;
+  margin-top: 30px;
+  z-index: 1; /* Ensure main content stays above other content */
+}
+
+.post-options {
+  width: 65%;
+}
+
+.post-options h1 {
+  font-size: 2em;
+  margin-bottom: 10px;
+}
+
+.post-options p {
+  font-size: 1.2em;
+  color: #666;
+  margin-bottom: 20px;
+}
+
+.option-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.option-card {
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: box-shadow 0.3s;
+}
+
+.option-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.option-icon {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+
+.option-label {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Info panel styles */
+.info-panel {
+  width: 30%;
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.info-panel h2 {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
+.info-panel p {
+  font-size: 1em;
+  color: #666;
+}
+
+/* Modal styles */
+/* Modal styles */
+.book-modal-overlay {
+  position: fixed; /* Changed to fixed for full-screen coverage */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 9999; /* Ensures the overlay is above all other content */
+}
+
+.book-modal {
+  position: absolute;
+  top: 50%; /* Centers modal vertically */
+  left: 50%; /* Centers modal horizontally */
+  transform: translate(-50%, -50%); /* Adjusts position to exact center */
+  width: 50%;
+  max-width: 600px;
+  background-color: #fff;
+  padding: 30px;
+  border-radius: 8px;
+  outline: none;
+  z-index: 10000; /* Ensures modal content is above the overlay */
+}
+
+.close-modal {
+  font-size: 1.5em;
+  cursor: pointer;
+  float: right;
+}
+
+.search-container {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.book-search-input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  font-size: 1em;
+}
+
+.clear-search {
+  margin-left: -30px;
+  cursor: pointer;
+}
+
+.book-modal-banner {
+  width: 100%;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  display: block; /* Ensure the image always displays by default */
+  transition: opacity 0.3s; /* Smooth transition for hiding */
+}
+
+.book-results {
+  position: relative;
+  background-color: #fff; /* White background to cover the banner */
+  border-radius: 8px;
+  padding: 10px;
+  margin-top: -370px; /* Adjust to ensure it overlaps the banner */
+  z-index: 1; /* Make sure it stays above the banner */
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.book-result {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.book-thumbnail {
+  width: 50px;
+  height: auto;
+  margin-right: 10px;
+}
+
+.book-info {
+  flex: 1;
+}
+
+.no-results {
+  text-align: center;
+}
+
+.manual-entry-btn {
+  margin-top: 10px;
+  padding: 10px 20px;
+  border-radius: 20px;
+  border: 1px solid #333;
+  background-color: #fff;
+  cursor: pointer;
+  font-size: 1em;
+}

@@ -1,0 +1,42 @@
+.collection-container {
+    width: 1000px;
+    padding: 20px;
+    margin-left: 150px;
+  }
+  
+  .collection-container h2 {
+    font-size: 30px;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  .collection-container p {
+    font-size: 20px;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+
+  .collection-card {
+    padding: 10px;
+  }
+  
+  .collection-image {
+    width: 180px;
+    height: 240px;
+    background-size: cover;
+    background-position: center
+  }
+
+  
+  
+  .slick-arrow {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  .slick-arrow:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+  }
+  

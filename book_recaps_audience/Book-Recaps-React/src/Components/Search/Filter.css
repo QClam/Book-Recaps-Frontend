@@ -1,0 +1,119 @@
+/* Sidebar styling */
+.Sidebar {
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  align-items: flex-start;
+  width: 200px; /* Adjust width to ensure more screen space */
+  padding: 10px;
+}
+
+.SidebarLogo img {
+  width: 40px; /* Reduce logo size */
+  height: 40px;
+}
+
+.SidebarList {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+  width: 100%;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 15px; /* Reduce gap between items */
+  cursor: pointer;
+}
+
+#icon {
+  margin-right: 5px; /* Reduce icon spacing */
+  color: #ff6f61;
+}
+
+#title {
+  font-size: 14px; /* Reduce font size */
+  color: #ff6f61;
+}
+
+.row:hover #icon, .row:hover #title {
+  color: #e64a19;
+}
+
+#active {
+  color: #ff6f61;
+  font-weight: bold;
+}
+
+/* Filter and Search Bar section */
+.filter-sidebar-container {
+  display: flex;
+  width: 100%;
+  padding: 10px 15px; /* Reduce padding */
+  box-sizing: border-box;
+}
+
+.filter-section {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-grow: 1;
+  margin-left: 15px; /* Small space between sidebar and search */
+}
+
+.search-form {
+  display: flex;
+  align-items: center;
+  max-width: 400px; /* Adjust search bar size */
+  width: 100%;
+  margin-left: 10px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 8px; /* Reduce padding */
+  font-size: 14px; /* Reduce font size */
+  border: none;
+  border-radius: 4px 0 0 4px;
+  background-color: #fff;
+}
+
+.search-button {
+  background-color: #007bff;
+  padding: 8px 16px; /* Reduce button size */
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  border-radius: 0 4px 4px 0;
+}
+
+/* User Info section */
+.user-info {
+  display: flex;
+  align-items: center;
+  margin-left: 20px;
+}
+
+.iconHeader {
+  font-size: 18px; /* Reduce icon size */
+  color: #ff6f61;
+  margin-left: 20px;
+  cursor: pointer;
+}
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+}
+
+.user-avatar {
+  width: 30px; /* Reduce avatar size */
+  height: 30px;
+  border-radius: 50%;
+}
+
+.user-name {
+  font-size: 14px; /* Reduce font size */
+  color: #333;
+}/*# sourceMappingURL=Filter.css.map */

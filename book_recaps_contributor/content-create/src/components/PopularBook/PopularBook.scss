@@ -1,0 +1,87 @@
+.book-layout-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px;
+}
+
+.section-heading {
+  font-size: 28px;
+  font-weight: 600;
+}
+
+.section-highlight {
+  color: #1a73e8;
+}
+
+.section-subtext {
+  color: #777;
+  margin-bottom: 30px;
+}
+
+.book-display-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-gap: 20px;
+}
+
+.book-item-card {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  height: 400px; /* Fixed height for all book cards */
+}
+
+.book-thumbnail {
+  width: 100px;
+  height: 150px;
+  object-fit: cover;
+  margin-bottom: 15px;
+}
+
+.book-details-wrapper {
+  text-align: center;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.book-name-title {
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 8px;
+  line-height: 1.2;
+  height: 40px; /* Fixed height for titles */
+  overflow: hidden;
+}
+
+.book-writer-name {
+  color: #777;
+  margin-top: 8px;
+  font-size: 14px;
+  height: 20px; /* Fixed height for authors */
+  overflow: hidden;
+}
+
+.book-summary-text {
+  margin: 12px 0;
+  font-size: 13px;
+  color: #555;
+  line-height: 1.4;
+  height: 60px; /* Fixed height for description */
+  overflow: hidden;
+}
+
+.book-info-meta {
+  font-size: 12px;
+  color: #777;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-top: 15px;
+}
