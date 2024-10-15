@@ -11,6 +11,8 @@ tạo file .env -> copy paste đoạn này
 
 VITE_RECAPTCHA_KEY="6LdFTgMqAAAAAPMELcBY4rySQ1UpT5ZcXvVcj-_J"
 
+Copy key Google Book API vô file .env 
+
 npm install react-google-recaptcha-v3
 
 Dùng GoogleReCaptchaProvider để bọc toàn bộ <App />
