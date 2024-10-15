@@ -441,27 +441,27 @@ function UsersList() {
                 <td>{user.birthDate}</td>
                 <td>
                   {user.roleType === 0 ? (
-                    <button style={{ backgroundColor: "green" }}>
+                    <button className="role-container" style={{ backgroundColor: "green" }}>
                       Super Admin
                     </button>
                   ) : user.roleType === 1 ? (
-                    <button style={{ backgroundColor: "#007bff" }}>
+                    <button className="role-container" style={{ backgroundColor: "#007bff" }}>
                       Staff
                     </button>
                   ) : user.roleType === 2 ? (
-                    <button style={{ backgroundColor: "#1d96c6" }}>
+                    <button className="role-container" style={{ backgroundColor: "#1d96c6" }}>
                       Contributor
                     </button>
                   ) : user.roleType === 3 ? (
-                    <button style={{ backgroundColor: "#268a3a" }}>
+                    <button className="role-container" style={{ backgroundColor: "#268a3a" }}>
                       Publisher
                     </button>
                   ) : user.roleType === 4 ? (
-                    <button style={{ backgroundColor: "#a74f19" }}>
+                    <button className="role-container" style={{ backgroundColor: "#a74f19" }}>
                       Customer
                     </button>
                   ) : (
-                    <button style={{ backgroundColor: "#5e6061" }}>
+                    <button className="role-container" style={{ backgroundColor: "#5e6061" }}>
                       Unknow Role
                     </button>
                   )}
