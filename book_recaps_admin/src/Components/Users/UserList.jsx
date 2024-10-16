@@ -6,6 +6,8 @@ import Modal from "react-modal";
 import Swal from "sweetalert2";
 import Pagination from "@mui/material/Pagination";
 import { Button, Menu, MenuItem } from "@mui/material";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3"
+import { useNavigate } from "react-router-dom";
 
 import api from "../Auth/AxiosInterceptors";
 import "./UserList.scss";
@@ -16,6 +18,7 @@ Modal.setAppElement("#root"); // Set the root element for the modal
 
 function UsersList() {
   const [users, setUsers] = useState([]);
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [modalIsOpen, setModalIsOpen] = useState(false); // Modal visibility state
   const [currentPage, setCurrentPage] = useState(1);
@@ -30,6 +33,7 @@ function UsersList() {
     confirmPassword: "",
     phoneNumber: "",
   });
+  const { executeRecaptcha } = useGoogleReCaptcha();
   const [editingUserId, setEditingUserId] = useState(null);
   const [anchorEl, setAnchorEl] = useState(null); // State để lưu anchor của submenu
   const [submenuAnchorEl, setSubmenuAnchorEl] = useState(null); // State cho submenu lồng
@@ -71,6 +75,13 @@ function UsersList() {
   ); // Adjust slicing for 1-based page indexing
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
+  };
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setRegisterForm({ ...registerForm, [name]: value });
+    setError(null);
+    console.log(value);
   };
 
   const validateForm = () => {
@@ -120,27 +131,58 @@ function UsersList() {
     setEditingUserId(null); // Reset user đang chỉnh sửa khi đóng modal
   };
 
-  const handleAddUser = async () => {
-    if (!validateForm()) return;
+  const handleAddUser = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      return; // Nếu form không hợp lệ, dừng lại
+    }
+
+    if (!executeRecaptcha) {
+      setError("reCAPTCHA chưa được khởi tạo");
+      return;
+    }
 
     try {
+      const token = await executeRecaptcha("signup");
+
       const newUser = {
         fullName: registerForm.fullName,
         email: registerForm.email,
         password: registerForm.password,
         confirmPassword: registerForm.confirmPassword,
         phoneNumber: registerForm.phoneNumber,
+        captchaToken: token,
       };
 
       const response = await axios.post(
-        "https://66e3e75ed2405277ed124249.mockapi.io/users",
+        "https://160.25.80.100:7124/api/register",
         newUser
       );
-      setUsers([...users, response.data]); // Update user list
+      console.log("Register Successfully", newUser);
+      console.log("Link: ", response.data.message);
+      navigate("/auth/confirm-email", {
+        state: {
+          email: registerForm.email,
+          message: response.data.message,
+        },
+      });
+
       resetForm();
+      setError(null);
     } catch (error) {
-      console.error("Error registering user:", error);
-      setError("Đăng ký thất bại.");
+      // Bắt lỗi và back-end trả về
+      if (
+        error.response &&
+        error.response.status === 400 &&
+        error.response.data.message
+      ) {
+        // Kiểm tra thông báo lỗi
+        setError("Email đã tồn tại, vui lòng sử dụng Email khác để đăng ký.");
+      } else {
+        console.error("Error registering user:", error);
+        setError("Đăng ký thất bại.");
+      }
     }
   };
 
@@ -336,64 +378,51 @@ function UsersList() {
         <h2 style={{ color: "#1a1a1a" }}>
           {editingUserId ? "Cập nhật người dùng" : "Thêm người dùng"}
         </h2>
-        <form>
+        <form onSubmit={handleAddUser}>
           <div className="input-group">
             <input
               type="text"
               placeholder="Họ và tên"
+              name="fullName"
               value={registerForm.fullName}
-              onChange={(e) =>
-                setRegisterForm({ ...registerForm, fullName: e.target.value })
-              }
+              onChange={handleInputChange}
             />
             <input
               type="text"
               placeholder="Số điện thoại"
+              name="phoneNumber"
               value={registerForm.phoneNumber}
-              onChange={(e) =>
-                setRegisterForm({
-                  ...registerForm,
-                  phoneNumber: e.target.value,
-                })
-              }
+              onChange={handleInputChange}
             />
           </div>
           <div className="input-group">
             <input
-              type="date"
-              placeholder="Ngày sinh"
-              value={registerForm.birthDate}
-              onChange={(e) =>
-                setRegisterForm({ ...registerForm, birthDate: e.target.value })
-              }
+              type="password"
+              placeholder="Mật khẩu"
+              name="password"
+              value={registerForm.password}
+              onChange={handleInputChange}
             />
             <input
-              type="text"
-              placeholder="Địa chỉ"
-              value={registerForm.address}
-              onChange={(e) =>
-                setRegisterForm({
-                  ...registerForm,
-                  address: e.target.value,
-                })
-              }
+              type="password"
+              placeholder="Xác nhận Mật khẩu"
+              name="confirmPassword"
+              value={registerForm.confirmPassword}
+              onChange={handleInputChange}
             />
           </div>
-          <input
-            type="email"
-            placeholder="Email"
-            value={registerForm.email}
-            onChange={(e) =>
-              setRegisterForm({ ...registerForm, email: e.target.value })
-            }
-          />
+            <input
+              type="email"
+              placeholder="Email"
+              name="email"
+              value={registerForm.email}
+              onChange={handleInputChange}
+            />
 
           {error && <p className="error">{error}</p>}
           <div className="button-container">
             <button
-              type="button"
-              onClick={editingUserId ? handleUpdateUser : handleAddUser}
-            >
+              type="submit">
               {editingUserId ? "Cập nhật" : "Thêm"}
             </button>
             <button

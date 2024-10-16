@@ -77,7 +77,7 @@ function ConfirmEmail() {
         icon: "success",
         confirmButtonText: "OK",
       }).then(() => {
-        navigate("/login"); // Redirect after SweetAlert is confirmed
+        navigate("/"); // Redirect after SweetAlert is confirmed
       });
     }, 3000);
   };

@@ -5,6 +5,7 @@ import UsersList from './Components/Users/UserList';
 import Login from './Components/Auth/Login';
 import PrivateRoute from './Components/Auth/PrivateRoute';
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
+import ConfirmEmail from './Components/Auth/ConfirmEmail';
 
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
         <Route path="/" element={<PrivateRoute> <UsersList /> </PrivateRoute>} />
         <Route path="/users" element={<PrivateRoute> <UsersList /> </PrivateRoute>} />
         <Route path="/auth" element={<Login />} />
+        <Route path="/auth/confirm-email" element={<ConfirmEmail />} />
       </Routes>
     </main>
   )
