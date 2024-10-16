@@ -12,6 +12,7 @@ function UsersList() {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true); // Start loading as true
     const [currentPage, setCurrentPage] = useState(1); // MUI Pagination uses 1-based indexing
+    const [isDarkMode, setIsDarkMode] = useState(true); // State to toggle dark mode
     const usersPerPage = 5;
 
     const token = localStorage.getItem('access_token');
@@ -89,13 +90,29 @@ function UsersList() {
                 </table>
             </div>
             <Pagination
-                className='center'
+                className="center"
                 count={Math.ceil(users.length / usersPerPage)} // Total number of pages
                 page={currentPage} // Current page
                 onChange={handlePageChange} // Handle page change
                 color="primary" // Styling options
                 showFirstButton
                 showLastButton
+                sx={{
+                    "& .MuiPaginationItem-root": {
+                        color: isDarkMode ? "#fff" : "#000", // Change text color based on theme
+                        backgroundColor: isDarkMode ? "#555" : "#f0f0f0", // Button background color based on theme
+                    },
+                    "& .MuiPaginationItem-root.Mui-selected": {
+                        backgroundColor: isDarkMode ? "#306cce" : "#72a1ed", // Change color of selected page button
+                        color: "#fff", // Ensure selected text is white for contrast
+                    },
+                    "& .MuiPaginationItem-root.Mui-selected:hover": {
+                        backgroundColor: isDarkMode ? "#2057a4" : "#5698d3", // Color on hover for selected button
+                    },
+                    "& .MuiPaginationItem-root:hover": {
+                        backgroundColor: isDarkMode ? "#666" : "#e0e0e0", // Color on hover for non-selected buttons
+                    },
+                }}
             />
         </div>
     );
