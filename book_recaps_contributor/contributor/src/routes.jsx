@@ -1,9 +1,14 @@
 import { createBrowserRouter } from "react-router-dom";
 import App from "./App";
-import ErrorPage from "./pages/ErrorPage";
+import ErrorPage from "./routes/ErrorPage";
+import Login from "./routes/Login";
+import { loginAction } from "./routes/actions/loginAction";
+import AuthWrapper from "./routes/AuthWrapper";
+import Logout from "./routes/Logout";
 
 export const routes = {
   login: '/login',
+  logout: '/logout',
   dashboard: '/',
   draftRecaps: '/draft-recaps',
   underRevisionRecaps: '/under-revision-recaps',
@@ -18,13 +23,38 @@ export const routes = {
 export const router = createBrowserRouter([
   {
     path: routes.dashboard,
-    element: <App/>,
     errorElement: <ErrorPage/>,
+    element: (
+      <AuthWrapper>
+        <App/>
+      </AuthWrapper>
+    ),
     children: [
       {
-        path: routes.dashboard,
-        element: <div>Dashboard</div>
+        errorElement: <ErrorPage/>,
+        children: [
+          {
+            index: true,
+            element: <div>Dashboard</div>
+          }
+        ]
       }
     ]
-  }
+  },
+  {
+    path: routes.login,
+    element: <Login/>,
+    errorElement: <ErrorPage/>,
+    action: loginAction,
+  },
+  {
+    path: routes.logout,
+    element: <Logout/>,
+    errorElement: <ErrorPage/>,
+  },
+  // {
+  //   path: '/register',
+  //   element: <Register />,
+  //   action: registerAction,
+  // },
 ])

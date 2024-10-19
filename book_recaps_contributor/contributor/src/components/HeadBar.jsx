@@ -2,8 +2,11 @@ import { useRef, useState } from "react";
 import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
 import Show from "./Show";
 import { useClickAway } from "react-use";
+import { useNavigate } from "react-router-dom";
+import { routes } from "../routes";
 
 export const HeadBar = (props) => {
+  const navigate = useNavigate();
   const { setIsNavOpen } = props;
   const [ isDropdownOpen, setIsDropdownOpen ] = useState(false);
   const dropdownEl = useRef(null);
@@ -13,7 +16,7 @@ export const HeadBar = (props) => {
   });
 
   const signOut = () => {
-    // signOut();
+    navigate(routes.logout);
   }
 
   return (
