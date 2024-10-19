@@ -3,7 +3,8 @@ import Show from "./Show";
 import { cn } from "../utils/cn";
 import { Link, NavLink } from "react-router-dom";
 import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
-import { TbApps, TbBooks, TbMessage, TbNews } from "react-icons/tb";
+import { TbApps, TbBooks, TbMessage, TbNews, TbUser } from "react-icons/tb";
+import { HiOutlineCreditCard } from "react-icons/hi2";
 import { routes } from "../routes";
 
 export const NavBar = (props) => {
@@ -62,36 +63,62 @@ export const NavBar = (props) => {
           />
         </NavbarDropDown>
 
-        <NavbarDropDown
+        <NavInfo isOpen={isOpen}>
+          Resources&nbsp;and&nbsp;help
+        </NavInfo>
+
+        <NavbarLink
           href={routes.books}
           icon={<TbBooks/>}
           text="Books"
           isOpen={isOpen}
-          // defaultOpen={false}
-        >
-          <NavbarLink
-            href={routes.books}
-            text="Posts"
-            isOpen={isOpen}
-            end
-          />
-          {/*<NavbarLink*/}
-          {/*  href={"/"}*/}
-          {/*  text="Categories"*/}
-          {/*  isOpen={isOpen}*/}
-          {/*/>*/}
-        </NavbarDropDown>
+          end
+        />
 
         <NavbarLink
-          href={routes.supportTickets}
-          text="Support&nbsp;Tickets"
+          href={routes.contact}
+          text="Contact"
           icon={<TbMessage/>}
+          isOpen={isOpen}
+        />
+
+        <NavInfo isOpen={isOpen}>
+          Account
+        </NavInfo>
+
+        <NavbarLink
+          href={routes.profile}
+          text="Profile"
+          icon={<TbUser/>}
+          isOpen={isOpen}
+        />
+
+        <NavbarLink
+          href={routes.billingInvoices}
+          text="Billing&nbsp;and&nbsp;invoices"
+          icon={<HiOutlineCreditCard/>}
           isOpen={isOpen}
         />
       </ul>
     </section>
   );
 };
+
+const NavInfo = (props) => {
+  const { isOpen, children } = props;
+
+  return (
+    <li className="w-full mt-3">
+      <div className="text-gray-400 flex text-sm font-semibold leading-[14px] py-2 px-[11px] uppercase">
+        <Show when={isOpen} fallback={
+          <span className="w-[18px]">&nbsp;</span>
+        }>
+          <span>{children}</span>
+        </Show>
+      </div>
+    </li>
+  )
+}
 
 const NavbarLink = (props) => {
   const { href, isOpen, icon, text, end } = props;

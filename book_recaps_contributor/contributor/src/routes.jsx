@@ -10,7 +10,9 @@ export const routes = {
   rejectionsRecaps: '/rejections-recaps',
   publishedRecaps: '/published-recaps',
   books: '/books',
-  supportTickets: '/support-tickets',
+  contact: '/contact',
+  profile: '/profile',
+  billingInvoices: '/billing-invoices',
 }
 
 export const router = createBrowserRouter([
