@@ -1,0 +1,112 @@
+.book-info-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    margin-top: -100px;
+    
+    .info-layout {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+      margin-left: 20px;
+      .left-info {
+        width: 40%;
+        padding-right: 20px;
+        padding-left: 20px;
+        .title {
+          font-size: 24px;
+          font-weight: bold;
+          margin-bottom: 10px;
+        }
+  
+        .cover-image {
+          width: 230px;
+          height: 7cm;
+          border-radius: 8px;
+          margin-bottom: 10px;
+        }
+  
+        .author-name {
+          font-size: 20px;
+          color: #555;
+        }
+  
+        .original-title {
+          font-size: 16px;
+          color: #777;
+        }
+  
+        .description-container {
+          margin: 10px 0;
+          font-size: 16px;
+          color: #333;
+        }
+  
+        .read-button {
+          background-color: #007bff;
+          color: white;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 5px;
+          cursor: pointer;
+          font-size: 16px;
+        }
+  
+        .category {
+          font-size: 14px;
+          color: #999;
+          margin-top: 10px;
+        }
+      }
+  
+      .right-info {
+        width: 60%;
+        // padding-left: 20px;
+        margin-left: -60px;
+
+        .recaps-heading {
+          font-size: 20px;
+          font-weight: bold;
+          margin-bottom: 10px;
+        }
+  
+        .recap-items {
+          list-style-type: none;
+          padding: 0;
+  
+          .recap-list-item {
+            margin-bottom: 15px;
+  
+            .audio-controller {
+              width: 100%;
+              margin-top: 10px; // Adjust this margin as necessary
+              margin-bottom: 5px;
+            }
+          }
+        }
+      }
+    }
+  
+    .transcript-areaea {
+      margin-top: 20px;
+  
+      h4 {
+        font-weight: bold;
+      }
+  
+      .transcript-part {
+        margin-bottom: 10px;
+  
+        .transcript-sentence {
+          font-size: 19px;
+          margin: 5px 0;
+          color: #333;
+        }
+      }
+    }
+  
+    .error-notice {
+      color: red;
+      font-weight: bold;
+    }
+  }
+  

@@ -1,0 +1,30 @@
+.recap-list-item { 
+  margin-bottom: 20px;    
+  margin-top: 10px;
+   margin-left: 20px;
+}
+
+.audio-controllerer {
+   width: calc(100% - 2cm); /* Reduced by 2cm for a total reduction of 6cm */
+  margin-right: 8px; /* Space between the audio and the button */
+  margin-top: 10px;
+  margin-left: 40px;
+}
+
+.loop-buttonon {
+  display: flex; /* Ensure the button is a flex item */
+  align-items: center; /* Center the icon vertically */
+  justify-content: center; /* Center the icon horizontally */
+  background-color: transparent; /* Make button background transparent */
+  border: none; /* Remove border */
+  cursor: pointer; /* Change cursor on hover */
+  padding: 5px; /* Add some padding for better click area */
+  
+  /* Adjust margins as necessary */
+  margin-top: -45px; /* Adjust as needed */
+  margin-left: -2px; /* Adjust as needed */
+  
+  &:hover {
+    opacity: 0.8; /* Add a hover effect for better UX */
+  }
+}

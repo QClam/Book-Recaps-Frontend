@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Home, Search, LibraryBooks, Person, BorderColor, MenuBook, Settings, HelpOutline, Logout, Category  } from '@mui/icons-material';
+import { Home, Search, LibraryBooks, Person, BorderColor, MenuBook, Settings, HelpOutline, Logout, Category, AutoAwesome  } from '@mui/icons-material';
 
 export const SidebarItems = [
     // {
@@ -29,21 +29,21 @@ export const SidebarItems = [
         link: "/author",
     },
     {
-        title: "Library",
+        title: "Playlist",
         icon: <LibraryBooks />,  // Icon cho Library
-        link: "/library",
+        link: "/playlist",
     },
     
-    {
-        title: "Highlights",
-        icon: <BorderColor />,
-        link: "/highlights",
-    },
     // {
-    //     title: "AI Search",
-    //     icon: <AutoAwesome />,
-    //     link: "/ai-search",
+    //     title: "Highlights",
+    //     icon: <BorderColor />,
+    //     link: "/highlights",
     // },
+    {
+        title: "Recap",
+        icon: <AutoAwesome />,
+        link: "/contributor",
+    },
     
 
     

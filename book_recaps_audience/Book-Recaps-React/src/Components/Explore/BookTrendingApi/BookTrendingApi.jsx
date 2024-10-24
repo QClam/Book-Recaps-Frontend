@@ -49,24 +49,53 @@ const BookTrendingApi = () => {
   }, []);
 
   const fetchBooks = async () => {
+    const accessToken = localStorage.getItem('authToken');
+    const refreshToken = localStorage.getItem('refreshToken');
+
     try {
       const response = await axios.get(
         'https://160.25.80.100:7124/api/book/getallbooks',
         {
           headers: {
-            Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2NWRmM2ExZC04NWY5LTQ2MzMtYTAwZC01ZTg0MjFiZWI3ZTQiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjhkMGFlYzdhLWZlZDEtNDFiZi1kYTQxLTA4ZGNlMmRjOTAyYSIsImVtYWlsIjoiY29udHJpYnV0b3JAcm9vdC5jb20iLCJzdWIiOiJjb250cmlidXRvckByb290LmNvbSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL21vYmlsZXBob25lIjoiMDk0MjcwNTYwNSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJjb250cmlidXRvciIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2dpdmVubmFtZSI6ImNvbnRyaWJ1dG9yIiwiaXBBZGRyZXNzIjoiMTE2LjExMC40MS45MCIsImltYWdlX3VybCI6IkZpbGVzL0ltYWdlL2pwZy9hZC5qcGciLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJDb250cmlidXRvciIsImV4cCI6MTcyODIyODA3NiwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzEyNCIsImF1ZCI6ImJvb2tyZWNhcCJ9.S6zTH1h6IdHOHndAtLhY7B_rVcnSBb1-Elqii75QX4Q`,
+            Authorization: `Bearer ${accessToken}`,
           },
         }
       );
       const booksData = response.data.data.$values; // Extract book data from API response
       setBooks(booksData);
     } catch (error) {
-      console.error('Error fetching the books:', error);
+      if (error.response && error.response.status === 401) {
+        // If the token is expired, refresh the token
+        await handleTokenRefresh(refreshToken);
+        // Retry fetching the books after refreshing the token
+        fetchBooks();
+      } else {
+        console.error('Error fetching the books:', error);
+      }
     }
   };
 
-  const handleBookClick = (book) => {
-    navigate('/book-trending-detail', { state: { book } }); // Navigate to book detail page
+  const handleTokenRefresh = async (refreshToken) => {
+    try {
+      const response = await axios.post('https://160.25.80.100:7124/api/tokens/refresh', {
+        refreshToken,
+      });
+
+      const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data.message.token;
+
+      // Update localStorage with new tokens
+      localStorage.setItem('authToken', newAccessToken);
+      localStorage.setItem('refreshToken', newRefreshToken);
+
+      console.log('Token refreshed successfully');
+    } catch (error) {
+      console.error('Error refreshing token:', error);
+      // Optionally handle logout or redirect to login if refreshing the token fails
+    }
+  };
+
+  const handleBookClick = (id) => {
+    navigate(`/bookdetailbook/${id}`); // Use the book's id for navigation
   };
 
   const settings = {
@@ -85,7 +114,7 @@ const BookTrendingApi = () => {
           slidesToShow: 3,
           slidesToScroll: 3,
           infinite: true,
-          dots: false, // Disable dots in responsive view as well
+          dots: false,
         },
       },
       {
@@ -94,7 +123,7 @@ const BookTrendingApi = () => {
           slidesToShow: 2,
           slidesToScroll: 2,
           initialSlide: 2,
-          dots: false, // Disable dots
+          dots: false,
         },
       },
       {
@@ -102,12 +131,11 @@ const BookTrendingApi = () => {
         settings: {
           slidesToShow: 1,
           slidesToScroll: 1,
-          dots: false, // Disable dots
+          dots: false,
         },
       },
     ],
   };
-  
 
   return (
     <div className="book-container-trend">
@@ -115,7 +143,7 @@ const BookTrendingApi = () => {
       <p>What's popular right now</p>
       <Slider {...settings}>
         {books.map((book) => (
-          <div key={book.id} className="book-item-trend" onClick={() => handleBookClick(book)}>
+          <div key={book.id} className="book-item-trend" onClick={() => handleBookClick(book.id)}>
             <img
               src={book.coverImage || 'https://via.placeholder.com/150'}
               alt={book.title}

@@ -1,4 +1,3 @@
-// BookDetailItem.jsx
 import React, { useEffect, useState } from 'react';
 import './BookDetailItem.scss';
 import { useParams } from 'react-router-dom';
@@ -9,19 +8,45 @@ const BookDetailItem = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  const getToken = () => {
+    const accessToken = localStorage.getItem('accessToken'); // Get accessToken from local storage
+    return accessToken; 
+  };
+
   const fetchBookDetail = async () => {
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJiNTE1Yjg2OC02ODA0LTQ2MjQtYjIxYS1iOGRmNjMyNzQ4YzIiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjhkMGFlYzdhLWZlZDEtNDFiZi1kYTQxLTA4ZGNlMmRjOTAyYSIsImVtYWlsIjoiY29udHJpYnV0b3JAcm9vdC5jb20iLCJzdWIiOiJjb250cmlidXRvckByb290LmNvbSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL21vYmlsZXBob25lIjoiMDk0MjcwNTYwNSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJjb250cmlidXRvciIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2dpdmVubmFtZSI6ImNvbnRyaWJ1dG9yIiwiaXBBZGRyZXNzIjoiMTI1LjIzNS4yMzguMTgxIiwiaW1hZ2VfdXJsIjoiRmlsZXMvSW1hZ2UvanBnL2FkLmpwZyIsImh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vd3MvMjAwOC8wNi9pZGVudGl0eS9jbGFpbXMvcm9sZSI6IkNvbnRyaWJ1dG9yIiwiZXhwIjoxNzI4MDU1Mjc2LCJpc3MiOiJodHRwczovL2xvY2FsaG9zdDo3MTI0IiwiYXVkIjoiYm9va3JlY2FwIn0.Ndwao4p_e83a1c0WjnQWdGZV0ZlZ6kSk7tcfpHJiSUI'; // Consider storing this securely
+    const token = getToken(); // Get the accessToken
 
     try {
-      const response = await fetch(`https://160.25.80.100:7124/api/book/getbookbyid/${id}`, { // Assuming there's an endpoint to get a book by ID
+      const response = await fetch(`https://160.25.80.100:7124/api/book/getbookbyid/${id}`, {
         method: 'GET',
         headers: {
           'accept': '*/*',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}` // Use accessToken
         }
       });
 
       if (!response.ok) {
+        // Handle token expiration here
+        if (response.status === 401) {
+          const refreshToken = localStorage.getItem('refreshToken'); // Get refreshToken from local storage
+          const refreshResponse = await fetch('https://160.25.80.100:7124/api/auth/refresh', { // Update with your refresh token endpoint
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ token: refreshToken }) // Pass refreshToken to get a new accessToken
+          });
+
+          if (!refreshResponse.ok) {
+            throw new Error('Unable to refresh token. Please log in again.');
+          }
+
+          const { accessToken: newAccessToken } = await refreshResponse.json();
+          localStorage.setItem('accessToken', newAccessToken); // Store new accessToken
+          // Retry fetching the book details with the new token
+          return fetchBookDetail(); // Recursively call fetchBookDetail
+        }
+
         const errorDetails = await response.text();
         throw new Error(`HTTP error! status: ${response.status}, details: ${errorDetails}`);
       }

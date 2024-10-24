@@ -1,0 +1,19 @@
+.audio-player-sectionon {
+    margin-right: 35px;
+    margin-top: -20px;
+    
+}
+
+.loop-buttonon {
+    background-color: transparent; // No background color
+    border: none; // Remove border
+    cursor: pointer; // Change cursor to pointer on hover
+    transition: transform 0.2s ease, color 0.2s ease;
+    margin-right: 30px;
+    margin-top: 30px;
+}
+.audio-playerer {
+    margin-left: 27px;
+    margin-top: -55px;
+  
+}

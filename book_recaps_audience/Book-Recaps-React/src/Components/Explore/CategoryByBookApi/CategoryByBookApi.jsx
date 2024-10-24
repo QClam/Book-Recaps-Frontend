@@ -2,53 +2,93 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import './CategoryByBookApi.scss';
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import { useParams, useNavigate } from 'react-router-dom';
 
 const CategoryByBookApi = () => {
   const [categories, setCategories] = useState([]);
   const [allBooks, setAllBooks] = useState([]);
   const [activeCategory, setActiveCategory] = useState('All');
+  const [error, setError] = useState(null); // For error handling
+  const navigate = useNavigate(); // Khởi tạo navigate
+  // Get accessToken and refreshToken from localStorage
+  const accessToken = localStorage.getItem("authToken");
+  const refreshToken = localStorage.getItem("refreshToken");
 
-  // Đặt token một lần để sử dụng cho cả hai cuộc gọi API
-  const token = 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2NWRmM2ExZC04NWY5LTQ2MzMtYTAwZC01ZTg0MjFiZWI3ZTQiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjhkMGFlYzdhLWZlZDEtNDFiZi1kYTQxLTA4ZGNlMmRjOTAyYSIsImVtYWlsIjoiY29udHJpYnV0b3JAcm9vdC5jb20iLCJzdWIiOiJjb250cmlidXRvckByb290LmNvbSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL21vYmlsZXBob25lIjoiMDk0MjcwNTYwNSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJjb250cmlidXRvciIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2dpdmVubmFtZSI6ImNvbnRyaWJ1dG9yIiwiaXBBZGRyZXNzIjoiMTE2LjExMC40MS45MCIsImltYWdlX3VybCI6IkZpbGVzL0ltYWdlL2pwZy9hZC5qcGciLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJDb250cmlidXRvciIsImV4cCI6MTcyODIyODA3NiwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzEyNCIsImF1ZCI6ImJvb2tyZWNhcCJ9.S6zTH1h6IdHOHndAtLhY7B_rVcnSBb1-Elqii75QX4Q';
+  // Function to refresh token
+  const handleTokenRefresh = async () => {
+    try {
+      const response = await axios.post("https://160.25.80.100:7124/api/tokens/refresh", {
+        refreshToken,
+      });
+
+      const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data.message.token;
+
+      // Update localStorage with new tokens
+      localStorage.setItem("authToken", newAccessToken);
+      localStorage.setItem("refreshToken", newRefreshToken);
+
+      console.log("Token refreshed successfully");
+    } catch (error) {
+      console.error("Error refreshing token:", error);
+      setError("Session expired. Please log in again.");
+    }
+  };
 
   useEffect(() => {
-    // Fetch categories từ API
-    axios
-      .get('https://160.25.80.100:7124/api/category', {
-        headers: {
-          'accept': '*/*',
-          'Authorization': token,
-        }
-      })
-      .then((res) => {
-        if (res.data && res.data.succeeded) {
-          setCategories(res.data.data.$values);
-        }
-      })
-      .catch((err) => console.log('Error fetching categories:', err));
-  }, [token]);
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get('https://160.25.80.100:7124/api/category', {
+          headers: {
+            'accept': '*/*',
+            'Authorization': `Bearer ${accessToken}`,
+          }
+        });
 
-  useEffect(() => {
-    // Fetch tất cả sách từ API
+        const data = response.data;
+        if (data && data.succeeded) {
+          setCategories(data.data.$values);
+        } else {
+          setCategories([]); // Set empty array if no categories are present
+        }
+      } catch (error) {
+        // If token is expired, try to refresh it
+        if (error.response && error.response.status === 401) {
+          await handleTokenRefresh();
+          fetchCategories(); // Retry fetching categories after refreshing the token
+        } else {
+          setError(error.message);
+          console.error('Error fetching categories:', error);
+        }
+      }
+    };
+
     const fetchBooks = async () => {
       try {
         const response = await axios.get('https://160.25.80.100:7124/api/book/getallbooks', {
           headers: {
             'accept': '*/*',
-            'Authorization': token,
+            'Authorization': `Bearer ${accessToken}`,
           }
         });
 
-        if (response.data && response.data.succeeded) {
-          setAllBooks(response.data.data.$values);
+        const data = response.data;
+        if (data && data.succeeded) {
+          setAllBooks(data.data.$values);
         }
       } catch (error) {
-        console.log('Error fetching books:', error);
+        // If token is expired, try to refresh it
+        if (error.response && error.response.status === 401) {
+          await handleTokenRefresh();
+          fetchBooks(); // Retry fetching books after refreshing the token
+        } else {
+          console.log('Error fetching books:', error);
+        }
       }
     };
 
+    fetchCategories();
     fetchBooks();
-  }, [token]);
+  }, [accessToken, refreshToken]);
 
   const handleCategoryClick = (category) => {
     setActiveCategory(category);
@@ -112,6 +152,11 @@ const CategoryByBookApi = () => {
         book.categories.$values.some(cat => cat.name === activeCategory)
       );
 
+   // Hàm điều hướng khi click vào sách
+   const handleBookClick = (id) => {
+    navigate(`/user-recap-detail/${id}`); // Navigate to UserRecapDetail with the book ID
+  };
+
   return (
     <div className="custom-category-wrapper">
       <div className="custom-category-header">
@@ -139,7 +184,16 @@ const CategoryByBookApi = () => {
 
       <div className="custom-books-grid">
         {filteredBooks.map((book, index) => (
-          <div key={index} className="custom-book-card">
+          <div 
+          key={book.id} 
+          className="custom-book-card" 
+          onClick={() => handleBookClick(book.id)} // Thêm sự kiện onClick
+          role="button" // Thêm role để tăng tính truy cập
+          tabIndex={0} // Thêm tabIndex để có thể focus
+          onKeyPress={(e) => {
+            if (e.key === 'Enter') handleBookClick(book.id);
+          }} // Thêm sự kiện onKeyPress để hỗ trợ keyboard
+        >
             {book.coverImage ? (
               <img src={book.coverImage} alt={book.title} className="custom-book-image" />
             ) : (
@@ -151,13 +205,11 @@ const CategoryByBookApi = () => {
                 {book.authors.$values && book.authors.$values.length > 0 ? book.authors.$values[0].name : 'Unknown'}
               </p>
             </div>
-            <div className="custom-book-rating">
-              <span className="custom-heart">❤️</span>
-              <span className="custom-rating-number">{book.rating}</span>
-            </div>
+          
           </div>
         ))}
       </div>
+      {error && <div className="error-message">{error}</div>} {/* Display error message if any */}
     </div>
   );
 };

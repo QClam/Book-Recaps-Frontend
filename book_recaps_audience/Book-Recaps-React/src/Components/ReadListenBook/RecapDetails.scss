@@ -1,0 +1,317 @@
+$primary-color: #0f4473;
+$secondary-color: #6d7f8c;
+$background-color: #f4f5f7;
+
+:root {
+  --text-size: 18px; // Default size
+  --bg-color: #FFFFFF;
+  --text-color: #000000;
+}
+
+.recap-container {
+  display: flex;
+  height: auto;
+  font-family: Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
+  position: relative; // To position context menu relative to this container
+}
+
+.sidebar {
+  width: 250px;
+  transition: width 0.3s;
+
+  &.collapsed {
+    width: 60px;
+  }
+
+  .sidebar-toggle {
+    cursor: pointer;
+    padding: 2px;
+  }
+
+  .sidebar-content {
+    padding: 20px;
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      cursor: pointer;
+
+      .icon {
+        margin-right: 10px;
+      }
+
+      &:hover {
+        background-color: #e0e0e0;
+      }
+    }
+  }
+
+  .sidebar-footer {
+    margin-top: auto;
+    padding: 20px;
+
+    .sidebar-item {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      cursor: pointer;
+
+      .icon {
+        margin-right: 10px;
+      }
+
+      &:hover {
+        background-color: #e0e0e0;
+      }
+    }
+  }
+
+  .text-settings-dropdown {
+    margin-top: 10px;
+    padding: 10px;
+
+    .text-settings-options {
+      display: flex;
+      justify-content: space-around;
+      margin-bottom: 10px;
+    }
+
+    .text-size-option {
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      width: 23px;
+      height: 13px;
+      /* Optional: Add styles to visualize the size */
+    }
+
+    .text-size-option.selected {
+      border: 2px solid #000;
+      border-radius: 4px;
+    }
+
+    .text-size-option:hover {
+      transform: scale(1.2);
+    }
+
+    .color-options {
+      display: flex;
+      justify-content: space-around;
+
+      .color-swatch {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        cursor: pointer;
+      }
+    }
+  }
+}
+
+.recap-detailsls {
+  flex: 1;
+  padding: 20px;
+
+  .recap-header {
+    display: flex;
+    align-items: center;
+    padding-bottom: 20px;
+
+    .back-button {
+      background: none;
+      border: none;
+      font-size: 16px;
+      color: $primary-color;
+      cursor: pointer;
+      text-decoration: underline;
+    }
+  }
+
+  .recap-title {
+    font-size: calc(var(--text-size) + 4px); // Slightly larger than content
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+
+  .subtitle {
+    font-size: var(--text-size);
+    font-weight: normal;
+    margin-bottom: 20px;
+    color: $primary-color;
+  }
+
+  .recap-content {
+    font-size: var(--text-size);
+    line-height: 1.5;
+    color: $secondary-color;
+  }
+
+  .audio-player-section {
+    margin-top: 20px;
+    font-size: var(--text-size);
+    color: var(--text-color); // Ensure text color is applied
+
+    h2 {
+      font-size: calc(var(--text-size) + 4px);
+      margin-bottom: 10px;
+    }
+
+    p {
+      line-height: 1.5;
+      color: var(--text-color); // Updated to use CSS variable
+      /* Ensure paragraphs inherit the font size */
+    }
+
+    audio {
+      width: 100%;
+      outline: none;
+    }
+  }
+}
+
+.text-settings-options {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 10px;
+}
+
+.text-size-option {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  width: 23px;
+  height: 13px;
+  /* Optional: Add styles to visualize the size */
+}
+
+.text-size-option.selected {
+  border: 2px solid #000;
+  border-radius: 4px;
+}
+
+.text-size-option:hover {
+  transform: scale(1.2);
+}
+
+/* Context Menu Styles */
+.context-menu {
+  position: absolute;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  display: flex;
+  gap: 10px; // Space between options
+  border-radius: 4px;
+  z-index: 1000; // Ensure it appears above other elements
+  margin-top: -150px;
+  div {
+    padding: 5px 10px;
+    cursor: pointer;
+    white-space: nowrap;
+    font-size: 14px;
+    color: #333;
+    transition: background-color 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 5px; // Space between icon and text
+
+    &:hover {
+      background-color: #f0f0f0;
+    }
+  }
+}
+
+/* Highlighted segment styling */
+.transcript-segment.highlighted {
+  background-color: yellow;
+  color: black;
+}
+
+/* Optional: Style for transcript segments to indicate interactivity */
+.transcript-segment {
+  cursor: pointer;
+}
+
+/* RecapDetails.scss */
+.transcript-sentence.highlighted {
+  background-color: yellow; // Highlight color
+}
+
+.transcript-sentence {
+  cursor: pointer; // Show pointer cursor on hover
+
+  &.highlighted {
+    background-color: yellow; // Highlight color for playing text
+  }
+
+  &:hover {
+    background-color: lightblue; // Change background on hover
+  }
+}
+
+/* Audio Play Container */
+.audio-play-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  padding: 10px;
+  background-color: var(--bg-color);
+}
+
+/* Audio Controls */
+.audio-controls {
+  display: flex;
+  align-items: center;
+  width: 100%;
+ 
+  .loop-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px;
+    margin-bottom: -350px;
+    margin-left: 10px;
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+
+  audio {
+    flex: 1 1 auto;
+    width: 100%;
+    max-width: 600px; /* Adjust as needed */
+  }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .audio-controls {
+    flex-direction: column;
+
+    .loop-button {
+      margin-right: 0;
+      margin-bottom: 10px;
+    }
+
+    audio {
+      width: 100%;
+      max-width: none;
+    }
+  }
+}
+
+.transcript-section p {
+    display: inline; /* Hoặc inline-block nếu bạn cần */
+    margin: 0;       /* Loại bỏ khoảng cách mặc định */
+  }
+  
+
+  

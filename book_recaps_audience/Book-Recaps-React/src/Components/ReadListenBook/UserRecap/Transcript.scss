@@ -1,0 +1,145 @@
+.transcript-areaea {
+    max-height: 400px;
+    overflow-y: hidden;
+    padding: 10px;
+    border: 1px solid #ccc;
+  }
+  
+  .transcript-sentence {
+    cursor: pointer;
+    padding: 1px;
+    transition: background-color 0.3s;
+   
+    
+  }
+  
+  .transcript-sentence:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .transcript-sentence.active {
+    background-color: #e8a966;
+  }
+  
+  
+  .transcript-sentence.user-highlighted {
+    background-color: #ffeeba; /* Màu vàng nhạt để highlight */
+  }
+  
+  /* Context Menu */
+  .context-menu {
+    position: absolute;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    z-index: 1000;
+    width: 190px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 40px;
+  }
+  
+  .context-menu-item {
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+  
+  .context-menu-item:hover {
+    background-color: #f0f0f0;
+  }
+  
+  .context-menu-item span.icon {
+    margin-right: 8px;
+  }
+  .note-icon {
+    margin-left: 5px;
+    cursor: pointer;
+  }
+  
+  /* Context Menu */
+  .context-menu {
+    position: absolute;
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+    z-index: 1000;
+    width: 290px;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-left: -70px;
+  }
+  
+  .context-menu-item {
+    padding: 10px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+  
+  
+  .context-menu-item span.icon {
+    margin-right: 8px;
+  }
+
+  .note-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .note-modal {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    width: 400px;
+    max-width: 90%;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  }
+  
+  .note-modal h2 {
+    margin-top: 0;
+  }
+  
+  .note-modal textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: vertical;
+  }
+  
+  .modal-buttonss {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 10px;
+  }
+  
+  .modal-buttonss button {
+    padding: 8px 12px;
+    margin-left: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .modal-buttonss button:first-child {
+    background-color: #28a745;
+    color: #fff;
+  }
+  
+  .modal-buttonss button:last-child {
+    background-color: #dc3545;
+    color: #fff;
+  }
+  
+  .modal-buttonss button:hover {
+    opacity: 0.9;
+  }

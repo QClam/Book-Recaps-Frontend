@@ -10,6 +10,7 @@ const ExploreCategory = () => {
         <div>
             <BookApiCategory />
             <CategoryByBookApi />
+           
             {/* <ListCategory /> */}
             {/* <CustomCategory /> */}
         </div>

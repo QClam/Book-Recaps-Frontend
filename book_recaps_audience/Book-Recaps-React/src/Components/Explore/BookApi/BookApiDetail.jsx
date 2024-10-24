@@ -1,7 +1,7 @@
-// BookApiDetail.jsx
 import React, { useEffect, useState } from 'react';
 import './BookApiDetail.scss';
 import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
 const BookApiDetail = () => {
   const [books, setBooks] = useState([]);
@@ -9,38 +9,62 @@ const BookApiDetail = () => {
   const [error, setError] = useState(null);
   const navigate = useNavigate();
 
+  // Get accessToken and refreshToken from localStorage
+  const accessToken = localStorage.getItem('authToken');
+  const refreshToken = localStorage.getItem('refreshToken');
+
   const fetchBooks = async () => {
-    const token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJmN2JhMGVmNy0xNGU5LTRiMWUtOTMzZi0zNjUxYjYxODI2YjAiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjhkMGFlYzdhLWZlZDEtNDFiZi1kYTQxLTA4ZGNlMmRjOTAyYSIsImVtYWlsIjoiY29udHJpYnV0b3JAcm9vdC5jb20iLCJzdWIiOiJjb250cmlidXRvckByb290LmNvbSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL21vYmlsZXBob25lIjoiMDk0MjcwNTYwNSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJjb250cmlidXRvciIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2dpdmVubmFtZSI6ImNvbnRyaWJ1dG9yIiwiaXBBZGRyZXNzIjoiMTE2LjExMC40MS45MCIsImltYWdlX3VybCI6IkZpbGVzL0ltYWdlL2pwZy9hZC5qcGciLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJDb250cmlidXRvciIsImV4cCI6MTcyODIxMTA4NCwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzEyNCIsImF1ZCI6ImJvb2tyZWNhcCJ9.9kBr24PfBlXZcVWUySL2_VJfy7QH7DPdsfQnuuqygZg'
     try {
-      const response = await fetch('https://160.25.80.100:7124/api/book/getallbooks', {
-        method: 'GET',
+      const response = await axios.get('https://160.25.80.100:7124/api/book/getallbooks', {
         headers: {
-          'accept': '*/*',
-          'Authorization': `Bearer ${token}`
-        }
+          'Authorization': `Bearer ${accessToken}`,
+        },
       });
 
-      if (!response.ok) {
-        const errorDetails = await response.text();
-        throw new Error(`HTTP error! status: ${response.status}, details: ${errorDetails}`);
+      const data = response.data;
+      if (data && data.data && Array.isArray(data.data.$values)) {
+        setBooks(data.data.$values);
+      } else {
+        setBooks([]);
       }
-
-      const data = await response.json();
-      setBooks(data.data.$values);
     } catch (error) {
-      console.error('Error fetching data:', error);
-      setError(error.message);
+      if (error.response && error.response.status === 401) {
+        await handleTokenRefresh();
+        fetchBooks(); // Retry fetching books after refreshing the token
+      } else {
+        setError(error.message);
+        console.error('Error fetching data:', error);
+      }
     } finally {
       setLoading(false);
     }
   };
 
+  const handleTokenRefresh = async () => {
+    try {
+      const response = await axios.post('https://160.25.80.100:7124/api/tokens/refresh', {
+        refreshToken,
+      });
+
+      const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data.message.token;
+
+      // Update localStorage with new tokens
+      localStorage.setItem('authToken', newAccessToken);
+      localStorage.setItem('refreshToken', newRefreshToken);
+
+      console.log('Token refreshed successfully');
+    } catch (error) {
+      console.error('Error refreshing token:', error);
+      setError('Session expired. Please log in again.');
+    }
+  };
+
   useEffect(() => {
     fetchBooks();
-  }, []);
+  }, [accessToken]);
 
   const handleBookClick = (id) => {
-    navigate(`/book/${id}`);
+    navigate(`/bookdetailbook/${id}`); // Navigate to the book detail page with the book ID
   };
 
   return (
