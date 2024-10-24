@@ -1,0 +1,92 @@
+.recap-list {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  padding: 30px;
+  background-color: #f9f9f9;
+  border-radius: 15px;
+
+  .recap-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding: 20px;
+    border: 1px solid #dedede;
+    border-radius: 15px;
+    background-color: #fff;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+    &:hover {
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15);
+    }
+
+    .recap-book {
+      flex: 3;
+      margin-right: 30px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      .recap-book-image {
+        width: 180px;
+        height: 270px;
+        border-radius: 10px;
+        object-fit: cover;
+        margin-bottom: 10px;
+        transition: transform 0.3s ease-in-out;
+
+        &:hover {
+          transform: scale(1.05);
+        }
+      }
+
+      h2 {
+        margin: 15px 0;
+        font-size: 20px;
+        font-weight: bold;
+        color: #2c3e50;
+      }
+
+      p {
+        font-size: 14px;
+        color: #7f8c8d;
+        line-height: 1.5;
+      }
+    }
+
+    .recap-contributor {
+      flex: 1;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+
+      .contributor-image {
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        object-fit: cover;
+        margin-bottom: 15px;
+        border: 3px solid #2c3e50;
+      }
+
+      h3 {
+        font-size: 18px;
+        color: #34495e;
+        margin-bottom: 10px;
+      }
+
+      a {
+        color: #3498db;
+        font-weight: bold;
+        text-decoration: none;
+        transition: color 0.3s ease-in-out;
+
+        &:hover {
+          color: #2980b9;
+        }
+      }
+    }
+  }
+}

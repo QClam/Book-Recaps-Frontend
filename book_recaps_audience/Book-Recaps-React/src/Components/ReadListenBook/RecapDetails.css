@@ -1,0 +1,277 @@
+@charset "UTF-8";
+:root {
+  --text-size: 18px;
+  --bg-color: #FFFFFF;
+  --text-color: #000000;
+}
+
+.recap-container {
+  display: flex;
+  height: auto;
+  font-family: Arial, sans-serif;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
+  position: relative;
+}
+
+.sidebar {
+  width: 250px;
+  transition: width 0.3s;
+}
+.sidebar.collapsed {
+  width: 60px;
+}
+.sidebar .sidebar-toggle {
+  cursor: pointer;
+  padding: 2px;
+}
+.sidebar .sidebar-content {
+  padding: 20px;
+}
+.sidebar .sidebar-content .sidebar-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+}
+.sidebar .sidebar-content .sidebar-item .icon {
+  margin-right: 10px;
+}
+.sidebar .sidebar-content .sidebar-item:hover {
+  background-color: #e0e0e0;
+}
+.sidebar .sidebar-footer {
+  margin-top: auto;
+  padding: 20px;
+}
+.sidebar .sidebar-footer .sidebar-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  cursor: pointer;
+}
+.sidebar .sidebar-footer .sidebar-item .icon {
+  margin-right: 10px;
+}
+.sidebar .sidebar-footer .sidebar-item:hover {
+  background-color: #e0e0e0;
+}
+.sidebar .text-settings-dropdown {
+  margin-top: 10px;
+  padding: 10px;
+}
+.sidebar .text-settings-dropdown .text-settings-options {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 10px;
+}
+.sidebar .text-settings-dropdown .text-size-option {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  width: 23px;
+  height: 13px;
+  /* Optional: Add styles to visualize the size */
+}
+.sidebar .text-settings-dropdown .text-size-option.selected {
+  border: 2px solid #000;
+  border-radius: 4px;
+}
+.sidebar .text-settings-dropdown .text-size-option:hover {
+  transform: scale(1.2);
+}
+.sidebar .text-settings-dropdown .color-options {
+  display: flex;
+  justify-content: space-around;
+}
+.sidebar .text-settings-dropdown .color-options .color-swatch {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.recap-detailsls {
+  flex: 1;
+  padding: 20px;
+}
+.recap-detailsls .recap-header {
+  display: flex;
+  align-items: center;
+  padding-bottom: 20px;
+}
+.recap-detailsls .recap-header .back-button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  color: #0f4473;
+  cursor: pointer;
+  text-decoration: underline;
+}
+.recap-detailsls .recap-title {
+  font-size: calc(var(--text-size) + 4px);
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+.recap-detailsls .subtitle {
+  font-size: var(--text-size);
+  font-weight: normal;
+  margin-bottom: 20px;
+  color: #0f4473;
+}
+.recap-detailsls .recap-content {
+  font-size: var(--text-size);
+  line-height: 1.5;
+  color: #6d7f8c;
+}
+.recap-detailsls .audio-player-section {
+  margin-top: 20px;
+  font-size: var(--text-size);
+  color: var(--text-color);
+}
+.recap-detailsls .audio-player-section h2 {
+  font-size: calc(var(--text-size) + 4px);
+  margin-bottom: 10px;
+}
+.recap-detailsls .audio-player-section p {
+  line-height: 1.5;
+  color: var(--text-color);
+  /* Ensure paragraphs inherit the font size */
+}
+.recap-detailsls .audio-player-section audio {
+  width: 100%;
+  outline: none;
+}
+
+.text-settings-options {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 10px;
+}
+
+.text-size-option {
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  width: 23px;
+  height: 13px;
+  /* Optional: Add styles to visualize the size */
+}
+
+.text-size-option.selected {
+  border: 2px solid #000;
+  border-radius: 4px;
+}
+
+.text-size-option:hover {
+  transform: scale(1.2);
+}
+
+/* Context Menu Styles */
+.context-menu {
+  position: absolute;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  display: flex;
+  gap: 10px;
+  border-radius: 4px;
+  z-index: 1000;
+  margin-top: -150px;
+}
+.context-menu div {
+  padding: 5px 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  font-size: 14px;
+  color: #333;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.context-menu div:hover {
+  background-color: #f0f0f0;
+}
+
+/* Highlighted segment styling */
+.transcript-segment.highlighted {
+  background-color: yellow;
+  color: black;
+}
+
+/* Optional: Style for transcript segments to indicate interactivity */
+.transcript-segment {
+  cursor: pointer;
+}
+
+/* RecapDetails.scss */
+.transcript-sentence.highlighted {
+  background-color: yellow;
+}
+
+.transcript-sentence {
+  cursor: pointer;
+}
+.transcript-sentence.highlighted {
+  background-color: yellow;
+}
+.transcript-sentence:hover {
+  background-color: lightblue;
+}
+
+/* Audio Play Container */
+.audio-play-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 20px;
+  padding: 10px;
+  background-color: var(--bg-color);
+}
+
+/* Audio Controls */
+.audio-controls {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+.audio-controls .loop-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  margin-right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px;
+  margin-bottom: -640px;
+  margin-left: 10px;
+}
+.audio-controls .loop-button:hover {
+  opacity: 0.8;
+}
+.audio-controls audio {
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: 600px; /* Adjust as needed */
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .audio-controls {
+    flex-direction: column;
+  }
+  .audio-controls .loop-button {
+    margin-right: 0;
+    margin-bottom: 10px;
+  }
+  .audio-controls audio {
+    width: 100%;
+    max-width: none;
+  }
+}
+.transcript-section p {
+  display: inline; /* Hoặc inline-block nếu bạn cần */
+  margin: 0; /* Loại bỏ khoảng cách mặc định */
+}/*# sourceMappingURL=RecapDetails.css.map */

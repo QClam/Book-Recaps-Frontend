@@ -47,6 +47,14 @@ import BookDetailItem from "./Components/Explore/BookApi/BookDetailItem";
 import AuthorApi from "./Components/Space/AuthorApi/AuthorApi";
 import RecapDetails from "./Components/ReadListenBook/RecapDetails";
 import Login from "./Components/Auth/Login";
+import BookDetailBook from "./Components/Explore/BookApi/BookDetailBook";
+import AllBookRecap from "./Components/ReadListenBook/AllBookRecap/AllBookRecap";
+import BookListCategory from "./Components/Explore/BookApiCategory/BookListCategory/BookListCategory";
+import AuthorBookApi from "./Components/Space/AuthorApi/AuthorBookApi/AuthorBookApi";
+import UserRecapDetail from "./Components/ReadListenBook/UserRecap/UserRecapDetail";
+import PlaylistBookList from "./Components/Library/PlaylistBook/PlaylistBookList";
+import HighlightAll from "./Components/Highlight/HighlightAll";
+import RecapByContributor from "./Components/ContributorItem/RecapByContributor/RecapByContributor";
 
 function App() {
   const [completedOnboarding, setCompletedOnboarding] = useState(false);
@@ -89,11 +97,15 @@ function App() {
                 <Route path="/for-you" element={<Explore />} />
                 <Route path="/explore" element={<Explore />} />
                 <Route path="/categories" element={<ExploreCategory />} />
+                {/* tu BookApiCategory qua BookListCategory */}
+                <Route path="/category/:categoryId" element={<BookListCategory />} />
                 {/* explore co book trending co book trending detail */}
                 <Route path="/book-trending-detail" element={<BookTrendingDetail />} />
-                <Route path="/library" element={<LibraryBook />} />
+                <Route path="/playlist" element={<LibraryBook />} />
+                {/* <Route path="/playlist/:id" element={<PlaylistBookList />} /> */}
                 <Route path="/all-books" element={<AllBooks />} />
                 <Route path="/author" element={<AuthorBy />} />
+                <Route path="/author-book-api/:id" element={<AuthorBookApi />} />
                 {/* <Route path="/author" element={<AuthorApi />} /> */}
                 {/*trong muc space co Author, Author by r bam vao hien ra list author */}
                 <Route path="/author-detail" element={<AuthorDetail />} />
@@ -102,21 +114,33 @@ function App() {
                 {/* trong space co author by genre */}
                 <Route path="/authors/:genre" element={<AuthorGenersDetail />} />
 
+                {/* Contributor Item */}
+                <Route path="/contributor" element={<RecapByContributor />} />
 
-                <Route path="/highlights" element={<HighLight />} />
+                <Route path="/highlights" element={<HighlightAll />} />
                 <Route path="/highlight-details" element={<HighlightDetails />} />
                 <Route path="/books" element={<BookFree />} />
+                {/* trong BookFree co BookRecap, seemore thay AllBookRecap */}
+                <Route path="/all-books-recap" element={<AllBookRecap />} />
                 <Route path="/popular-books-detail" element={<PopularBookDetail />} />
                 <Route path="/book/:id" element={<BookDetail />} />
                 
                 {/* trong Explore co Book list by category */}
-                <Route path="/books" element={<BooksByCategory />} />
+                {/* <Route path="/books" element={<BooksByCategory />} /> */}
                 {/* Book list by category detail */}
                 <Route path="/bookbycategory/:id" element={<BookByCategoryDetail />} />
                 
                 <Route path="/book-api-detail" element={<BookApiDetail />} />
-                <Route path="/book/:id" element={<BookDetailItem />} />
-                <Route path="/recap/:bookId" element={<RecapDetails />} /> {/* Route cho trang RecapDetails */}
+                <Route path="/bookapi/:id" element={<BookDetailItem />} />
+
+                {/* <Route path="/recap/:bookId" element={<RecapDetails />} />  */}
+                {/* api book detail trang Books thuoc BookFree */}
+                {/* <Route path="/bookdetailbook/:id" element={<BookDetailBook />} /> */}
+
+                {/* Recap User Recap Detail */}
+                <Route path="/user-recap-detail/:id" element={<UserRecapDetail />} />
+
+
               </Route>
 
                 {/* Route không có sidebar */}
@@ -124,8 +148,8 @@ function App() {
                 <Route path="/application" element={<Application />} />
                 <Route path="/billing" element={<Billing />} />
 
-                <Route path="/help" element={<Help />} />
-                <Route path="/report" element={<Report />} />
+                <Route path="/help" element={<Report />} />
+                {/* <Route path="/report" element={<Report />} /> */}
                 {/* Khi bam vao button listen trong today free detail la BookDetail */}
                {/* <Route path="/read" element={<ListenBook />} /> */}
               {/* <Route path="/listen" element={<TextToSpeechWithHighlighting />} />  */}

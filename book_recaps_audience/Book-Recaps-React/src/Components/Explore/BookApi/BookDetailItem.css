@@ -1,0 +1,42 @@
+/* BookDetailItem.scss */
+.book-detail-item {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.book-detail-item h1 {
+  font-size: 2em;
+  margin-bottom: 10px;
+}
+.book-detail-item h2 {
+  font-size: 1.5em;
+  color: #555;
+  margin-bottom: 20px;
+}
+.book-detail-item p {
+  font-size: 1em;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+.book-detail-item img.book-detail-cover {
+  max-width: 100%;
+  height: auto;
+  margin-top: 20px;
+  border-radius: 8px;
+}
+.book-detail-item ul {
+  list-style-type: none;
+  padding: 0;
+}
+.book-detail-item ul li {
+  background-color: #f9f9f9;
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 5px;
+}
+.book-detail-item ul li p {
+  margin: 5px 0;
+}
+.book-detail-item div {
+  margin-top: 20px;
+}/*# sourceMappingURL=BookDetailItem.css.map */

@@ -1,0 +1,71 @@
+.recap-wrapper {
+    padding: 20px;
+    margin-top: -80px;
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+  
+    .recap-error {
+      color: red;
+      text-align: center;
+    }
+  
+    .recap-book-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);  // Chia thành 4 cột đều nhau
+      gap: 20px;  // Khoảng cách giữa các cuốn sách
+      justify-items: center;  // Canh giữa các cuốn sách theo chiều ngang
+      margin-bottom: 20px;
+    }
+  
+    .recap-book-card {
+      background-color: #f8f8f8;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 25px;
+      text-align: center;
+      cursor: pointer;
+      transition: transform 0.3s;
+  
+      &:hover {
+        transform: scale(1.05);
+      }
+  
+      img.recap-book-cover {
+        width: 200px;
+        height: 250px;  // Giới hạn chiều cao của ảnh bìa
+        object-fit: cover;  // Đảm bảo ảnh bìa không bị méo
+        margin-bottom: 10px;
+      }
+  
+      h2 {
+        font-size: 15px;
+        font-weight: bold;
+        margin: 10px 0;
+        white-space: pre-wrap; /* Cho phép ngắt dòng theo ký tự \n */
+        word-wrap: break-word; /* Ngắt dòng nếu tiêu đề quá dài */
+      }
+      
+      p {
+        font-size: 14px;
+        color: #555;
+      }
+    }
+  
+    .recap-see-more {
+      display: block;
+      margin: 0 auto;
+      padding: 10px 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+  
+      &:hover {
+        background-color: #0056b3;
+      }
+    }
+  }
+  

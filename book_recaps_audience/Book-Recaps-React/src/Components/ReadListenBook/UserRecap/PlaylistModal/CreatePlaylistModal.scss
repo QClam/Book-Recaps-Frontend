@@ -1,0 +1,131 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6); // Darken the overlay for better focus on modal
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 25px 30px;
+  border-radius: 12px; // Softer corners for a modern look
+  width: 450px;
+  max-width: 90%; // Responsive for smaller screens
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2); // Increased shadow for depth
+  transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+  
+  // Add a subtle animation effect when modal appears
+  transform: translateY(-20px);
+  opacity: 0;
+  animation: fadeIn 0.4s forwards;
+}
+
+@keyframes fadeIn {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modal-content h2 {
+  margin-bottom: 20px;
+  font-size: 24px;
+  color: #333;
+  font-weight: bold;
+  text-align: center; // Centered header for emphasis
+}
+
+.modal-content h3 {
+  font-size: 18px;
+  margin-bottom: 15px;
+  color: #444;
+  font-weight: 500;
+}
+
+.modal-content input[type='text'] {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin-bottom: 20px;
+  font-size: 16px;
+  color: #555;
+  transition: border 0.2s;
+
+  &:focus {
+    border-color: #1db954; // Spotify green for focus color
+    outline: none;
+  }
+}
+
+.modal-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.modal-buttons button {
+  padding: 12px 25px;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+
+  &:first-child {
+    background: #f5f5f5;
+    color: #555;
+
+    &:hover {
+      background: #e0e0e0;
+    }
+  }
+
+  &:nth-child(2) {
+    background: #ffca28; // Bright color to stand out for "Save"
+    color: white;
+
+    &:hover {
+      background: #ffc107;
+    }
+  }
+
+  &:last-child {
+    background: #1db954; // Brand color for "Create"
+    color: white;
+
+    &:hover {
+      background: #17a84b;
+    }
+  }
+
+  &:disabled {
+    background: #ddd;
+    color: #999;
+    cursor: not-allowed;
+  }
+}
+
+.modal-content label {
+  font-size: 16px;
+  color: #333;
+}
+
+.modal-content div {
+  margin-bottom: 15px;
+}
+
+input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+p {
+  color: #888;
+  font-size: 14px;
+}

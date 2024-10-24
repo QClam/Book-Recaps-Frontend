@@ -1,7 +1,7 @@
 .custom-category-wrapper {
     padding: 20px;
     font-family: 'Arial', sans-serif;
-    background-color: #f0f2f5; // Thêm nền nhẹ cho toàn bộ vùng chứa
+    
   
     .custom-category-header {
       display: flex;
@@ -76,7 +76,7 @@
   
       .custom-book-card {
         background-color: #fff;
-        padding: 15px;
+        padding: 35px;
         border-radius: 12px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -85,15 +85,17 @@
         flex-direction: column;
         align-items: center;
         text-align: center;
-  
+        height: 400px;
         &:hover {
           transform: scale(1.05);
           box-shadow: 0 6px 18px rgba(0, 0, 0, 0.2);
         }
   
         .custom-book-image {
-          width: 100%;
-          height: auto;
+          // width: 100%;
+          // height: auto;
+          width: 200px;
+          height: 300px;
           object-fit: cover;
           border-radius: 8px;
           margin-bottom: 10px;

@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 function Login() {
   const [isActive, setIsActive] = useState(false);
   const navigate = useNavigate();
+
   const [registerForm, setRegisterForm] = useState({
     fullName: "",
     email: "",
@@ -83,7 +84,7 @@ function Login() {
 
     try {
 
-      const token = await executeRecaptcha("signup")
+      const capcha = await executeRecaptcha("signup")
 
       const newUser = {
         fullName: registerForm.fullName,
@@ -91,7 +92,7 @@ function Login() {
         password: registerForm.password,
         confirmPassword: registerForm.confirmPassword,
         phoneNumber: registerForm.phoneNumber,
-        captchaToken: token,
+        captchaToken: capcha,
       };
 
       const response = await axios.post(
@@ -123,32 +124,43 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-
+  
     if (!executeRecaptcha) {
       setError("reCAPTCHA chưa được khởi tạo");
       return;
     }
-
+  
     try {
       // Thực hiện reCAPTCHA
-      const token = await executeRecaptcha("login");
-
+      const capcha = await executeRecaptcha("login");
+  
       // Login request
-      const response = await axios.post(
-        "https://160.25.80.100:7124/api/tokens",
-        {
-          email,
-          password,
-          captchaToken: token,
-        }
-      );
+      const response = await axios.post("https://160.25.80.100:7124/api/tokens", {
+        email,
+        password,
+        captchaToken: capcha,
+      });
+  
+      const { accessToken, refreshToken } = response.data.message.token;
 
-      console.log("Login successfully", response.data);
-      navigate("/");
+      // Save the tokens if they exist
+      if (accessToken && refreshToken) {
+        localStorage.setItem("authToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+        console.log("AccessToken saved to localStorage:", accessToken);
+        console.log("RefreshToken saved to localStorage:", refreshToken);
+      } else {
+        console.error("Tokens not found in API response");
+        setError("Không tìm thấy token trong phản hồi của API.");
+      }
+    
+      navigate("/"); // Navigate to the home page after successful login
     } catch (error) {
-      setError("Đăng nhập thất bại", error);
+      console.error("Error logging in:", error.response ? error.response.data : error.message);
+      setError("Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản và mật khẩu.");
     }
   };
+  
 
   return (
     <div className="login-page">

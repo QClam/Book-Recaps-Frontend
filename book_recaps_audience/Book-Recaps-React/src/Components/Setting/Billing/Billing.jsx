@@ -1,58 +1,59 @@
-import React from 'react';
+import React from 'react'; 
 import './Billing.scss';
 
 function Billing() {
   return (
     <div className="billing-container">
-      <h1>Start your 5-day free trial</h1>
+      <h1>Bắt đầu dùng thử miễn phí 5 ngày</h1>
       <p>
-        Get full access to Shortform. You won't be charged until your free trial ends on Sept 24. Cancel anytime.
+        Nhận quyền truy cập đầy đủ vào BookRecaps. Bạn sẽ không bị tính phí cho đến khi kết thúc thời gian dùng thử miễn phí. Huỷ bất cứ lúc nào.
       </p>
 
       <div className="billing-options">
-        {/* Annual Plan */}
-        <div className="billing-card">
+                {/* Gói hàng tháng */}
+                <div className="billing-card">
           <div className="billing-header">
             <div className="billing-title">
               <i className="calendar-icon"></i>
-              <h2>Annually</h2>
+              <h2>Hàng tháng</h2>
             </div>
-            <p className="price">$16.42/mo</p>
-            <p className="billed">Billed annually at <strong>$197</strong></p>
+            <p className="price">80.000/tháng</p>
+            <p className="billed">Tính phí hàng tháng</p>
           </div>
-          <button className="start-trial-button annual">Start Free Trial</button>
+          <button className="start-trial-button monthly">Bắt đầu dùng thử miễn phí</button>
           <ul className="features-list">
-            <li>5-Day Free Trial</li>
-            <li>1000+ Books Covered</li>
-            <li>500+ Article and Topic Guides</li>
-            <li>Mobile App (iOS/Android)</li>
-            <li>Highlights & Notes</li>
-            <li>Audio Narrations</li>
-            <li>Community Discussions</li>
+            
+            <li>Hơn 100 cuốn sách</li>
+            <li>Hơn 100 bài tóm tắt sách khác nhau</li>
+            <li>Ứng dụng di động (iOS/Android)</li>
+            <li>Đánh dấu & Ghi chú</li>
+            <li>Kể chuyện bằng âm thanh</li>
+           
           </ul>
         </div>
 
-        {/* Monthly Plan */}
+        {/* Gói hàng năm */}
         <div className="billing-card">
           <div className="billing-header">
             <div className="billing-title">
               <i className="calendar-icon"></i>
-              <h2>Monthly</h2>
+              <h2>Hàng năm</h2>
             </div>
-            <p className="price">$24.00/mo</p>
-            <p className="billed">Billed monthly</p>
+            <p className="price">800.000/năm</p>
+            <p className="billed">Tính phí hàng năm</p>
           </div>
-          <button className="start-trial-button monthly">Start Free Trial</button>
+          <button className="start-trial-button annual">Bắt đầu dùng thử miễn phí</button>
           <ul className="features-list">
-            <li>5-Day Free Trial</li>
-            <li>1000+ Books Covered</li>
-            <li>500+ Article and Topic Guides</li>
-            <li>Mobile App (iOS/Android)</li>
-            <li>Highlights & Notes</li>
-            <li>Audio Narrations</li>
-            <li>Community Discussions</li>
+            <li>Hơn 100 cuốn sách</li>
+            <li>Hơn 100 hướng dẫn bài viết và chủ đề</li>
+            <li>Ứng dụng di động (iOS/Android)</li>
+            <li>Đánh dấu & Ghi chú</li>
+            <li>Kể chuyện bằng âm thanh</li>
+            
           </ul>
         </div>
+
+
       </div>
     </div>
   );

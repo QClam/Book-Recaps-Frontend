@@ -1,66 +1,296 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from 'react-router-dom';
 import ReactPaginate from "react-paginate";
-import "./BookApi.css"; // Import your CSS for styling
+import axios from "axios";
+import "./BookApi.scss"; // Import CSS cho styling
 
 const BookApi = () => {
   const [books, setBooks] = useState([]);
+  const [filteredBooks, setFilteredBooks] = useState([]);
   const [currentPage, setCurrentPage] = useState(0);
   const [error, setError] = useState(null); // For error handling
-  const booksPerPage = 10; // Number of books per page
-  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiI2NWRmM2ExZC04NWY5LTQ2MzMtYTAwZC01ZTg0MjFiZWI3ZTQiLCJodHRwOi8vc2NoZW1hcy54bWxzb2FwLm9yZy93cy8yMDA1LzA1L2lkZW50aXR5L2NsYWltcy9uYW1laWRlbnRpZmllciI6IjhkMGFlYzdhLWZlZDEtNDFiZi1kYTQxLTA4ZGNlMmRjOTAyYSIsImVtYWlsIjoiY29udHJpYnV0b3JAcm9vdC5jb20iLCJzdWIiOiJjb250cmlidXRvckByb290LmNvbSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL21vYmlsZXBob25lIjoiMDk0MjcwNTYwNSIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL25hbWUiOiJjb250cmlidXRvciIsImh0dHA6Ly9zY2hlbWFzLnhtbHNvYXAub3JnL3dzLzIwMDUvMDUvaWRlbnRpdHkvY2xhaW1zL2dpdmVubmFtZSI6ImNvbnRyaWJ1dG9yIiwiaXBBZGRyZXNzIjoiMTE2LjExMC40MS45MCIsImltYWdlX3VybCI6IkZpbGVzL0ltYWdlL2pwZy9hZC5qcGciLCJodHRwOi8vc2NoZW1hcy5taWNyb3NvZnQuY29tL3dzLzIwMDgvMDYvaWRlbnRpdHkvY2xhaW1zL3JvbGUiOiJDb250cmlidXRvciIsImV4cCI6MTcyODIyODA3NiwiaXNzIjoiaHR0cHM6Ly9sb2NhbGhvc3Q6NzEyNCIsImF1ZCI6ImJvb2tyZWNhcCJ9.S6zTH1h6IdHOHndAtLhY7B_rVcnSBb1-Elqii75QX4Q"; // Replace with your actual token
+  const booksPerPage = 16; // Số lượng sách mỗi trang
+  const navigate = useNavigate();
+  // Trạng thái cho Search
+  const [searchTitle, setSearchTitle] = useState("");
+  const [searchAuthor, setSearchAuthor] = useState("");
+
+  // Trạng thái cho Filter
+  const [categories, setCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+  const [ageLimits, setAgeLimits] = useState([]);
+  const [selectedAgeLimit, setSelectedAgeLimit] = useState("");
+  const [publicationYears, setPublicationYears] = useState([]);
+  const [selectedPublicationYear, setSelectedPublicationYear] = useState("");
+
+  // Lấy accessToken và refreshToken từ localStorage
+  const accessToken = localStorage.getItem("authToken");
+  const refreshToken = localStorage.getItem("refreshToken");
 
   useEffect(() => {
-    // Fetch the book data from the API
     const fetchBooks = async () => {
       try {
-        const response = await fetch('https://160.25.80.100:7124/api/book/getallbooks', {
-          method: 'GET',
-          headers: {
-            'accept': '*/*',
-            'Authorization': `Bearer ${token}`
+        // Fetch books data from the API
+        const response = await axios.get(
+          "https://160.25.80.100:7124/api/book/getallbooks",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+            },
           }
-        });
+        );
 
-        if (!response.ok) {
-          const errorDetails = await response.text();
-          throw new Error(`HTTP error! status: ${response.status}, details: ${errorDetails}`);
-        }
+        const data = response.data;
+        console.log("Fetched Books Data:", data); // Kiểm tra dữ liệu
 
-        const data = await response.json();
         if (data && data.data && Array.isArray(data.data.$values)) {
-          setBooks(data.data.$values); // Assuming book data is in `data.$values`
+          setBooks(data.data.$values); // Giả sử dữ liệu sách nằm trong `data.$values`
+          setFilteredBooks(data.data.$values);
+          extractFilters(data.data.$values);
         } else {
-          setBooks([]); // If no data is present, set an empty array
+          setBooks([]);
+          setFilteredBooks([]);
         }
       } catch (error) {
-        setError(error.message);
-        console.error("Error fetching books:", error);
+        // Nếu token hết hạn, thử làm mới nó
+        if (error.response && error.response.status === 401) {
+          await handleTokenRefresh();
+          fetchBooks(); // Thử lại việc lấy sách sau khi làm mới token
+        } else {
+          setError(error.message);
+          console.error("Error fetching books:", error);
+        }
       }
     };
 
     fetchBooks();
-  }, [token]);
+  }, [accessToken]);
 
-  // Calculate pagination
-  const pageCount = books.length > 0 ? Math.ceil(books.length / booksPerPage) : 1;
+  // Hàm làm mới token
+  const handleTokenRefresh = async () => {
+    try {
+      const response = await axios.post(
+        "https://160.25.80.100:7124/api/tokens/refresh",
+        {
+          refreshToken,
+        }
+      );
+
+      const {
+        accessToken: newAccessToken,
+        refreshToken: newRefreshToken,
+      } = response.data.message.token;
+
+      // Cập nhật localStorage với token mới
+      localStorage.setItem("authToken", newAccessToken);
+      localStorage.setItem("refreshToken", newRefreshToken);
+
+      console.log("Token refreshed successfully");
+    } catch (error) {
+      console.error("Error refreshing token:", error);
+      setError("Session expired. Please log in again.");
+    }
+  };
+
+  // Hàm để trích xuất các giá trị lọc từ dữ liệu sách
+  const extractFilters = (booksData) => {
+    const categorySet = new Set();
+    const ageLimitSet = new Set();
+    const publicationYearSet = new Set();
+
+    booksData.forEach((book) => {
+      // Categories
+      if (book.categories && book.categories.$values) {
+        book.categories.$values.forEach((cat) => categorySet.add(cat.name));
+      }
+
+      // Age Limits
+      ageLimitSet.add(book.ageLimit);
+
+      // Publication Years
+      publicationYearSet.add(book.publicationYear);
+    });
+
+    setCategories([...categorySet]);
+    setAgeLimits([...ageLimitSet].sort((a, b) => a - b));
+    setPublicationYears([...publicationYearSet].sort((a, b) => b - a));
+  };
+
+  // Hàm xử lý khi thay đổi Search hoặc Filter
+  useEffect(() => {
+    let tempBooks = [...books];
+
+    // Apply Search by title
+    if (searchTitle) {
+      tempBooks = tempBooks.filter((book) =>
+        book.title.toLowerCase().includes(searchTitle.toLowerCase())
+      );
+    }
+
+    // Apply Search by author
+    if (searchAuthor) {
+      const lowerSearchAuthor = searchAuthor.toLowerCase();
+      tempBooks = tempBooks.filter((book) =>
+        book.authors &&
+        book.authors.$values &&
+        book.authors.$values.some(
+          (author) =>
+            author.name &&
+            author.name.toLowerCase().includes(lowerSearchAuthor)
+        )
+      );
+    }
+
+    // Apply Filter (Categories, Age Limit, Publication Year)
+    if (selectedCategories.length > 0) {
+      tempBooks = tempBooks.filter((book) =>
+        book.categories &&
+        book.categories.$values &&
+        book.categories.$values.some((cat) =>
+          selectedCategories.includes(cat.name)
+        )
+      );
+    }
+
+    if (selectedAgeLimit !== "") {
+      tempBooks = tempBooks.filter(
+        (book) => book.ageLimit === Number(selectedAgeLimit)
+      );
+    }
+
+    if (selectedPublicationYear !== "") {
+      tempBooks = tempBooks.filter(
+        (book) => book.publicationYear === Number(selectedPublicationYear)
+      );
+    }
+
+    setFilteredBooks(tempBooks);
+    setCurrentPage(0); // Reset về trang đầu khi có thay đổi
+  }, [
+    books,
+    searchTitle,
+    searchAuthor,
+    selectedCategories,
+    selectedAgeLimit,
+    selectedPublicationYear,
+  ]);
+
+  // Tính toán phân trang
+  const pageCount =
+    filteredBooks.length > 0 ? Math.ceil(filteredBooks.length / booksPerPage) : 1;
   const offset = currentPage * booksPerPage;
-  const currentBooks = books.length > 0 ? books.slice(offset, offset + booksPerPage) : [];
+  const currentBooks = filteredBooks.slice(offset, offset + booksPerPage);
 
-  // Handle page click for pagination
+  // Xử lý khi thay đổi trang
   const handlePageClick = ({ selected }) => {
     setCurrentPage(selected);
   };
 
+  // Xử lý thay đổi các bộ lọc
+  const handleCategoryChange = (e) => {
+    const { value, checked } = e.target;
+    if (checked) {
+      setSelectedCategories([...selectedCategories, value]);
+    } else {
+      setSelectedCategories(selectedCategories.filter((cat) => cat !== value));
+    }
+  };
+
+  const handleAgeLimitChange = (e) => {
+    setSelectedAgeLimit(e.target.value);
+  };
+
+  const handlePublicationYearChange = (e) => {
+    setSelectedPublicationYear(e.target.value);
+  };
+
+  // const handleBookClick = (id) => {
+  //   navigate(`/bookdetailbook/${id}`); // Use the book's id for navigation
+  // };
+  const handleBookClick = (id) => {
+    navigate(`/user-recap-detail/${id}`); // Navigate to UserRecapDetail with the book ID
+  };
+
   return (
     <div className="book-api-container">
-      <h1 className="title">Book List</h1>
+      {/* <h1 className="title">Danh Sách Sách</h1> */}
 
-      {error && <p className="error">Error: {error}</p>}
+      {error && <p className="error">Lỗi: {error}</p>}
 
+      {/* Phần Search và Filter */}
+      <div className="filters-container">
+        <div className="search-section">
+          <input
+            type="text"
+            placeholder="Tìm kiếm theo tiêu đề..."
+            value={searchTitle}
+            onChange={(e) => setSearchTitle(e.target.value)}
+            className="search-input"
+          />
+          <input
+            type="text"
+            placeholder="Tìm kiếm theo tác giả..."
+            value={searchAuthor}
+            onChange={(e) => setSearchAuthor(e.target.value)}
+            className="search-input"
+          />
+        </div>
+
+        <div className="filter-section">
+          <div className="filter-group">
+            <h3>Thể loại</h3>
+            {categories.map((category) => (
+              <label key={category} className="filter-label">
+                <input
+                  type="checkbox"
+                  value={category}
+                  checked={selectedCategories.includes(category)}
+                  onChange={handleCategoryChange}
+                />
+                {category}
+              </label>
+            ))}
+          </div>
+
+          <div className="filter-groupup">
+            <h3>Giới hạn tuổi</h3>
+            <select
+              value={selectedAgeLimit}
+              onChange={handleAgeLimitChange}
+              className="filter-select"
+            >
+              <option value="">Tất cả</option>
+              {ageLimits.map((age) => (
+                <option key={age} value={age}>
+                  {age === 0 ? "Không giới hạn" : age}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="filter-groupup">
+            <h3>Năm xuất bản</h3>
+            <select
+              value={selectedPublicationYear}
+              onChange={handlePublicationYearChange}
+              className="filter-select"
+            >
+              <option value="">Tất cả</option>
+              {publicationYears.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </select>
+          </div>
+        </div>
+      </div>
+
+      {/* Danh sách sách */}
       <div className="book-list">
         {currentBooks.length > 0 ? (
           currentBooks.map((book) => (
-            <div className="book-itemem" key={book.$id}>
+            <div className="book-item" key={book.id} onClick={() => handleBookClick(book.id)}>
               {book.coverImage && (
                 <img
                   src={book.coverImage}
@@ -68,27 +298,35 @@ const BookApi = () => {
                   className="book-cover"
                 />
               )}
-              <h2>{book.title}</h2>
-              <h3>{book.originalTitle}</h3>
-              {/* <p>{book.description}</p> */}
-              <p><strong>Publication Year:</strong> {book.publicationYear}</p>
-              
-              {/* Show first author */}
-              {book.authors && book.authors.$values.length > 0 && (
-                <p><strong>Author:</strong> {book.authors.$values[0].name}</p>
-              )}
+              <div className="book-info">
+                <h2 className="book-title">{book.title}</h2>
+                <h3 className="book-original-title">{book.originalTitle.length > 18 ? `${book.originalTitle.slice(0, 10)}\n${book.originalTitle.slice(25)}` : book.originalTitle}</h3>
+                <p className="book-publication-year">
+                  <strong>Năm xuất bản:</strong> {book.publicationYear}
+                </p>
+                {book.authors && book.authors.$values.length > 0 && (
+                  <p className="book-author">
+                    <strong>Tác giả:</strong>{" "}
+                    {book.authors.$values
+                      .map((author) => author.name)
+                      .filter(Boolean) // Loại bỏ các tên undefined/null
+                      .join(", ")}
+                  </p>
+                )}
+                {/* <p className="book-description">{book.description}</p> */}
+              </div>
             </div>
           ))
         ) : (
-          <p>No books found.</p>
+          <p>Không tìm thấy sách nào.</p>
         )}
       </div>
 
-      {/* Pagination */}
-      {books.length > 0 && (
+      {/* Phân trang */}
+      {filteredBooks.length > 0 && (
         <ReactPaginate
-          previousLabel={"Previous"}
-          nextLabel={"Next"}
+          previousLabel={"Trước"}
+          nextLabel={"Sau"}
           breakLabel={"..."}
           pageCount={pageCount}
           marginPagesDisplayed={2}

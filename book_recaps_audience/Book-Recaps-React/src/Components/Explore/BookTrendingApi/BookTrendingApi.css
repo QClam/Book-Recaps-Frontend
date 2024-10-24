@@ -1,0 +1,48 @@
+.book-container-trend {
+  padding: 20px;
+  text-align: center;
+  margin-top: 30px;
+}
+.book-container-trend h2 {
+  font-size: 2.5rem;
+  color: #4a4a4a;
+  margin-bottom: 10px;
+}
+.book-container-trend p {
+  font-size: 1.2rem;
+  color: #888;
+  margin-bottom: 30px;
+}
+.book-container-trend .book-item-trend {
+  width: 270px;
+  height: 350px;
+  padding: 20px;
+  border-radius: 10px;
+  text-align: center;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  margin-right: 20px;
+}
+.book-container-trend .book-item-trend:hover {
+  transform: translateY(-10px);
+}
+.book-container-trend .book-item-trend img {
+  width: 150px;
+  height: 200px;
+  -o-object-fit: cover;
+     object-fit: cover;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+.book-container-trend .book-item-trend h3 {
+  font-size: 1.3rem;
+  color: #333;
+  margin-bottom: 10px;
+}
+.book-container-trend .book-item-trend p {
+  font-size: 1rem;
+  color: #666;
+}/*# sourceMappingURL=BookTrendingApi.css.map */

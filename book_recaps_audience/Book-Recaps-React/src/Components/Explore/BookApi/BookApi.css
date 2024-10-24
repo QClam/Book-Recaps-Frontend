@@ -1,3 +1,4 @@
+@charset "UTF-8";
 .book-api-container {
   width: 80%;
   margin: 0 auto;
@@ -35,12 +36,14 @@
 }
 
 .book-cover {
-  width: 3cm;  /* Chiều rộng ảnh là 3cm */
+  width: 3cm; /* Chiều rộng ảnh là 3cm */
   height: 4cm; /* Chiều dài ảnh là 4cm */
-  object-fit: cover; /* Đảm bảo ảnh nằm gọn trong khung */
+  -o-object-fit: cover;
+     object-fit: cover; /* Đảm bảo ảnh nằm gọn trong khung */
   border-radius: 5px;
   margin-bottom: 10px;
 }
+
 .book-item img {
   width: 100%;
   height: auto;
@@ -55,7 +58,6 @@
 }
 
 .book-item p {
-  
   font-size: 0.8rem;
   text-align: center;
 }
@@ -84,4 +86,4 @@
   background-color: #007bff;
   color: #fff;
   border: none;
-}
+}/*# sourceMappingURL=BookApi.css.map */

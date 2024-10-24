@@ -16,12 +16,12 @@ const Explore = () => {
         <div>
             {/* <SearchBook /> */}
             <BookApi />
-            <BookTrendingApi />
+            {/* <BookTrendingApi /> */}
             {/* <BookApiCategory /> */}
             {/* <BookTrending /> */}
             {/* <Categories /> */}
-            <LatestBook />
-            <Collection />
+            {/* <LatestBook /> */}
+            {/* <Collection /> */}
             {/* <ListCategory />
             <CustomCategory /> */}
             {/* <BookCarousel /> */}

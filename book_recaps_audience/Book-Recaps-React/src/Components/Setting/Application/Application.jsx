@@ -9,7 +9,7 @@ const Application = () => {
   };
 
   return (
-    <div className="container">
+    <div className="container-er">
 
       {/* Main Content */}
       <div className="content">
