@@ -2,12 +2,12 @@ import { useRef, useState } from "react";
 import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
 import Show from "./Show";
 import { useClickAway } from "react-use";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { routes } from "../routes";
+import { TbPlus } from "react-icons/tb";
 
-export const HeadBar = (props) => {
+export const HeadBar = () => {
   const navigate = useNavigate();
-  const { setIsNavOpen } = props;
   const [ isDropdownOpen, setIsDropdownOpen ] = useState(false);
   const dropdownEl = useRef(null);
 
@@ -22,9 +22,16 @@ export const HeadBar = (props) => {
   return (
     <nav
       className="flex flex-row justify-between items-center py-4 px-6 gap-4 h-[72px] bg-white border-b-1 border-gray-200 shadow-md">
-      <button onClick={() => setIsNavOpen((open) => !open)} className="p-3 rounded hover:bg-[#EFEFFD]">
-        <img alt="nav-button" src="/buger_icon.svg" className="bx bx-menu"></img>
-      </button>
+      <Link
+        to={routes.createRecap}
+        className="flex justify-center align-center gap-1 px-5 py-2 text-sm font-semibold bg-indigo-600 text-white rounded hover:bg-indigo-800">
+        <span className="text-lg">
+          <TbPlus/>
+        </span>
+        <span>
+          Tạo bài viết mới
+        </span>
+      </Link>
       <div className="relative ml-3" ref={dropdownEl}>
         <div className="h-full items-center flex">
           <button

@@ -10,10 +10,12 @@ export const routes = {
   login: '/login',
   logout: '/logout',
   dashboard: '/',
-  draftRecaps: '/draft-recaps',
-  underRevisionRecaps: '/under-revision-recaps',
-  rejectionsRecaps: '/rejections-recaps',
-  publishedRecaps: '/published-recaps',
+  recaps: '/recaps',
+  draftRecaps: '/recaps/draft',
+  underRevisionRecaps: '/recaps/under-revision',
+  rejectionsRecaps: '/recaps/rejected',
+  publishedRecaps: '/recaps/published',
+  createRecap: '/recaps/create',
   books: '/books',
   contact: '/contact',
   profile: '/profile',
@@ -36,7 +38,36 @@ export const router = createBrowserRouter([
           {
             index: true,
             element: <div>Dashboard</div>
-          }
+          },
+          {
+            path: routes.recaps,
+            children: [
+              {
+                index: true,
+                element: <div>Recaps</div>,
+              },
+              {
+                path: routes.draftRecaps,
+                element: <div>Draft Recaps</div>
+              },
+              {
+                path: routes.underRevisionRecaps,
+                element: <div>Under Revision Recaps</div>
+              },
+              {
+                path: routes.rejectionsRecaps,
+                element: <div>Rejections Recaps</div>
+              },
+              {
+                path: routes.publishedRecaps,
+                element: <div>Published Recaps</div>
+              },
+              {
+                path: routes.createRecap,
+                element: <div>Create Recap</div>
+              }
+            ]
+          },
         ]
       }
     ]

@@ -1,16 +1,15 @@
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 import Spinner from "../components/Spinner";
 import { HeadBar } from "../components/HeadBar";
 import { NavBar } from "../components/NavBar";
 
 const MainLayout = ({ children }) => {
-  const [ isNavOpen, setIsNavOpen ] = useState(true)
 
   return (
     <div className="flex flex-row h-screen">
-      <NavBar isOpen={isNavOpen} setIsNavOpen={setIsNavOpen}/>
+      <NavBar/>
       <div className="flex-1 overflow-x-auto flex flex-col">
-        <HeadBar setIsNavOpen={setIsNavOpen}/>
+        <HeadBar/>
         <div id="admin-main-div" className="relative flex-1 overflow-auto flex flex-col justify-between">
           <Suspense fallback={
             <div className="flex-1 grid place-items-center">

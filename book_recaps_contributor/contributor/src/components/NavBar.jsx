@@ -3,12 +3,12 @@ import Show from "./Show";
 import { cn } from "../utils/cn";
 import { Link, NavLink } from "react-router-dom";
 import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
-import { TbApps, TbBooks, TbMessage, TbNews, TbUser } from "react-icons/tb";
+import { TbApps, TbArrowBarLeft, TbArrowBarRight, TbBooks, TbMessage, TbNews, TbUser } from "react-icons/tb";
 import { HiOutlineCreditCard } from "react-icons/hi2";
 import { routes } from "../routes";
 
-export const NavBar = (props) => {
-  const { isOpen } = props;
+export const NavBar = () => {
+  const [ isOpen, setIsOpen ] = useState(true)
 
   return (
     <section
@@ -25,6 +25,15 @@ export const NavBar = (props) => {
           Dashboard
         </span>
       </Link>
+
+      <div className="w-full px-[18px] mt-2">
+        <button
+          onClick={() => setIsOpen((open) => !open)}
+          className="flex flex-row items-center p-2.5 gap-2 rounded border border-gray-300 text-lg font-semibold text-gray-600 hover:bg-[#EFEFFD] hover:text-indigo-600">
+          {isOpen ? <TbArrowBarLeft/> : <TbArrowBarRight/>}
+        </button>
+      </div>
+
       <ul className="w-full flex flex-col items-start gap-2 px-[18px] py-6">
         {/* Dashboard */}
         <NavbarLink
@@ -35,7 +44,7 @@ export const NavBar = (props) => {
           end
         />
         <NavbarDropDown
-          href={routes.draftRecaps}
+          href={routes.recaps}
           isOpen={isOpen}
           icon={<TbNews/>}
           text="Recaps"

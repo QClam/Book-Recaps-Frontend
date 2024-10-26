@@ -63,6 +63,7 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
+    // Dont change the order of the following lines
     setUser(null);
     setSession(null);
 
