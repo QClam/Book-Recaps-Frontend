@@ -133,6 +133,7 @@ const NavbarLink = (props) => {
             isActive ? "bg-indigo-600 text-white" : "text-gray-600 hover:bg-[#EFEFFD] hover:text-indigo-600")
         }
         end={end}
+        title={text}
       >
         <Show when={icon} fallback={<span className="w-[18px]"></span>}>
           {<span className="text-lg">{icon}</span>}
@@ -161,6 +162,7 @@ const NavbarDropDown = (props) => {
             "bg-indigo-600 text-white": isActive && (!isOpen || !isDropdownOpen),
             "hover:bg-[#EFEFFD] hover:text-indigo-600": !isActive,
           })}
+          title={text}
         >
           <Show when={icon}>{<span className="text-lg">{icon}</span>}</Show>
           <span className={cn(!isOpen && "hidden")}>{text}</span>

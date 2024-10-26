@@ -62,9 +62,14 @@ export function AuthProvider({ children }) {
     setSession(accessToken);
   };
 
-  const logout = () => {
+  const logout = async () => {
     setUser(null);
     setSession(null);
+
+    const loginToken = await executeRecaptcha("login");
+    const signupToken = await executeRecaptcha("signup");
+
+    setReCaptchaTokens({ loginToken, signupToken });
   };
 
   const isAuthenticated = !!user;
