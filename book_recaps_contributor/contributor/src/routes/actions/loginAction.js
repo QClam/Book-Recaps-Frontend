@@ -35,7 +35,8 @@ export async function loginAction({ request }) {
       user: {
         email: decoded.email,
         name: decoded[import.meta.env.VITE_CLAIMS_NAME],
-        role: decoded[import.meta.env.VITE_CLAIMS_ROLE]
+        role: decoded[import.meta.env.VITE_CLAIMS_ROLE],
+        id: decoded[import.meta.env.VITE_CLAIMS_IDENTIFIER]
       },
       token: accessToken
     };

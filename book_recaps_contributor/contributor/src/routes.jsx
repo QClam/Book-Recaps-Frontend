@@ -5,7 +5,7 @@ import Login from "./routes/Login";
 import { loginAction } from "./routes/actions/loginAction";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Logout from "./routes/Logout";
-import CreateRecap, { booksLoader } from "./routes/recaps/CreateRecap";
+import CreateRecap, { booksLoader, createRecapAction } from "./routes/recaps/CreateRecap";
 import { AuthProvider, sessionLoader } from "./contexts/Auth";
 
 export const routes = {
@@ -72,6 +72,7 @@ export const router = createBrowserRouter([
                     path: routes.createRecap,
                     element: <CreateRecap/>,
                     loader: booksLoader,
+                    action: createRecapAction
                   }
                 ]
               },

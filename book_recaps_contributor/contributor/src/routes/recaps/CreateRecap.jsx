@@ -3,12 +3,14 @@ import {
   defer,
   Form,
   Link,
+  redirect,
   useAsyncValue,
   useLoaderData,
   useNavigation,
   useSearchParams
 } from "react-router-dom";
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
+import { Toast } from 'primereact/toast';
 import { axiosInstance, axiosInstance2 } from "../../utils/axios";
 import { handleFetchError } from "../../utils/handleFetchError";
 import TextInput from "../../components/form/TextInput";
@@ -16,6 +18,8 @@ import { TbSearch } from "react-icons/tb";
 import Select from "../../components/form/Select";
 import Show from "../../components/Show";
 import { cn } from "../../utils/cn";
+import { useAuth } from "../../contexts/Auth";
+import { Dialog } from "primereact/dialog";
 
 const getBooks = async (q, category, page) => {
   try {
@@ -64,10 +68,35 @@ export async function booksLoader({ request }) {
   });
 }
 
+export async function createRecapAction({ request }) {
+  const formData = await request.formData();
+  const bookId = formData.get('bookId');
+  const contributorId = formData.get('userId');
+  const name = formData.get('name');
+
+  if (!bookId || !contributorId || !name) {
+    return { error: "Vui lòng điền đầy đủ thông tin" };
+  }
+
+  try {
+    const response = await axiosInstance.post('/api/recap', {
+      bookId, contributorId, name
+    });
+
+    return redirect(`/recaps/${response.data.data.id}`);
+  } catch (error) {
+    return handleFetchError(error);
+  }
+}
+
 const CreateRecap = () => {
   const { booksPagination, categories, params: { q, category } } = useLoaderData();
   let [ , setSearchParams ] = useSearchParams();
   const navigation = useNavigation()
+  const { user } = useAuth();
+  const toast = useRef(null);
+  const [ dialogVisible, setDialogVisible ] = useState(false);
+  const [ chosenBookId, setChosenBookId ] = useState("");
 
   useEffect(() => {
     document.getElementById("q").value = decodeURIComponent(q ?? "");
@@ -78,8 +107,67 @@ const CreateRecap = () => {
     setSearchParams({});
   }
 
+  const handleClickCreate = (bookId) => {
+    if (!user) {
+      toast.current.show({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Bạn cần đăng nhập để tạo bài viết tóm tắt',
+        life: 3000
+      });
+      return;
+    }
+    setChosenBookId(bookId);
+    setDialogVisible(true);
+  }
+
   return (
     <>
+      <Toast ref={toast}/>
+      <Dialog
+        visible={dialogVisible}
+        modal
+        onHide={() => {
+          if (!dialogVisible) return;
+          setDialogVisible(false);
+        }}
+        content={({ hide }) => (
+          <Form className="flex flex-col px-2 py-1 gap-1 bg-white" method="post">
+            <input type="hidden" name="bookId" value={chosenBookId}/>
+            <input type="hidden" name="userId" value={user.id}/>
+            <div className="inline-flex flex-column gap-2">
+              <TextInput id="name" label="Recap name" name="name"/>
+            </div>
+            <div className="flex align-items-center gap-2">
+              <button
+                className={cn({
+                  "text-white bg-indigo-600 rounded py-2 px-4 border font-medium hover:bg-indigo-700": true,
+                  "opacity-50 cursor-not-allowed": navigation.state === "loading"
+                })}
+                type="submit"
+                disabled={navigation.state === "loading"}
+              >
+                {navigation.state === "loading" ? "Loading..." : "Tạo"}
+              </button>
+
+              <button
+                className={cn({
+                  "text-white bg-gray-200 rounded py-2 px-4 border font-medium hover:bg-gray-300": true,
+                  "opacity-50 cursor-not-allowed": navigation.state === "loading"
+                })}
+                type="button"
+                onClick={(e) => {
+                  setChosenBookId("");
+                  hide(e);
+                }}
+                disabled={navigation.state === "loading"}
+              >
+                Hủy
+              </button>
+            </div>
+          </Form>
+        )}
+      />
       <div className="bg-white border border-gray-200 rounded shadow-sm p-4">
         <h1 className="font-semibold text-lg">Tạo bài viết tóm tắt mới</h1>
         <p>
@@ -191,7 +279,7 @@ const CreateRecap = () => {
                 </tbody>
               }
             >
-              <BooksTable/>
+              <BooksTable handleClickCreate={handleClickCreate}/>
             </Await>
           </Suspense>
         </table>
@@ -208,7 +296,7 @@ const CreateRecap = () => {
 
 export default CreateRecap;
 
-function BooksTable() {
+function BooksTable({ handleClickCreate }) {
   const paginationData = useAsyncValue();
   const navigation = useNavigation();
 
@@ -274,6 +362,7 @@ function BooksTable() {
             </td>
             <td className="px-2.5 py-3 border-[#e2e7ee] border-b" style={{ borderLeft: "1px dashed #d5dce6" }}>
               <button
+                onClick={() => handleClickCreate(book.id)}
                 className="flex justify-center items-center gap-1 px-5 py-2 font-semibold bg-indigo-600 text-white rounded hover:bg-indigo-800">
                 Tạo tóm tắt
               </button>

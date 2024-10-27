@@ -9,7 +9,7 @@ const AuthContext = createContext(null);
 export function AuthProvider() {
   const loaderData = useLoaderData()
   const { executeRecaptcha } = useGoogleReCaptcha();
-  const [ user, setUser ] = useState(loaderData); // { email, name, role }
+  const [ user, setUser ] = useState(loaderData); // { id, email, name, role }
   const [ reCaptchaTokens, setReCaptchaTokens ] = useState(null); // { loginToken, signupToken }
 
   useEffect(() => {
@@ -77,7 +77,8 @@ export const sessionLoader = () => {
     return {
       email: decoded.email,
       name: decoded[import.meta.env.VITE_CLAIMS_NAME],
-      role: decoded[import.meta.env.VITE_CLAIMS_ROLE]
+      role: decoded[import.meta.env.VITE_CLAIMS_ROLE],
+      id: decoded[import.meta.env.VITE_CLAIMS_IDENTIFIER]
     }
   }
   setSession(null)
