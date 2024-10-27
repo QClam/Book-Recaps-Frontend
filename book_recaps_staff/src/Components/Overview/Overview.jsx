@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { sampleData } from '../Content/ContentItems'
+import { sampleData } from '../Recaps/ContentItems'
 import './Overview.scss'
 
 function Overview() {

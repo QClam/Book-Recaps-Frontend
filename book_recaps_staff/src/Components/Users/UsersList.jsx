@@ -23,7 +23,7 @@ function UsersList() {
                 const response = await api.get('/users/getalluser',
                     {
                         headers: {
-                            'accept': "*/*",
+                            Accept : "*/*",
                             Authorization: `Bearer ${token}`
                         }
                     }
@@ -37,7 +37,7 @@ function UsersList() {
             }
         };
         fetchUsers();
-    }, [users]);
+    }, []);
 
     const displayUsers = users.slice((currentPage - 1) * usersPerPage, currentPage * usersPerPage); // Adjust slicing for 1-based page indexing
     const handlePageChange = (event, value) => {
@@ -77,7 +77,7 @@ function UsersList() {
                     </thead>
                     <tbody>
                         {displayUsers.map((val) => (
-                            <tr key={val.id}>
+                            <tr key={val.$id}>
                                 <td>{val.fullName}</td>
                                 <td>{val.userName}</td>
                                 <td>{val.email}</td>

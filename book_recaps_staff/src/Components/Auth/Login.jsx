@@ -162,7 +162,7 @@ function Login() {
       localStorage.setItem("access_token", accessToken);
       localStorage.setItem("refresh_token", refreshToken);
       
-      navigate("/content")
+      navigate("/recaps")
       console.log("Login successfully", response.data);
     } catch (error) {
       setError("Đăng nhập thất bại", error);

@@ -23,9 +23,9 @@ export const SidebarItems = [
     link: "/overview",
   },
   {
-    title: "Danh sách nội dung",
+    title: "Danh sách Recaps",
     icon: <LibraryBooks />,
-    link: "/content",
+    link: "/recaps",
   },
   {
     title: "Quản lý người dùng",
