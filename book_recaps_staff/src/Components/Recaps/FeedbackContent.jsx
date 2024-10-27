@@ -59,7 +59,7 @@ const FeedbackContent = ({ version_number }) => {
           ))}
         </ul>
       ) : (
-        <p>Hiện chưa có Feedback</p>
+        <p>Hiện chưa có Comment</p>
       )}
     </div>
   );

@@ -284,17 +284,17 @@ function ReviewNote() {
                       width: "50%",
                       height: 60,
                       marginTop: 10,
-                      backgroundColor: "#f1f1f1"
+                      // backgroundColor: "#f1f1f1"
                     }}
                   />
                   <div style={{ marginBottom: 10 }}>
                     <button
                       onClick={handleAddComment}
-                      style={{ marginRight: 10 }}
+                      style={{ marginRight: 10, backgroundColor: "#007bff" }}
                     >
                       Add Comment
                     </button>
-                    <button onClick={() => setShowInput(false)}>Cancel</button>
+                    <button onClick={() => setShowInput(false)} style={{backgroundColor: "red"}}>Cancel</button>
                   </div>
                 </div>
               )}

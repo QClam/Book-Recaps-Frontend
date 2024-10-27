@@ -1,29 +1,120 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link, useParams } from 'react-router-dom';
-import FeedbackContent from '../Content/FeedbackContent';
 import Swal from 'sweetalert2';
 import { Hourglass } from 'react-loader-spinner';
 
 function Review() {
   const [contentItem, setContentItem] = useState(null);
-  const { id } = useParams();
+  const { id } = useParams(); // Get the ID from the URL
   const [loading, setLoading] = useState(true);
+  const [recapStatus, setRecapStatus] = useState(null);
+  const [recapDetail, setRecapDetail] = useState(null);
+  const [bookRecap, setBookRecap] = useState(null);
+  
+  const token = localStorage.getItem('access_token');
+
+  const fetchContent = async () => {
+    try {
+      const response = await axios.get(
+        `https://160.25.80.100:7124/api/review/getreviewbyid/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const recap = response.data.data;
+      console.log('Fetched Content: ', recap);
+      setContentItem(recap);
+      return recap.recapVersionId; // Return recapVersionId for the next request
+    } catch (error) {
+      console.log('Error Fetching Content', error);
+    }
+  };
+
+// Fetch RecapVersion để lấy recapId và status của Version hiện tại
+  const fetchRecapVersion = async (recapVersionId) => {
+    try {
+      const response = await axios.get(
+        `https://160.25.80.100:7124/version/${recapVersionId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      const recapVersionData = response.data.data;
+      console.log('RecapId: ', recapVersionData.recapId);
+      setRecapStatus(recapVersionData);
+      return recapVersionData.recapId;    
+    } catch (error) {
+      console.log('Error Fetching Recap Version', error);
+    }
+  };
+
+  //Fetch Recap để lấy bookId 
+  const fetchRecapDetail = async (recapId) => {
+    try {
+      const response = await axios.get(`https://160.25.80.100:7124/getrecapbyId/${recapId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      const recapDetailData = response.data.data;
+      console.log("BookId: ", recapDetailData.bookId);
+      setRecapDetail(recapDetailData);
+      return recapDetailData.bookId;
+    } catch (error) {
+      console.log('Error Fetching Recap Detail', error);
+    }
+  }
+
+  //Fetch bookId để lấy detail sách
+  const fetchBookRecap = async (bookId) => {
+    try {
+      const response = await axios.get(`https://160.25.80.100:7124/api/book/getbookbyid/${bookId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          },
+        },
+      )
+      const bookRecap = response.data.data;
+      console.log("Book Detail: ", bookRecap);
+      setBookRecap(bookRecap);
+    } catch (error) {
+      console.log('Error Fetching Book', error);
+    }
+  }
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      // Fetch content first to get recapVersionId
+      const recapVersionId = await fetchContent();
+      if (recapVersionId) {
+        // Fetch recap version and detail using recapVersionId
+        const recapId = await fetchRecapVersion(recapVersionId);
+        if (recapId) {
+          const bookid = await fetchRecapDetail(recapId);
+          // Fetch recap detail để lấy bookId
+          if(bookid) {
+            await fetchBookRecap(bookid);
+          }
+        }
+      }
+    } catch (error) {
+      console.log('Error Fetching Data', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchContent = async () => {
-      try {
-        const response = await axios.get(`https://66eb9ee32b6cf2b89c5b1714.mockapi.io/ContentItems/${id}`);
-        setContentItem(response.data);
-        console.log("Fetched Content: ", response.data);
-      } catch (error) {
-        console.log("Error Fetching", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchContent();
+    fetchData();
   }, [id]);
 
   const handleApprove = async () => {
@@ -61,17 +152,19 @@ function Review() {
   };
 
   if (loading) {
-    return <div className='loading'>
-    <Hourglass
-        visible={true}
-        height="80"
-        width="80"
-        ariaLabel="hourglass-loading"
-        wrapperStyle={{}}
-        wrapperClass=""
-        colors={['#306cce', '#72a1ed']}
-    />
-</div>;
+    return (
+      <div className='loading'>
+        <Hourglass
+          visible={true}
+          height="80"
+          width="80"
+          ariaLabel="hourglass-loading"
+          wrapperStyle={{}}
+          wrapperClass=""
+          colors={['#306cce', '#72a1ed']}
+        />
+      </div>
+    );
   }
 
   if (!contentItem) {
@@ -80,14 +173,23 @@ function Review() {
 
   return (
     <div>
-      <h1>{contentItem.title}</h1>
-      <p>{contentItem.description}</p>
-      <p>Status: {contentItem.status}</p>
-      <Link to={`/note/content_version/${contentItem.id}`}>Comment</Link>
-
-      <FeedbackContent version_number={contentItem.version_number} />
+      <h1>{bookRecap.title}</h1>
+      <p>{bookRecap.description}</p>
+      {recapStatus?.status === 1 ? (
+        <button className="role-container" style={{ backgroundColor: "#007bff" }}>
+          Pending
+        </button>
+      ) : (
+        <button className="role-container" style={{ backgroundColor: "#5e6061" }}>
+          Unknown
+        </button>
+      )}
+      <div>
+        <Link to={`/note/content_version/${contentItem.id}`}>Comment</Link>
+      </div>
+      <p>{contentItem.comments}</p>
       <br />
-      {contentItem.status === 'Pending' && (
+      {recapStatus?.status === 1 && (
         <button onClick={confirmApprove}>Phê duyệt nội dung</button>
       )}
     </div>

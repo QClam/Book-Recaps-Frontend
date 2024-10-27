@@ -1,19 +1,20 @@
 import { BrowserRouter as Router, Route, Routes, useLocation } from "react-router-dom";
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3'
 import Sidebar from "./Components/Sidebar/Sidebar";
-import ContentList from "./Components/Content/ContentList";
+
 import Overview from "./Components/Overview/Overview";
-import FeedbackContent from "./Components/Content/FeedbackContent";
+import FeedbackContent from "./Components/Recaps/FeedbackContent";
 import Review from "./Components/Review/Review";
 import ReviewNote from "./Components/Review/ReviewNote";
 import Login from "./Components/Auth/Login";
 import UsersList from "./Components/Users/UsersList";
 import ConfirmEmail from "./Components/Auth/ConfirmEmail";
 import PrivateRoute from "./Components/Auth/PrivateRoute";
+import RecapsList from "./Components/Recaps/RecapsList";
 
 import "./App.css";
 import axios from "axios";
-import BookApi from "./Components/Book/Book";
+import UserProfile from "./Components/Auth/UserProfile";
 
 function App() {
   const location = useLocation();
@@ -119,14 +120,14 @@ function App() {
     <main>
       {!isLoginPage && <Sidebar />}
       <Routes>
-        <Route path="/" element={<PrivateRoute> <ContentList /> </PrivateRoute>} />
-        <Route path="/content" element={<PrivateRoute> <ContentList /> </PrivateRoute>} />
+        <Route path="/" element={<PrivateRoute> <RecapsList /> </PrivateRoute>} />
+        <Route path="/recaps" element={<PrivateRoute> <RecapsList /> </PrivateRoute>} />
         <Route path="/overview" element={<PrivateRoute> <Overview /> </PrivateRoute>} />
         <Route path="/feedback" element={<PrivateRoute> <FeedbackContent /> </PrivateRoute>} />
         <Route path="/login" element={<Login />} />
         <Route path="/auth/confirm-email" element={<ConfirmEmail />} />
         <Route path="/users" element={<PrivateRoute> <UsersList /> </PrivateRoute>} />
-        <Route path="/for-you" element={<PrivateRoute> <BookApi /> </PrivateRoute>} />
+        <Route path="/settings" element={<PrivateRoute> <UserProfile /> </PrivateRoute>} />
         <Route
           path="/review/content_version/:id"
           element={<PrivateRoute> <Review /> </PrivateRoute>} />
