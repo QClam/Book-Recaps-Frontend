@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Show from "./Show";
 import { cn } from "../utils/cn";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useMatch } from "react-router-dom";
 import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
 import { TbApps, TbArrowBarLeft, TbArrowBarRight, TbBooks, TbMessage, TbNews, TbUser } from "react-icons/tb";
 import { HiOutlineCreditCard } from "react-icons/hi2";
@@ -12,7 +12,7 @@ export const NavBar = () => {
 
   return (
     <section
-      className={cn("w-64 h-screen bg-white z-10 overflow-x-hidden flex flex-col items-start border-r-1 border-gray-200 shadow-lg",
+      className={cn("w-64 h-screen bg-white z-10 overflow-x-hidden flex flex-col items-start border-r border-gray-200 shadow-lg",
         !isOpen && "w-[76px]"
       )}
     >
@@ -118,7 +118,7 @@ const NavInfo = (props) => {
 
   return (
     <li className="w-full mt-3">
-      <div className="text-gray-400 flex text-sm font-semibold leading-[14px] py-2 px-[11px] uppercase">
+      <div className="text-gray-400 flex font-semibold leading-[14px] py-2 px-[11px] uppercase">
         <Show when={isOpen} fallback={
           <span className="w-[18px]">&nbsp;</span>
         }>
@@ -158,6 +158,7 @@ const NavbarLink = (props) => {
 const NavbarDropDown = (props) => {
   const { href, isOpen, icon, text, defaultOpen } = props;
   const [ isDropdownOpen, setDropdownOpen ] = useState(defaultOpen === undefined ? true : defaultOpen);
+  const exactMatch = useMatch(href);
 
   return (
     <>
@@ -168,7 +169,7 @@ const NavbarDropDown = (props) => {
             "text-gray-600 flex flex-row items-center py-2 px-[11px] gap-2 rounded w-full font-semibold z-20": true,
             "py-[11px]": !isOpen,
             "bg-[#EFEFFD] text-indigo-600": isDropdownOpen && isOpen,
-            "bg-indigo-600 text-white": isActive && (!isOpen || !isDropdownOpen),
+            "bg-indigo-600 text-white": !!exactMatch || (isActive && (!isOpen || !isDropdownOpen)),
             "hover:bg-[#EFEFFD] hover:text-indigo-600": !isActive,
           })}
           title={text}
@@ -179,7 +180,7 @@ const NavbarDropDown = (props) => {
         <Show when={isOpen}>
           <button
             onClick={() => setDropdownOpen(!isDropdownOpen)}
-            className="rounded text-lg hover:bg-indigo-300 absolute right-[11px] top-1/2 -translate-y-1/2"
+            className="rounded p-1 text-lg hover:bg-indigo-300 absolute right-[11px] top-1/2 -translate-y-1/2"
           >
               <span className="text-lg">
                 <Show

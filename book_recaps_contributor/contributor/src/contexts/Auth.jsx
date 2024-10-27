@@ -1,39 +1,16 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { getSession, isRoleMatched, isValidToken, setSession } from "../utils/axios";
+import { Outlet, useLoaderData } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
 
 const AuthContext = createContext(null);
 
-export function AuthProvider({ children }) {
+export function AuthProvider() {
+  const loaderData = useLoaderData()
   const { executeRecaptcha } = useGoogleReCaptcha();
-  const [ isFirstMountChecking, setIsFirstMountChecking ] = useState(true);
-  const [ user, setUser ] = useState(null); // { email, name, role }
+  const [ user, setUser ] = useState(loaderData); // { email, name, role }
   const [ reCaptchaTokens, setReCaptchaTokens ] = useState(null); // { loginToken, signupToken }
-
-  useEffect(() => {
-    const token = getSession();
-
-    if (!token) {
-      setIsFirstMountChecking(false);
-      setSession(null)
-      return;
-    }
-
-    const decoded = jwtDecode(token)
-
-    if (isValidToken(decoded) && isRoleMatched(decoded, "Contributor")) {
-      setUser({
-        email: decoded.email,
-        name: decoded.name,
-        role: decoded[import.meta.env.VITE_CLAIMS_ROLE]
-      })
-    } else {
-      setSession(null)
-    }
-
-    setIsFirstMountChecking(false);
-  }, []);
 
   useEffect(() => {
     const handleReCaptchaVerify = async () => {
@@ -76,8 +53,8 @@ export function AuthProvider({ children }) {
   const isAuthenticated = !!user;
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated, isFirstMountChecking, reCaptchaTokens }}>
-      {children}
+    <AuthContext.Provider value={{ user, login, logout, isAuthenticated, reCaptchaTokens }}>
+      <Outlet/>
     </AuthContext.Provider>
   );
 }
@@ -85,3 +62,25 @@ export function AuthProvider({ children }) {
 export function useAuth() {
   return useContext(AuthContext);
 }
+
+export const sessionLoader = () => {
+  const token = getSession();
+
+  if (!token) {
+    setSession(null)
+    return null;
+  }
+
+  const decoded = jwtDecode(token)
+
+  if (isValidToken(decoded) && isRoleMatched(decoded, "Contributor")) {
+    return {
+      email: decoded.email,
+      name: decoded[import.meta.env.VITE_CLAIMS_NAME],
+      role: decoded[import.meta.env.VITE_CLAIMS_ROLE]
+    }
+  }
+  setSession(null)
+  return null;
+}
+

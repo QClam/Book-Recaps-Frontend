@@ -1,4 +1,4 @@
-import { Form, useActionData, useNavigate, useNavigation } from 'react-router-dom';
+import { Form, Navigate, useActionData, useNavigate, useNavigation } from 'react-router-dom';
 import { useEffect } from "react";
 import { useAuth } from "../contexts/Auth";
 import { routes } from "../routes";
@@ -7,24 +7,19 @@ function Login() {
   const navigate = useNavigate();
   const navigation = useNavigation();
   const actionData = useActionData();
-  const { login, reCaptchaTokens, isAuthenticated, isFirstMountChecking } = useAuth();
-
-  useEffect(() => {
-    if (isAuthenticated && !isFirstMountChecking) {
-      navigate(routes.dashboard, { replace: true });
-    }
-  }, [ isAuthenticated, isFirstMountChecking, navigate ]);
+  const { login, reCaptchaTokens, isAuthenticated } = useAuth();
 
   useEffect(() => {
     if (actionData?.user && actionData?.token) {
       login(actionData.user, actionData.token);
-
-      const redirectTo = actionData.redirectTo || routes.dashboard;
-      navigate(redirectTo, { replace: true });
     }
   }, [ actionData, login, navigate ]);
 
   const loading = navigation.state === 'loading' || navigation.state === 'submitting';
+
+  if (isAuthenticated) {
+    return <Navigate to={routes.dashboard} replace={true}/>
+  }
 
   return (
     <div className="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
