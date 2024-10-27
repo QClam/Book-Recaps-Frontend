@@ -6,6 +6,10 @@ export const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_ENDPOINT,
 });
 
+export const axiosInstance2 = axios.create({
+  baseURL: import.meta.env.VITE_API_ENDPOINT_2,
+});
+
 export const isValidToken = (decoded) => {
   if (!decoded) {
     return false
@@ -33,9 +37,11 @@ export const setSession = (accessToken) => {
   if (accessToken) {
     localStorage.setItem(ACCESS_TOKEN, accessToken)
     axiosInstance.defaults.headers.common.Authorization = `Bearer ${accessToken}`
+    axiosInstance2.defaults.headers.common.Authorization = `Bearer ${accessToken}`
   } else {
     localStorage.removeItem(ACCESS_TOKEN)
     delete axiosInstance.defaults.headers.common.Authorization
+    delete axiosInstance2.defaults.headers.common.Authorization
   }
 }
 
@@ -44,6 +50,7 @@ export const getSession = () => {
 
   if (isValidToken(accessToken)) {
     axiosInstance.defaults.headers.common.Authorization = `Bearer ${accessToken}`
+    axiosInstance2.defaults.headers.common.Authorization = `Bearer ${accessToken}`
     return accessToken
   }
 

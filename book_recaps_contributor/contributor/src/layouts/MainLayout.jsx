@@ -2,8 +2,11 @@ import { Suspense } from "react";
 import Spinner from "../components/Spinner";
 import { HeadBar } from "../components/HeadBar";
 import { NavBar } from "../components/NavBar";
+import { useNavigation } from "react-router-dom";
+import { cn } from "../utils/cn";
 
 const MainLayout = ({ children }) => {
+  const navigation = useNavigation();
 
   return (
     <div className="flex flex-row h-screen">
@@ -19,7 +22,12 @@ const MainLayout = ({ children }) => {
               </p>
             </div>
           }>
-            <div className="py-8 px-6 min-w-[1024px] h-fit">{children}</div>
+            <div className={cn({
+              "py-8 px-6 min-w-[1024px] h-fit": true,
+              "cursor-progress": navigation.state === "loading"
+            })}>
+              {children}
+            </div>
           </Suspense>
           <div className="text-center min-w-[1024px] py-2 text-gray-400">
             ©{new Date().getFullYear()} BookRecaps {import.meta.env.VITE_WEB_NAME}. All rights reserved
