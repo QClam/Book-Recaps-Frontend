@@ -13,11 +13,9 @@ export const routes = {
   logout: '/logout',
   dashboard: '/',
   recaps: '/recaps',
-  draftRecaps: '/recaps/draft',
-  underRevisionRecaps: '/recaps/under-revision',
-  rejectionsRecaps: '/recaps/rejected',
-  publishedRecaps: '/recaps/published',
+  recapDetails: '/recaps/:recapId',
   createRecap: '/recaps/create',
+  recapVersionDetails: '/recaps/:recapId/:versionId',
   books: '/books',
   contact: '/contact',
   profile: '/profile',
@@ -50,30 +48,27 @@ export const router = createBrowserRouter([
                 children: [
                   {
                     index: true,
-                    element: <div>Recaps</div>,
-                  },
-                  {
-                    path: routes.draftRecaps,
-                    element: <div>Draft Recaps</div>
-                  },
-                  {
-                    path: routes.underRevisionRecaps,
-                    element: <div>Under Revision Recaps</div>
-                  },
-                  {
-                    path: routes.rejectionsRecaps,
-                    element: <div>Rejections Recaps</div>
-                  },
-                  {
-                    path: routes.publishedRecaps,
-                    element: <div>Published Recaps</div>
+                    element: <div>Danh sách các Recaps</div>,
                   },
                   {
                     path: routes.createRecap,
                     element: <CreateRecap/>,
                     loader: booksLoader,
                     action: createRecapAction
-                  }
+                  },
+                  {
+                    path: routes.recapDetails,
+                    children: [
+                      {
+                        index: true,
+                        element: <div>Chi tiết Recap. Chứa danh sách các recap version</div>,
+                      },
+                      {
+                        path: routes.recapVersionDetails,
+                        element: <div>Chi tiết Recap Version. Tạo và chỉnh sửa keyideas</div>
+                      }
+                    ]
+                  },
                 ]
               },
             ]

@@ -4,13 +4,13 @@ import {
   Form,
   Link,
   redirect,
+  useActionData,
   useAsyncValue,
   useLoaderData,
   useNavigation,
   useSearchParams
 } from "react-router-dom";
-import { Suspense, useEffect, useRef, useState } from "react";
-import { Toast } from 'primereact/toast';
+import { Suspense, useEffect, useState } from "react";
 import { axiosInstance, axiosInstance2 } from "../../utils/axios";
 import { handleFetchError } from "../../utils/handleFetchError";
 import TextInput from "../../components/form/TextInput";
@@ -21,14 +21,15 @@ import { cn } from "../../utils/cn";
 import { useAuth } from "../../contexts/Auth";
 import { Dialog } from "primereact/dialog";
 
-const getBooks = async (q, category, page) => {
+const getBooks = async (q, category, page, request) => {
   try {
     const response = await axiosInstance2.get('/books/search', {
       params: {
         q,
         category,
         page
-      }
+      },
+      signal: request.signal
     });
     return response.data;
   } catch (error) {
@@ -36,9 +37,11 @@ const getBooks = async (q, category, page) => {
   }
 }
 
-const getCategories = async () => {
+const getCategories = async (request) => {
   try {
-    const response = await axiosInstance.get('/api/category');
+    const response = await axiosInstance.get('/api/category', {
+      signal: request.signal
+    });
     return (response.data.data.$values.map((category) => ({
       value: category.id,
       label: category.name
@@ -54,8 +57,8 @@ export async function booksLoader({ request }) {
   const category = url.searchParams.get("category");
   const page = url.searchParams.get("page");
 
-  const booksPromise = getBooks(q, category, page);
-  const categories = await getCategories();
+  const booksPromise = getBooks(q, category, page, request);
+  const categories = await getCategories(request);
 
   return defer({
     booksPagination: booksPromise,
@@ -83,7 +86,7 @@ export async function createRecapAction({ request }) {
       bookId, contributorId, name
     });
 
-    return redirect(`/recaps/${response.data.data.id}`);
+    return redirect(`/recaps/${response.data.data.id}/${response.data.data.currentVersionId}`);
   } catch (error) {
     return handleFetchError(error);
   }
@@ -91,10 +94,10 @@ export async function createRecapAction({ request }) {
 
 const CreateRecap = () => {
   const { booksPagination, categories, params: { q, category } } = useLoaderData();
+  const actionData = useActionData();
   let [ , setSearchParams ] = useSearchParams();
   const navigation = useNavigation()
-  const { user } = useAuth();
-  const toast = useRef(null);
+  const { user, showToast } = useAuth();
   const [ dialogVisible, setDialogVisible ] = useState(false);
   const [ chosenBookId, setChosenBookId ] = useState("");
 
@@ -103,17 +106,28 @@ const CreateRecap = () => {
     document.getElementById("category").value = category ?? "";
   }, [ q, category ]);
 
+  useEffect(() => {
+    if (actionData?.error) {
+      showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: actionData.error,
+      });
+      setChosenBookId("");
+      setDialogVisible(false);
+    }
+  }, [ actionData ]);
+
   const resetFilter = () => {
     setSearchParams({});
   }
 
   const handleClickCreate = (bookId) => {
     if (!user) {
-      toast.current.show({
+      showToast({
         severity: 'error',
         summary: 'Error',
         detail: 'Bạn cần đăng nhập để tạo bài viết tóm tắt',
-        life: 3000
       });
       return;
     }
@@ -123,7 +137,6 @@ const CreateRecap = () => {
 
   return (
     <>
-      <Toast ref={toast}/>
       <Dialog
         visible={dialogVisible}
         modal
@@ -132,13 +145,11 @@ const CreateRecap = () => {
           setDialogVisible(false);
         }}
         content={({ hide }) => (
-          <Form className="flex flex-col px-2 py-1 gap-1 bg-white" method="post">
+          <Form className="flex flex-col p-4 gap-1 bg-white rounded" method="post">
             <input type="hidden" name="bookId" value={chosenBookId}/>
             <input type="hidden" name="userId" value={user.id}/>
-            <div className="inline-flex flex-column gap-2">
-              <TextInput id="name" label="Recap name" name="name"/>
-            </div>
-            <div className="flex align-items-center gap-2">
+            <TextInput id="name" label="Recap name" name="name"/>
+            <div className="flex justify-end gap-2">
               <button
                 className={cn({
                   "text-white bg-indigo-600 rounded py-2 px-4 border font-medium hover:bg-indigo-700": true,
@@ -180,7 +191,7 @@ const CreateRecap = () => {
             id="q"
             aria-label="Search books"
             placeholder="Tìm kiếm sách"
-            type="search"
+            type="text"
             name="q"
             defaultValue={q}
             inputClassName="pl-12"

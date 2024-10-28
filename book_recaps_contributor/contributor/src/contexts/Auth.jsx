@@ -1,8 +1,9 @@
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
-import { getSession, isRoleMatched, isValidToken, setSession } from "../utils/axios";
+import { axiosInstance, getSession, isRoleMatched, isValidToken, setSession } from "../utils/axios";
 import { Outlet, useLoaderData } from "react-router-dom";
 import { jwtDecode } from "jwt-decode";
+import { Toast } from "primereact/toast";
 
 const AuthContext = createContext(null);
 
@@ -11,6 +12,7 @@ export function AuthProvider() {
   const { executeRecaptcha } = useGoogleReCaptcha();
   const [ user, setUser ] = useState(loaderData); // { id, email, name, role }
   const [ reCaptchaTokens, setReCaptchaTokens ] = useState(null); // { loginToken, signupToken }
+  const toast = useRef(null);
 
   useEffect(() => {
     const handleReCaptchaVerify = async () => {
@@ -50,10 +52,15 @@ export function AuthProvider() {
     setReCaptchaTokens({ loginToken, signupToken });
   };
 
+  const showToast = ({ severity, summary, detail }) => {
+    toast.current.show({ severity, summary, detail, life: 3000 });
+  }
+
   const isAuthenticated = !!user;
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated, reCaptchaTokens }}>
+    <AuthContext.Provider value={{ user, login, logout, isAuthenticated, reCaptchaTokens, showToast }}>
+      <Toast ref={toast} position="top-center"/>
       <Outlet/>
     </AuthContext.Provider>
   );
@@ -63,7 +70,7 @@ export function useAuth() {
   return useContext(AuthContext);
 }
 
-export const sessionLoader = () => {
+export const sessionLoader = async () => {
   const token = getSession();
 
   if (!token) {
@@ -71,9 +78,22 @@ export const sessionLoader = () => {
     return null;
   }
 
+  let responseId = null;
+
+  try {
+    const response = await axiosInstance.get("/api/personal/profile");
+    responseId = response.data.id || null;
+  } catch (e) {
+    console.error(e);
+  }
+
   const decoded = jwtDecode(token)
 
-  if (isValidToken(decoded) && isRoleMatched(decoded, "Contributor")) {
+  if (
+    isValidToken(decoded) &&
+    isRoleMatched(decoded, "Contributor") &&
+    responseId === decoded[import.meta.env.VITE_CLAIMS_IDENTIFIER]
+  ) {
     return {
       email: decoded.email,
       name: decoded[import.meta.env.VITE_CLAIMS_NAME],

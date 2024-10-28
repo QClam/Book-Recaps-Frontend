@@ -43,34 +43,12 @@ export const NavBar = () => {
           isOpen={isOpen}
           end
         />
-        <NavbarDropDown
+        <NavbarLink
           href={routes.recaps}
-          isOpen={isOpen}
           icon={<TbNews/>}
           text="Recaps"
-        >
-          <NavbarLink
-            href={routes.draftRecaps}
-            text="Drafts"
-            isOpen={isOpen}
-            end
-          />
-          <NavbarLink
-            href={routes.underRevisionRecaps}
-            text="Under&nbsp;revision"
-            isOpen={isOpen}
-          />
-          <NavbarLink
-            href={routes.rejectionsRecaps}
-            text="Rejections"
-            isOpen={isOpen}
-          />
-          <NavbarLink
-            href={routes.publishedRecaps}
-            text="Published"
-            isOpen={isOpen}
-          />
-        </NavbarDropDown>
+          isOpen={isOpen}
+        />
 
         <NavInfo isOpen={isOpen}>
           Resources&nbsp;and&nbsp;help
