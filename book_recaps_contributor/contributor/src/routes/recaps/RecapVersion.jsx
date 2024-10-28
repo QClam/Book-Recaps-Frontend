@@ -1,10 +1,13 @@
 import { axiosInstance, axiosInstance2 } from "../../utils/axios";
 import { handleFetchError } from "../../utils/handleFetchError";
-import { json, useLoaderData } from "react-router-dom";
-import { useState } from "react";
+import { json, redirect, useActionData, useLoaderData, useLocation, useSubmit } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../contexts/Auth";
 import Show from "../../components/Show";
 import { cn } from "../../utils/cn";
+import { ProgressSpinner } from "primereact/progressspinner";
+import { Divider } from 'primereact/divider';
+import { routes } from "../../routes";
 
 const getRecapVersion = async (versionId, request) => {
   try {
@@ -38,6 +41,26 @@ export const recapVersionLoader = async ({ params, request }) => {
     recapVersion,
     keyIdeas
   };
+}
+
+export const recapVersionSubmitAction = async ({ request, params }) => {
+  const { versionId } = params;
+  try {
+    const response = await axiosInstance.put('/change-recapversion-status', {
+      recapVersionId: versionId,
+      status: 1
+    }, { signal: request.signal });
+
+    return json({ data: response.data.data });
+
+  } catch (error) {
+    const err = handleFetchError(error);
+    console.log("err", err);
+    if (err.status === 401) {
+      return redirect(routes.logout);
+    }
+    return err;
+  }
 }
 
 const RecapVersion = () => {
@@ -99,28 +122,36 @@ const MainPanel = () => {
 
   const handleSaveKeyIdea = async (keyIdea, formdata) => {
     try {
-      if (keyIdea.isNewKeyIdea) {
-        const response = await axiosInstance.post('/api/keyidea/createkeyidea', formdata);
-        const responseData = response.data.data;
-        console.log("keyIdea", responseData);
-
-        setIdeas(ideas.map(idea => {
-          if (idea.order === keyIdea.order) {
-            return {
-              title: responseData.title,
-              body: responseData.body,
-              image: responseData.image,
-              order: responseData.order,
-              recapVersionId: responseData.recapVersionId,
-              id: responseData.id,
-              isNewKeyIdea: false
-            };
-          }
-          return idea;
-        }));
-      } else {
-        console.log("update key idea");
+      const imageKeyIdea = formdata.get('ImageKeyIdea');
+      if (
+        imageKeyIdea && imageKeyIdea.size > 0 &&
+        formdata.get('RemoveImage') === 'true'
+      ) {
+        // change the RemoveImage value to false
+        formdata.set('RemoveImage', 'false');
       }
+
+      const response = keyIdea.isNewKeyIdea ?
+        await axiosInstance.post('/api/keyidea/createkeyidea', formdata) :
+        await axiosInstance.put('/api/keyidea/updatekeyidea/' + keyIdea.id, formdata);
+
+      const responseData = response.data.data;
+      console.log("keyIdea", responseData);
+
+      setIdeas(ideas.map(idea => {
+        if (idea.order === keyIdea.order) {
+          return {
+            title: responseData.title,
+            body: responseData.body,
+            image: responseData.image,
+            order: responseData.order,
+            recapVersionId: responseData.recapVersionId,
+            id: responseData.id,
+            isNewKeyIdea: false
+          };
+        }
+        return idea;
+      }));
     } catch (error) {
       throw handleFetchError(error);
     }
@@ -153,13 +184,15 @@ const MainPanel = () => {
         ))}
 
         {/* Add New Key Idea Button */}
-        <div className="flex justify-center mt-8">
-          <button
-            onClick={addNewKeyIdea}
-            className="px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
-            Add new key idea
-          </button>
-        </div>
+        <Show when={recapVersion.status === 0}>
+          <div className="flex justify-center mt-8">
+            <button
+              onClick={addNewKeyIdea}
+              className="px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
+              Add new key idea
+            </button>
+          </div>
+        </Show>
       </div>
     </div>
   )
@@ -167,16 +200,122 @@ const MainPanel = () => {
 
 const RightSidePanel = () => {
   const { recapVersion } = useLoaderData();
+  const actionData = useActionData();
+  const [ recapVersionData, setRecapVersionData ] = useState(recapVersion);
+  const [ loading, setLoading ] = useState(false);
+  const submit = useSubmit();
+  let location = useLocation();
+  const { showToast } = useAuth();
+
+  useEffect(() => {
+    if (actionData?.error) {
+      showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: actionData.error,
+      });
+    }
+    if (actionData?.data) {
+      setLoading(false);
+      setRecapVersionData({ ...actionData.data });
+      showToast({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Version submitted for review successfully',
+      });
+    }
+  }, [ actionData ]);
+
+  const handleUpload = async (event) => {
+    try {
+      setLoading(true);
+      const formData = new FormData();
+      formData.append('audioFile', event.target.files[0]);
+      formData.append('recapVersionId', recapVersion.id);
+      await axiosInstance.put('/upload-audio', formData);
+
+      const controller = new AbortController();
+      const result = await getRecapVersion(recapVersion.id, controller);
+      setRecapVersionData({ ...result });
+
+      showToast({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Audio uploaded successfully',
+      });
+
+    } catch (error) {
+      console.error('Error uploading file:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGenerateAudio = async () => {
+    try {
+      setLoading(true);
+      await axiosInstance.put('/generate-audio', {
+        recapVersionId: recapVersion.id
+      });
+
+      const controller = new AbortController();
+      const result = await getRecapVersion(recapVersion.id, controller);
+      setRecapVersionData({ ...result });
+
+      showToast({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Audio generated successfully',
+      });
+
+    } catch (error) {
+      console.error('Error generating audio:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleUpdateName = async () => {
+    try {
+      setLoading(true);
+      await axiosInstance2.put('/recap-versions/change-name/' + recapVersion.id, {
+        versionName: recapVersionData.versionName || ''
+      });
+
+      const controller = new AbortController();
+      const result = await getRecapVersion(recapVersion.id, controller);
+      setRecapVersionData({ ...result });
+
+      showToast({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Version name updated successfully',
+      });
+
+    } catch (error) {
+      console.error('Error updating version name:', error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const handleSubmitForReview = async () => {
+    if (!confirm("Are you sure you want to submit this version for review? You won't be able to change this version anymore."))
+      return;
+
+    setLoading(true);
+    submit(null, { method: "post", action: location.pathname });
+  }
 
   const getStatus = (status) => {
     switch (status) {
-      case 1:
+      case 0:
         return "Draft";
-      case 2:
+      case 1:
         return "Pending";
-      case 3:
+      case 2:
         return "Approved";
-      case 4:
+      case 3:
         return "Rejected";
       default:
         return "Unknown"
@@ -184,23 +323,47 @@ const RightSidePanel = () => {
   }
 
   return (
-    <div className="border-l border-gray-300 bg-white h-full py-8 px-6">
+    <div className="border-l border-gray-300 bg-white h-full py-8 px-6 min-w-80">
       <div className="sticky top-8">
+        <div className="mb-4">
+          <h2 className="text-2xl font-bold text-gray-900">Recap Version</h2>
+
+          <Show when={loading}>
+            <div className="flex gap-2 items-center mt-3">
+              <div>
+                <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
+                                 fill="var(--surface-ground)" animationDuration=".5s"/>
+              </div>
+              <p>Updating...</p>
+            </div>
+          </Show>
+        </div>
         {/* Version name */}
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">Version name</label>
-          <input
-            type="text"
-            defaultValue={recapVersion.versionName}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-          />
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              placeholder="Version name"
+              value={recapVersionData.versionName || ''}
+              onChange={(e) => setRecapVersionData({ ...recapVersionData, versionName: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+            />
+            <button
+              type="button"
+              disabled={loading}
+              onClick={handleUpdateName}
+              className="px-4 py-2 text-white border bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
+              Save
+            </button>
+          </div>
         </div>
 
         {/* Status */}
         <div className="mb-4">
           <span className="block text-sm font-medium text-gray-700 mb-1">Status:</span>
           <span className="block text-lg font-semibold text-gray-900">
-            {getStatus(recapVersion.status)}
+            {getStatus(recapVersionData.status)}
           </span>
         </div>
 
@@ -211,36 +374,55 @@ const RightSidePanel = () => {
             <input
               type="text"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
-              defaultValue={recapVersion.audioURL}
+              defaultValue={recapVersionData.audioURL}
               placeholder="Audio URL"
               readOnly
             />
           </div>
         </div>
 
-        <div className="mb-4">
-          <button
-            className="w-full px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
-            Upload audio
-          </button>
-          <p className="block text-center text-xs text-gray-500 mt-2">Or</p>
-        </div>
-        {/* Generate Audio Button */}
-        <div className="mb-4">
-          <button
-            className="w-full px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
-            Generate audio
-          </button>
-          <span className="block text-xs text-gray-500 mt-2">Generate audio using AI (recommended)</span>
-        </div>
+        <Show when={recapVersionData.status === 0}>
+          <>
+            {/* Generate Audio Button */}
+            <div className="mb-4">
+              <p className="block text-xs text-gray-500 mb-2">Generate audio using AI (recommended)</p>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={handleGenerateAudio}
+                className="w-full px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
+                Generate audio
+              </button>
+              <p className="block text-center text-xs text-gray-500 mt-2">Or</p>
+            </div>
 
-        {/* Submit for review */}
-        <div>
-          <button
-            className="w-full px-4 py-2 text-white bg-indigo-500 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring focus:ring-indigo-300">
-            Submit for review
-          </button>
-        </div>
+            <div className="relative mb-4">
+              <input
+                type="file"
+                className="absolute inset-0 opacity-0 cursor-pointer"
+                onChange={handleUpload}
+              />
+              <button
+                type="button"
+                className="w-full px-4 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-400 focus:outline-none"
+                disabled={loading}
+              >
+                Upload audio
+              </button>
+            </div>
+            <Divider/>
+            {/* Submit for review */}
+            <div>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={handleSubmitForReview}
+                className="w-full px-4 py-2 text-white bg-indigo-500 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring focus:ring-indigo-300">
+                Submit for review
+              </button>
+            </div>
+          </>
+        </Show>
       </div>
     </div>
   )
@@ -248,15 +430,20 @@ const RightSidePanel = () => {
 
 const KeyIdeaItem = ({ keyIdea, handleDeleteKeyIdea, handleSaveKeyIdea }) => {
   // const [ isEditing, setIsEditing ] = useState(false);
+  const { recapVersion } = useLoaderData();
   const [ loading, setLoading ] = useState(false);
+  const [ removeImage, setRemoveImage ] = useState(false);
   const { showToast } = useAuth();
+  const fileInputRef = useRef(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (loading || recapVersion.status !== 0) return;
+
     const form = e.target;
     const formData = new FormData(form);
 
-    // const id = formData.get('id');
     const title = formData.get('Title');
     const order = formData.get('Order');
     const recapVersionId = formData.get('RecapVersionId');
@@ -282,11 +469,14 @@ const KeyIdeaItem = ({ keyIdea, handleDeleteKeyIdea, handleSaveKeyIdea }) => {
     setLoading(true);
     await handleSaveKeyIdea(keyIdea, formData);
     setLoading(false);
+    setRemoveImage(false);
+    fileInputRef.current.value = '';
   }
 
   const onClickDeleteKeyIdea = async () => {
-    const isConfirmed = confirm("Are you sure you want to delete this key idea?");
+    if (loading || recapVersion.status !== 0) return;
 
+    const isConfirmed = confirm("Are you sure you want to delete this key idea?");
     if (!isConfirmed) return;
 
     // Delete key idea
@@ -303,7 +493,7 @@ const KeyIdeaItem = ({ keyIdea, handleDeleteKeyIdea, handleSaveKeyIdea }) => {
         "opacity-50 cursor-progress": loading
       })}
     >
-      <input type="hidden" name="Id" defaultValue={keyIdea.id}/>
+      <input type="hidden" name="RemoveImage" value={removeImage ? "true" : "false"}/>
       <input type="hidden" name="Order" defaultValue={keyIdea.order}/>
       <input type="hidden" name="RecapVersionId" defaultValue={keyIdea.recapVersionId}/>
       <div className="flex gap-2 items-center">
@@ -311,6 +501,7 @@ const KeyIdeaItem = ({ keyIdea, handleDeleteKeyIdea, handleSaveKeyIdea }) => {
           type="text"
           name="Title"
           placeholder="Key idea title"
+          disabled={loading || recapVersion.status !== 0}
           defaultValue={keyIdea.title}
           className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
         />
@@ -323,46 +514,65 @@ const KeyIdeaItem = ({ keyIdea, handleDeleteKeyIdea, handleSaveKeyIdea }) => {
         name="Body"
         placeholder="Key idea details..."
         defaultValue={keyIdea.body}
+        disabled={loading || recapVersion.status !== 0}
         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
       />
       <Show when={keyIdea.image}>
-        <div className="flex gap-2 items-center">
-          <p>Image:</p>
-          <p className="font-semibold">{keyIdea.image}</p>
+        <div>
+          <div className="flex gap-2 items-center">
+            <p>Image:</p>
+            <Show when={recapVersion.status === 0}>
+              (
+              <button
+                type="button"
+                onClick={() => setRemoveImage(!removeImage)}
+                disabled={loading || recapVersion.status !== 0}
+                className="text-red-500 hover:text-red-700 hover:underline"
+              >
+                {removeImage ? "Undo" : "Remove"}
+              </button>
+              )
+            </Show>
+          </div>
+          <p className={cn({ "font-semibold": true, "text-gray-500 line-through": removeImage })}>{keyIdea.image}</p>
         </div>
       </Show>
-      <div className="flex gap-2 items-center">
-        <p>Upload new image (optional):</p>
-        <input
-          type="file"
-          placeholder="Upload image (optional)"
-          accept="image/*"
-          name="ImageKeyIdea"
-          className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-        />
-      </div>
-      <div className="flex justify-between gap-4">
-        <button
-          type="button"
-          className="text-red-500 hover:text-red-700"
-          onClick={onClickDeleteKeyIdea}
-          disabled={loading}
-        >
-          Delete
-        </button>
-        <div className="flex gap-4 items-center">
-          <p className='italic font-semibold text-gray-500'>
-            {keyIdea.isNewKeyIdea ? 'Not saved yet' : 'Saved'}
-          </p>
-          <button
-            type="submit"
-            disabled={loading}
-            className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
-          >
-            {loading ? 'Loading...' : 'Save'}
-          </button>
+      <Show when={recapVersion.status === 0}>
+        <div className="flex gap-2 items-center">
+          <p>Upload new image (optional):</p>
+          <input
+            type="file"
+            placeholder="Upload image (optional)"
+            accept="image/*"
+            name="ImageKeyIdea"
+            disabled={loading || recapVersion.status !== 0}
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+            ref={fileInputRef}
+          />
         </div>
-      </div>
+        <div className="flex justify-between gap-4">
+          <button
+            type="button"
+            className="text-red-500 hover:text-red-700"
+            onClick={onClickDeleteKeyIdea}
+            disabled={loading || recapVersion.status !== 0}
+          >
+            Delete
+          </button>
+          <div className="flex gap-4 items-center">
+            <p className='italic font-semibold text-gray-500'>
+              {keyIdea.isNewKeyIdea ? 'Not saved yet' : 'Saved'}
+            </p>
+            <button
+              type="submit"
+              disabled={loading || recapVersion.status !== 0}
+              className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
+            >
+              {loading ? 'Loading...' : 'Save'}
+            </button>
+          </div>
+        </div>
+      </Show>
     </form>
   )
 }
