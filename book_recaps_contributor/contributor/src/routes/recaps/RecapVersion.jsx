@@ -1,6 +1,6 @@
-import { axiosInstance } from "../../utils/axios";
+import { axiosInstance, axiosInstance2 } from "../../utils/axios";
 import { handleFetchError } from "../../utils/handleFetchError";
-import { defer, json, useLoaderData } from "react-router-dom";
+import { json, useLoaderData } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "../../contexts/Auth";
 import Show from "../../components/Show";
@@ -18,20 +18,29 @@ const getRecapVersion = async (versionId, request) => {
   }
 }
 
+const getKeyIdeas = async (versionId, request) => {
+  try {
+    const response = await axiosInstance2.get('/key-ideas/by-recap-version/' + versionId, {
+      signal: request.signal
+    });
+    return response.data;
+  } catch (error) {
+    const err = handleFetchError(error);
+    throw json({ error: err.error }, { status: err.status });
+  }
+}
+
 export const recapVersionLoader = async ({ params, request }) => {
   const recapVersion = await getRecapVersion(params.versionId, request);
+  const keyIdeas = await getKeyIdeas(params.versionId, request);
 
-  return defer({
+  return {
     recapVersion,
-    keyIdeas: []
-  });
+    keyIdeas
+  };
 }
 
 const RecapVersion = () => {
-  const loaderData = useLoaderData();
-
-  console.log(loaderData)
-
   return (
     <div className="relative flex h-full">
       <MainPanel/>
@@ -159,6 +168,21 @@ const MainPanel = () => {
 const RightSidePanel = () => {
   const { recapVersion } = useLoaderData();
 
+  const getStatus = (status) => {
+    switch (status) {
+      case 1:
+        return "Draft";
+      case 2:
+        return "Pending";
+      case 3:
+        return "Approved";
+      case 4:
+        return "Rejected";
+      default:
+        return "Unknown"
+    }
+  }
+
   return (
     <div className="border-l border-gray-300 bg-white h-full py-8 px-6">
       <div className="sticky top-8">
@@ -167,7 +191,7 @@ const RightSidePanel = () => {
           <label className="block text-sm font-medium text-gray-700 mb-1">Version name</label>
           <input
             type="text"
-            defaultValue={recapVersion.name}
+            defaultValue={recapVersion.versionName}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
           />
         </div>
@@ -175,7 +199,9 @@ const RightSidePanel = () => {
         {/* Status */}
         <div className="mb-4">
           <span className="block text-sm font-medium text-gray-700 mb-1">Status:</span>
-          <span className="block text-lg font-semibold text-gray-900">Draft</span>
+          <span className="block text-lg font-semibold text-gray-900">
+            {getStatus(recapVersion.status)}
+          </span>
         </div>
 
         {/* Audio Upload */}
@@ -185,23 +211,27 @@ const RightSidePanel = () => {
             <input
               type="text"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
-              value="https://...ssgasgsagasgasgsgasgsagasgsagasgagsg"
+              defaultValue={recapVersion.audioURL}
+              placeholder="Audio URL"
               readOnly
             />
-            <button
-              className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
-              Upload
-            </button>
           </div>
         </div>
 
+        <div className="mb-4">
+          <button
+            className="w-full px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
+            Upload audio
+          </button>
+          <p className="block text-center text-xs text-gray-500 mt-2">Or</p>
+        </div>
         {/* Generate Audio Button */}
         <div className="mb-4">
           <button
             className="w-full px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
             Generate audio
           </button>
-          <span className="block text-xs text-gray-500 mt-2">Generate audio from key ideas (recommended)</span>
+          <span className="block text-xs text-gray-500 mt-2">Generate audio using AI (recommended)</span>
         </div>
 
         {/* Submit for review */}
