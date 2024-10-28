@@ -353,18 +353,18 @@ function BooksTable({ handleClickCreate }) {
               <div className="w-20">
                 <Show when={book.coverImage} fallback={
                   <img
-                    src="/empty-image.png"
+                    src="/empty-image.jpg"
                     alt="Empty image"
-                    className="block aspect-[3/4] object-contain w-full"
+                    className="block aspect-[3/4] object-cover w-full rounded-md"
                   />
                 }>
                   <img
                     src={book.coverImage}
                     alt={book.title}
-                    className="block aspect-[3/4] object-contain w-full"
+                    className="block aspect-[3/4] object-cover w-full rounded-md"
                     onError={({ currentTarget }) => {
                       currentTarget.onerror = null; // prevents looping
-                      currentTarget.src = "/empty-image.png";
+                      currentTarget.src = "/empty-image.jpg";
                     }}
                   />
                 </Show>

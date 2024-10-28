@@ -7,7 +7,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import Logout from "./routes/Logout";
 import CreateRecap, { booksLoader, createRecapAction } from "./routes/recaps/CreateRecap";
 import { AuthProvider, sessionLoader } from "./contexts/Auth";
-import RecapVersion from "./routes/recaps/RecapVersion";
+import RecapVersion, { recapVersionLoader } from "./routes/recaps/RecapVersion";
 
 export const routes = {
   login: '/login',
@@ -17,6 +17,7 @@ export const routes = {
   recapDetails: '/recaps/:recapId',
   createRecap: '/recaps-create',
   recapVersionDetails: '/recaps/:recapId/version/:versionId',
+  keyIdea: '/key-idea',
   books: '/books',
   contact: '/contact',
   profile: '/profile',
@@ -60,7 +61,8 @@ export const router = createBrowserRouter([
                       },
                       {
                         path: routes.recapVersionDetails,
-                        element: <RecapVersion/>
+                        element: <RecapVersion/>,
+                        loader: recapVersionLoader,
                       }
                     ]
                   },
@@ -91,5 +93,5 @@ export const router = createBrowserRouter([
       //   action: registerAction,
       // },
     ]
-  }
+  },
 ])
