@@ -2,6 +2,7 @@ import {
   Await,
   defer,
   Form,
+  json,
   Link,
   redirect,
   useActionData,
@@ -20,6 +21,8 @@ import Show from "../../components/Show";
 import { cn } from "../../utils/cn";
 import { useAuth } from "../../contexts/Auth";
 import { Dialog } from "primereact/dialog";
+import { ProgressSpinner } from "primereact/progressspinner";
+import { routes } from "../../routes";
 
 const getBooks = async (q, category, page, request) => {
   try {
@@ -33,7 +36,8 @@ const getBooks = async (q, category, page, request) => {
     });
     return response.data;
   } catch (error) {
-    return handleFetchError(error);
+    const err = handleFetchError(error);
+    throw json({ error: err.error }, { status: err.status });
   }
 }
 
@@ -47,7 +51,8 @@ const getCategories = async (request) => {
       label: category.name
     })));
   } catch (error) {
-    return handleFetchError(error);
+    const err = handleFetchError(error);
+    throw json({ error: err.error }, { status: err.status });
   }
 }
 
@@ -86,9 +91,14 @@ export async function createRecapAction({ request }) {
       bookId, contributorId, name
     });
 
-    return redirect(`/recaps/${response.data.data.id}/${response.data.data.currentVersionId}`);
+    return redirect(`/recaps/${response.data.data.id}/version/${response.data.data.currentVersionId}`);
   } catch (error) {
-    return handleFetchError(error);
+    const err = handleFetchError(error);
+    console.log("err", err);
+    if (err.status === 401) {
+      return redirect(routes.logout);
+    }
+    return err;
   }
 }
 
@@ -210,7 +220,7 @@ const CreateRecap = () => {
             id="category"
             placeholder="Thể loại"
             name="category"
-            options={categories}
+            options={categories ?? []}
             defaultValue={category}
           />
         </div>
@@ -275,7 +285,15 @@ const CreateRecap = () => {
             fallback={
               <tbody>
               <tr>
-                <td className="h-32 text-center" colSpan="100">Loading books...</td>
+                <td className="h-32 text-center" colSpan="100">
+                  <div className="flex gap-2 justify-center items-center">
+                    <div>
+                      <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
+                                       fill="var(--surface-ground)" animationDuration=".5s"/>
+                    </div>
+                    <p>Loading books...</p>
+                  </div>
+                </td>
               </tr>
               </tbody>
             }
@@ -317,7 +335,15 @@ function BooksTable({ handleClickCreate }) {
       when={navigation.state !== "loading"}
       fallback={
         <tr>
-          <td className="h-32 text-center" colSpan="100">Loading books...</td>
+          <td className="h-32 text-center" colSpan="100">
+            <div className="flex gap-2 justify-center items-center">
+              <div>
+                <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
+                                 fill="var(--surface-ground)" animationDuration=".5s"/>
+              </div>
+              <p>Loading books...</p>
+            </div>
+          </td>
         </tr>
       }>
       <>

@@ -1,4 +1,5 @@
-import { isRouteErrorResponse, Link, useRouteError } from 'react-router-dom';
+import { isRouteErrorResponse, Navigate, useRouteError } from 'react-router-dom';
+import { routes } from "../routes";
 
 function ErrorBoundary() {
   const error = useRouteError();
@@ -7,6 +8,9 @@ function ErrorBoundary() {
 
   const renderContent = () => {
     if (isRouteErrorResponse(error)) {
+      if (error.status === 401) {
+        return <Navigate to={routes.logout} replace={true}/>;
+      }
       if (error.status === 404) {
         return (
           <>
@@ -15,7 +19,6 @@ function ErrorBoundary() {
           </>
         );
       }
-
       if (error.status === 500) {
         return (
           <>

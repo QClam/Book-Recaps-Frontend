@@ -7,7 +7,17 @@ function Login() {
   const navigate = useNavigate();
   const navigation = useNavigation();
   const actionData = useActionData();
-  const { login, reCaptchaTokens, isAuthenticated } = useAuth();
+  const { login, reCaptchaTokens, isAuthenticated, showToast } = useAuth();
+
+  useEffect(() => {
+    if (actionData?.error) {
+      showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: actionData.error,
+      });
+    }
+  }, [ actionData ]);
 
   useEffect(() => {
     if (actionData?.user && actionData?.token) {

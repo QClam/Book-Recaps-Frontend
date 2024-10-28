@@ -7,6 +7,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import Logout from "./routes/Logout";
 import CreateRecap, { booksLoader, createRecapAction } from "./routes/recaps/CreateRecap";
 import { AuthProvider, sessionLoader } from "./contexts/Auth";
+import RecapVersion from "./routes/recaps/RecapVersion";
 
 export const routes = {
   login: '/login',
@@ -14,8 +15,8 @@ export const routes = {
   dashboard: '/',
   recaps: '/recaps',
   recapDetails: '/recaps/:recapId',
-  createRecap: '/recaps/create',
-  recapVersionDetails: '/recaps/:recapId/:versionId',
+  createRecap: '/recaps-create',
+  recapVersionDetails: '/recaps/:recapId/version/:versionId',
   books: '/books',
   contact: '/contact',
   profile: '/profile',
@@ -51,12 +52,6 @@ export const router = createBrowserRouter([
                     element: <div>Danh sách các Recaps</div>,
                   },
                   {
-                    path: routes.createRecap,
-                    element: <CreateRecap/>,
-                    loader: booksLoader,
-                    action: createRecapAction
-                  },
-                  {
                     path: routes.recapDetails,
                     children: [
                       {
@@ -65,11 +60,17 @@ export const router = createBrowserRouter([
                       },
                       {
                         path: routes.recapVersionDetails,
-                        element: <div>Chi tiết Recap Version. Tạo và chỉnh sửa keyideas</div>
+                        element: <RecapVersion/>
                       }
                     ]
                   },
                 ]
+              },
+              {
+                path: routes.createRecap,
+                element: <CreateRecap/>,
+                loader: booksLoader,
+                action: createRecapAction
               },
             ]
           }
