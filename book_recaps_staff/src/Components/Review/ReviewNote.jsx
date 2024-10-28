@@ -3,17 +3,16 @@ import data from "../../data/read_along_output-final.json";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import { Hourglass } from "react-loader-spinner";
-
 import "./ReviewNote.scss";
 
 function ReviewNote() {
-  const { id } = useParams(); // Lấy id từ URL params
-  const [comments, setComments] = useState([]); // Lưu comment vào state
-  const [showInput, setShowInput] = useState(false); // Ẩn/hiện ô nhập comment
-  const [currentComment, setCurrentComment] = useState(""); // Lấy comment trong ô input
-  const [selectedIndex, setSelectedIndex] = useState(null); // Lấy sentence cần comment
-  const [visibleComment, setVisibleComment] = useState(null); // Ẩn/hiện comment
-  const [commentPosition, setCommentPosition] = useState({ top: 0, left: 0 }); // Vị trí của comment
+  const { id } = useParams();
+  const [comments, setComments] = useState([]);
+  const [showInput, setShowInput] = useState(false);
+  const [currentComment, setCurrentComment] = useState("");
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [visibleComment, setVisibleComment] = useState(null);
+  const [commentPosition, setCommentPosition] = useState({ top: 0, left: 0 });
 
   const [loading, setLoading] = useState(true);
   const [content, setContent] = useState(null);
@@ -35,7 +34,6 @@ function ReviewNote() {
     fetchContent();
   }, [id]);
 
-  // Fetch comments
   useEffect(() => {
     const fetchComments = async () => {
       try {
@@ -44,7 +42,6 @@ function ReviewNote() {
         );
         const commentsData = response.data[0]?.comments || [];
         setComments(commentsData);
-        console.log(commentsData);
       } catch (error) {
         console.log("Error fetching comments:", error);
       }
@@ -54,7 +51,7 @@ function ReviewNote() {
   }, []);
 
   const handleRightClick = (e, sectionIndex, sentenceIndex) => {
-    e.preventDefault(); // Chặn menu chuột phải mặc định
+    e.preventDefault();
     setSelectedIndex({ sectionIndex, sentenceIndex });
 
     const existingComment = comments.find(
@@ -64,28 +61,23 @@ function ReviewNote() {
     );
 
     if (existingComment) {
-      setCurrentComment(existingComment.feedback); // Nếu có comment thì hiện trong ô input
+      setCurrentComment(existingComment.feedback);
     } else {
       setCurrentComment("");
     }
 
-    setShowInput(true); // Hiển thị ô nhập comment
+    setShowInput(true);
   };
 
-
-  // Thêm nhận xét
   const handleAddComment = async () => {
     if (currentComment.trim()) {
-      const contentId = id; // Lấy ID hiện tại
+      const contentId = id;
 
       try {
-        // Lấy dữ liệu hiện tại từ API
         const response = await axios.get(
           `https://66ebd9352b6cf2b89c5c0bb9.mockapi.io/feedback/${contentId}`
         );
         const currentData = response.data;
-
-        // Sao chép các comment hiện tại
         const updatedComments = [...currentData.comments];
         const commentIndex = updatedComments.findIndex(
           (comment) =>
@@ -93,12 +85,10 @@ function ReviewNote() {
             comment.sentence_index === selectedIndex.sentenceIndex
         );
 
-        // Lấy câu đã chọn
         const selectedSentence =
           data.transcriptSections[selectedIndex.sectionIndex]
             ?.transcriptSentences[selectedIndex.sentenceIndex];
 
-        // Kiểm tra dữ liệu từ selectedSentence
         if (!selectedSentence) {
           console.error(
             "Selected sentence is undefined. Check the structure of data."
@@ -106,19 +96,16 @@ function ReviewNote() {
           return;
         }
 
-        // Lấy nội dung câu và chỉ số bắt đầu/kết thúc
         const targetText = selectedSentence.value.html;
-        const startIndex = 0; // Vị trí đầu tiên của câu
-        const endIndex = targetText.length - 1; // Vị trí cuối cùng của câu
+        const startIndex = 0;
+        const endIndex = targetText.length - 1;
 
         if (commentIndex > -1) {
-          // Cập nhật comment hiện tại
           updatedComments[commentIndex].feedback = currentComment;
           updatedComments[commentIndex].target_text = targetText;
           updatedComments[commentIndex].start_index = startIndex;
           updatedComments[commentIndex].end_index = endIndex;
         } else {
-          // Thêm comment mới
           const newComment = {
             section_index: selectedIndex.sectionIndex,
             sentence_index: selectedIndex.sentenceIndex,
@@ -130,7 +117,6 @@ function ReviewNote() {
           updatedComments.push(newComment);
         }
 
-        // Gửi PUT request để cập nhật dữ liệu
         await axios.put(
           `https://66ebd9352b6cf2b89c5c0bb9.mockapi.io/feedback/${contentId}`,
           {
@@ -139,7 +125,7 @@ function ReviewNote() {
           }
         );
 
-        setComments(updatedComments); // Cập nhật state với comment mới
+        setComments(updatedComments);
         setCurrentComment("");
         setShowInput(false);
       } catch (error) {
@@ -148,7 +134,6 @@ function ReviewNote() {
     }
   };
 
-  // Xóa nhận xét
   const handleDeleteComment = async (sectionIndex, sentenceIndex) => {
     const contentId = id;
 
@@ -158,8 +143,6 @@ function ReviewNote() {
       );
       const currentData = response.data;
 
-      // Lọc ra các comment không phải là comment cần xóa, filter dùng để lọc các comment hiện có
-      //  nếu có thì loại khỏi danh sách cần xóa
       const updatedComments = currentData.comments.filter(
         (comment) =>
           !(
@@ -172,17 +155,17 @@ function ReviewNote() {
         { ...currentData, comments: updatedComments }
       );
       setComments(updatedComments);
-      setVisibleComment(false)
+      setVisibleComment(false);
     } catch (error) {
       console.log("Error Deleting comment", error);
     }
   };
 
   const toggleCommentVisibility = (sectionIndex, sentenceIndex, event) => {
-    const iconElement = event.target.getBoundingClientRect(); // Lấy vị trí icon
+    const iconElement = event.target.getBoundingClientRect();
 
-    const topPosition = iconElement.bottom + window.scrollY; // vị trí dưới icon
-    const leftPosition = iconElement.left + window.scrollX; // vị trí trái icon
+    const topPosition = iconElement.bottom + window.scrollY;
+    const leftPosition = iconElement.left + window.scrollX;
 
     setCommentPosition({ top: topPosition, left: leftPosition });
 
@@ -225,130 +208,140 @@ function ReviewNote() {
   }
 
   return (
-    <div>
-      <h1>{content.title}</h1>
-      <p>{content.description}</p>
-      <p style={{ fontWeight: "bold" }}>Status: {content.status}</p>
-      <br />
-      <div>
-      {data.transcriptSections.map((section, sectionIndex) => (
-  <div key={sectionIndex}>
-    <span>
-      {section.transcriptSentences.map((sentence, sentenceIndex) => {
-        const hasComment = comments.find(
-          (comment) =>
-            comment.section_index === sectionIndex &&
-            comment.sentence_index === sentenceIndex &&
-            comment.feedback
-        );
+    <div className="audio-grid">
+      <div className="transcript-container">
+        <div className="transcript-box">
+          <div className="transcript">
+            <h1>{content.title}</h1>
+            <p>{content.description}</p>
+            <p style={{ fontWeight: "bold" }}>Status: {content.status}</p>
+            <br />
+            <div>
+              {data.transcriptSections.map((section, sectionIndex) => (
+                <div key={sectionIndex}>
+                  <span>
+                    {section.transcriptSentences.map((sentence, sentenceIndex) => {
+                      const hasComment = comments.find(
+                        (comment) =>
+                          comment.section_index === sectionIndex &&
+                          comment.sentence_index === sentenceIndex &&
+                          comment.feedback
+                      );
 
-        return (
-          <span key={sentenceIndex}>
-            <span
-              id={`word-${sectionIndex}-${sentenceIndex}`}
-              onContextMenu={(e) =>
-                handleRightClick(e, sectionIndex, sentenceIndex)
-              }
-              style={{ cursor: "pointer", marginRight: "4px" }}
-            >
-              {sentence.value.html + " "}
-              {hasComment && (
-                <>
-                  <span
-                    style={{ marginLeft: "2px", color: "#00aaff" }}
-                    onClick={(e) =>
-                      toggleCommentVisibility(
-                        sectionIndex,
-                        sentenceIndex,
-                        e
-                      )
-                    }
-                  >
-                    💬
+                      return (
+                        <span key={sentenceIndex}>
+                          <span
+                            id={`word-${sectionIndex}-${sentenceIndex}`}
+                            onContextMenu={(e) =>
+                              handleRightClick(e, sectionIndex, sentenceIndex)
+                            }
+                            style={{ cursor: "pointer", marginRight: "4px" }}
+                          >
+                            {sentence.value.html + " "}
+                            {hasComment && (
+                              <span
+                                style={{ marginLeft: "2px", color: "#00aaff" }}
+                                onClick={(e) =>
+                                  toggleCommentVisibility(
+                                    sectionIndex,
+                                    sentenceIndex,
+                                    e
+                                  )
+                                }
+                              >
+                                💬
+                              </span>
+                            )}
+                          </span>
+
+                          {showInput &&
+                            selectedIndex &&
+                            selectedIndex.sectionIndex === sectionIndex &&
+                            selectedIndex.sentenceIndex === sentenceIndex && (
+                              <div>
+                                <textarea
+                                  value={currentComment}
+                                  onChange={(e) => setCurrentComment(e.target.value)}
+                                  placeholder="Add a comment"
+                                  className="comment-input"
+                                />
+                                <div style={{ marginBottom: 10 }}>
+                                  <button
+                                    onClick={handleAddComment}
+                                    className="add-button"
+                                  >
+                                    Add Comment
+                                  </button>
+                                  <button
+                                    onClick={() => setShowInput(false)}
+                                    className="cancel-button"
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+                        </span>
+                      );
+                    })}
                   </span>
-                </>
-              )}
-            </span>
-
-            {/* Hiển thị ô nhập comment dưới câu được chọn */}
-            {showInput &&
-              selectedIndex &&
-              selectedIndex.sectionIndex === sectionIndex &&
-              selectedIndex.sentenceIndex === sentenceIndex && (
-                <div>
-                  <textarea
-                    value={currentComment}
-                    onChange={(e) => setCurrentComment(e.target.value)}
-                    placeholder="Add a comment"
-                    style={{
-                      width: "50%",
-                      height: 60,
-                      marginTop: 10,
-                      // backgroundColor: "#f1f1f1"
-                    }}
-                  />
-                  <div style={{ marginBottom: 10 }}>
-                    <button
-                      onClick={handleAddComment}
-                      style={{ marginRight: 10, backgroundColor: "#007bff" }}
-                    >
-                      Add Comment
-                    </button>
-                    <button onClick={() => setShowInput(false)} style={{backgroundColor: "red"}}>Cancel</button>
-                  </div>
                 </div>
-              )}
-          </span>
-        );
-      })}
-    </span>
-  </div>
-))}
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
-      
-      {visibleComment && (
-        <div>
-          <div
-            style={{
-              position: "absolute",
-              background: "aqua",
-              padding: "5px",
-              border: "1px solid #ccc",
-              top: commentPosition.top + 15,
-              left: commentPosition.left,
-              zIndex: 1,
-              color: "black",
-              width: "auto",
-            }}
-          >
-            <p>
-              {
-                comments.find(
-                  (comment) =>
-                    comment.section_index === visibleComment.section_index &&
-                    comment.sentence_index === visibleComment.sentence_index
-                )?.feedback
-              }
-            </p>
+      <div className="staff-comments-side">
+        <div className="staff-comments">
+          <h3>Staff Comments</h3>
+          <div className="comment">
+            <p>Staff Name</p>
+            <p>6:38 PM Today</p>
+            <p>Sample comment...</p>
           </div>
+          <div className="comment">
+            <p>Staff Name</p>
+            <p>6:38 PM Today</p>
+            <p>Sample comment...</p>
+          </div>
+          <div className="summary-note">
+            <h4>Ghi chú tổng:</h4>
+            <textarea placeholder="Ghi chú ở đây..." className="comment-input"></textarea>
+            <div className="status-buttons">
+              <button className="not-achieved">Chưa đạt</button>
+              <button className="achieved">Đạt</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {visibleComment && (
+        <div
+          style={{
+            position: "absolute",
+            background: "aqua",
+            padding: "4px",
+            top: commentPosition.top,
+            left: commentPosition.left,
+            zIndex: 1,
+          }}
+        >
+          <p>{comments.find(
+            (comment) =>
+              comment.section_index === visibleComment.section_index &&
+              comment.sentence_index === visibleComment.sentence_index
+          ).feedback}</p>
           <button
+            className="delete-button"
             onClick={() =>
               handleDeleteComment(
                 visibleComment.section_index,
                 visibleComment.sentence_index
               )
             }
-            style={{
-              marginTop: "5px", backgroundColor: "red", color: "white", position: "absolute",
-              padding: "5px",
-              top: commentPosition.top + 50,
-              left: commentPosition.left,
-              zIndex: 1,
-              width: "auto",
-            }}
           >
-            Xóa
+            Delete Comment
           </button>
         </div>
       )}

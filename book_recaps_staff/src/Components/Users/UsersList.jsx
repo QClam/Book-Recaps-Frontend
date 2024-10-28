@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { Hourglass } from 'react-loader-spinner';
 import api from '../Auth/AxiosInterceptors';
-import Pagination from '@mui/material/Pagination'; // Import MUI Pagination
+import Pagination from '@mui/material/Pagination';
 
 import './UsersList.scss';
 import '../Loading.scss';
