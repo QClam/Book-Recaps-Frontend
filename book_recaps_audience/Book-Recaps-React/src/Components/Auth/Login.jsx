@@ -250,6 +250,11 @@ function Login() {
             />
             <button type="submit">Đăng nhập</button>
             {error && <p style={{ color: 'red' }}>{error}</p>}
+            {/* Add the Forgot Password Link */}
+    <p>
+     Forgot Password?
+    </p>
+
           </form>
         </div>
 

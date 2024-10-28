@@ -196,3 +196,18 @@
     color: rgb(240, 113, 50);
   }
 }
+
+.login-button {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  color: #FF6F61; /* Màu tương tự với ảnh mẫu */
+  font-size: 18px;
+  margin-left: 20px;
+}
+
+.login-icon {
+  margin-right: 18px; /* Khoảng cách giữa icon và chữ */
+  font-size: 20px;
+  color: #FF6F61; /* Màu của icon */
+}
