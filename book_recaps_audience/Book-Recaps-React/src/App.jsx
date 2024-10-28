@@ -55,24 +55,14 @@ import UserRecapDetail from "./Components/ReadListenBook/UserRecap/UserRecapDeta
 import PlaylistBookList from "./Components/Library/PlaylistBook/PlaylistBookList";
 import HighlightAll from "./Components/Highlight/HighlightAll";
 import RecapByContributor from "./Components/ContributorItem/RecapByContributor/RecapByContributor";
+import ConfirmEmail from "./Components/Auth/ConfirmEmail";
 
 function App() {
-  const [completedOnboarding, setCompletedOnboarding] = useState(false);
   const [loading, setLoading] = useState(true);
   
-
   useEffect(() => {
-    const completed = localStorage.getItem('completedOnboarding');
-    if (completed) {
-      setCompletedOnboarding(true);
-    }
     setLoading(false);
   }, []);
-
-  const handleCompletedOnboarding = () => {
-    localStorage.setItem('completedOnboarding', 'true');
-    setCompletedOnboarding(true);
-  };
   
   if (loading) {
     return <div>Loading...</div>;
@@ -85,9 +75,7 @@ function App() {
             {/* <Header /> */}
           <main>
             
-            {!completedOnboarding ? (
-              <Onboarding onComplete={handleCompletedOnboarding} />
-            ) : (
+           
               <Routes>
                 {/* Layout cho các trang có sidebar */}
                 <Route element={<MainLayout />}>
@@ -162,9 +150,12 @@ function App() {
                {/* <Route path="/read" element={<NoteReadBook />} /> */}
 
               <Route path="/login" element={<Login />} />
+            
+              {/* Confirm mail khi dang ki */}
+              <Route path="/auth/confirm-email" element={<ConfirmEmail />} />
 
               </Routes>
-            )}
+        
           </main>
         </Router>
         {/* <Footer /> */}

@@ -53,3 +53,27 @@
   font-size: 1em;
   color: #777;
 }
+
+
+// SCSS cho nút Sort
+.author-page button {
+  background-color: #4CAF50; /* Màu nền nút (màu xanh lá) */
+  color: white;              /* Màu chữ (trắng) */
+  font-size: 16px;           /* Kích thước chữ */
+  padding: 10px 20px;        /* Khoảng cách bên trong nút */
+  border: none;              /* Bỏ viền */
+  border-radius: 25px;       /* Bo tròn nút */
+  cursor: pointer;           /* Con trỏ chuột khi hover */
+  transition: background-color 0.3s ease; /* Hiệu ứng chuyển khi hover */
+  margin-bottom: 20px;       /* Khoảng cách giữa nút và lưới tác giả */
+}
+
+.author-page button:hover {
+  background-color: #45a049; /* Màu khi di chuột */
+}
+
+.author-page button:focus {
+  outline: none; /* Bỏ viền khi nhấn */
+}
+
+

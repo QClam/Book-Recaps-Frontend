@@ -6,6 +6,7 @@ import "../SidebarNavigation/css/Sidebar.scss";
 import bookRecap from '../../image/removeBR.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faBell } from '@fortawesome/free-solid-svg-icons';
+import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -14,6 +15,17 @@ function Sidebar() {
   const [showLogout, setShowLogout] = useState(false); // State to manage logout option visibility
   const [userName, setUserName] = useState(''); // State for user's name
   const [imageUrl, setImageUrl] = useState(''); // State for user's avatar image URL
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // State to manage login status
+
+    // Check if user is logged in by checking if authToken exists
+    useEffect(() => {
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        setIsLoggedIn(true); // Set logged in status if token exists
+      } else {
+        setIsLoggedIn(false); // Set logged out status if no token
+      }
+    }, []);
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -62,8 +74,10 @@ function Sidebar() {
       }
     };
 
-    fetchUserProfile();
-  }, []);
+    if (isLoggedIn) {
+      fetchUserProfile(); 
+    }
+  }, [isLoggedIn]);
 
 
   useEffect(() => {
@@ -158,19 +172,34 @@ function Sidebar() {
             </ul>
           )}
 
-          <div className="user-info">
+            <div className="user-info">
             <FontAwesomeIcon icon={faBell} className="iconHeader" />
-            <div className="user-profile" onClick={toggleLogout}> {/* Toggle logout on avatar click */}
-            <span className="user-name">{userName}</span> {/* Dynamic user name */}
-              <img src={imageUrl ? `https://160.25.80.100:7124/${imageUrl}` : JKROW} alt="User Avatar" className="user-avatar" /> {/* Dynamic user avatar */}
 
-            </div>
+            {/* Chỉ hiển thị nút Login nếu chưa đăng nhập */}
+            {/* Thay vì dùng button, bạn dùng div hoặc span */}
+            {!isLoggedIn && ( 
+              <div onClick={() => navigate("/login")} className="login-button">
+                <FontAwesomeIcon icon={faSignInAlt} className="login-icon" /> {/* Sử dụng FontAwesome icon */}
+                <span>Login</span>
+              </div>
+            )}
+
+
+            {/* Hiển thị avatar và tên người dùng khi đã đăng nhập */}
+            {isLoggedIn && (
+              <div className="user-profile" onClick={toggleLogout}> 
+                <span className="user-name">{userName}</span> 
+                <img src={imageUrl} alt="User Avatar" className="user-avatar" />
+              </div>
+            )}
+
             {showLogout && (
-              <div className="logout-option"> {/* Conditionally render the logout option */}
+              <div className="logout-option"> 
                 <button onClick={handleLogout}>Logout</button>
               </div>
             )}
           </div>
+
         </div>
       </div>
     </div>

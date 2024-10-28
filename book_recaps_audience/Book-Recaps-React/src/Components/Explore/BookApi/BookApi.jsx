@@ -42,6 +42,7 @@ const BookApi = () => {
 
         const data = response.data;
         console.log("Fetched Books Data:", data); // Kiểm tra dữ liệu
+        
 
         if (data && data.data && Array.isArray(data.data.$values)) {
           setBooks(data.data.$values); // Giả sử dữ liệu sách nằm trong `data.$values`
@@ -300,7 +301,7 @@ const BookApi = () => {
               )}
               <div className="book-info">
                 <h2 className="book-title">{book.title}</h2>
-                <h3 className="book-original-title">{book.originalTitle.length > 18 ? `${book.originalTitle.slice(0, 10)}\n${book.originalTitle.slice(25)}` : book.originalTitle}</h3>
+                {/* <h3 className="book-original-title">{book.originalTitle.length > 18 ? `${book.originalTitle.slice(0, 10)}\n${book.originalTitle.slice(25)}` : book.originalTitle}</h3> */}
                 <p className="book-publication-year">
                   <strong>Năm xuất bản:</strong> {book.publicationYear}
                 </p>
