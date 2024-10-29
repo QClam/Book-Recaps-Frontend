@@ -228,7 +228,7 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
           console.error('Error polling for transcript status:', error);
           clearInterval(interval); // Optionally stop polling on error
         }
-      }, 5000);
+      }, 3000);
     }
 
     return () => {

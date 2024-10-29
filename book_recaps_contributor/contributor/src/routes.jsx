@@ -8,6 +8,7 @@ import Logout from "./routes/Logout";
 import CreateRecap, { booksLoader, createRecapAction } from "./routes/recaps/CreateRecap";
 import { AuthProvider, sessionLoader } from "./contexts/Auth";
 import RecapVersion, { recapVersionLoader } from "./routes/recaps/RecapVersion";
+import RecapDetails from "./routes/recaps/RecapDetails";
 
 export const routes = {
   login: '/login',
@@ -57,7 +58,7 @@ export const router = createBrowserRouter([
                     children: [
                       {
                         index: true,
-                        element: <div>Chi tiết Recap. Chứa danh sách các recap version</div>,
+                        element: <RecapDetails/>,
                       },
                       {
                         path: routes.recapVersionDetails,
