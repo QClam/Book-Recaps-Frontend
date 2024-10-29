@@ -1,6 +1,6 @@
 import { axiosInstance, axiosInstance2 } from "../../utils/axios";
 import { handleFetchError } from "../../utils/handleFetchError";
-import { json, redirect, useActionData, useLoaderData, useLocation, useSubmit } from "react-router-dom";
+import { json, useActionData, useLoaderData, useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "../../contexts/Auth";
 import Show from "../../components/Show";
@@ -8,6 +8,7 @@ import { cn } from "../../utils/cn";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { Divider } from 'primereact/divider';
 import { routes } from "../../routes";
+import { Badge } from "primereact/badge";
 
 const getRecapVersion = async (versionId, request) => {
   try {
@@ -43,39 +44,22 @@ export const recapVersionLoader = async ({ params, request }) => {
   };
 }
 
-export const recapVersionSubmitAction = async ({ request, params }) => {
-  const { versionId } = params;
-  try {
-    const response = await axiosInstance.put('/change-recapversion-status', {
-      recapVersionId: versionId,
-      status: 1
-    }, { signal: request.signal });
-
-    return json({ data: response.data.data });
-
-  } catch (error) {
-    const err = handleFetchError(error);
-    console.log("err", err);
-    if (err.status === 401) {
-      return redirect(routes.logout);
-    }
-    return err;
-  }
-}
-
 const RecapVersion = () => {
+  const { recapVersion } = useLoaderData();
+  const [ recapVersionData, setRecapVersionData ] = useState(recapVersion);
+
   return (
     <div className="relative flex h-full">
-      <MainPanel/>
-      <RightSidePanel/>
+      <MainPanel recapVersion={recapVersionData}/>
+      <RightSidePanel recapVersionData={recapVersionData} setRecapVersionData={setRecapVersionData}/>
     </div>
   );
 }
 
 export default RecapVersion;
 
-const MainPanel = () => {
-  const { recapVersion, keyIdeas } = useLoaderData();
+const MainPanel = ({ recapVersion }) => {
+  const { keyIdeas } = useLoaderData();
   const [ ideas, setIdeas ] = useState(keyIdeas);
   const { showToast } = useAuth();
 
@@ -178,6 +162,7 @@ const MainPanel = () => {
           <KeyIdeaItem
             key={idea.id}
             keyIdea={idea}
+            recapVersion={recapVersion}
             handleDeleteKeyIdea={handleDeleteKeyIdea}
             handleSaveKeyIdea={handleSaveKeyIdea}
           />
@@ -198,13 +183,10 @@ const MainPanel = () => {
   )
 }
 
-const RightSidePanel = () => {
-  const { recapVersion } = useLoaderData();
+const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
   const actionData = useActionData();
-  const [ recapVersionData, setRecapVersionData ] = useState(recapVersion);
   const [ loading, setLoading ] = useState(false);
-  const submit = useSubmit();
-  let location = useLocation();
+  const navigate = useNavigate();
   const { showToast } = useAuth();
 
   useEffect(() => {
@@ -215,15 +197,6 @@ const RightSidePanel = () => {
         detail: actionData.error,
       });
     }
-    if (actionData?.data) {
-      setLoading(false);
-      setRecapVersionData({ ...actionData.data });
-      showToast({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Version submitted for review successfully',
-      });
-    }
   }, [ actionData ]);
 
   const handleUpload = async (event) => {
@@ -231,11 +204,11 @@ const RightSidePanel = () => {
       setLoading(true);
       const formData = new FormData();
       formData.append('audioFile', event.target.files[0]);
-      formData.append('recapVersionId', recapVersion.id);
+      formData.append('recapVersionId', recapVersionData.id);
       await axiosInstance.put('/upload-audio', formData);
 
       const controller = new AbortController();
-      const result = await getRecapVersion(recapVersion.id, controller);
+      const result = await getRecapVersion(recapVersionData.id, controller);
       setRecapVersionData({ ...result });
 
       showToast({
@@ -255,11 +228,11 @@ const RightSidePanel = () => {
     try {
       setLoading(true);
       await axiosInstance.put('/generate-audio', {
-        recapVersionId: recapVersion.id
+        recapVersionId: recapVersionData.id
       });
 
       const controller = new AbortController();
-      const result = await getRecapVersion(recapVersion.id, controller);
+      const result = await getRecapVersion(recapVersionData.id, controller);
       setRecapVersionData({ ...result });
 
       showToast({
@@ -278,12 +251,12 @@ const RightSidePanel = () => {
   const handleUpdateName = async () => {
     try {
       setLoading(true);
-      await axiosInstance2.put('/recap-versions/change-name/' + recapVersion.id, {
+      await axiosInstance2.put('/recap-versions/change-name/' + recapVersionData.id, {
         versionName: recapVersionData.versionName || ''
       });
 
       const controller = new AbortController();
-      const result = await getRecapVersion(recapVersion.id, controller);
+      const result = await getRecapVersion(recapVersionData.id, controller);
       setRecapVersionData({ ...result });
 
       showToast({
@@ -304,7 +277,31 @@ const RightSidePanel = () => {
       return;
 
     setLoading(true);
-    submit(null, { method: "post", action: location.pathname });
+    try {
+      const request = new AbortController();
+      const response = await axiosInstance.put('/change-recapversion-status', {
+        recapVersionId: recapVersionData.id,
+        status: 1
+      }, { signal: request.signal });
+
+      showToast({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Version submitted for review successfully',
+      });
+
+      setRecapVersionData({ ...response.data.data });
+      setLoading(false);
+    } catch (error) {
+      setLoading(false);
+      const err = handleFetchError(error);
+
+      console.log("err", err);
+
+      if (err.status === 401) {
+        navigate(routes.logout, { replace: true });
+      }
+    }
   }
 
   const getStatus = (status) => {
@@ -362,8 +359,16 @@ const RightSidePanel = () => {
         {/* Status */}
         <div className="mb-4">
           <span className="block text-sm font-medium text-gray-700 mb-1">Status:</span>
-          <span className="block text-lg font-semibold text-gray-900">
-            {getStatus(recapVersionData.status)}
+          <span className="block font-semibold">
+            <Badge
+              value={getStatus(recapVersionData.status)}
+              size="large"
+              severity={
+                recapVersionData.status === 0 ? 'warning' :
+                  recapVersionData.status === 1 ? 'info' :
+                    recapVersionData.status === 2 ? 'success' :
+                      'danger'
+              }/>
           </span>
         </div>
 
@@ -428,9 +433,8 @@ const RightSidePanel = () => {
   )
 }
 
-const KeyIdeaItem = ({ keyIdea, handleDeleteKeyIdea, handleSaveKeyIdea }) => {
+const KeyIdeaItem = ({ keyIdea, recapVersion, handleDeleteKeyIdea, handleSaveKeyIdea }) => {
   // const [ isEditing, setIsEditing ] = useState(false);
-  const { recapVersion } = useLoaderData();
   const [ loading, setLoading ] = useState(false);
   const [ removeImage, setRemoveImage ] = useState(false);
   const { showToast } = useAuth();
@@ -561,7 +565,7 @@ const KeyIdeaItem = ({ keyIdea, handleDeleteKeyIdea, handleSaveKeyIdea }) => {
           </button>
           <div className="flex gap-4 items-center">
             <p className='italic font-semibold text-gray-500'>
-              {keyIdea.isNewKeyIdea ? 'Not saved yet' : 'Saved'}
+              {keyIdea.isNewKeyIdea ? 'Not saved yet' : loading ? 'Saving...' : 'Saved'}
             </p>
             <button
               type="submit"
