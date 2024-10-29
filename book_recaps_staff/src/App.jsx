@@ -15,10 +15,14 @@ import RecapsList from "./Components/Recaps/RecapsList";
 import "./App.css";
 import axios from "axios";
 import UserProfile from "./Components/Auth/UserProfile";
+import ForgetPassword from "./Components/Auth/ForgetPassword";
 
 function App() {
   const location = useLocation();
-  const isLoginPage = location.pathname === "/login" || location.pathname === "/auth/confirm-email";
+  const isLoginPage = 
+    location.pathname === "/login" || 
+    location.pathname === "/auth/confirm-email" || 
+    location.pathname === "/forget-password";
 
   const api = axios.create({
     baseURL: "https://160.25.80.100:7124/api",
@@ -128,6 +132,7 @@ function App() {
         <Route path="/auth/confirm-email" element={<ConfirmEmail />} />
         <Route path="/users" element={<PrivateRoute> <UsersList /> </PrivateRoute>} />
         <Route path="/settings" element={<PrivateRoute> <UserProfile /> </PrivateRoute>} />
+        <Route path="/forget-password" element={ <ForgetPassword /> } />
         <Route
           path="/review/content_version/:id"
           element={<PrivateRoute> <Review /> </PrivateRoute>} />

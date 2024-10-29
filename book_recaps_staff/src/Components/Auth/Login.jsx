@@ -169,6 +169,10 @@ function Login() {
     }
   };
 
+  const forgetPasswordClick = () => {
+    navigate("/forget-password");
+  }
+
   return (
     <div className="login-page">
       <div className={`container ${isActive ? "active" : ""}`} id="container">
@@ -237,7 +241,7 @@ function Login() {
         <div className="form-container sign-in">
           <form onSubmit={handleLogin}>
             <h1>Đăng nhập</h1>
-            <div className="social-icons">
+            {/* <div className="social-icons">
               <a href="#" className="icon">
                 <i className="fa-brands fa-google"></i>
               </a>
@@ -245,7 +249,7 @@ function Login() {
                 <i className="fa-brands fa-facebook"></i>
               </a>
             </div>
-            <span>hoặc sử dụng email để đăng nhập</span>
+            <span>hoặc sử dụng email để đăng nhập</span> */}
             <input
               type="email"
               value={email}
@@ -263,6 +267,7 @@ function Login() {
               onFocus={() => setError(null)}
             />
             <button type="submit">Đăng nhập</button>
+            <a style={{textDecoration: "none", cursor: "pointer"}} onClick={() => forgetPasswordClick()}>Bạn quên mật khẩu</a>
             {error && <p style={{ color: "red" }}>{error}</p>}
           </form>
         </div>
