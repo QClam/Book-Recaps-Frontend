@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 5173;
 // Serve static files with caching headers
 app.use(
   express.static(path.join(__dirname, 'dist'), {
-    maxAge: '1y', // Cache static assets (e.g., JS, CSS) for a year
+    maxAge: '1m', // Cache static assets (e.g., JS, CSS) for 1 minute
     setHeaders: (res, filePath) => {
       // Set cache-control for index.html to no-cache
       if (filePath.endsWith('index.html')) {
