@@ -1,7 +1,7 @@
 import { axiosInstance, axiosInstance2 } from "../../utils/axios";
 import { handleFetchError } from "../../utils/handleFetchError";
-import { json, useActionData, useLoaderData, useNavigate } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { Await, defer, json, useAsyncValue, useLoaderData, useNavigate } from "react-router-dom";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useAuth } from "../../contexts/Auth";
 import Show from "../../components/Show";
 import { cn } from "../../utils/cn";
@@ -36,21 +36,43 @@ const getKeyIdeas = async (versionId, request) => {
 
 export const recapVersionLoader = async ({ params, request }) => {
   const recapVersion = await getRecapVersion(params.versionId, request);
-  const keyIdeas = await getKeyIdeas(params.versionId, request);
+  const keyIdeas = getKeyIdeas(params.versionId, request);
 
-  return {
+  return defer({
     recapVersion,
     keyIdeas
-  };
+  });
 }
 
 const RecapVersion = () => {
-  const { recapVersion } = useLoaderData();
+  const { recapVersion, keyIdeas } = useLoaderData();
   const [ recapVersionData, setRecapVersionData ] = useState(recapVersion);
 
   return (
     <div className="relative flex h-full">
-      <MainPanel recapVersion={recapVersionData}/>
+
+      <Suspense
+        fallback={<div className="flex-1 text-center">
+          <div className="h-32 flex gap-2 justify-center items-center">
+            <div>
+              <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
+                               fill="var(--surface-ground)" animationDuration=".5s"/>
+            </div>
+            <p>Loading key ideas...</p>
+          </div>
+        </div>}
+      >
+        <Await
+          resolve={keyIdeas}
+          errorElement={<div className="flex-1 text-center">
+            <div className="h-32 flex gap-2 justify-center items-center">
+              Error loading key ideas!
+            </div>
+          </div>}
+        >
+          <MainPanel recapVersion={recapVersionData}/>
+        </Await>
+      </Suspense>
       <RightSidePanel recapVersionData={recapVersionData} setRecapVersionData={setRecapVersionData}/>
     </div>
   );
@@ -59,7 +81,7 @@ const RecapVersion = () => {
 export default RecapVersion;
 
 const MainPanel = ({ recapVersion }) => {
-  const { keyIdeas } = useLoaderData();
+  const keyIdeas = useAsyncValue();
   const [ ideas, setIdeas ] = useState(keyIdeas);
   const { showToast } = useAuth();
 
@@ -184,22 +206,38 @@ const MainPanel = ({ recapVersion }) => {
 }
 
 const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
-  const actionData = useActionData();
   const [ loading, setLoading ] = useState(false);
   const navigate = useNavigate();
   const { showToast } = useAuth();
 
+  // if recapVersionData.transcriptStatus === 1, then keep polling for the transcript status until it's 2
   useEffect(() => {
-    if (actionData?.error) {
-      showToast({
-        severity: 'error',
-        summary: 'Error',
-        detail: actionData.error,
-      });
-    }
-  }, [ actionData ]);
+    let interval = null;
+    const controller = new AbortController();
 
-  const handleUpload = async (event) => {
+    if (recapVersionData.transcriptStatus === 1) {
+      interval = setInterval(async () => {
+        try {
+          const result = await getRecapVersion(recapVersionData.id, controller);
+          setRecapVersionData({ ...result });
+
+          if (result.transcriptStatus !== 1) {
+            clearInterval(interval);
+          }
+        } catch (error) {
+          console.error('Error polling for transcript status:', error);
+          clearInterval(interval); // Optionally stop polling on error
+        }
+      }, 5000);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+      controller.abort(); // Abort any ongoing fetch
+    };
+  }, [ recapVersionData.transcriptStatus ]);
+
+  const handleUploadAudio = async (event) => {
     try {
       setLoading(true);
       const formData = new FormData();
@@ -273,6 +311,15 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
   }
 
   const handleSubmitForReview = async () => {
+    if (!recapVersionData.audioURL || !recapVersionData.transcriptUrl || recapVersionData.transcriptStatus !== 2) {
+      showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Audio and transcript must be ready before submitting for review',
+      });
+      return;
+    }
+
     if (!confirm("Are you sure you want to submit this version for review? You won't be able to change this version anymore."))
       return;
 
@@ -309,7 +356,7 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
       case 0:
         return "Draft";
       case 1:
-        return "Pending";
+        return "Pending review";
       case 2:
         return "Approved";
       case 3:
@@ -320,7 +367,7 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
   }
 
   return (
-    <div className="border-l border-gray-300 bg-white h-full py-8 px-6 min-w-80">
+    <div className="border-l border-gray-300 bg-white h-full py-8 px-6 w-[330px]">
       <div className="sticky top-8">
         <div className="mb-4">
           <h2 className="text-2xl font-bold text-gray-900">Recap Version</h2>
@@ -358,11 +405,11 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
 
         {/* Status */}
         <div className="mb-4">
-          <span className="block text-sm font-medium text-gray-700 mb-1">Status:</span>
-          <span className="block font-semibold">
+          <span className="text-sm font-medium text-gray-700 mr-1">Status:</span>
+          <span className="font-semibold">
             <Badge
               value={getStatus(recapVersionData.status)}
-              size="large"
+              // size="large"
               severity={
                 recapVersionData.status === 0 ? 'warning' :
                   recapVersionData.status === 1 ? 'info' :
@@ -386,11 +433,39 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
           </div>
         </div>
 
+        <Show when={recapVersionData.audioURL}>
+          <div className="mb-4">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Audio transcript:</label>
+            <div className="flex items-center space-x-2">
+              <input
+                type="text"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none"
+                defaultValue={recapVersionData.transcriptUrl}
+                placeholder="Audio transcript URL"
+                readOnly
+              />
+            </div>
+            <Show when={recapVersionData.transcriptStatus === 1} fallback={
+              recapVersionData.transcriptStatus === 0 ? (
+                <p className="text-xs mt-1 text-red-500">
+                  Transcript generation failed. Please try uploading the audio again.
+                </p>
+              ) : null
+            }>
+              <div className="flex gap-2 items-center mt-3">
+                <div>
+                  <ProgressSpinner style={{ width: '15px', height: '15px' }} strokeWidth="8"
+                                   fill="var(--surface-ground)" animationDuration=".5s"/>
+                </div>
+                <p>Generating transcript...</p>
+              </div>
+            </Show>
+          </div>
+        </Show>
         <Show when={recapVersionData.status === 0}>
           <>
             {/* Generate Audio Button */}
             <div className="mb-4">
-              <p className="block text-xs text-gray-500 mb-2">Generate audio using AI (recommended)</p>
               <button
                 type="button"
                 disabled={loading}
@@ -398,6 +473,7 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
                 className="w-full px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
                 Generate audio
               </button>
+              <p className="block text-xs text-gray-500 mt-2">Generate audio using AI (recommended)</p>
               <p className="block text-center text-xs text-gray-500 mt-2">Or</p>
             </div>
 
@@ -405,7 +481,7 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
               <input
                 type="file"
                 className="absolute inset-0 opacity-0 cursor-pointer"
-                onChange={handleUpload}
+                onChange={handleUploadAudio}
               />
               <button
                 type="button"
@@ -415,8 +491,8 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
                 Upload audio
               </button>
             </div>
+
             <Divider/>
-            {/* Submit for review */}
             <div>
               <button
                 type="button"

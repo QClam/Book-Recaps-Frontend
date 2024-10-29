@@ -23,7 +23,7 @@ const Select = (props) => {
         id={local.id}
         className={cn({
           "ring-1 ring-orange-600 focus:outline-none": local.error,
-          "w-full border border-gray-300 py-2 px-2 rounded placeholder-gray-500": true,
+          "w-full border border-gray-300 pt-2 pb-[calc(0.5rem+1px)] px-2 rounded placeholder-gray-500": true,
           [local.selectClassName]: local.selectClassName
         })}
       >

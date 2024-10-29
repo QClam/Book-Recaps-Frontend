@@ -155,11 +155,17 @@ const CreateRecap = () => {
           setDialogVisible(false);
         }}
         content={({ hide }) => (
-          <Form className="flex flex-col p-4 gap-1 bg-white rounded" method="post">
+          <Form className="flex flex-col py-4 px-5 gap-1 bg-white rounded" method="post">
             <input type="hidden" name="bookId" value={chosenBookId}/>
             <input type="hidden" name="userId" value={user.id}/>
-            <TextInput id="name" label="Recap name" name="name"/>
-            <div className="flex justify-end gap-2">
+            <TextInput
+              id="name"
+              label="Recap name:"
+              name="name"
+              placeholder="Tên bài viết tóm tắt"
+              required
+            />
+            <div className="flex justify-end gap-2 mt-3">
               <button
                 className={cn({
                   "text-white bg-indigo-600 rounded py-2 px-4 border font-medium hover:bg-indigo-700": true,
@@ -224,7 +230,7 @@ const CreateRecap = () => {
             defaultValue={category}
           />
         </div>
-        <div className="col-span-1 flex gap-2.5">
+        <div className="col-start-4 col-end-7 flex gap-2.5">
           <button
             className={cn({
               "text-white bg-indigo-600 rounded py-2 px-4 border font-medium hover:bg-indigo-700": true,
@@ -401,7 +407,7 @@ function BooksTable({ handleClickCreate }) {
               <button
                 onClick={() => handleClickCreate(book.id)}
                 className="flex justify-center items-center gap-1 px-5 py-2 font-semibold bg-indigo-600 text-white rounded hover:bg-indigo-800">
-                Tạo tóm tắt
+                Tạo&nbsp;tóm&nbsp;tắt
               </button>
             </td>
           </tr>
