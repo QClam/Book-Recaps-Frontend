@@ -134,9 +134,6 @@ function Login() {
     }
   };
 
-
-  
-
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -161,11 +158,12 @@ function Login() {
       const { accessToken, refreshToken } = response.data.message.token;
       localStorage.setItem("access_token", accessToken);
       localStorage.setItem("refresh_token", refreshToken);
-      
+
       navigate("/recaps")
       console.log("Login successfully", response.data);
     } catch (error) {
-      setError("Đăng nhập thất bại", error);
+      setError("Tài khoản hoặc mật khẩu không đúng. Vui lòng kiểm tra lại");
+      console.error("Error sending forget password request:", error.response?.data || error.message);
     }
   };
 
@@ -267,7 +265,7 @@ function Login() {
               onFocus={() => setError(null)}
             />
             <button type="submit">Đăng nhập</button>
-            <a style={{textDecoration: "none", cursor: "pointer"}} onClick={() => forgetPasswordClick()}>Bạn quên mật khẩu</a>
+            <a style={{ textDecoration: "none", cursor: "pointer" }} onClick={() => forgetPasswordClick()}>Bạn quên mật khẩu</a>
             {error && <p style={{ color: "red" }}>{error}</p>}
           </form>
         </div>

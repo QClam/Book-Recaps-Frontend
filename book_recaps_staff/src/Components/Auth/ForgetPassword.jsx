@@ -86,6 +86,13 @@ function ForgetPassword() {
       console.log("Gửi Email Thành Công");
       handleRegisterClick();
     } catch (error) {
+      if (
+        error.response &&
+        error.response.status === 400 &&
+        error.response.data.message === "No user associated with email"
+      ) {
+        setError("Email chưa đăng ký hoặc không tồn tại trong hệ thống")
+      }
       console.error("Error sending forget password request:", error.response?.data || error.message);
     }
   };

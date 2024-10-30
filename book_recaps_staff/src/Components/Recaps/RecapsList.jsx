@@ -32,7 +32,7 @@ function RecapsList() {
   const token = localStorage.getItem("access_token");
   const navigate = useNavigate();
   
-  const recapsPerPage = 6;
+  const recapsPerPage = 5;
 
   const fetchRecaps = async () => {
     try {
@@ -152,8 +152,7 @@ function RecapsList() {
       const reviewId = response.data.data?.id;
       if (reviewId) {
         console.log("Review created successfully:", response.data);
-        navigate(`/review/content_version/${reviewId}`, 
-        );
+        navigate(`/review/content_version/${reviewId}`);
       } else {
         console.error("Review created but ID not found.");
       }
@@ -192,7 +191,8 @@ function RecapsList() {
         <table className="content-table">
           <thead>
             <tr>
-              <th>Chủ đề</th>
+              <th>Tên Bản Recap</th>
+              <th>Tên cuốn sách</th>
               <th>Mô tả cuốn sách</th>
               <th>Tên Contributor</th>
               <th>Ngày</th>
@@ -203,6 +203,7 @@ function RecapsList() {
           <tbody>
             {displayRecaps.map((val) => (
               <tr key={val.id}>
+                <td>{val.name}</td>
                 <td>{val.book?.title}</td>
                 <td>{val.book?.description}</td>
                 <td>{val.contributor?.fullName}</td>
@@ -211,7 +212,7 @@ function RecapsList() {
                   <button
                     className="button"
                     style={{ backgroundColor: "green", color: "#fff" }}
-                    onClick={() => createReview(val.currentVersionId, val.currentVersionStatus, val.book?.title, val.book?.description)}
+                    onClick={() => createReview(val.currentVersionId)}
                   >
                     Duyệt
                   </button>
