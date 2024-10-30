@@ -37,7 +37,7 @@ const MainLayout = ({ children }) => {
           }>
             <div className={cn({
               "min-w-[1024px]": true,
-              "py-8 px-6 h-fit": !isOffFooter,
+              "pb-8 px-6 h-fit": !isOffFooter,
               "flex-1": isOffFooter
             })}>
               {children}

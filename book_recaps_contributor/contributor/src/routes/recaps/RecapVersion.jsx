@@ -9,18 +9,8 @@ import { Divider } from 'primereact/divider';
 import { routes } from "../../routes";
 import { Badge } from "primereact/badge";
 import { useToast } from "../../contexts/Toast";
-
-const getBookInfoByRecap = async (recapId, request) => {
-  try {
-    const response = await axiosInstance2.get('/books/by-recap/' + recapId, {
-      signal: request.signal
-    });
-    return response.data;
-  } catch (error) {
-    const err = handleFetchError(error);
-    throw json({ error: err.error }, { status: err.status });
-  }
-}
+import { getBookInfoByRecap } from "../fetch";
+import CustomBreadCrumb from "../../components/CustomBreadCrumb";
 
 const getRecapVersion = async (versionId, request) => {
   try {
@@ -66,7 +56,13 @@ const RecapVersion = () => {
     <div className="relative flex h-full">
 
       {/* Main panel */}
-      <div className="flex-1 py-8 px-6 overflow-y-auto">
+      <div className="flex-1 pb-8 px-6 overflow-y-auto">
+        <CustomBreadCrumb items={[
+          { label: "Recaps", path: routes.recaps },
+          { label: "Recap details", path: routes.recaps + "/" + recapVersionData.recapId },
+          { label: recapVersionData.versionName || "Version details" }
+        ]}/>
+
         <Suspense>
           <Await resolve={bookInfo} errorElement={
             <div className="h-14 flex gap-2 justify-center items-center italic font-semibold text-gray-400">
@@ -262,6 +258,8 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
         return "Approved";
       case 3:
         return "Rejected";
+      case 4:
+        return "Superseded";
       default:
         return "Unknown"
     }
@@ -414,11 +412,15 @@ const BookInfo = () => {
   const bookInfo = useAsyncValue();
 
   return (
-    <div className="mb-6 flex items-center space-x-4 border-b pb-4 border-gray-300">
+    <div className="mb-6 flex items-center gap-4 border-b pb-4 border-gray-300">
       <img
         src={bookInfo.coverImage || "/empty-image.jpg"}
         alt="Book Cover"
         className="w-24 aspect-[3/4] object-cover rounded-md shadow-md"
+        onError={({ currentTarget }) => {
+          currentTarget.onerror = null; // prevents looping
+          currentTarget.src = "/empty-image.jpg";
+        }}
       />
       <div>
         <h1 className="text-2xl font-bold text-gray-900">{bookInfo.title}</h1>
@@ -534,6 +536,11 @@ const ListKeyIdeas = ({ recapVersion }) => {
           handleSaveKeyIdea={handleSaveKeyIdea}
         />
       ))}
+
+      {/* No Key Idea */}
+      <Show when={ideas.length === 0}>
+        <p className="text-center text-gray-500 mt-4">No key idea found</p>
+      </Show>
 
       {/* Add New Key Idea Button */}
       <Show when={recapVersion.status === 0}>

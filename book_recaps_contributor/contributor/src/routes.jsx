@@ -7,7 +7,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import Logout from "./routes/Logout";
 import CreateRecap, { booksLoader, createRecapAction } from "./routes/recaps/CreateRecap";
 import RecapVersion, { recapVersionLoader } from "./routes/recaps/RecapVersion";
-import RecapDetails from "./routes/recaps/RecapDetails";
+import RecapDetails, { recapDetailsAction, recapDetailsLoader } from "./routes/recaps/RecapDetails";
 import { sessionLoader } from "./routes/loaders/sessionLoader";
 import MainLayout from "./layouts/MainLayout";
 import { AuthProvider } from "./contexts/Auth";
@@ -67,6 +67,8 @@ export const router = createBrowserRouter([
                       {
                         index: true,
                         element: <RecapDetails/>,
+                        loader: recapDetailsLoader,
+                        action: recapDetailsAction
                       },
                       {
                         path: routes.recapVersionDetails,

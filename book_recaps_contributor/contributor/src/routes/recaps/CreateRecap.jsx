@@ -24,6 +24,7 @@ import { Dialog } from "primereact/dialog";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { routes } from "../../routes";
 import { useToast } from "../../contexts/Toast";
+import CustomBreadCrumb from "../../components/CustomBreadCrumb";
 
 const getBooks = async (q, category, page, request) => {
   try {
@@ -98,7 +99,7 @@ export async function createRecapAction({ request }) {
     console.log("err", err);
 
     if (err.status === 400 && err.data?.id) {
-      return redirect(`/recaps/${err.data.id}?error=${encodeURIComponent(err.error)}`);
+      return redirect(`/recaps/${err.data.id}`);
     }
 
     if (err.status === 401) {
@@ -154,6 +155,7 @@ const CreateRecap = () => {
 
   return (
     <>
+      <CustomBreadCrumb items={[ { label: "Create Recap" } ]}/>
       <Dialog
         visible={dialogVisible}
         modal
