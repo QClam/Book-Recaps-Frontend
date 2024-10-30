@@ -20,7 +20,7 @@ export const SidebarItems = [
     {
         title: "Tổng quan",
         icon: <Widgets />,
-        link: "/overview",
+        link: "/dashboard",
     },
     {
         title: "Quản lý người dùng",
