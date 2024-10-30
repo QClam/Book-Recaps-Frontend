@@ -43,7 +43,7 @@ const getBooks = async (q, category, page, request) => {
 
 const getCategories = async (request) => {
   try {
-    const response = await axiosInstance.get('/api/category', {
+    const response = await axiosInstance.get('/api/category/getallcategory', {
       signal: request.signal
     });
     return (response.data.data.$values.map((category) => ({
