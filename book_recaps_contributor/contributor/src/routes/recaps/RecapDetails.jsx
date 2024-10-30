@@ -1,8 +1,7 @@
 import Show from "../../components/Show";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { useState } from "react";
-import { axiosInstance2 } from "../../utils/axios";
-import { useAuth } from "../../contexts/Auth";
+import { useToast } from "../../contexts/Toast";
 
 const RecapDetails = () => {
   return (
@@ -14,9 +13,9 @@ const RecapDetails = () => {
 
 export default RecapDetails;
 
-const RightSidePanel = ({recapData, setRecapData}) => {
+const RightSidePanel = ({ recapData, setRecapData }) => {
   const [ loading, setLoading ] = useState(false);
-  const { showToast } = useAuth();
+  const { showToast } = useToast();
 
   const handleUpdateName = async () => {
     // try {

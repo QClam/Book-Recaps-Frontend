@@ -2,12 +2,14 @@ import { Form, Navigate, useActionData, useNavigate, useNavigation } from 'react
 import { useEffect } from "react";
 import { useAuth } from "../contexts/Auth";
 import { routes } from "../routes";
+import { useToast } from "../contexts/Toast";
 
 function Login() {
   const navigate = useNavigate();
   const navigation = useNavigation();
   const actionData = useActionData();
-  const { login, reCaptchaTokens, isAuthenticated, showToast } = useAuth();
+  const { login, reCaptchaTokens, isAuthenticated } = useAuth();
+  const { showToast } = useToast();
 
   useEffect(() => {
     if (actionData?.error) {

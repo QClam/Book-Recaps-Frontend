@@ -2,13 +2,25 @@ import { axiosInstance, axiosInstance2 } from "../../utils/axios";
 import { handleFetchError } from "../../utils/handleFetchError";
 import { Await, defer, json, useAsyncValue, useLoaderData, useNavigate } from "react-router-dom";
 import { Suspense, useEffect, useRef, useState } from "react";
-import { useAuth } from "../../contexts/Auth";
 import Show from "../../components/Show";
 import { cn } from "../../utils/cn";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { Divider } from 'primereact/divider';
 import { routes } from "../../routes";
 import { Badge } from "primereact/badge";
+import { useToast } from "../../contexts/Toast";
+
+const getBookInfoByRecap = async (recapId, request) => {
+  try {
+    const response = await axiosInstance2.get('/books/by-recap/' + recapId, {
+      signal: request.signal
+    });
+    return response.data;
+  } catch (error) {
+    const err = handleFetchError(error);
+    throw json({ error: err.error }, { status: err.status });
+  }
+}
 
 const getRecapVersion = async (versionId, request) => {
   try {
@@ -37,42 +49,56 @@ const getKeyIdeas = async (versionId, request) => {
 export const recapVersionLoader = async ({ params, request }) => {
   const recapVersion = await getRecapVersion(params.versionId, request);
   const keyIdeas = getKeyIdeas(params.versionId, request);
+  const bookInfo = getBookInfoByRecap(params.recapId, request);
 
   return defer({
     recapVersion,
-    keyIdeas
+    keyIdeas,
+    bookInfo
   });
 }
 
 const RecapVersion = () => {
-  const { recapVersion, keyIdeas } = useLoaderData();
+  const { recapVersion, keyIdeas, bookInfo } = useLoaderData();
   const [ recapVersionData, setRecapVersionData ] = useState(recapVersion);
 
   return (
     <div className="relative flex h-full">
 
-      <Suspense
-        fallback={<div className="flex-1 text-center">
-          <div className="h-32 flex gap-2 justify-center items-center">
-            <div>
-              <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
-                               fill="var(--surface-ground)" animationDuration=".5s"/>
+      {/* Main panel */}
+      <div className="flex-1 py-8 px-6 overflow-y-auto">
+        <Suspense>
+          <Await resolve={bookInfo} errorElement={
+            <div className="h-14 flex gap-2 justify-center items-center italic font-semibold text-gray-400">
+              Error loading book info!
             </div>
-            <p>Loading key ideas...</p>
-          </div>
-        </div>}
-      >
-        <Await
-          resolve={keyIdeas}
-          errorElement={<div className="flex-1 text-center">
+          }>
+            <BookInfo/>
+          </Await>
+        </Suspense>
+
+        <Suspense
+          fallback={
             <div className="h-32 flex gap-2 justify-center items-center">
-              Error loading key ideas!
+              <div>
+                <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
+                                 fill="var(--surface-ground)" animationDuration=".5s"/>
+              </div>
+              <p>Loading key ideas...</p>
             </div>
-          </div>}
-        >
-          <MainPanel recapVersion={recapVersionData}/>
-        </Await>
-      </Suspense>
+          }>
+          <Await
+            resolve={keyIdeas}
+            errorElement={
+              <div className="h-32 flex gap-2 justify-center items-center">
+                Error loading key ideas!
+              </div>
+            }>
+            <ListKeyIdeas recapVersion={recapVersionData}/>
+          </Await>
+        </Suspense>
+      </div>
+
       <RightSidePanel recapVersionData={recapVersionData} setRecapVersionData={setRecapVersionData}/>
     </div>
   );
@@ -80,135 +106,10 @@ const RecapVersion = () => {
 
 export default RecapVersion;
 
-const MainPanel = ({ recapVersion }) => {
-  const keyIdeas = useAsyncValue();
-  const [ ideas, setIdeas ] = useState(keyIdeas);
-  const { showToast } = useAuth();
-
-  const addNewKeyIdea = () => {
-    const highestOrder = ideas.reduce((max, idea) => Math.max(max, idea.order), 0);
-
-    setIdeas([ ...ideas, {
-      title: "",
-      body: "",
-      image: "",
-      order: highestOrder + 1,
-      recapVersionId: recapVersion.id,
-      id: new Date().getTime(),
-      isNewKeyIdea: true
-    } ]);
-  }
-
-  const handleDeleteKeyIdea = async (keyIdea) => {
-    if (keyIdea.isNewKeyIdea) {
-      setIdeas(ideas.filter(idea => idea.id !== keyIdea.id));
-      return;
-    }
-
-    // Delete key idea
-    try {
-      const response = await axiosInstance.delete('/api/keyidea/delete/' + keyIdea.id);
-      console.log(response.data);
-      setIdeas(ideas.filter(idea => idea.id !== keyIdea.id));
-      showToast({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Key idea deleted successfully',
-      });
-    } catch (error) {
-      console.error(error);
-      const err = handleFetchError(error);
-      showToast({
-        severity: 'error',
-        summary: 'Error',
-        detail: err.error,
-      });
-    }
-  }
-
-  const handleSaveKeyIdea = async (keyIdea, formdata) => {
-    try {
-      const imageKeyIdea = formdata.get('ImageKeyIdea');
-      if (
-        imageKeyIdea && imageKeyIdea.size > 0 &&
-        formdata.get('RemoveImage') === 'true'
-      ) {
-        // change the RemoveImage value to false
-        formdata.set('RemoveImage', 'false');
-      }
-
-      const response = keyIdea.isNewKeyIdea ?
-        await axiosInstance.post('/api/keyidea/createkeyidea', formdata) :
-        await axiosInstance.put('/api/keyidea/updatekeyidea/' + keyIdea.id, formdata);
-
-      const responseData = response.data.data;
-      console.log("keyIdea", responseData);
-
-      setIdeas(ideas.map(idea => {
-        if (idea.order === keyIdea.order) {
-          return {
-            title: responseData.title,
-            body: responseData.body,
-            image: responseData.image,
-            order: responseData.order,
-            recapVersionId: responseData.recapVersionId,
-            id: responseData.id,
-            isNewKeyIdea: false
-          };
-        }
-        return idea;
-      }));
-    } catch (error) {
-      throw handleFetchError(error);
-    }
-  }
-
-  return (
-    <div className="flex-1 py-8 px-6 overflow-y-auto">
-      <div className="mb-6 flex items-center space-x-4 border-b pb-4 border-gray-300">
-        <img
-          src="/empty-image.jpg"
-          alt="Book Cover"
-          className="w-24 aspect-[3/4] object-cover rounded-md shadow-md"
-        />
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Book Title</h1>
-          <p className="text-lg text-gray-700">Author Name</p>
-        </div>
-      </div>
-
-      {/* Key Ideas Section */}
-      <div>
-        {/* Key Idea Item */}
-        {ideas.map((idea) => (
-          <KeyIdeaItem
-            key={idea.id}
-            keyIdea={idea}
-            recapVersion={recapVersion}
-            handleDeleteKeyIdea={handleDeleteKeyIdea}
-            handleSaveKeyIdea={handleSaveKeyIdea}
-          />
-        ))}
-
-        {/* Add New Key Idea Button */}
-        <Show when={recapVersion.status === 0}>
-          <div className="flex justify-center mt-8">
-            <button
-              onClick={addNewKeyIdea}
-              className="px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
-              Add new key idea
-            </button>
-          </div>
-        </Show>
-      </div>
-    </div>
-  )
-}
-
 const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
   const [ loading, setLoading ] = useState(false);
   const navigate = useNavigate();
-  const { showToast } = useAuth();
+  const { showToast } = useToast();
 
   // if recapVersionData.transcriptStatus === 1, then keep polling for the transcript status until it's 2
   useEffect(() => {
@@ -509,11 +410,150 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
   )
 }
 
+const BookInfo = () => {
+  const bookInfo = useAsyncValue();
+
+  return (
+    <div className="mb-6 flex items-center space-x-4 border-b pb-4 border-gray-300">
+      <img
+        src={bookInfo.coverImage || "/empty-image.jpg"}
+        alt="Book Cover"
+        className="w-24 aspect-[3/4] object-cover rounded-md shadow-md"
+      />
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">{bookInfo.title}</h1>
+        <p className="text-lg text-gray-700">
+          <span className="font-semibold text-black">Tác giả: </span>
+          <span>{bookInfo.authors.map((author) => author.name).join(", ")}</span>
+        </p>
+        <p className="text-lg text-gray-700">
+          <span className="font-semibold text-black">Thể loại: </span>
+          <span>{bookInfo.categories.map((cate) => cate.name).join(", ")}</span>
+        </p>
+        <p className="text-lg text-gray-700">
+          <span className="font-semibold text-black">Năm xuất bản: </span>
+          <span>{bookInfo.publicationYear}</span>
+        </p>
+      </div>
+    </div>
+  )
+}
+
+const ListKeyIdeas = ({ recapVersion }) => {
+  const keyIdeas = useAsyncValue();
+  const [ ideas, setIdeas ] = useState(keyIdeas);
+  const { showToast } = useToast();
+
+  const addNewKeyIdea = () => {
+    const highestOrder = ideas.reduce((max, idea) => Math.max(max, idea.order), 0);
+
+    setIdeas([ ...ideas, {
+      title: "",
+      body: "",
+      image: "",
+      order: highestOrder + 1,
+      recapVersionId: recapVersion.id,
+      id: new Date().getTime(),
+      isNewKeyIdea: true
+    } ]);
+  }
+
+  const handleDeleteKeyIdea = async (keyIdea) => {
+    if (keyIdea.isNewKeyIdea) {
+      setIdeas(ideas.filter(idea => idea.id !== keyIdea.id));
+      return;
+    }
+
+    // Delete key idea
+    try {
+      const response = await axiosInstance.delete('/api/keyidea/delete/' + keyIdea.id);
+      console.log(response.data);
+      setIdeas(ideas.filter(idea => idea.id !== keyIdea.id));
+      showToast({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Key idea deleted successfully',
+      });
+    } catch (error) {
+      console.error(error);
+      const err = handleFetchError(error);
+      showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: err.error,
+      });
+    }
+  }
+
+  const handleSaveKeyIdea = async (keyIdea, formdata) => {
+    try {
+      const imageKeyIdea = formdata.get('ImageKeyIdea');
+      if (
+        imageKeyIdea && imageKeyIdea.size > 0 &&
+        formdata.get('RemoveImage') === 'true'
+      ) {
+        // change the RemoveImage value to false
+        formdata.set('RemoveImage', 'false');
+      }
+
+      const response = keyIdea.isNewKeyIdea ?
+        await axiosInstance.post('/api/keyidea/createkeyidea', formdata) :
+        await axiosInstance.put('/api/keyidea/updatekeyidea/' + keyIdea.id, formdata);
+
+      const responseData = response.data.data;
+      console.log("keyIdea", responseData);
+
+      setIdeas(ideas.map(idea => {
+        if (idea.order === keyIdea.order) {
+          return {
+            title: responseData.title,
+            body: responseData.body,
+            image: responseData.image,
+            order: responseData.order,
+            recapVersionId: responseData.recapVersionId,
+            id: responseData.id,
+            isNewKeyIdea: false
+          };
+        }
+        return idea;
+      }));
+    } catch (error) {
+      throw handleFetchError(error);
+    }
+  }
+
+  return (
+    <div>
+      {/* Key Idea Item */}
+      {ideas.map((idea) => (
+        <KeyIdeaItem
+          key={idea.id}
+          keyIdea={idea}
+          recapVersion={recapVersion}
+          handleDeleteKeyIdea={handleDeleteKeyIdea}
+          handleSaveKeyIdea={handleSaveKeyIdea}
+        />
+      ))}
+
+      {/* Add New Key Idea Button */}
+      <Show when={recapVersion.status === 0}>
+        <div className="flex justify-center mt-8">
+          <button
+            onClick={addNewKeyIdea}
+            className="px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
+            Add new key idea
+          </button>
+        </div>
+      </Show>
+    </div>
+  )
+}
+
 const KeyIdeaItem = ({ keyIdea, recapVersion, handleDeleteKeyIdea, handleSaveKeyIdea }) => {
   // const [ isEditing, setIsEditing ] = useState(false);
   const [ loading, setLoading ] = useState(false);
   const [ removeImage, setRemoveImage ] = useState(false);
-  const { showToast } = useAuth();
+  const { showToast } = useToast();
   const fileInputRef = useRef(null);
 
   const handleSubmit = async (e) => {

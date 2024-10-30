@@ -9,9 +9,8 @@ export function handleFetchError(error) {
     if (error.response.status === 401) {
       return { error: "Phiên đăng nhập đã hết hạn", status: 401 };
     }
-
-    if (error.response.data.message) {
-      return { error: error.response.data.message, status: error.response.status };
+    if (error.response.data?.message) {
+      return { error: error.response.data.message, status: error.response.status, data: error.response.data.data };
     }
     throw error;
   } else if (error.request) {

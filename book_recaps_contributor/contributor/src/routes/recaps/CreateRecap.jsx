@@ -23,6 +23,7 @@ import { useAuth } from "../../contexts/Auth";
 import { Dialog } from "primereact/dialog";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { routes } from "../../routes";
+import { useToast } from "../../contexts/Toast";
 
 const getBooks = async (q, category, page, request) => {
   try {
@@ -95,6 +96,11 @@ export async function createRecapAction({ request }) {
   } catch (error) {
     const err = handleFetchError(error);
     console.log("err", err);
+
+    if (err.status === 400 && err.data?.id) {
+      return redirect(`/recaps/${err.data.id}?error=${encodeURIComponent(err.error)}`);
+    }
+
     if (err.status === 401) {
       return redirect(routes.logout);
     }
@@ -107,7 +113,8 @@ const CreateRecap = () => {
   const actionData = useActionData();
   let [ , setSearchParams ] = useSearchParams();
   const navigation = useNavigation()
-  const { user, showToast } = useAuth();
+  const { user } = useAuth();
+  const { showToast } = useToast();
   const [ dialogVisible, setDialogVisible ] = useState(false);
   const [ chosenBookId, setChosenBookId ] = useState("");
 

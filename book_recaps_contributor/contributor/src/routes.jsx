@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Outlet } from "react-router-dom";
 import App from "./App";
 import ErrorPage from "./routes/ErrorPage";
 import Login from "./routes/Login";
@@ -6,9 +6,11 @@ import { loginAction } from "./routes/actions/loginAction";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import Logout from "./routes/Logout";
 import CreateRecap, { booksLoader, createRecapAction } from "./routes/recaps/CreateRecap";
-import { AuthProvider, sessionLoader } from "./contexts/Auth";
 import RecapVersion, { recapVersionLoader } from "./routes/recaps/RecapVersion";
 import RecapDetails from "./routes/recaps/RecapDetails";
+import { sessionLoader } from "./routes/loaders/sessionLoader";
+import MainLayout from "./layouts/MainLayout";
+import { AuthProvider } from "./contexts/Auth";
 
 export const routes = {
   login: '/login',
@@ -28,14 +30,20 @@ export const routes = {
 export const router = createBrowserRouter([
   {
     loader: sessionLoader,
-    element: <AuthProvider/>,
+    element: (
+      <AuthProvider>
+        <App/>
+      </AuthProvider>
+    ),
     errorElement: <ErrorPage/>,
     children: [
       {
         path: routes.dashboard,
         element: (
           <ProtectedRoute>
-            <App/>
+            <MainLayout>
+              <Outlet/>
+            </MainLayout>
           </ProtectedRoute>
         ),
         children: [
@@ -88,11 +96,6 @@ export const router = createBrowserRouter([
         path: routes.logout,
         element: <Logout/>,
       },
-      // {
-      //   path: '/register',
-      //   element: <Register />,
-      //   action: registerAction,
-      // },
     ]
   },
 ])
