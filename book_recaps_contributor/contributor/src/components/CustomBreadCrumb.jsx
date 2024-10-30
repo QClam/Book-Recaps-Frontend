@@ -7,7 +7,7 @@ const CustomBreadCrumb = ({ items }) => {
     return {
       label: item.label,
       template: item.path ?
-        <Link to={item.path} className="hover:underline hover:text-blue-500">{item.label}</Link> : item.label
+        <Link to={item.path} className="truncate block max-w-48 hover:underline hover:text-blue-500">{item.label}</Link> : item.label
     };
   });
 

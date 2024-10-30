@@ -8,6 +8,7 @@ import {
   useActionData,
   useAsyncValue,
   useLoaderData,
+  useNavigate,
   useNavigation,
   useSearchParams
 } from "react-router-dom";
@@ -89,7 +90,7 @@ export async function createRecapAction({ request }) {
   }
 
   try {
-    const response = await axiosInstance.post('/api/recap', {
+    const response = await axiosInstance.post('/api/recap/createrecap', {
       bookId, contributorId, name
     });
 
@@ -97,10 +98,6 @@ export async function createRecapAction({ request }) {
   } catch (error) {
     const err = handleFetchError(error);
     console.log("err", err);
-
-    if (err.status === 400 && err.data?.id) {
-      return redirect(`/recaps/${err.data.id}`);
-    }
 
     if (err.status === 401) {
       return redirect(routes.logout);
@@ -114,6 +111,7 @@ const CreateRecap = () => {
   const actionData = useActionData();
   let [ , setSearchParams ] = useSearchParams();
   const navigation = useNavigation()
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { showToast } = useToast();
   const [ dialogVisible, setDialogVisible ] = useState(false);
@@ -133,6 +131,10 @@ const CreateRecap = () => {
       });
       setChosenBookId("");
       setDialogVisible(false);
+
+      if (actionData.status === 400 && actionData.data?.id) {
+        navigate(`/recaps/${actionData.data.id}`);
+      }
     }
   }, [ actionData ]);
 

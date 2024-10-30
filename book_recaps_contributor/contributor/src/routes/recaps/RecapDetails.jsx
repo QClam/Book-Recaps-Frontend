@@ -10,10 +10,11 @@ import {
   useActionData,
   useAsyncValue,
   useLoaderData,
+  useNavigate,
   useNavigation
 } from "react-router-dom";
 import { getBookInfoByRecap } from "../fetch";
-import { axiosInstance2 } from "../../utils/axios";
+import { axiosInstance, axiosInstance2 } from "../../utils/axios";
 import { handleFetchError } from "../../utils/handleFetchError";
 import { routes } from "../../routes";
 import { Suspense, useEffect, useState } from "react";
@@ -92,22 +93,21 @@ export async function recapDetailsAction({ request, params }) {
 
   // Create new version
   const formData = await request.formData();
-  const bookId = formData.get('bookId');
+  const recapId = formData.get('recapId');
   const contributorId = formData.get('userId');
-  const name = formData.get('name');
+  const versionName = formData.get('name');
 
-  if (!bookId || !contributorId || !name) {
+  if (!recapId || !contributorId || !versionName) {
     return { error: "Vui lòng điền đầy đủ thông tin" };
   }
 
   try {
-    // const response = await axiosInstance.post('/api/recap', {
-    //   bookId, contributorId, name
-    // });
+    const response = await axiosInstance.post('/api/recap/create-version', {
+      recapId, contributorId, versionName
+    });
 
     return {
-      // data: response.data.data,
-      data: {},
+      data: response.data.data,
       success: true,
       method: 'post'
     }
@@ -126,6 +126,7 @@ const RecapDetails = () => {
   const { recapVersions, bookInfo, recap } = useLoaderData();
   const actionData = useActionData();
   const navigation = useNavigation()
+  const navigate = useNavigate();
   const [ dialogVisible, setDialogVisible ] = useState(false);
   const { showToast } = useToast();
 
@@ -136,16 +137,19 @@ const RecapDetails = () => {
         summary: 'Error',
         detail: actionData.error,
       });
+
+      if (dialogVisible) setDialogVisible(false);
     }
     if (actionData?.success && actionData.method === 'post') {
       showToast({
         severity: 'success',
         summary: 'Success',
-        // detail: 'Version created successfully',
-        detail: 'Chưa có api tạo version mới',
+        detail: 'Version created successfully',
       });
 
       setDialogVisible(false);
+
+      navigate(`/recaps/${recap.id}/version/${actionData.data.id}`);
     }
   }, [ actionData ]);
 
@@ -160,7 +164,7 @@ const RecapDetails = () => {
         }}
         content={({ hide }) => (
           <Form className="flex flex-col py-4 px-5 gap-1 bg-white rounded" method="post">
-            <input type="hidden" name="bookId" value={recap.bookId}/>
+            <input type="hidden" name="recapId" value={recap.id}/>
             <input type="hidden" name="userId" value={recap.userId}/>
             <TextInput
               id="name"
@@ -197,7 +201,8 @@ const RecapDetails = () => {
         )}
       />
       <div className="flex-1 pb-8 px-6 overflow-y-auto">
-        <CustomBreadCrumb items={[ { label: "Recaps", path: routes.recaps }, { label: "Recap details" } ]}/>
+        <CustomBreadCrumb
+          items={[ { label: "Recaps", path: routes.recaps }, { label: recap.name || "Recap details" } ]}/>
 
         <Suspense>
           <Await resolve={bookInfo} errorElement={
