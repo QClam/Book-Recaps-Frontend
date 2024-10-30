@@ -9,7 +9,7 @@ Chạy Project: npm install -> npm run dev
 
 tạo file .env -> copy paste đoạn này
 
-VITE_RECAPTCHA_KEY="6LdFTgMqAAAAAPMELcBY4rySQ1UpT5ZcXvVcj-_J"
+VITE_RECAPTCHA_KEY="6LeJZW8qAAAAAJF44afAyb_F273FPoL85pNExzM5"
 
 Copy key Google Book API vô file .env 
 
