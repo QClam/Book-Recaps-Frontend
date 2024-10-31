@@ -18,6 +18,7 @@ function Review() {
   const [comments, setComments] = useState([]);
   const [currentComment, setCurrentComment] = useState('');
   const [showInput, setShowInput] = useState(false);
+  const [recapVersionId, setRecapVersionId] = useState(null);
 
   const token = localStorage.getItem('access_token');
 
@@ -34,6 +35,7 @@ function Review() {
       const recap = response.data.data;
       setContentItem(recap);
       setSummaryNote(recap.comments);
+      setRecapVersionId(recap.recapVersionId);
       return recap.recapVersionId; // Return recapVersionId for the next request
     } catch (error) {
       console.log('Error Fetching Content', error);
@@ -162,15 +164,24 @@ function Review() {
   }, [id]);
 
   const handleApprove = async () => {
+    if (!recapVersionId) {
+      console.error("recapVersionId is not defined");
+      return;
+    }
+
+    const reqBody = {
+      recapVersionId: recapVersionId,
+      status: 2
+    };
     try {
-      await axios.put(
-        `https://66eb9ee32b6cf2b89c5b1714.mockapi.io/ContentItems/${id}`,
+      const response = await axios.put(`https://160.25.80.100:7124/change-recapversion-status`, reqBody ,
         {
-          ...contentItem,
-          status: 'Approved',
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
       );
-      setContentItem((prev) => ({ ...prev, status: 'Approved' })); // Update local state
+      setRecapStatus(response.data);
     } catch (error) {
       console.log('Error updating status', error);
       Swal.fire('Error', 'Failed to update status.', 'error');
@@ -239,8 +250,8 @@ function Review() {
     const newComment = {
       reviewId: id,
       targetText: targetText,
-      startIndex: startIndex, // Ép kiểu thành chuỗi
-      endIndex: (targetText.length - 1).toString(), // Ép kiểu thành chuỗi
+      startIndex: startIndex, 
+      endIndex: (targetText.length - 1).toString(),
       sentenceIndex: sentenceIndex.toString(), // Use sentenceIndex
       feedback: currentComment,
     };
@@ -261,8 +272,8 @@ function Review() {
         });
       }
       fetchComment(id); // Refresh comments
-      setCurrentComment(''); // Clear input
-      setShowInput(false); // Hide input
+      setCurrentComment('');
+      setShowInput(false); 
     } catch (error) {
       console.error('Error saving comment:', error);
     }
@@ -321,6 +332,56 @@ function Review() {
       }
     })
   }
+
+  const handleAchieveButton = async () => {
+    if (!recapVersionId) {
+      console.error("recapVersionId is not defined");
+      return;
+    }
+    
+    const reqBody = {
+      id: id,
+      recapVersionId: recapVersionId,
+      comments: "Đạt"
+    };
+    
+    try {
+      const response = await axios.put(`https://160.25.80.100:7124/api/review/updatereview/${id}`, reqBody, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+      });
+      const recap = response.data.data;
+      setSummaryNote(recap.comments);
+    } catch (error) {
+      console.log("Error Achieve", error);
+    }
+  };
+
+  const handleNotAchieveButton = async () => {
+    if (!recapVersionId) {
+      console.error("recapVersionId is not defined");
+      return;
+    }
+
+    const reqBody = {
+      id: id,
+      recapVersionId: recapVersionId,
+      comments: "Chưa Đạt"
+    };
+
+    try {
+      const response = await axios.put(`https://160.25.80.100:7124/api/review/updatereview/${id}`, reqBody, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+      });
+      const recap = response.data.data;
+      setSummaryNote(recap.comments);
+    } catch (error) {
+      console.log("Error Not Achieve", error);
+    }
+  };
 
   if (loading) {
     return (
@@ -431,10 +492,15 @@ function Review() {
             <h4>Ghi chú tổng:</h4>
             <textarea placeholder="Ghi chú ở đây..." className="comment-input" readOnly value={summaryNote}></textarea>
             <div className="status-buttons">
-              <button style={{ backgroundColor: "red" }}>Chưa đạt</button>
-              <button style={{ backgroundColor: "green" }}>Đạt</button>
+              <button style={{ backgroundColor: "red" }}
+                onClick={handleNotAchieveButton}>
+                Chưa đạt</button>
+              <button style={{ backgroundColor: "green" }}
+                onClick={handleAchieveButton}>
+                  Đạt</button>
             </div>
-            <button style={{ backgroundColor: "#007bff" }}>Phê Duyệt Nội Dung</button>
+            <button style={{ backgroundColor: "#007bff" }}
+              onClick={confirmApprove} disabled={summaryNote === "Chưa Đạt"}>Phê Duyệt Nội Dung</button>
           </div>
         </div>
       </div>

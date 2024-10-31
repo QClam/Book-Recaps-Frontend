@@ -32,6 +32,7 @@
 }
 
 .staff-comments-side {
+  
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -46,6 +47,8 @@
     padding-bottom: 10px;
 
     .comment {
+      max-height: 400px;
+      overflow-y: auto;
       padding: 8px 0;
       border-bottom: 1px solid #444;
 
@@ -61,6 +64,7 @@
   }
 
   .summary-note {
+
     .status-buttons {
       display: flex;
       justify-content: space-between;
@@ -69,10 +73,14 @@
     }
     button {
       transition: transform 0.3s ease; /* Smooth animation */
-  
-    &:hover {
-      transform: scale(1.1); /* Scale the button to 110% */
-    }
+
+      &:hover {
+        transform: scale(1.1); /* Scale the button to 110% */
+      }
+      &:disabled {
+        cursor: not-allowed; 
+        opacity: 1; 
+      }
     }
   }
 
@@ -121,9 +129,13 @@ li {
     cursor: pointer;
     font-size: 14px;
     transition: transform 0.3s ease; /* Smooth animation */
-  
+
     &:hover {
       transform: scale(1.1); /* Scale the button to 110% */
+    }
+    &:disabled {
+      cursor: not-allowed; 
+      opacity: 0.6; 
     }
   }
 }
