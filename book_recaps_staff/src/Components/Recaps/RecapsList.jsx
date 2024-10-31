@@ -22,7 +22,8 @@ function RecapsList() {
   const [loading, setLoading] = useState(true); // Start loading as true
   const [profile, setProfile] = useState([]);
   const [currentPage, setCurrentPage] = useState(1); // MUI Pagination uses 1-based indexing
-  const [isDarkMode, setIsDarkMode] = useState(true); // State to toggle dark mode
+  const [review, setReview] = useState([]);
+  const [isDarkMode, setIsDarkMode] = useState(true);
   const [reviewForm, setReviewForm] = useState({
     staffId: "",
     recapVersionId: "",
@@ -31,7 +32,7 @@ function RecapsList() {
 
   const token = localStorage.getItem("access_token");
   const navigate = useNavigate();
-  
+
   const recapsPerPage = 5;
 
   const fetchRecaps = async () => {
@@ -48,24 +49,44 @@ function RecapsList() {
       const recaps = response.data.data.$values;
       console.log("Recaps: ", recaps);
 
-      // Call fetchRecapVersion and fetchContributor for each recap to get its current version status
+      // Process each recap to get version status and contributor
       const updatedRecaps = await Promise.all(
         recaps.map(async (recap) => {
           let updatedRecap = { ...recap };
 
-          // Fetch version status
-          if (recap.currentVersionId) {
-            const versionData = await fetchRecapVersion(recap.currentVersionId);
-            updatedRecap.currentVersionStatus =
-              versionData.data?.status || "Unknown";
+          // Initial check for status from recapVersions array
+          if (recap.recapVersions?.$values && recap.recapVersions.$values.length > 0) {
+            updatedRecap.currentVersionStatus = recap.recapVersions.$values[0].status;
+            updatedRecap.recapVersionId = recap.recapVersions.$values[0].id;
+            // console.log("recapVersionId: ", updatedRecap.recapVersionId);
+
           } else {
             updatedRecap.currentVersionStatus = "No Version";
+            updatedRecap.recapVersionId = "No ID";
+          }
+
+          // Fetch version status from currentVersionId if available
+          if (recap.currentVersionId) {
+            try {
+              const versionData = await fetchRecapVersion(recap.currentVersionId);
+              if (versionData.data?.status) {
+                updatedRecap.currentVersionStatus = versionData.data.status; // Overwrite with current version status if available
+              }
+              // console.log("Recap Version Data for ID", recap.currentVersionId, versionData);
+            } catch (versionError) {
+              console.log("Error fetching recap version:", versionError);
+            }
           }
 
           // Fetch contributor data
           if (recap.userId) {
-            const contributorData = await fetchContributor(recap.userId);
-            updatedRecap.contributor = contributorData.data;
+            try {
+              const contributorData = await fetchContributor(recap.userId);
+              updatedRecap.contributor = contributorData.data;
+            } catch (contributorError) {
+              console.log("Error fetching contributor:", contributorError);
+              updatedRecap.contributor = { fullName: "Unknown" };
+            }
           } else {
             updatedRecap.contributor = { fullName: "Unknown" };
           }
@@ -74,10 +95,9 @@ function RecapsList() {
         })
       );
 
-      setContentItems(updatedRecaps); // Set the updated recaps with version status
+      setContentItems(updatedRecaps);
     } catch (error) {
       console.log("Error fetching data, using sample data as fallback:", error);
-      return [];
     } finally {
       setLoading(false);
     }
@@ -85,6 +105,7 @@ function RecapsList() {
 
   useEffect(() => {
     fetchRecaps();
+    fetchReview();
   }, []);
 
   useEffect(() => {
@@ -108,6 +129,8 @@ function RecapsList() {
           },
         }
       );
+      // console.log("Recap Version: ", response.data);
+
       return response.data;
     } catch (error) {
       console.log("Error Fetching currentVersionId: ", error);
@@ -124,7 +147,7 @@ function RecapsList() {
           },
         }
       );
-      console.log("Contributor: ", response.data);
+      // console.log("Contributor: ", response.data);
       return response.data;
     } catch (error) {
       console.error("Error fetching user account: ", error);
@@ -137,7 +160,7 @@ function RecapsList() {
       const newReview = {
         staffId: reviewForm.staffId,
         recapVersionId: recapVersionId,
-        comments: "Hiện chưa có comment",
+        comments: "Chưa đạt",
       };
 
       const response = await axios.post(
@@ -161,6 +184,23 @@ function RecapsList() {
     }
   };
 
+  const fetchReview = async () => {
+    try {
+      const response = await axios.get(`https://160.25.80.100:7124/api/review/getallreview`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      )
+      const reviews = response.data.data.$values;
+      console.log("Reviews: ", reviews);
+      setReview(reviews)
+    } catch (error) {
+      console.error("Error fetching review:", error);
+    }
+  }
+
   if (loading) {
     return (
       <div className="loading">
@@ -177,7 +217,7 @@ function RecapsList() {
     );
   }
 
-  const displayRecaps = contentItems.slice((currentPage - 1) * recapsPerPage, currentPage * recapsPerPage )
+  const displayRecaps = contentItems.slice((currentPage - 1) * recapsPerPage, currentPage * recapsPerPage)
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
   }
@@ -197,6 +237,7 @@ function RecapsList() {
               <th>Tên Contributor</th>
               <th>Ngày</th>
               <th>Duyệt nội dung</th>
+              <th>Chi tiết bản duyệt</th>
               <th>Trạng thái</th>
             </tr>
           </thead>
@@ -212,11 +253,25 @@ function RecapsList() {
                   <button
                     className="button"
                     style={{ backgroundColor: "green", color: "#fff" }}
-                    onClick={() => createReview(val.currentVersionId)}
+                    onClick={() => createReview(val.recapVersionId)}
                   >
-                    Duyệt
+                    Tạo Review
                   </button>
                 </td>
+                  <td>
+                  {review
+                    .filter((rev) => rev.recapVersionId === val.recapVersionId)
+                    .map((rev) => (
+                      <button
+                        key={rev.id}
+                        className="button"
+                        style={{ backgroundColor: "#007bff", color: "#fff", marginLeft: 5 }}
+                        onClick={() => navigate(`/review/content_version/${rev.id}`)}
+                      >
+                        Xem Review
+                      </button>
+                    ))}
+                  </td>
                 <td>
                   {val.currentVersionStatus === 1 ? (
                     <button
@@ -254,30 +309,30 @@ function RecapsList() {
         </table>
       </div>
       <Pagination
-                className="center"
-                count={Math.ceil(contentItems.length / recapsPerPage)} // Total number of pages
-                page={currentPage} // Current page
-                onChange={handlePageChange} // Handle page change
-                color="primary" // Styling options
-                showFirstButton
-                showLastButton
-                sx={{
-                    "& .MuiPaginationItem-root": {
-                        color: isDarkMode ? "#fff" : "#000", // Change text color based on theme
-                        backgroundColor: isDarkMode ? "#555" : "#f0f0f0", // Button background color based on theme
-                    },
-                    "& .MuiPaginationItem-root.Mui-selected": {
-                        backgroundColor: isDarkMode ? "#306cce" : "#72a1ed", // Change color of selected page button
-                        color: "#fff", // Ensure selected text is white for contrast
-                    },
-                    "& .MuiPaginationItem-root.Mui-selected:hover": {
-                        backgroundColor: isDarkMode ? "#2057a4" : "#5698d3", // Color on hover for selected button
-                    },
-                    "& .MuiPaginationItem-root:hover": {
-                        backgroundColor: isDarkMode ? "#666" : "#e0e0e0", // Color on hover for non-selected buttons
-                    },
-                }}
-            />
+        className="center"
+        count={Math.ceil(contentItems.length / recapsPerPage)}
+        page={currentPage}
+        onChange={handlePageChange}
+        color="primary"
+        showFirstButton
+        showLastButton
+        sx={{
+          "& .MuiPaginationItem-root": {
+            color: isDarkMode ? "#fff" : "#000", // Change text color based on theme
+            backgroundColor: isDarkMode ? "#555" : "#f0f0f0", // Button background color based on theme
+          },
+          "& .MuiPaginationItem-root.Mui-selected": {
+            backgroundColor: isDarkMode ? "#306cce" : "#72a1ed", // Change color of selected page button
+            color: "#fff", // Ensure selected text is white for contrast
+          },
+          "& .MuiPaginationItem-root.Mui-selected:hover": {
+            backgroundColor: isDarkMode ? "#2057a4" : "#5698d3", // Color on hover for selected button
+          },
+          "& .MuiPaginationItem-root:hover": {
+            backgroundColor: isDarkMode ? "#666" : "#e0e0e0", // Color on hover for non-selected buttons
+          },
+        }}
+      />
     </div>
   );
 }

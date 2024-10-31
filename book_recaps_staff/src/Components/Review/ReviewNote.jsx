@@ -16,6 +16,9 @@ function ReviewNote() {
 
   const [loading, setLoading] = useState(true);
   const [content, setContent] = useState(null);
+  const [contentItem, setContentItem] = useState(null);
+
+  const token = localStorage.getItem("access_token")
 
   useEffect(() => {
     const fetchContent = async () => {

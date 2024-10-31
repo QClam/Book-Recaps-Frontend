@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Link, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
 import { Hourglass } from 'react-loader-spinner';
+import './ReviewNote.scss';
 
 function Review() {
   const [contentItem, setContentItem] = useState(null);
@@ -11,7 +12,13 @@ function Review() {
   const [recapStatus, setRecapStatus] = useState(null);
   const [recapDetail, setRecapDetail] = useState(null);
   const [bookRecap, setBookRecap] = useState(null);
-  
+  const [transcript, setTranscript] = useState(null);
+  const [summaryNote, setSummaryNote] = useState('');
+  const [selectedIndex, setSelectedIndex] = useState(null);
+  const [comments, setComments] = useState([]);
+  const [currentComment, setCurrentComment] = useState('');
+  const [showInput, setShowInput] = useState(false);
+
   const token = localStorage.getItem('access_token');
 
   const fetchContent = async () => {
@@ -25,15 +32,15 @@ function Review() {
         }
       );
       const recap = response.data.data;
-      console.log('Fetched Content: ', recap);
       setContentItem(recap);
+      setSummaryNote(recap.comments);
       return recap.recapVersionId; // Return recapVersionId for the next request
     } catch (error) {
       console.log('Error Fetching Content', error);
+      Swal.fire('Error', 'Failed to fetch content.', 'error');
     }
   };
 
-// Fetch RecapVersion để lấy recapId và status của Version hiện tại
   const fetchRecapVersion = async (recapVersionId) => {
     try {
       const response = await axios.get(
@@ -45,69 +52,105 @@ function Review() {
         }
       );
       const recapVersionData = response.data.data;
-      console.log('RecapId: ', recapVersionData.recapId);
       setRecapStatus(recapVersionData);
-      return recapVersionData.recapId;    
+      return {
+        recapId: recapVersionData.recapId,
+        transcriptUrl: recapVersionData.transcriptUrl,
+      };
     } catch (error) {
       console.log('Error Fetching Recap Version', error);
+      Swal.fire('Error', 'Failed to fetch recap version.', 'error');
     }
   };
 
-  //Fetch Recap để lấy bookId 
   const fetchRecapDetail = async (recapId) => {
     try {
-      const response = await axios.get(`https://160.25.80.100:7124/getrecapbyId/${recapId}`,
+      const response = await axios.get(
+        `https://160.25.80.100:7124/getrecapbyId/${recapId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
-      )
+      );
       const recapDetailData = response.data.data;
-      console.log("BookId: ", recapDetailData.bookId);
       setRecapDetail(recapDetailData);
       return recapDetailData.bookId;
     } catch (error) {
       console.log('Error Fetching Recap Detail', error);
+      Swal.fire('Error', 'Failed to fetch recap detail.', 'error');
     }
-  }
+  };
 
-  //Fetch bookId để lấy detail sách
   const fetchBookRecap = async (bookId) => {
     try {
-      const response = await axios.get(`https://160.25.80.100:7124/api/book/getbookbyid/${bookId}`,
+      const response = await axios.get(
+        `https://160.25.80.100:7124/api/book/getbookbyid/${bookId}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`
+            Authorization: `Bearer ${token}`,
           },
-        },
-      )
-      const bookRecap = response.data.data;
-      console.log("Book Detail: ", bookRecap);
-      setBookRecap(bookRecap);
+        }
+      );
+      setBookRecap(response.data.data);
     } catch (error) {
       console.log('Error Fetching Book', error);
+      Swal.fire('Error', 'Failed to fetch book details.', 'error');
+    }
+  };
+
+  const fetchTranscript = async (transcriptUrl) => {
+    try {
+      const response = await axios.get(transcriptUrl, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setTranscript(response.data);
+      console.log("Transcript: ", response.data);
+
+    } catch (error) {
+      console.log('Error Fetching Transcript', error);
+      Swal.fire('Error', 'Failed to fetch transcript.', 'error');
+    }
+  };
+
+  const fetchComment = async (reviewId) => {
+    try {
+      const response = await axios.get(`https://160.25.80.100:7124/api/reviewnote/getallnotebyreviewid/${reviewId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          }
+        }
+      )
+      const comments = response.data.data.$values
+      setComments(comments)
+      console.log("Comments: ", comments);
+    } catch (error) {
+      console.log('Error Fetching', error);
     }
   }
 
   const fetchData = async () => {
     setLoading(true);
     try {
-      // Fetch content first to get recapVersionId
       const recapVersionId = await fetchContent();
       if (recapVersionId) {
-        // Fetch recap version and detail using recapVersionId
-        const recapId = await fetchRecapVersion(recapVersionId);
+        const { recapId, transcriptUrl } = await fetchRecapVersion(recapVersionId);
         if (recapId) {
-          const bookid = await fetchRecapDetail(recapId);
-          // Fetch recap detail để lấy bookId
-          if(bookid) {
-            await fetchBookRecap(bookid);
+          const bookId = await fetchRecapDetail(recapId);
+          if (bookId) {
+            await fetchBookRecap(bookId);
           }
+        }
+        if (transcriptUrl) {
+          await fetchTranscript(transcriptUrl);
         }
       }
     } catch (error) {
       console.log('Error Fetching Data', error);
+      Swal.fire('Error', 'Failed to fetch data.', 'error');
     } finally {
       setLoading(false);
     }
@@ -115,17 +158,22 @@ function Review() {
 
   useEffect(() => {
     fetchData();
+    fetchComment(id)
   }, [id]);
 
   const handleApprove = async () => {
     try {
-      await axios.put(`https://66eb9ee32b6cf2b89c5b1714.mockapi.io/ContentItems/${id}`, {
-        ...contentItem,
-        status: 'Approved'
-      });
-      setContentItem(prev => ({ ...prev, status: 'Approved' })); // Update local state
+      await axios.put(
+        `https://66eb9ee32b6cf2b89c5b1714.mockapi.io/ContentItems/${id}`,
+        {
+          ...contentItem,
+          status: 'Approved',
+        }
+      );
+      setContentItem((prev) => ({ ...prev, status: 'Approved' })); // Update local state
     } catch (error) {
-      console.log("Error updating status", error);
+      console.log('Error updating status', error);
+      Swal.fire('Error', 'Failed to update status.', 'error');
     }
   };
 
@@ -138,29 +186,151 @@ function Review() {
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Có, phê duyệt!',
-      cancelButtonText: 'Hủy'
+      cancelButtonText: 'Hủy',
     }).then((result) => {
       if (result.isConfirmed) {
         handleApprove();
-        Swal.fire(
-          'Đã chấp thuận!',
-          'Nội dung này đã được phê duyệt.',
-          'success'
-        );
+        Swal.fire('Đã chấp thuận!', 'Nội dung này đã được phê duyệt.', 'success');
       }
     });
   };
+
+  const handleTakenote = async (existingComment) => {
+    if (!selectedIndex) {
+      console.error("selectedIndex is not defined");
+      return;
+    }
+
+    const { sectionIndex, sentenceIndex } = selectedIndex;
+    const selectedSection = transcript.transcriptSections[sectionIndex];
+    let targetText = "";
+
+    if (selectedSection) {
+      const transcriptSentences = selectedSection.transcriptSentences; // Lưu trữ mảng sentences vào biến
+
+      // Kiểm tra xem sentenceIndex có nằm trong khoảng hợp lệ không
+      if (sentenceIndex >= 0 && sentenceIndex < transcriptSentences.length) {
+        const selectedSentence = transcriptSentences[sentenceIndex]; // Truy cập selectedSentence
+        if (selectedSentence) {
+          targetText = selectedSentence.value.html; // Truy cập targetText
+          console.log("targetText: ", targetText);
+        } else {
+          console.log("selectedSentence is undefined");
+        }
+      } else {
+        // Lấy giá trị cuối cùng nếu không có giá trị nào
+        const selectedSentence = transcriptSentences[transcriptSentences.length - 1]; // Lấy giá trị cuối
+        if (selectedSentence) {
+          targetText = selectedSentence.value.html; // Truy cập targetText
+          console.log("targetText from last sentence: ", targetText);
+        }
+      }
+    } else {
+      console.error("selectedSection is undefined!");
+    }
+
+    // Kiểm tra nếu targetText vẫn rỗng
+    if (!targetText) {
+      console.error("targetText is still undefined after processing.");
+      return;
+    }
+    const startIndex = '0';
+
+    const newComment = {
+      reviewId: id,
+      targetText: targetText,
+      startIndex: startIndex, // Ép kiểu thành chuỗi
+      endIndex: (targetText.length - 1).toString(), // Ép kiểu thành chuỗi
+      sentenceIndex: sentenceIndex.toString(), // Use sentenceIndex
+      feedback: currentComment,
+    };
+
+    try {
+      // Check existing comment
+      if (existingComment) {
+        await axios.put(`https://160.25.80.100:7124/api/reviewnote/updatereviewnote/${existingComment.id}`, newComment, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+      } else {
+        await axios.post(`https://160.25.80.100:7124/api/reviewnote/createreviewnote`, newComment, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+      }
+      fetchComment(id); // Refresh comments
+      setCurrentComment(''); // Clear input
+      setShowInput(false); // Hide input
+    } catch (error) {
+      console.error('Error saving comment:', error);
+    }
+  };
+
+
+  const handleRightClick = (e, sectionIndex, sentenceIndex) => {
+    e.preventDefault();
+    setSelectedIndex({ sectionIndex, sentenceIndex });
+
+    const existingComment = comments.find(
+      (comment) => comment.sentenceIndex === String(sentenceIndex) && !comment.isDeleted
+    );
+
+    // Log để kiểm tra
+    console.log("Current Sentence Index: ", sentenceIndex);
+    console.log("Comments: ", comments);
+    console.log("Existing Comment: ", existingComment);
+
+    if (existingComment) {
+      setCurrentComment(existingComment.feedback); // Show existing feedback
+      setShowInput(true);
+    } else {
+      setCurrentComment('');
+      setShowInput(true);
+    }
+  };
+
+  const handleDeleteComment = async (existingComment) => {
+    Swal.fire({
+      title: 'Bạn đã chắc chắn chưa?',
+      text: 'Bạn không thể hoàn tác hành động này',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Có, xóa!',
+      cancelButtonText: 'Hủy',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const response = await axios.delete(`https://160.25.80.100:7124/api/reviewnote/delete/${existingComment.id}`,
+            {
+              headers: {
+                Authorization: `Bearer ${token}`
+              },
+            },
+          );
+          fetchComment(id);
+          setShowInput(false)
+        } catch (error) {
+          console.log("Error Delete Comment", error);
+          Swal.fire('Lỗi', 'Không thể xóa comment.', 'error');
+        }
+        Swal.fire('Đã xóa!', 'Comment này đã được xóa.', 'success');
+      }
+    })
+  }
 
   if (loading) {
     return (
       <div className='loading'>
         <Hourglass
           visible={true}
-          height="80"
-          width="80"
-          ariaLabel="hourglass-loading"
-          wrapperStyle={{}}
-          wrapperClass=""
+          height='80'
+          width='80'
+          ariaLabel='hourglass-loading'
+          wrapperClass=''
           colors={['#306cce', '#72a1ed']}
         />
       </div>
@@ -172,26 +342,102 @@ function Review() {
   }
 
   return (
-    <div>
-      <h1>{bookRecap.title}</h1>
-      <p>{bookRecap.description}</p>
-      {recapStatus?.status === 1 ? (
-        <button className="role-container" style={{ backgroundColor: "#007bff" }}>
-          Pending
-        </button>
-      ) : (
-        <button className="role-container" style={{ backgroundColor: "#5e6061" }}>
-          Unknown
-        </button>
-      )}
-      <div>
-        <Link to={`/note/content_version/${contentItem.id}`}>Comment</Link>
+    <div className='audio-grid'>
+      <div className='transcript-container'>
+        <div className='transcript-box'>
+          <div className='transcript'>
+            <h1>{bookRecap.title}</h1>
+            <p>{bookRecap.description}</p>
+            <br />
+            <div>
+              {transcript.transcriptSections.map((section, sectionIndex) => {
+                return (
+                  <div key={sectionIndex} className='transcript-section'>
+                    <h2>Section {sectionIndex + 1}</h2>
+                    {section.transcriptSentences.map((sentence, sentenceIndexInSection) => {
+                      // Tính toán chỉ số toàn cục cho sentence
+                      const globalSentenceIndex = section.transcriptSentences.reduce(
+                        (acc, curr, idx) => acc + (idx < sentenceIndexInSection ? 1 : 0),
+                        0
+                      ) + sectionIndex * section.transcriptSentences.length;
+
+                      const existingComment = comments.find(
+                        (comment) =>
+                          comment.sentenceIndex === globalSentenceIndex.toString() &&
+                          !comment.isDeleted
+                      );
+
+                      return (
+                        <span
+                          key={globalSentenceIndex}
+                          id={`word-${globalSentenceIndex}`}
+                          style={{ cursor: 'pointer', position: 'relative' }}
+                          onContextMenu={(e) => handleRightClick(e, sectionIndex, globalSentenceIndex)}
+                        >
+                          {sentence.value.html + ' '}
+                          {existingComment && (
+                            <span>📋</span>
+                          )}
+                          {showInput &&
+                            selectedIndex &&
+                            selectedIndex.sectionIndex === sectionIndex &&
+                            selectedIndex.sentenceIndex === globalSentenceIndex && (
+                              <div className='add-comment-container'>
+                                <textarea
+                                  value={currentComment}
+                                  onChange={(e) => setCurrentComment(e.target.value)}
+                                  placeholder="Add a comment..."
+                                />
+                                <button onClick={() => handleTakenote(existingComment)}
+                                  style={{ backgroundColor: "green" }}>
+                                  Take Note
+                                </button>
+                                <button onClick={() => setShowInput(false)}
+                                  style={{ backgroundColor: "red" }}>
+                                  Cancel</button>
+                                <button style={{ backgroundColor: "#FF0000" }} 
+                                onClick={() => handleDeleteComment(existingComment)}
+                                disabled={!existingComment}>
+                                  Xoá</button>
+                              </div>
+                            )}
+                        </span>
+                      );
+                    })}
+                  </div>
+                );
+              })}
+
+            </div>
+          </div>
+        </div>
       </div>
-      <p>{contentItem.comments}</p>
-      <br />
-      {recapStatus?.status === 1 && (
-        <button onClick={confirmApprove}>Phê duyệt nội dung</button>
-      )}
+
+      <div className="staff-comments-side">
+        <div className="staff-comments">
+          <h3>Staff Comments</h3>
+          <div className="comment">
+            {comments.map((comment) => (
+              <ul key={comment.id}>
+                <li>Staff Name</li>
+                <li>{new Date(comment.createdAt).toLocaleDateString()}</li>
+                <li>Đoạn: {comment.targetText}</li>
+                <li>Feedback: {comment.feedback}</li>
+                <br />
+              </ul>
+            ))}
+          </div>
+          <div className="summary-note">
+            <h4>Ghi chú tổng:</h4>
+            <textarea placeholder="Ghi chú ở đây..." className="comment-input" readOnly value={summaryNote}></textarea>
+            <div className="status-buttons">
+              <button style={{ backgroundColor: "red" }}>Chưa đạt</button>
+              <button style={{ backgroundColor: "green" }}>Đạt</button>
+            </div>
+            <button style={{ backgroundColor: "#007bff" }}>Phê Duyệt Nội Dung</button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
