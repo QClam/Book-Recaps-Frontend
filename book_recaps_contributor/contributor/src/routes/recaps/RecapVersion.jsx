@@ -123,9 +123,14 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
           }
         } catch (error) {
           console.error('Error polling for transcript status:', error);
+          showToast({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Error polling for transcript status. Please try upload audio again.',
+          });
           clearInterval(interval); // Optionally stop polling on error
         }
-      }, 3000);
+      }, 1500);
     }
 
     return () => {

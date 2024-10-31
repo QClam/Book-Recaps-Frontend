@@ -22,6 +22,7 @@ export const routes = {
   recapVersionDetails: '/recaps/:recapId/version/:versionId',
   keyIdea: '/key-idea',
   books: '/books',
+  bookDetails: '/books/:bookId',
   contact: '/contact',
   profile: '/profile',
   billingInvoices: '/billing-invoices',

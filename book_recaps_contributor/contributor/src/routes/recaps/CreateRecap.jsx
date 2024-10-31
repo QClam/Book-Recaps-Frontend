@@ -2,13 +2,14 @@ import {
   Await,
   defer,
   Form,
+  generatePath,
   json,
   Link,
+  Navigate,
   redirect,
   useActionData,
   useAsyncValue,
   useLoaderData,
-  useNavigate,
   useNavigation,
   useSearchParams
 } from "react-router-dom";
@@ -94,7 +95,10 @@ export async function createRecapAction({ request }) {
       bookId, contributorId, name
     });
 
-    return redirect(`/recaps/${response.data.data.id}/version/${response.data.data.currentVersionId}`);
+    return redirect(generatePath(routes.recapVersionDetails, {
+      recapId: response.data.data.id,
+      versionId: response.data.data.currentVersionId
+    }));
   } catch (error) {
     const err = handleFetchError(error);
     console.log("err", err);
@@ -111,7 +115,6 @@ const CreateRecap = () => {
   const actionData = useActionData();
   let [ , setSearchParams ] = useSearchParams();
   const navigation = useNavigation()
-  const navigate = useNavigate();
   const { user } = useAuth();
   const { showToast } = useToast();
   const [ dialogVisible, setDialogVisible ] = useState(false);
@@ -131,10 +134,6 @@ const CreateRecap = () => {
       });
       setChosenBookId("");
       setDialogVisible(false);
-
-      if (actionData.status === 400 && actionData.data?.id) {
-        navigate(`/recaps/${actionData.data.id}`);
-      }
     }
   }, [ actionData ]);
 
@@ -153,6 +152,10 @@ const CreateRecap = () => {
     }
     setChosenBookId(bookId);
     setDialogVisible(true);
+  }
+
+  if (actionData?.error && actionData.status === 400 && actionData.data?.id) {
+    return <Navigate to={generatePath(routes.recapDetails, { recapId: actionData.data.id })}/>;
   }
 
   return (
@@ -390,7 +393,7 @@ function BooksTable({ handleClickCreate }) {
             <td className="px-2.5 py-3 border-[#e2e7ee] border-b" style={{ borderLeft: "1px dashed #d5dce6" }}>
               <div className="min-w-60">
                 <Link
-                  to={`/books/${book.id}`}
+                  to={generatePath(routes.bookDetails, { bookId: book.id })}
                   className="min-w-full line-clamp-2 break-words hover:underline text-indigo-500"
                 >
                   {book.title}

@@ -4,8 +4,10 @@ import {
   Await,
   defer,
   Form,
+  generatePath,
   json,
   Link,
+  Navigate,
   redirect,
   useActionData,
   useAsyncValue,
@@ -140,18 +142,21 @@ const RecapDetails = () => {
 
       if (dialogVisible) setDialogVisible(false);
     }
+
     if (actionData?.success && actionData.method === 'post') {
       showToast({
         severity: 'success',
         summary: 'Success',
         detail: 'Version created successfully',
       });
-
-      setDialogVisible(false);
-
-      navigate(`/recaps/${recap.id}/version/${actionData.data.id}`);
     }
   }, [ actionData ]);
+
+  if (actionData?.success && actionData.method === 'post') {
+    return <Navigate to={generatePath(routes.recapVersionDetails,
+      { recapId: recap.id, versionId: actionData.data.id })
+    }/>
+  }
 
   return (
     <div className="relative flex h-full">
@@ -341,7 +346,7 @@ const ListRecapVersions = () => {
             <td className="px-2.5 py-1 pl-[18px] font-semibold border-[#e2e7ee] border-b">
               <div className="min-w-60">
                 <Link
-                  to={`/recaps/${version.recapId}/version/${version.id}`}
+                  to={generatePath(routes.recapVersionDetails, { recapId: version.recapId, versionId: version.id })}
                   className="min-w-full line-clamp-2 break-words hover:underline text-indigo-500"
                 >
                   {version.versionName || <span className="italic">(Chưa có tên)</span>}
