@@ -12,13 +12,18 @@ import {
   GifBox,
   LibraryBooks,
   Widgets,
-  Notes,
+  Gavel,
   Groups
 } from "@mui/icons-material";
 
 export const SidebarItems = [
   {
     title: "Tổng quan",
+    icon: <SpaceDashboard />,
+    link: "/dashboard",
+  },
+  {
+    title: "Nội dung chờ duyệt",
     icon: <Widgets />,
     link: "/overview",
   },
@@ -33,13 +38,13 @@ export const SidebarItems = [
     link: "/users",
   },
   {
+    title: "Kháng cáo",
+    icon: <Gavel />,
+    link: "/appeal",
+  },
+  {
     title: "Cài đặt",
     icon: <Settings />,
     link: "/settings",
   },
-  // {
-  //   title: "Đăng xuất",
-  //   icon: <Logout />,
-  //   link: "/logout",
-  // },
 ];

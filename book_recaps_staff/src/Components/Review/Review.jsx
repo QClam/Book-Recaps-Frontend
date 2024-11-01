@@ -21,7 +21,15 @@ function Review() {
   const [currentComment, setCurrentComment] = useState('');
   const [showInput, setShowInput] = useState(false);
   const [recapVersionId, setRecapVersionId] = useState(null);
-  const [profile, setProfile] = useState([])
+  const [profile, setProfile] = useState([]);
+  const [isChecked, setIsChecked] = useState(false);
+  const [plagiarismResults, setPlagiarismResults] = useState(null);
+
+  const [mode, setMode] = useState('comment');
+
+  const handleChangeMode = (newMode) => {
+    setMode(newMode);
+  }
 
   const token = localStorage.getItem('access_token');
 
@@ -112,7 +120,6 @@ function Review() {
         },
       });
       setTranscript(response.data);
-      console.log("Transcript: ", response.data);
 
     } catch (error) {
       console.log('Error Fetching Transcript', error);
@@ -212,7 +219,7 @@ function Review() {
     });
   };
 
-  const handleReject = async() => {
+  const handleReject = async () => {
     if (!recapVersionId) {
       console.error("recapVersionId is not defined");
       return;
@@ -255,81 +262,55 @@ function Review() {
     });
   };
 
-  const handleTakenote = async (existingComment) => {
+  const handleTakenote = async (targetText, existingComment) => {
     if (!selectedIndex) {
-      console.error("selectedIndex is not defined");
-      return;
+        console.error("selectedIndex is not defined");
+        return;
     }
 
     const { sectionIndex, sentenceIndex } = selectedIndex;
     const selectedSection = transcript.transcriptSections[sectionIndex];
-    let targetText = "";
 
-    if (selectedSection) {
-      const transcriptSentences = selectedSection.transcriptSentences; // Lưu trữ mảng sentences vào biến
-
-      // Kiểm tra xem sentenceIndex có nằm trong khoảng hợp lệ không
-      if (sentenceIndex >= 0 && sentenceIndex < transcriptSentences.length) {
-        const selectedSentence = transcriptSentences[sentenceIndex]; // Truy cập selectedSentence
-        if (selectedSentence) {
-          targetText = selectedSentence.value.html; // Truy cập targetText
-          console.log("targetText: ", targetText);
-        } else {
-          console.log("selectedSentence is undefined");
-        }
-      } else {
-        // Lấy giá trị cuối cùng nếu không có giá trị nào
-        const selectedSentence = transcriptSentences[transcriptSentences.length - 1]; // Lấy giá trị cuối
-        if (selectedSentence) {
-          targetText = selectedSentence.value.html; // Truy cập targetText
-          console.log("targetText from last sentence: ", targetText);
-        }
-      }
-    } else {
-      console.error("selectedSection is undefined!");
+    if (!selectedSection) {
+        console.error("selectedSection is undefined!");
+        return;
     }
 
-    // Kiểm tra nếu targetText vẫn rỗng
-    if (!targetText) {
-      console.error("targetText is still undefined after processing.");
-      return;
-    }
-    const startIndex = '0';
+    // Chúng ta đã có targetText từ handleRightClick
+    console.log("targetText: ", targetText);
 
     const newComment = {
-      reviewId: id,
-      targetText: targetText,
-      startIndex: startIndex,
-      endIndex: (targetText.length - 1).toString(),
-      sentenceIndex: sentenceIndex.toString(),
-      feedback: currentComment,
+        reviewId: id,
+        targetText: targetText,
+        startIndex: '0',
+        endIndex: (targetText.length - 1).toString(),
+        sentenceIndex: sentenceIndex.toString(),
+        feedback: currentComment,
     };
 
     try {
-      // Kiểm tra nếu đã có comment thì dùng PUT, chưa có thì dùng POST
-      if (existingComment) {
-        await axios.put(`https://160.25.80.100:7124/api/reviewnote/updatereviewnote/${existingComment.id}`, newComment, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-      } else {
-        await axios.post(`https://160.25.80.100:7124/api/reviewnote/createreviewnote`, newComment, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        });
-      }
-      fetchComment(id);
-      setCurrentComment('');
-      setShowInput(false);
+        if (existingComment) {
+            await axios.put(`https://160.25.80.100:7124/api/reviewnote/updatereviewnote/${existingComment.id}`, newComment, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+        } else {
+            await axios.post(`https://160.25.80.100:7124/api/reviewnote/createreviewnote`, newComment, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+        }
+        fetchComment(id);
+        setCurrentComment('');
+        setShowInput(false);
     } catch (error) {
-      console.error('Error saving comment:', error);
+        console.error('Error saving comment:', error);
     }
-  };
+}; 
 
-
-  const handleRightClick = (e, sectionIndex, sentenceIndex) => {
+  const handleRightClick = (e, sectionIndex, sentenceIndex, targetHtml) => {
     e.preventDefault();
     setSelectedIndex({ sectionIndex, sentenceIndex });
 
@@ -337,10 +318,11 @@ function Review() {
       (comment) => comment.sentenceIndex === String(sentenceIndex) && !comment.isDeleted
     );
 
-    // // Log để kiểm tra
-    // console.log("Current Sentence Index: ", sentenceIndex);
-    // console.log("Comments: ", comments);
-    // console.log("Existing Comment: ", existingComment);
+    // Log để kiểm tra
+    console.log("Current Sentence Index: ", sentenceIndex);
+    console.log("Target HTML: ", targetHtml); // Log đoạn HTML đã được target
+    console.log("Comments: ", comments);
+    console.log("Existing Comment: ", existingComment);
 
     if (existingComment) {
       setCurrentComment(existingComment.feedback); // Hiển thị comment hiện tại
@@ -349,7 +331,8 @@ function Review() {
       setCurrentComment('');
       setShowInput(true);
     }
-  };
+};
+
 
   const handleDeleteComment = async (existingComment) => {
     Swal.fire({
@@ -432,6 +415,31 @@ function Review() {
     }
   };
 
+  const handleCheckPlagiarism = async () => {
+    // Simulate an API call to check plagiarism
+    const results = await fetchPlagiarismResults(); // Replace with your actual API call
+    if (results) {
+      setPlagiarismResults(results);
+      setIsChecked(true);
+    }
+  };
+
+  const handleDeleteResults = () => {
+    // Reset the state to remove plagiarism results
+    setPlagiarismResults(null);
+    setIsChecked(false);
+  };
+
+  const fetchPlagiarismResults = async () => {
+    // Simulate an API call
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve(['Kết quả 1: Tìm thấy', 'Kết quả 2: Không tìm thấy']);
+        // You can replace this with your actual API response logic
+      }, 2000); // Simulate a delay
+    });
+  }
+
   if (loading) {
     return (
       <div className='loading'>
@@ -453,109 +461,180 @@ function Review() {
 
   return (
     <div className='audio-grid'>
-      <div className='transcript-container'>
-        <div className='transcript-box'>
-          <div className='transcript'>
-            <h1>{bookRecap.title}</h1>
-            <p>{bookRecap.description}</p>
-            <br />
-            <div>
-              {transcript.transcriptSections.map((section, sectionIndex) => {
-                return (
-                  <div key={sectionIndex} className='transcript-section'>
-                    <h2>Section {sectionIndex + 1}</h2>
-                    {section.transcriptSentences.map((sentence, sentenceIndexInSection) => {
-                      // Tính toán chỉ số toàn cục cho sentence
-                      const globalSentenceIndex = section.transcriptSentences.reduce(
-                        (acc, curr, idx) => acc + (idx < sentenceIndexInSection ? 1 : 0),
-                        0
-                      ) + sectionIndex * section.transcriptSentences.length;
+      <div className='transcript-section-container'>
+        <h1>{recapStatus.versionName}</h1>
+        <div className='button-group'>
+          <button onClick={() => handleChangeMode('comment')} style={{ backgroundColor: "#90c494" }}>Nhận xét</button>
+          <button onClick={() => handleChangeMode('plagiarism')} style={{ backgroundColor: "#c49c9c" }}>Kiểm tra đạo văn</button>
+        </div>
+        <br />
+        <div>
+        </div>
+        <div className='transcript-container'>
+          {mode === 'comment' ? (
+            <div className='transcript-box'>
+              <div className='transcript'>
+                <div>
+                  {transcript.transcriptSections.map((section, sectionIndex) => {
+                    return (
+                      <div key={sectionIndex} className='transcript-section'>
+                        <h2>Section {sectionIndex + 1}</h2>
+                        {section.transcriptSentences.map((sentence, sentenceIndexInSection) => {
+                          // Tính toán chỉ số toàn cục cho sentence
+                          const globalSentenceIndex = section.transcriptSentences.reduce(
+                            (acc, curr, idx) => acc + (idx < sentenceIndexInSection ? 1 : 0),
+                            0
+                          ) + sectionIndex * section.transcriptSentences.length;
 
-                      const existingComment = comments.find(
-                        (comment) =>
-                          comment.sentenceIndex === globalSentenceIndex.toString() &&
-                          !comment.isDeleted
-                      );
-
-                      return (
-                        <span
-                          key={globalSentenceIndex}
-                          id={`word-${globalSentenceIndex}`}
-                          style={{ cursor: 'pointer', position: 'relative' }}
-                          onContextMenu={(e) => handleRightClick(e, sectionIndex, globalSentenceIndex)}
-                        >
-                          {sentence.value.html + ' '}
-                          {existingComment && (
-                            <span>📋</span>
-                          )}
-                          {showInput &&
-                            selectedIndex &&
-                            selectedIndex.sectionIndex === sectionIndex &&
-                            selectedIndex.sentenceIndex === globalSentenceIndex && (
-                              <div className='add-comment-container'>
-                                <textarea
-                                  value={currentComment}
-                                  onChange={(e) => setCurrentComment(e.target.value)}
-                                  placeholder="Add a comment..."
-                                />
-                                <button onClick={() => handleTakenote(existingComment)}
-                                  style={{ backgroundColor: "green" }}>
-                                  Take Note
-                                </button>
-                                <button onClick={() => setShowInput(false)}
-                                  style={{ backgroundColor: "red" }}>
-                                  Cancel</button>
-                                <button style={{ backgroundColor: "#FF0000" }}
-                                  onClick={() => handleDeleteComment(existingComment)}
-                                  disabled={!existingComment}>
-                                  Xoá</button>
-                              </div>
-                            )}
-                        </span>
-                      );
-                    })}
-                  </div>
-                );
-              })}
-
+                          const existingComment = comments.find(
+                            (comment) =>
+                              comment.sentenceIndex === globalSentenceIndex.toString() &&
+                              !comment.isDeleted
+                          );
+                          return (
+                            <span
+                              key={globalSentenceIndex}
+                              id={`word-${globalSentenceIndex}`}
+                              style={{ cursor: 'pointer', position: 'relative' }}
+                              onContextMenu={(e) => handleRightClick(e, sectionIndex, globalSentenceIndex, sentence.value.html)}
+                            >
+                              {sentence.value.html + ' '}
+                              {existingComment && (
+                                <span>📋</span>
+                              )}
+                              {showInput &&
+                                selectedIndex &&
+                                selectedIndex.sectionIndex === sectionIndex &&
+                                selectedIndex.sentenceIndex === globalSentenceIndex && (
+                                  <div className='add-comment-container'>
+                                    <textarea
+                                      value={currentComment}
+                                      onChange={(e) => setCurrentComment(e.target.value)}
+                                      placeholder="Add a comment..."
+                                    />
+                                    <button onClick={() => handleTakenote(sentence.value.html, existingComment)}
+                                      style={{ backgroundColor: "green" }}>
+                                      Take Note
+                                    </button>
+                                    <button onClick={() => setShowInput(false)}
+                                      style={{ backgroundColor: "red" }}>
+                                      Cancel</button>
+                                    <button style={{ backgroundColor: "#FF0000" }}
+                                      onClick={() => handleDeleteComment(existingComment)}
+                                      disabled={!existingComment}>
+                                      Xoá</button>
+                                  </div>
+                                )}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className='transcript-box'>
+              <div className='transcript'>
+                <div>
+                  {transcript.transcriptSections.map((section, sectionIndex) => {
+                    return (
+                      <div key={sectionIndex} className='transcript-section'>
+                        <h2>Section {sectionIndex + 1}</h2>
+                        {section.transcriptSentences.map((sentence, sentenceIndexInSection) => {
+                          // Tính toán chỉ số toàn cục cho sentence
+                          const globalSentenceIndex = section.transcriptSentences.reduce(
+                            (acc, curr, idx) => acc + (idx < sentenceIndexInSection ? 1 : 0),
+                            0
+                          ) + sectionIndex * section.transcriptSentences.length;
+                          return (
+                            <span
+                              key={globalSentenceIndex}
+                              id={`word-${globalSentenceIndex}`}
+                              style={{ cursor: 'pointer', position: 'relative' }}
+                              onContextMenu={(e) => handleRightClick(e, sectionIndex, globalSentenceIndex)}
+                            >
+                              {sentence.value.html + ' '}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
       <div className="staff-comments-side">
-        <div className="staff-comments">
-          <h3>Staff Comments</h3>
-          <div className="comment">
-            {comments.map((comment) => (
-              <ul key={comment.id}>
-                <li>Staff: {profile.fullName}</li>
-                <li>{new Date(comment.createdAt).toLocaleDateString()}</li>
-                <li>Đoạn: {comment.targetText}</li>
-                <li>Feedback: {comment.feedback}</li>
-                <br />
-              </ul>
-            ))}
-          </div>
-          <div className="summary-note">
-            <h4>Ghi chú tổng:</h4>
-            <textarea placeholder="Ghi chú ở đây..." className="comment-input" readOnly value={summaryNote}></textarea>
-            <div className="status-buttons">
-              <button style={{ backgroundColor: "#f95700" }}
-                onClick={handleNotAchieveButton}>
-                Chưa đạt</button>
-              <button style={{ backgroundColor: "green" }}
-                onClick={handleAchieveButton}>
-                Đạt</button>
+        {mode === 'comment' ? (
+          <div className="staff-comments">
+            <h3>Staff Comments</h3>
+            <div className="comment">
+              {comments.map((comment) => (
+                <ul key={comment.id}>
+                  <li>Staff: {profile.fullName}</li>
+                  <li>{new Date(comment.createdAt).toLocaleDateString()}</li>
+                  <li>Đoạn: {comment.targetText}</li>
+                  <li>Feedback: {comment.feedback}</li>
+                  <br />
+                </ul>
+              ))}
             </div>
-            <div className="status-buttons">
-              <button style={{ backgroundColor: "#f95700" }}
-                onClick={confirmReject} disabled={summaryNote === "Đạt"}>Từ Chối</button>
-              <button style={{ backgroundColor: "#007bff" }}
-                onClick={confirmApprove} disabled={summaryNote === "Chưa Đạt"}>Chấp Thuận</button>
+            <div className="summary-note">
+              <h4>Ghi chú tổng:</h4>
+              <textarea placeholder="Ghi chú ở đây..." className="comment-input" readOnly value={summaryNote}></textarea>
+              <div className="status-buttons">
+                <button style={{ backgroundColor: "#f95700" }}
+                  onClick={handleNotAchieveButton}>
+                  Chưa đạt</button>
+                <button style={{ backgroundColor: "green" }}
+                  onClick={handleAchieveButton}>
+                  Đạt</button>
+              </div>
+              <div className="status-buttons">
+                <button style={{ backgroundColor: "#f95700" }}
+                  onClick={confirmReject} disabled={summaryNote === "Đạt"}>Từ Chối</button>
+                <button style={{ backgroundColor: "#007bff" }}
+                  onClick={confirmApprove} disabled={summaryNote === "Chưa Đạt"}>Chấp Thuận</button>
+              </div>
             </div>
           </div>
-        </div>
+        ) : (
+          <div className='plagiarism-container'>
+            <div className='plagiarism-side'>
+              {!isChecked ? (
+                <>
+                  <p>Chưa có kết quả kiểm tra</p>
+                  <button className='check-plagiarism' onClick={handleCheckPlagiarism}>
+                    Kiểm tra ngay
+                  </button>
+                </>
+              ) : (
+                <div>
+                  <h3>Kết quả kiểm tra đạo văn</h3>
+                  {plagiarismResults ? (
+                    <div className='comment'>
+                      <ul>
+                        {plagiarismResults.map((result, index) => (
+                          <li key={index}>{result}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ) : (
+                    <p>Không có kết quả nào được tìm thấy.</p>
+                  )}
+                  <button className='delete-results' onClick={handleDeleteResults}>
+                    Xóa kết quả
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

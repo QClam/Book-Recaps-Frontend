@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-// import { sampleData } from './ContentItems';
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Hourglass } from "react-loader-spinner";
-import Pagination from '@mui/material/Pagination';
+import Pagination from "@mui/material/Pagination";
 
 import { fetchProfile } from "../Auth/Profile";
 import "./Content.scss";
 import "../Loading.scss";
 
-// function truncateText(text, maxLength) {
-//   if (text.length > maxLength) {
-//     return text.substring(0, maxLength) + '...';
-//   }
-//   return text;
-// }
+function truncateText(text, maxLength) {
+  if (text.length > maxLength) {
+    return text.substring(0, maxLength) + '...';
+  }
+  return text;
+}
 
 function RecapsList() {
   const [contentItems, setContentItems] = useState([]);
@@ -30,10 +29,14 @@ function RecapsList() {
     comments: "",
   });
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+
   const token = localStorage.getItem("access_token");
   const navigate = useNavigate();
 
   const recapsPerPage = 5;
+  const maxLength = 150;
 
   const fetchRecaps = async () => {
     try {
@@ -55,11 +58,14 @@ function RecapsList() {
           let updatedRecap = { ...recap };
 
           // Initial check for status from recapVersions array
-          if (recap.recapVersions?.$values && recap.recapVersions.$values.length > 0) {
-            updatedRecap.currentVersionStatus = recap.recapVersions.$values[0].status;
+          if (
+            recap.recapVersions?.$values &&
+            recap.recapVersions.$values.length > 0
+          ) {
+            updatedRecap.currentVersionStatus =
+              recap.recapVersions.$values[0].status;
             updatedRecap.recapVersionId = recap.recapVersions.$values[0].id;
             // console.log("recapVersionId: ", updatedRecap.recapVersionId);
-
           } else {
             updatedRecap.currentVersionStatus = "No Version";
             updatedRecap.recapVersionId = "No ID";
@@ -68,7 +74,9 @@ function RecapsList() {
           // Fetch version status from currentVersionId if available
           if (recap.currentVersionId) {
             try {
-              const versionData = await fetchRecapVersion(recap.currentVersionId);
+              const versionData = await fetchRecapVersion(
+                recap.currentVersionId
+              );
               if (versionData.data?.status) {
                 updatedRecap.currentVersionStatus = versionData.data.status; // Overwrite with current version status if available
               }
@@ -78,7 +86,7 @@ function RecapsList() {
             }
           }
 
-          // Fetch contributor data
+          // Fetch contributor
           if (recap.userId) {
             try {
               const contributorData = await fetchContributor(recap.userId);
@@ -186,20 +194,21 @@ function RecapsList() {
 
   const fetchReview = async () => {
     try {
-      const response = await axios.get(`https://160.25.80.100:7124/api/review/getallreview`,
+      const response = await axios.get(
+        `https://160.25.80.100:7124/api/review/getallreview`,
         {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         }
-      )
+      );
       const reviews = response.data.data.$values;
       console.log("Reviews: ", reviews);
-      setReview(reviews)
+      setReview(reviews);
     } catch (error) {
       console.error("Error fetching review:", error);
     }
-  }
+  };
 
   if (loading) {
     return (
@@ -217,21 +226,49 @@ function RecapsList() {
     );
   }
 
-  const displayRecaps = contentItems.slice((currentPage - 1) * recapsPerPage, currentPage * recapsPerPage)
+  //Filter
+  const filteredRecaps = contentItems.filter((item) => {
+    const search = item.book?.title
+      .toLowerCase()
+      .includes(searchQuery.toLocaleLowerCase());
+    const status = selectedStatus
+      ? item.currentVersionStatus === parseInt(selectedStatus)
+      : true;
+    return search && status;
+  });
+
+  const displayRecaps = filteredRecaps.slice(
+    (currentPage - 1) * recapsPerPage,
+    currentPage * recapsPerPage
+  );
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
-  }
+  };
 
   return (
     <div className="content-container">
       <div>
         <h2>Nội dung của Contributor</h2>
       </div>
+      <div className="search-filter-container">
+        <input
+          type="text"
+          placeholder="Tìm theo cuốn sách..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
+          <option value="">Tất cả</option>
+          <option value="1">Pending</option>
+          <option value="2">Approved</option>
+          <option value="3">Reject</option>
+        </select>
+      </div>
       <div className="content-list">
         <table className="content-table">
           <thead>
             <tr>
-              <th>Tên Bản Recap</th>
+              <th>Tên bản Recap</th>
               <th>Tên cuốn sách</th>
               <th>Mô tả cuốn sách</th>
               <th>Tên Contributor</th>
@@ -246,7 +283,7 @@ function RecapsList() {
               <tr key={val.id}>
                 <td>{val.name}</td>
                 <td>{val.book?.title}</td>
-                <td>{val.book?.description}</td>
+                <td>{truncateText(val.book?.description, maxLength)}</td>
                 <td>{val.contributor?.fullName}</td>
                 <td>{new Date(val.createdAt).toLocaleDateString()}</td>
                 <td>
@@ -258,20 +295,26 @@ function RecapsList() {
                     Tạo Review
                   </button>
                 </td>
-                  <td>
+                <td>
                   {review
                     .filter((rev) => rev.recapVersionId === val.recapVersionId)
                     .map((rev) => (
                       <button
                         key={rev.id}
                         className="button"
-                        style={{ backgroundColor: "#007bff", color: "#fff", marginLeft: 5 }}
-                        onClick={() => navigate(`/review/content_version/${rev.id}`)}
+                        style={{
+                          backgroundColor: "#007bff",
+                          color: "#fff",
+                          marginLeft: 5,
+                        }}
+                        onClick={() =>
+                          navigate(`/review/content_version/${rev.id}`)
+                        }
                       >
                         Xem Review
                       </button>
                     ))}
-                  </td>
+                </td>
                 <td>
                   {val.currentVersionStatus === 1 ? (
                     <button

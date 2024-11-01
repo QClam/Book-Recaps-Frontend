@@ -1,46 +1,56 @@
-.highlighted {
-  background-color: rgb(143, 228, 237);
-  font-weight: bold;
-  color: black;
-}
-
 .audio-grid {
   display: grid;
   grid-template-columns: 2fr 1fr;
   gap: 20px;
   padding: 20px;
   color: #f0f0f0;
-  height: 100vh; /* Chiều cao toàn màn hình */
+  height: 100vh;
 
-  .transcript-container {
+  .transcript-section-container {
     display: flex;
     flex-direction: column;
+    gap: 15px;
     background-color: #1a1a1a;
-    padding: 20px;
+    padding: 15px;
     border-radius: 8px;
     border: 1px solid #444;
     overflow-y: auto;
-    height: 100%; /* Chiều cao tối đa */
+    height: 100%;
 
-    .transcript-box {
-      overflow-x: hidden;
+    .button-group {
+      display: flex;
+      gap: 10px;
+    }
+
+    .transcript-container {
+      display: flex;
+      flex-direction: column;
+      background-color: #1a1a1a;
+      padding: 20px;
+      border-radius: 8px;
+      border: 1px solid #444;
       overflow-y: auto;
-      max-height: calc(100vh - 150px); /* Đảm bảo không vượt quá màn hình */
-      padding: 15px;
+      height: 100%;
+
+      .transcript-box {
+        overflow-x: hidden;
+        overflow-y: auto;
+        max-height: calc(100vh - 150px);
+        padding: 15px;
+      }
     }
   }
 }
 
 .staff-comments-side {
-  
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
+  // display: flex;
+  // justify-content: center;
+  // align-items: center;
   background-color: #222;
   padding: 20px;
   border-radius: 8px;
   border: 1px solid #444;
-  height: 100%; /* Chiều cao toàn màn hình */
+  height: 100%;
 
   .staff-comments {
     border-bottom: 1px solid #444;
@@ -64,7 +74,6 @@
   }
 
   .summary-note {
-
     .status-buttons {
       display: flex;
       justify-content: space-between;
@@ -72,14 +81,14 @@
       margin-bottom: 10px;
     }
     button {
-      transition: transform 0.3s ease; /* Smooth animation */
+      transition: transform 0.3s ease;
 
       &:hover {
-        transform: scale(1.1); /* Scale the button to 110% */
+        transform: scale(1.1);
       }
       &:disabled {
-        cursor: not-allowed; 
-        opacity: 0.9; 
+        cursor: not-allowed;
+        opacity: 0.9;
       }
     }
   }
@@ -93,6 +102,23 @@
     border-radius: 4px;
     padding: 8px;
     resize: none;
+  }
+
+  .plagiarism-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    padding: 20px;
+    border-radius: 8px;
+
+    .plagiarism-side {
+      text-align: center;
+
+      .check-plagiarism {
+        margin-top: 10px;
+      }
+    }
   }
 }
 
@@ -128,14 +154,14 @@ li {
     color: #fff;
     cursor: pointer;
     font-size: 14px;
-    transition: transform 0.3s ease; /* Smooth animation */
+    transition: transform 0.3s ease;
 
     &:hover {
-      transform: scale(1.1); /* Scale the button to 110% */
+      transform: scale(1.1);
     }
     &:disabled {
-      cursor: not-allowed; 
-      opacity: 0.9; 
+      cursor: not-allowed;
+      opacity: 0.9;
     }
   }
 }
