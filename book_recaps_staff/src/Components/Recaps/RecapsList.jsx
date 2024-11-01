@@ -160,7 +160,7 @@ function RecapsList() {
       const newReview = {
         staffId: reviewForm.staffId,
         recapVersionId: recapVersionId,
-        comments: "Chưa đạt",
+        comments: "Chưa Đạt",
       };
 
       const response = await axios.post(

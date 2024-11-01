@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Link, useParams } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { Link, useParams } from 'react-router-dom';
 import { Hourglass } from 'react-loader-spinner';
+
+import { fetchProfile } from '../Auth/Profile';
 import './ReviewNote.scss';
 
 function Review() {
@@ -19,6 +21,7 @@ function Review() {
   const [currentComment, setCurrentComment] = useState('');
   const [showInput, setShowInput] = useState(false);
   const [recapVersionId, setRecapVersionId] = useState(null);
+  const [profile, setProfile] = useState([])
 
   const token = localStorage.getItem('access_token');
 
@@ -160,6 +163,9 @@ function Review() {
 
   useEffect(() => {
     fetchData();
+    fetchProfile(token, (profileData) => {
+      setProfile(profileData)
+    });
     fetchComment(id)
   }, [id]);
 
@@ -174,7 +180,7 @@ function Review() {
       status: 2
     };
     try {
-      const response = await axios.put(`https://160.25.80.100:7124/change-recapversion-status`, reqBody ,
+      const response = await axios.put(`https://160.25.80.100:7124/change-recapversion-status`, reqBody,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -202,6 +208,49 @@ function Review() {
       if (result.isConfirmed) {
         handleApprove();
         Swal.fire('Đã chấp thuận!', 'Nội dung này đã được phê duyệt.', 'success');
+      }
+    });
+  };
+
+  const handleReject = async() => {
+    if (!recapVersionId) {
+      console.error("recapVersionId is not defined");
+      return;
+    }
+
+    const reqBody = {
+      recapVersionId: recapVersionId,
+      status: 3
+    };
+    try {
+      const response = await axios.put(`https://160.25.80.100:7124/change-recapversion-status`, reqBody,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      setRecapStatus(response.data);
+    } catch (error) {
+      console.log('Error updating status', error);
+      Swal.fire('Error', 'Failed to update status.', 'error');
+    }
+  }
+
+  const confirmReject = () => {
+    Swal.fire({
+      title: 'Bạn đã chắc chắn chưa?',
+      text: 'Bạn thực sự muốn từ chối Nội dung này?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Có, từ chối!',
+      cancelButtonText: 'Hủy',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        handleReject();
+        Swal.fire('Đã từ chối!', 'Nội dung này đã bị từ chối.', 'success');
       }
     });
   };
@@ -250,14 +299,14 @@ function Review() {
     const newComment = {
       reviewId: id,
       targetText: targetText,
-      startIndex: startIndex, 
+      startIndex: startIndex,
       endIndex: (targetText.length - 1).toString(),
-      sentenceIndex: sentenceIndex.toString(), // Use sentenceIndex
+      sentenceIndex: sentenceIndex.toString(),
       feedback: currentComment,
     };
 
     try {
-      // Check existing comment
+      // Kiểm tra nếu đã có comment thì dùng PUT, chưa có thì dùng POST
       if (existingComment) {
         await axios.put(`https://160.25.80.100:7124/api/reviewnote/updatereviewnote/${existingComment.id}`, newComment, {
           headers: {
@@ -271,9 +320,9 @@ function Review() {
           }
         });
       }
-      fetchComment(id); // Refresh comments
+      fetchComment(id);
       setCurrentComment('');
-      setShowInput(false); 
+      setShowInput(false);
     } catch (error) {
       console.error('Error saving comment:', error);
     }
@@ -288,13 +337,13 @@ function Review() {
       (comment) => comment.sentenceIndex === String(sentenceIndex) && !comment.isDeleted
     );
 
-    // Log để kiểm tra
-    console.log("Current Sentence Index: ", sentenceIndex);
-    console.log("Comments: ", comments);
-    console.log("Existing Comment: ", existingComment);
+    // // Log để kiểm tra
+    // console.log("Current Sentence Index: ", sentenceIndex);
+    // console.log("Comments: ", comments);
+    // console.log("Existing Comment: ", existingComment);
 
     if (existingComment) {
-      setCurrentComment(existingComment.feedback); // Show existing feedback
+      setCurrentComment(existingComment.feedback); // Hiển thị comment hiện tại
       setShowInput(true);
     } else {
       setCurrentComment('');
@@ -338,13 +387,13 @@ function Review() {
       console.error("recapVersionId is not defined");
       return;
     }
-    
+
     const reqBody = {
       id: id,
       recapVersionId: recapVersionId,
       comments: "Đạt"
     };
-    
+
     try {
       const response = await axios.put(`https://160.25.80.100:7124/api/review/updatereview/${id}`, reqBody, {
         headers: {
@@ -456,9 +505,9 @@ function Review() {
                                 <button onClick={() => setShowInput(false)}
                                   style={{ backgroundColor: "red" }}>
                                   Cancel</button>
-                                <button style={{ backgroundColor: "#FF0000" }} 
-                                onClick={() => handleDeleteComment(existingComment)}
-                                disabled={!existingComment}>
+                                <button style={{ backgroundColor: "#FF0000" }}
+                                  onClick={() => handleDeleteComment(existingComment)}
+                                  disabled={!existingComment}>
                                   Xoá</button>
                               </div>
                             )}
@@ -480,7 +529,7 @@ function Review() {
           <div className="comment">
             {comments.map((comment) => (
               <ul key={comment.id}>
-                <li>Staff Name</li>
+                <li>Staff: {profile.fullName}</li>
                 <li>{new Date(comment.createdAt).toLocaleDateString()}</li>
                 <li>Đoạn: {comment.targetText}</li>
                 <li>Feedback: {comment.feedback}</li>
@@ -492,15 +541,19 @@ function Review() {
             <h4>Ghi chú tổng:</h4>
             <textarea placeholder="Ghi chú ở đây..." className="comment-input" readOnly value={summaryNote}></textarea>
             <div className="status-buttons">
-              <button style={{ backgroundColor: "red" }}
+              <button style={{ backgroundColor: "#f95700" }}
                 onClick={handleNotAchieveButton}>
                 Chưa đạt</button>
               <button style={{ backgroundColor: "green" }}
                 onClick={handleAchieveButton}>
-                  Đạt</button>
+                Đạt</button>
             </div>
-            <button style={{ backgroundColor: "#007bff" }}
-              onClick={confirmApprove} disabled={summaryNote === "Chưa Đạt"}>Phê Duyệt Nội Dung</button>
+            <div className="status-buttons">
+              <button style={{ backgroundColor: "#f95700" }}
+                onClick={confirmReject} disabled={summaryNote === "Đạt"}>Từ Chối</button>
+              <button style={{ backgroundColor: "#007bff" }}
+                onClick={confirmApprove} disabled={summaryNote === "Chưa Đạt"}>Chấp Thuận</button>
+            </div>
           </div>
         </div>
       </div>
