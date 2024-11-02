@@ -118,6 +118,32 @@
       .check-plagiarism {
         margin-top: 10px;
       }
+
+      .plagiarism-result {
+
+        .progress-container {
+          margin-top: 5px;
+
+          .progress-bar {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: 5px;
+
+            .progress {
+              height: 24px; /* Adjust height as needed */
+              background-color: #c49c9c; /* Color of the progress bar */
+              transition: width 0.3s ease; /* Smooth transition for the width */
+
+              .percentage {
+                font-weight: bold; /* Make percentage text bold */
+                color: #333; /* You can change the color as needed */
+              }
+            }
+          }
+        }
+      }
     }
   }
 }

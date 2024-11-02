@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import Swal from 'sweetalert2';
 import { Link, useParams } from 'react-router-dom';
 import { Hourglass } from 'react-loader-spinner';
 
 import { fetchProfile } from '../Auth/Profile';
+import api from '../Auth/AxiosInterceptors';
 import './ReviewNote.scss';
 
 function Review() {
@@ -22,8 +22,9 @@ function Review() {
   const [showInput, setShowInput] = useState(false);
   const [recapVersionId, setRecapVersionId] = useState(null);
   const [profile, setProfile] = useState([]);
-  const [isChecked, setIsChecked] = useState(false);
   const [plagiarismResults, setPlagiarismResults] = useState(null);
+  const [hasResults, setHasResults] = useState(false);
+  const [metadata, setMetadata] = useState(null); // State to store metadata
 
   const [mode, setMode] = useState('comment');
 
@@ -35,8 +36,8 @@ function Review() {
 
   const fetchContent = async () => {
     try {
-      const response = await axios.get(
-        `https://160.25.80.100:7124/api/review/getreviewbyid/${id}`,
+      const response = await api.get(
+        `/api/review/getreviewbyid/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -56,8 +57,8 @@ function Review() {
 
   const fetchRecapVersion = async (recapVersionId) => {
     try {
-      const response = await axios.get(
-        `https://160.25.80.100:7124/version/${recapVersionId}`,
+      const response = await api.get(
+        `/version/${recapVersionId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -78,8 +79,8 @@ function Review() {
 
   const fetchRecapDetail = async (recapId) => {
     try {
-      const response = await axios.get(
-        `https://160.25.80.100:7124/getrecapbyId/${recapId}`,
+      const response = await api.get(
+        `/getrecapbyId/${recapId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -97,8 +98,8 @@ function Review() {
 
   const fetchBookRecap = async (bookId) => {
     try {
-      const response = await axios.get(
-        `https://160.25.80.100:7124/api/book/getbookbyid/${bookId}`,
+      const response = await api.get(
+        `/api/book/getbookbyid/${bookId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -114,7 +115,7 @@ function Review() {
 
   const fetchTranscript = async (transcriptUrl) => {
     try {
-      const response = await axios.get(transcriptUrl, {
+      const response = await api.get(transcriptUrl, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -129,7 +130,7 @@ function Review() {
 
   const fetchComment = async (reviewId) => {
     try {
-      const response = await axios.get(`https://160.25.80.100:7124/api/reviewnote/getallnotebyreviewid/${reviewId}`,
+      const response = await api.get(`/api/reviewnote/getallnotebyreviewid/${reviewId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -187,7 +188,7 @@ function Review() {
       status: 2
     };
     try {
-      const response = await axios.put(`https://160.25.80.100:7124/change-recapversion-status`, reqBody,
+      const response = await api.put(`/change-recapversion-status`, reqBody,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -230,7 +231,7 @@ function Review() {
       status: 3
     };
     try {
-      const response = await axios.put(`https://160.25.80.100:7124/change-recapversion-status`, reqBody,
+      const response = await api.put(`/change-recapversion-status`, reqBody,
         {
           headers: {
             Authorization: `Bearer ${token}`
@@ -262,54 +263,6 @@ function Review() {
     });
   };
 
-  const handleTakenote = async (targetText, existingComment) => {
-    if (!selectedIndex) {
-        console.error("selectedIndex is not defined");
-        return;
-    }
-
-    const { sectionIndex, sentenceIndex } = selectedIndex;
-    const selectedSection = transcript.transcriptSections[sectionIndex];
-
-    if (!selectedSection) {
-        console.error("selectedSection is undefined!");
-        return;
-    }
-
-    // Chúng ta đã có targetText từ handleRightClick
-    console.log("targetText: ", targetText);
-
-    const newComment = {
-        reviewId: id,
-        targetText: targetText,
-        startIndex: '0',
-        endIndex: (targetText.length - 1).toString(),
-        sentenceIndex: sentenceIndex.toString(),
-        feedback: currentComment,
-    };
-
-    try {
-        if (existingComment) {
-            await axios.put(`https://160.25.80.100:7124/api/reviewnote/updatereviewnote/${existingComment.id}`, newComment, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-        } else {
-            await axios.post(`https://160.25.80.100:7124/api/reviewnote/createreviewnote`, newComment, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-        }
-        fetchComment(id);
-        setCurrentComment('');
-        setShowInput(false);
-    } catch (error) {
-        console.error('Error saving comment:', error);
-    }
-}; 
-
   const handleRightClick = (e, sectionIndex, sentenceIndex, targetHtml) => {
     e.preventDefault();
     setSelectedIndex({ sectionIndex, sentenceIndex });
@@ -319,10 +272,10 @@ function Review() {
     );
 
     // Log để kiểm tra
-    console.log("Current Sentence Index: ", sentenceIndex);
+    // console.log("Current Sentence Index: ", sentenceIndex);
+    // console.log("Comments: ", comments);
+    // console.log("Existing Comment: ", existingComment);
     console.log("Target HTML: ", targetHtml); // Log đoạn HTML đã được target
-    console.log("Comments: ", comments);
-    console.log("Existing Comment: ", existingComment);
 
     if (existingComment) {
       setCurrentComment(existingComment.feedback); // Hiển thị comment hiện tại
@@ -331,8 +284,55 @@ function Review() {
       setCurrentComment('');
       setShowInput(true);
     }
-};
+  };
 
+  const handleTakenote = async (targetText, existingComment) => {
+    if (!selectedIndex) {
+      console.error("selectedIndex is not defined");
+      return;
+    }
+
+    const { sectionIndex, sentenceIndex } = selectedIndex;
+    const selectedSection = transcript.transcriptSections[sectionIndex];
+
+    if (!selectedSection) {
+      console.error("selectedSection is undefined!");
+      return;
+    }
+
+    // Chúng ta đã có targetText từ handleRightClick
+    console.log("targetText: ", targetText);
+
+    const newComment = {
+      reviewId: id,
+      targetText: targetText,
+      startIndex: '0',
+      endIndex: (targetText.length - 1).toString(),
+      sentenceIndex: sentenceIndex.toString(),
+      feedback: currentComment,
+    };
+
+    try {
+      if (existingComment) {
+        await api.put(`/api/reviewnote/updatereviewnote/${existingComment.id}`, newComment, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+      } else {
+        await api.post(`/api/reviewnote/createreviewnote`, newComment, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+      }
+      fetchComment(id);
+      setCurrentComment('');
+      setShowInput(false);
+    } catch (error) {
+      console.error('Error saving comment:', error);
+    }
+  };
 
   const handleDeleteComment = async (existingComment) => {
     Swal.fire({
@@ -347,7 +347,7 @@ function Review() {
     }).then(async (result) => {
       if (result.isConfirmed) {
         try {
-          const response = await axios.delete(`https://160.25.80.100:7124/api/reviewnote/delete/${existingComment.id}`,
+          const response = await api.delete(`/api/reviewnote/delete/${existingComment.id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`
@@ -378,7 +378,7 @@ function Review() {
     };
 
     try {
-      const response = await axios.put(`https://160.25.80.100:7124/api/review/updatereview/${id}`, reqBody, {
+      const response = await api.put(`/api/review/updatereview/${id}`, reqBody, {
         headers: {
           Authorization: `Bearer ${token}`
         },
@@ -403,7 +403,7 @@ function Review() {
     };
 
     try {
-      const response = await axios.put(`https://160.25.80.100:7124/api/review/updatereview/${id}`, reqBody, {
+      const response = await api.put(`/api/review/updatereview/${id}`, reqBody, {
         headers: {
           Authorization: `Bearer ${token}`
         },
@@ -416,29 +416,28 @@ function Review() {
   };
 
   const handleCheckPlagiarism = async () => {
-    // Simulate an API call to check plagiarism
-    const results = await fetchPlagiarismResults(); // Replace with your actual API call
-    if (results) {
-      setPlagiarismResults(results);
-      setIsChecked(true);
+    try {
+      const response = await api.get('https://66eb9ee32b6cf2b89c5b1714.mockapi.io/Plagiarism');
+      const data = response.data; // Define data here
+
+      if (data.length > 0) {
+        setPlagiarismResults(data[0].plagiarism_result); // Set plagiarism results
+        setMetadata(data[0].exsiting_recap_version_metadata[0]); // Set metadata
+        setHasResults(true);
+      } else {
+        alert('Không có kết quả kiểm tra.');
+        setHasResults(false);
+      }
+    } catch (error) {
+      console.error('Error fetching plagiarism results:', error);
     }
   };
 
   const handleDeleteResults = () => {
     // Reset the state to remove plagiarism results
     setPlagiarismResults(null);
-    setIsChecked(false);
+    setHasResults(false);
   };
-
-  const fetchPlagiarismResults = async () => {
-    // Simulate an API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve(['Kết quả 1: Tìm thấy', 'Kết quả 2: Không tìm thấy']);
-        // You can replace this with your actual API response logic
-      }, 2000); // Simulate a delay
-    });
-  }
 
   if (loading) {
     return (
@@ -606,7 +605,7 @@ function Review() {
         ) : (
           <div className='plagiarism-container'>
             <div className='plagiarism-side'>
-              {!isChecked ? (
+              {!hasResults ? (
                 <>
                   <p>Chưa có kết quả kiểm tra</p>
                   <button className='check-plagiarism' onClick={handleCheckPlagiarism}>
@@ -620,7 +619,24 @@ function Review() {
                     <div className='comment'>
                       <ul>
                         {plagiarismResults.map((result, index) => (
-                          <li key={index}>{result}</li>
+                          <div key={index} className='plagiarism-result'>
+                            <p><strong>Câu:</strong> {result.sentence}</p>
+                            <p><strong>Câu tương tự:</strong> {result.existing_sentence}</p>
+                            <div className="progress-container">
+                              <div className="progress-bar">
+                                <div className="progress" style={{ width: `${result.similarity_score * 100}%` }}><span className="percentage">
+                                  {Math.round(result.similarity_score * 100)}%
+                                </span></div>
+                              </div>
+                            </div>
+                            {metadata && (
+                              <>
+                                <p><strong>Nhà cung cấp:</strong> {metadata.contributor_full_name}</p>
+                                <p><strong>Tiêu đề sách:</strong> {metadata.book_title}</p>
+                              </>
+                            )}
+                            <hr />
+                          </div>
                         ))}
                       </ul>
                     </div>

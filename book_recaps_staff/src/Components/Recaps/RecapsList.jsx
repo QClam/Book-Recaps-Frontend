@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { Hourglass } from "react-loader-spinner";
 import Pagination from "@mui/material/Pagination";
 
 import { fetchProfile } from "../Auth/Profile";
+import api from '../Auth/AxiosInterceptors'
 import "./Content.scss";
 import "../Loading.scss";
 
@@ -40,8 +40,8 @@ function RecapsList() {
 
   const fetchRecaps = async () => {
     try {
-      const response = await axios.get(
-        "https://160.25.80.100:7124/api/recap/Getallrecap",
+      const response = await api.get(
+        "/api/recap/Getallrecap",
         {
           headers: {
             Accept: "*/*",
@@ -129,8 +129,8 @@ function RecapsList() {
   // Fetch version details
   const fetchRecapVersion = async (currentVersionId) => {
     try {
-      const response = await axios.get(
-        `https://160.25.80.100:7124/version/${currentVersionId}`,
+      const response = await api.get(
+        `/version/${currentVersionId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -147,8 +147,8 @@ function RecapsList() {
 
   const fetchContributor = async (userId) => {
     try {
-      const response = await axios.get(
-        `https://160.25.80.100:7124/api/users/get-user-account-byID?userId=${userId}`,
+      const response = await api.get(
+        `/api/users/get-user-account-byID?userId=${userId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -171,8 +171,8 @@ function RecapsList() {
         comments: "Chưa Đạt",
       };
 
-      const response = await axios.post(
-        "https://160.25.80.100:7124/api/review/createreview",
+      const response = await api.post(
+        "/api/review/createreview",
         newReview,
         {
           headers: {
@@ -194,8 +194,8 @@ function RecapsList() {
 
   const fetchReview = async () => {
     try {
-      const response = await axios.get(
-        `https://160.25.80.100:7124/api/review/getallreview`,
+      const response = await api.get(
+        `/api/review/getallreview`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

@@ -1,42 +1,48 @@
-import React, { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom';
-import api from '../Auth/AxiosInterceptors';
-import './Appeal.scss'
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "../Auth/AxiosInterceptors";
+import "./Appeal.scss";
 
 function AppealList() {
-
     const [appeals, setAppeal] = useState([]);
-    const [reviews, setReview] = useState([]);
-
-    const token = localStorage.getItem("access_token");
+    const [users, setUsers] = useState([]);
 
     const navigate = useNavigate();
 
     const fetchAppeals = async () => {
         try {
-            const response = await api.get('/appeal/getallappeals', 
-                {
-                    headers: {
-                        Authorization: `Bearer ${token}`
-                    }
-                }
-            )
+            const response = await api.get("/api/appeal/getallappeals");
             const appeals = response.data.data.$values;
-            setAppeal(appeals)
-            console.log("Appeals: ", appeals);
-            
+            console.log(appeals);
+
+            setAppeal(appeals);
         } catch (error) {
             console.error("Error Fetching", error);
         }
-    }
+    };
+
+    const fetchUsers = async () => {
+        try {
+            const response = await api.get("/api/users/getalluser");
+            const users = response.data.$values;
+            setUsers(users);
+        } catch (error) { }
+    };
 
     useEffect(() => {
         fetchAppeals();
-    },[])
+        fetchUsers();
+    }, []);
+
+    // Tìm tên contributor hoặc staff theo ID
+    const getUserNameById = (id) => {
+        const user = users.find((user) => user.id === id);
+        return user ? user.fullName : "Chưa có Staff Response Kháng cáo này";
+    };
 
     return (
         <div>
-            <div className='content-list'>
+            <div className="content-list">
                 <h2>Danh sách Kháng cáo của Contributor</h2>
             </div>
             <div>
@@ -56,21 +62,47 @@ function AppealList() {
                     <tbody>
                         {appeals.map((val) => (
                             <tr key={val.id}>
-                                <td>{val.contributor}</td>
-                                <td>{val.staff}</td>
+                                <td>{getUserNameById(val.contributorId)}</td>
+                                <td>{getUserNameById(val.staffId)}</td>
                                 <td>{val.reason}</td>
                                 <td>{val.response}</td>
                                 <td>{new Date(val.createdAt).toLocaleDateString()}</td>
-                                <td><button onClick={() => navigate(`/review/content_version/${val.reviewId}`)}>Xem Review</button></td>
-                                <td><button onClick={() => navigate(`/appeal/response/${val.id}`)}>Phản hồi</button></td>
-                                <td>Under review</td>
+                                <td>
+                                    <button
+                                        onClick={() =>
+                                            navigate(`/review/content_version/${val.reviewId}`)
+                                        }
+                                    >
+                                        Xem Review
+                                    </button>
+                                </td>
+                                <td>
+                                    <button
+                                        onClick={() => navigate(`/appeal/response/${val.id}`)}
+                                    >
+                                        Phản hồi
+                                    </button>
+                                </td>
+                                <td>
+                                    {val.appealStatus === 1 ? (
+                                        <button style={{ backgroundColor: "#007bff" }}>
+                                            Under Review
+                                        </button>
+                                    ) : val.appealStatus === 2 ? (
+                                        <button style={{ backgroundColor: "green" }}>
+                                            Resolved
+                                        </button>
+                                    ) : (
+                                        <button>Unknow</button>
+                                    )}
+                                </td>
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
         </div>
-    )
+    );
 }
 
-export default AppealList
+export default AppealList;

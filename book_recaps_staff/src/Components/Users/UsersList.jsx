@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { Hourglass } from 'react-loader-spinner';
 import api from '../Auth/AxiosInterceptors';
 import Pagination from '@mui/material/Pagination';
@@ -20,10 +19,9 @@ function UsersList() {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await api.get('/users/getalluser',
+                const response = await api.get('/api/users/getalluser',
                     {
                         headers: {
-                            Accept : "*/*",
                             Authorization: `Bearer ${token}`
                         }
                     }
