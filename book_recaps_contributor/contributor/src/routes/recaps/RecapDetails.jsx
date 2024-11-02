@@ -12,7 +12,6 @@ import {
   useActionData,
   useAsyncValue,
   useLoaderData,
-  useNavigate,
   useNavigation
 } from "react-router-dom";
 import { getBookInfoByRecap } from "../fetch";
@@ -128,7 +127,6 @@ const RecapDetails = () => {
   const { recapVersions, bookInfo, recap } = useLoaderData();
   const actionData = useActionData();
   const navigation = useNavigation()
-  const navigate = useNavigate();
   const [ dialogVisible, setDialogVisible ] = useState(false);
   const { showToast } = useToast();
 
@@ -209,7 +207,16 @@ const RecapDetails = () => {
         <CustomBreadCrumb
           items={[ { label: "Recaps", path: routes.recaps }, { label: recap.name || "Recap details" } ]}/>
 
-        <Suspense>
+        <Suspense
+          fallback={
+            <div className="h-32 flex gap-2 justify-center items-center">
+              <div>
+                <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
+                                 fill="var(--surface-ground)" animationDuration=".5s"/>
+              </div>
+              <p>Loading book information...</p>
+            </div>
+          }>
           <Await resolve={bookInfo} errorElement={
             <div className="h-14 flex gap-2 justify-center items-center italic font-semibold text-gray-400">
               Error loading book info!
@@ -218,19 +225,6 @@ const RecapDetails = () => {
             <BookInfo/>
           </Await>
         </Suspense>
-
-        <div className="mb-4 flex justify-end">
-          <button
-            type="button"
-            className="flex justify-center items-center gap-1 px-5 py-2 font-semibold bg-indigo-600 text-white rounded hover:bg-indigo-800"
-            onClick={() => setDialogVisible(true)}
-          >
-            <TbPlus/>
-            <span>
-              Tạo version mới
-            </span>
-          </button>
-        </div>
 
         <Suspense
           fallback={
@@ -249,6 +243,19 @@ const RecapDetails = () => {
                 Error loading versions!
               </div>
             }>
+
+            <div className="mb-4 flex justify-end">
+              <button
+                type="button"
+                className="flex justify-center items-center gap-1 px-5 py-2 font-semibold bg-indigo-600 text-white rounded hover:bg-indigo-800"
+                onClick={() => setDialogVisible(true)}
+              >
+                <TbPlus/>
+                <span>
+                  Tạo version mới
+                </span>
+              </button>
+            </div>
             <ListRecapVersions/>
           </Await>
         </Suspense>

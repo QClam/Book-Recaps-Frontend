@@ -49,10 +49,33 @@ export function AuthProvider({ children }) {
     setReCaptchaTokens({ loginToken, signupToken });
   };
 
+  const reFetchReCaptchaTokens = async (action) => {
+    if (!executeRecaptcha) {
+      console.log('Execute recaptcha not yet available');
+      return;
+    }
+
+    if (action === "login") {
+      const loginToken = await executeRecaptcha("login");
+      setReCaptchaTokens({ ...reCaptchaTokens, loginToken });
+    }
+
+    if (action === "signup") {
+      const signupToken = await executeRecaptcha("signup");
+      setReCaptchaTokens({ ...reCaptchaTokens, signupToken });
+    }
+
+    if (!action) {
+      const loginToken = await executeRecaptcha("login");
+      const signupToken = await executeRecaptcha("signup");
+      setReCaptchaTokens({ loginToken, signupToken });
+    }
+  }
+
   const isAuthenticated = !!user;
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated, reCaptchaTokens }}>
+    <AuthContext.Provider value={{ user, login, logout, isAuthenticated, reCaptchaTokens, reFetchReCaptchaTokens }}>
       {children}
     </AuthContext.Provider>
   );

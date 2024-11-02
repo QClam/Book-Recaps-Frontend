@@ -1,7 +1,7 @@
 import { axiosInstance, axiosInstance2 } from "../../utils/axios";
 import { handleFetchError } from "../../utils/handleFetchError";
 import { Await, defer, json, useAsyncValue, useLoaderData, useNavigate } from "react-router-dom";
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Show from "../../components/Show";
 import { cn } from "../../utils/cn";
 import { ProgressSpinner } from "primereact/progressspinner";
@@ -11,6 +11,7 @@ import { Badge } from "primereact/badge";
 import { useToast } from "../../contexts/Toast";
 import { getBookInfoByRecap } from "../fetch";
 import CustomBreadCrumb from "../../components/CustomBreadCrumb";
+import { useDebounce } from "react-use";
 
 const getRecapVersion = async (versionId, request) => {
   try {
@@ -63,7 +64,16 @@ const RecapVersion = () => {
           { label: recapVersionData.versionName || "Version details" }
         ]}/>
 
-        <Suspense>
+        <Suspense
+          fallback={
+            <div className="h-32 flex gap-2 justify-center items-center">
+              <div>
+                <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
+                                 fill="var(--surface-ground)" animationDuration=".5s"/>
+              </div>
+              <p>Loading book information...</p>
+            </div>
+          }>
           <Await resolve={bookInfo} errorElement={
             <div className="h-14 flex gap-2 justify-center items-center italic font-semibold text-gray-400">
               Error loading book info!
@@ -103,7 +113,8 @@ const RecapVersion = () => {
 export default RecapVersion;
 
 const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
-  const [ loading, setLoading ] = useState(false);
+  const [ uploadingAudio, setUploadingAudio ] = useState(false);
+  const [ updatingName, setUpdatingName ] = useState(false);
   const navigate = useNavigate();
   const { showToast } = useToast();
 
@@ -111,24 +122,34 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
   useEffect(() => {
     let interval = null;
     const controller = new AbortController();
+    let isRequestActive = false; // Flag to track active requests
 
     if (recapVersionData.transcriptStatus === 1) {
       interval = setInterval(async () => {
-        try {
-          const result = await getRecapVersion(recapVersionData.id, controller);
-          setRecapVersionData({ ...result });
+        if (!isRequestActive) {
+          isRequestActive = true;
+          try {
+            const result = await getRecapVersion(recapVersionData.id, controller);
 
-          if (result.transcriptStatus !== 1) {
+            if (result.transcriptStatus !== 1) {
+              setRecapVersionData(ver => ({
+                ...ver,
+                transcriptStatus: result.transcriptStatus,
+                transcriptUrl: result.transcriptUrl
+              }));
+              clearInterval(interval);
+            }
+          } catch (error) {
+            console.error('Error polling for transcript status:', error);
+            showToast({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Error polling for transcript status. Please try upload audio again.',
+            });
             clearInterval(interval);
+          } finally {
+            isRequestActive = false; // Reset flag after request completes
           }
-        } catch (error) {
-          console.error('Error polling for transcript status:', error);
-          showToast({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Error polling for transcript status. Please try upload audio again.',
-          });
-          clearInterval(interval); // Optionally stop polling on error
         }
       }, 1500);
     }
@@ -140,8 +161,10 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
   }, [ recapVersionData.transcriptStatus ]);
 
   const handleUploadAudio = async (event) => {
+    if (uploadingAudio) return;
+
     try {
-      setLoading(true);
+      setUploadingAudio(true);
       const formData = new FormData();
       formData.append('audioFile', event.target.files[0]);
       formData.append('recapVersionId', recapVersionData.id);
@@ -160,13 +183,15 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
     } catch (error) {
       console.error('Error uploading file:', error);
     } finally {
-      setLoading(false);
+      setUploadingAudio(false);
     }
   };
 
   const handleGenerateAudio = async () => {
+    if (uploadingAudio) return;
+
     try {
-      setLoading(true);
+      setUploadingAudio(true);
       await axiosInstance.put('/generate-audio', {
         recapVersionId: recapVersionData.id
       });
@@ -184,13 +209,15 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
     } catch (error) {
       console.error('Error generating audio:', error);
     } finally {
-      setLoading(false);
+      setUploadingAudio(false);
     }
   }
 
   const handleUpdateName = async () => {
+    if (updatingName) return;
+
     try {
-      setLoading(true);
+      setUpdatingName(true);
       await axiosInstance2.put('/recap-versions/change-name/' + recapVersionData.id, {
         versionName: recapVersionData.versionName || ''
       });
@@ -208,11 +235,13 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
     } catch (error) {
       console.error('Error updating version name:', error);
     } finally {
-      setLoading(false);
+      setUpdatingName(false);
     }
   }
 
   const handleSubmitForReview = async () => {
+    if (uploadingAudio || updatingName) return;
+
     if (!recapVersionData.audioURL || !recapVersionData.transcriptUrl || recapVersionData.transcriptStatus !== 2) {
       showToast({
         severity: 'error',
@@ -225,7 +254,7 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
     if (!confirm("Are you sure you want to submit this version for review? You won't be able to change this version anymore."))
       return;
 
-    setLoading(true);
+    setUploadingAudio(true);
     try {
       const request = new AbortController();
       const response = await axiosInstance.put('/change-recapversion-status', {
@@ -240,9 +269,9 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
       });
 
       setRecapVersionData({ ...response.data.data });
-      setLoading(false);
+      setUploadingAudio(false);
     } catch (error) {
-      setLoading(false);
+      setUploadingAudio(false);
       const err = handleFetchError(error);
 
       console.log("err", err);
@@ -269,6 +298,8 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
         return "Unknown"
     }
   }
+
+  const loading = uploadingAudio || updatingName;
 
   return (
     <div className="border-l border-gray-300 bg-white h-full py-8 px-6 w-[330px]">
@@ -301,7 +332,7 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
               type="button"
               disabled={loading}
               onClick={handleUpdateName}
-              className="px-4 py-2 text-white border bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300">
+              className="px-4 py-2 text-white border bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300 disabled:opacity-50">
               Save
             </button>
           </div>
@@ -366,7 +397,7 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
             </Show>
           </div>
         </Show>
-        <Show when={recapVersionData.status === 0}>
+        <Show when={recapVersionData.status === 0 && recapVersionData.transcriptStatus !== 1}>
           <>
             {/* Generate Audio Button */}
             <div className="mb-4">
@@ -374,7 +405,7 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
                 type="button"
                 disabled={loading}
                 onClick={handleGenerateAudio}
-                className="w-full px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
+                className="w-full px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300 disabled:opacity-50">
                 Generate audio
               </button>
               <p className="block text-xs text-gray-500 mt-2">Generate audio using AI (recommended)</p>
@@ -389,7 +420,7 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
               />
               <button
                 type="button"
-                className="w-full px-4 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-400 focus:outline-none"
+                className="w-full px-4 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-400 focus:outline-none disabled:opacity-50"
                 disabled={loading}
               >
                 Upload audio
@@ -402,7 +433,7 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData }) => {
                 type="button"
                 disabled={loading}
                 onClick={handleSubmitForReview}
-                className="w-full px-4 py-2 text-white bg-indigo-500 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring focus:ring-indigo-300">
+                className="w-full px-4 py-2 text-white bg-indigo-500 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring focus:ring-indigo-300 disabled:opacity-50">
                 Submit for review
               </button>
             </div>
@@ -448,7 +479,16 @@ const BookInfo = () => {
 
 const ListKeyIdeas = ({ recapVersion }) => {
   const keyIdeas = useAsyncValue();
-  const [ ideas, setIdeas ] = useState(keyIdeas);
+  const [ ideas, setIdeas ] = useState(keyIdeas.map(idea => ({
+    title: idea.title,
+    body: idea.body,
+    image: idea.image,
+    order: idea.order,
+    recapVersionId: idea.recapVersionId,
+    id: idea.id,
+    isNewKeyIdea: false,
+    isSaving: false
+  })));
   const { showToast } = useToast();
 
   const addNewKeyIdea = () => {
@@ -461,7 +501,8 @@ const ListKeyIdeas = ({ recapVersion }) => {
       order: highestOrder + 1,
       recapVersionId: recapVersion.id,
       id: new Date().getTime(),
-      isNewKeyIdea: true
+      isNewKeyIdea: true,
+      isSaving: false
     } ]);
   }
 
@@ -470,6 +511,10 @@ const ListKeyIdeas = ({ recapVersion }) => {
       setIdeas(ideas.filter(idea => idea.id !== keyIdea.id));
       return;
     }
+
+    setIdeas((prevIdeas) => prevIdeas.map(idea =>
+      idea.id === keyIdea.id ? { ...idea, isSaving: true } : idea
+    ));
 
     // Delete key idea
     try {
@@ -489,43 +534,50 @@ const ListKeyIdeas = ({ recapVersion }) => {
         summary: 'Error',
         detail: err.error,
       });
+
+      setIdeas((prevIdeas) => prevIdeas.map(idea =>
+        idea.id === keyIdea.id ? { ...idea, isSaving: false } : idea
+      ));
     }
   }
 
   const handleSaveKeyIdea = async (keyIdea, formdata) => {
-    try {
-      const imageKeyIdea = formdata.get('ImageKeyIdea');
-      if (
-        imageKeyIdea && imageKeyIdea.size > 0 &&
-        formdata.get('RemoveImage') === 'true'
-      ) {
-        // change the RemoveImage value to false
-        formdata.set('RemoveImage', 'false');
-      }
+    setIdeas((prevIdeas) => prevIdeas.map(idea =>
+      idea.id === keyIdea.id ? { ...idea, isSaving: true } : idea
+    ));
 
+    try {
       const response = keyIdea.isNewKeyIdea ?
         await axiosInstance.post('/api/keyidea/createkeyidea', formdata) :
         await axiosInstance.put('/api/keyidea/updatekeyidea/' + keyIdea.id, formdata);
 
       const responseData = response.data.data;
-      console.log("keyIdea", responseData);
 
-      setIdeas(ideas.map(idea => {
-        if (idea.order === keyIdea.order) {
-          return {
-            title: responseData.title,
-            body: responseData.body,
-            image: responseData.image,
-            order: responseData.order,
-            recapVersionId: responseData.recapVersionId,
-            id: responseData.id,
-            isNewKeyIdea: false
-          };
-        }
-        return idea;
-      }));
+      setIdeas((prevIdeas) => prevIdeas.map(idea =>
+        idea.id === keyIdea.id ? ({
+          title: responseData.title,
+          body: responseData.body,
+          image: responseData.image,
+          order: responseData.order,
+          recapVersionId: responseData.recapVersionId,
+          id: responseData.id,
+          isNewKeyIdea: false,
+          isSaving: false
+        }) : idea
+      ));
+
     } catch (error) {
-      throw handleFetchError(error);
+      console.error(error);
+      const err = handleFetchError(error);
+      showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: err.error,
+      });
+
+      setIdeas((prevIdeas) => prevIdeas.map(idea =>
+        idea.id === keyIdea.id ? { ...idea, isSaving: false } : idea
+      ));
     }
   }
 
@@ -562,25 +614,54 @@ const ListKeyIdeas = ({ recapVersion }) => {
 }
 
 const KeyIdeaItem = ({ keyIdea, recapVersion, handleDeleteKeyIdea, handleSaveKeyIdea }) => {
-  // const [ isEditing, setIsEditing ] = useState(false);
-  const [ loading, setLoading ] = useState(false);
-  const [ removeImage, setRemoveImage ] = useState(false);
+  const [ formData, setFormData ] = useState({
+    Title: keyIdea.title,
+    Body: keyIdea.body,
+    ImageKeyIdea: null,
+    Order: keyIdea.order,
+    RecapVersionId: keyIdea.recapVersionId
+  });
   const { showToast } = useToast();
-  const fileInputRef = useRef(null);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const [ , cancel ] = useDebounce(async () => {
+      if (keyIdea.isSaving || recapVersion.status !== 0) return;
 
-    if (loading || recapVersion.status !== 0) return;
+      if (keyIdea.title === formData.Title && keyIdea.body === formData.Body) return;
 
-    const form = e.target;
-    const formData = new FormData(form);
+      await handleSave();
+    },
+    2000,
+    [ formData.Title, formData.Body ]
+  );
 
-    const title = formData.get('Title');
-    const order = formData.get('Order');
-    const recapVersionId = formData.get('RecapVersionId');
+  useEffect(() => {
+    if (!formData.ImageKeyIdea) return;
 
-    if (!recapVersionId || !order) {
+    handleSave();
+
+    return () => cancel();
+  }, [ formData.ImageKeyIdea ]);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    console.log("file", file);
+    setFormData((prevData) => ({ ...prevData, ImageKeyIdea: file }));
+  };
+
+  const handleRemoveImage = async () => {
+    if (!confirm("Are you sure you want to remove this image?")) return;
+    await handleSave(true);
+  }
+
+  const handleSave = async (removeImage = false) => {
+    if (keyIdea.isSaving || recapVersion.status !== 0) return;
+
+    if (!formData.RecapVersionId || !formData.Order) {
       showToast({
         severity: 'error',
         summary: 'Error',
@@ -589,122 +670,134 @@ const KeyIdeaItem = ({ keyIdea, recapVersion, handleDeleteKeyIdea, handleSaveKey
       return;
     }
 
-    if (!title) {
-      showToast({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Tiêu đề không được để trống',
-      });
-      return;
+    const formdata = new FormData();
+
+    formdata.append('Title', formData.Title || "");
+    formdata.append('Body', formData.Body || "");
+    formdata.append('Order', formData.Order);
+    formdata.append('RecapVersionId', formData.RecapVersionId);
+    formdata.append('RemoveImage', removeImage ? "true" : "false");
+
+    if (formData.ImageKeyIdea) {
+      formdata.append('ImageKeyIdea', formData.ImageKeyIdea);
+
+      // change the RemoveImage value to false if a new image is added
+      if (removeImage) {
+        formdata.set('RemoveImage', 'false');
+      }
+    } else {
+      formdata.append('ImageKeyIdea', new Blob([]), "");
     }
 
-    setLoading(true);
-    await handleSaveKeyIdea(keyIdea, formData);
-    setLoading(false);
-    setRemoveImage(false);
-    fileInputRef.current.value = '';
+    await handleSaveKeyIdea(keyIdea, formdata);
+    setFormData({
+      ...formData,
+      ImageKeyIdea: null,
+      RemoveImage: false,
+    })
   }
 
-  const onClickDeleteKeyIdea = async () => {
-    if (loading || recapVersion.status !== 0) return;
+  const onClickRemoveKeyIdea = async () => {
+    if (keyIdea.isSaving || recapVersion.status !== 0) return;
 
-    const isConfirmed = confirm("Are you sure you want to delete this key idea?");
+    const isConfirmed = confirm("Are you sure you want to remove this key idea?");
     if (!isConfirmed) return;
 
-    // Delete key idea
-    setLoading(true);
     await handleDeleteKeyIdea(keyIdea);
-    setLoading(false);
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
+    <div
       className={cn({
         "mb-4 bg-white shadow-sm border border-gray-300 p-4 rounded-md flex flex-col gap-2": true,
-        "opacity-50 cursor-progress": loading
+        "opacity-50 cursor-progress": keyIdea.isSaving
       })}
     >
-      <input type="hidden" name="RemoveImage" value={removeImage ? "true" : "false"}/>
-      <input type="hidden" name="Order" defaultValue={keyIdea.order}/>
-      <input type="hidden" name="RecapVersionId" defaultValue={keyIdea.recapVersionId}/>
       <div className="flex gap-2 items-center">
         <input
           type="text"
           name="Title"
           placeholder="Key idea title"
-          disabled={loading || recapVersion.status !== 0}
-          defaultValue={keyIdea.title}
+          disabled={recapVersion.status !== 0}
+          value={formData.Title || ""}
+          onChange={handleInputChange}
           className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
         />
         <div className="flex-1 text-right">
-          <p>Thứ tự: <span className="font-semibold">{keyIdea.order}</span></p>
+          {/*<p>Thứ tự: <span className="font-semibold">{keyIdea.order}</span></p>*/}
+
+          <button
+            type="button"
+            className="text-red-500 hover:text-red-700"
+            onClick={onClickRemoveKeyIdea}
+            disabled={keyIdea.isSaving || recapVersion.status !== 0}
+          >
+            Remove
+          </button>
         </div>
       </div>
       <textarea
         rows="4"
         name="Body"
         placeholder="Key idea details..."
-        defaultValue={keyIdea.body}
-        disabled={loading || recapVersion.status !== 0}
+        value={formData.Body || ""}
+        onChange={handleInputChange}
+        disabled={recapVersion.status !== 0}
         className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
       />
       <Show when={keyIdea.image}>
         <div>
           <div className="flex gap-2 items-center">
-            <p>Image:</p>
+            <p className="font-semibold mt-3">Image:</p>
             <Show when={recapVersion.status === 0}>
-              (
               <button
                 type="button"
-                onClick={() => setRemoveImage(!removeImage)}
-                disabled={loading || recapVersion.status !== 0}
+                onClick={handleRemoveImage}
+                disabled={keyIdea.isSaving || recapVersion.status !== 0}
                 className="text-red-500 hover:text-red-700 hover:underline"
               >
-                {removeImage ? "Undo" : "Remove"}
+                (Remove)
               </button>
-              )
             </Show>
           </div>
-          <p className={cn({ "font-semibold": true, "text-gray-500 line-through": removeImage })}>{keyIdea.image}</p>
+          <p className={cn({
+            "font-semibold": true,
+            "text-gray-500 line-through": formData.RemoveImage
+          })}>
+            {keyIdea.image}
+          </p>
         </div>
       </Show>
       <Show when={recapVersion.status === 0}>
-        <div className="flex gap-2 items-center">
-          <p>Upload new image (optional):</p>
-          <input
-            type="file"
-            placeholder="Upload image (optional)"
-            accept="image/*"
-            name="ImageKeyIdea"
-            disabled={loading || recapVersion.status !== 0}
-            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-            ref={fileInputRef}
-          />
-        </div>
-        <div className="flex justify-between gap-4">
-          <button
-            type="button"
-            className="text-red-500 hover:text-red-700"
-            onClick={onClickDeleteKeyIdea}
-            disabled={loading || recapVersion.status !== 0}
-          >
-            Delete
-          </button>
+        <Show when={!keyIdea.image}>
+          <div>
+            <p className="font-semibold mt-3">Image <span className="font-normal">(optional)</span>:</p>
+            <div className="flex gap-2 items-center">
+              <input
+                type="file"
+                placeholder="Upload image (optional)"
+                accept="image/*"
+                name="ImageKeyIdea"
+                onChange={handleFileChange}
+                disabled={keyIdea.isSaving || recapVersion.status !== 0}
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+              />
+            </div>
+          </div>
+        </Show>
+
+        <div className="flex justify-end gap-2">
           <div className="flex gap-4 items-center">
+            <Show when={keyIdea.isSaving}>
+              <ProgressSpinner style={{ width: '15px', height: '15px' }} strokeWidth="8"
+                               fill="var(--surface-ground)" animationDuration=".5s"/>
+            </Show>
             <p className='italic font-semibold text-gray-500'>
-              {keyIdea.isNewKeyIdea ? 'Not saved yet' : loading ? 'Saving...' : 'Saved'}
+              {keyIdea.isNewKeyIdea ? 'Not saved yet' : keyIdea.isSaving ? 'Saving...' : 'Saved'}
             </p>
-            <button
-              type="submit"
-              disabled={loading || recapVersion.status !== 0}
-              className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
-            >
-              {loading ? 'Loading...' : 'Save'}
-            </button>
           </div>
         </div>
       </Show>
-    </form>
+    </div>
   )
 }

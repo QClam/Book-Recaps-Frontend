@@ -8,7 +8,7 @@ function Login() {
   const navigate = useNavigate();
   const navigation = useNavigation();
   const actionData = useActionData();
-  const { login, reCaptchaTokens, isAuthenticated } = useAuth();
+  const { login, reCaptchaTokens, isAuthenticated, reFetchReCaptchaTokens } = useAuth();
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -18,6 +18,8 @@ function Login() {
         summary: 'Error',
         detail: actionData.error,
       });
+
+      reFetchReCaptchaTokens('login');
     }
   }, [ actionData ]);
 
@@ -70,7 +72,7 @@ function Login() {
           </div>
           <div>
             <button type="submit"
-                    disabled={loading}
+                    disabled={loading || !reCaptchaTokens?.loginToken}
                     className="flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
               {loading ? 'Loading...' : 'Login'}
             </button>
