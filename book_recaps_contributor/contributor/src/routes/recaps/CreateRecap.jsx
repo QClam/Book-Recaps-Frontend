@@ -127,13 +127,21 @@ const CreateRecap = () => {
 
   useEffect(() => {
     if (actionData?.error) {
-      showToast({
-        severity: 'error',
-        summary: 'Error',
-        detail: actionData.error,
-      });
-      setChosenBookId("");
-      setDialogVisible(false);
+      if (actionData.status === 400 && actionData.data?.id) {
+        showToast({
+          severity: 'warn',
+          summary: 'Warning',
+          detail: actionData.error,
+        });
+      } else {
+        showToast({
+          severity: 'error',
+          summary: 'Error',
+          detail: actionData.error,
+        });
+        setChosenBookId("");
+        setDialogVisible(false);
+      }
     }
   }, [ actionData ]);
 
@@ -371,23 +379,15 @@ function BooksTable({ handleClickCreate }) {
           <tr key={book.id} className="hover:bg-gray-100 odd:bg-white even:bg-gray-50 text-[#333c48]">
             <td className="px-2.5 py-1 pl-[18px] font-semibold border-[#e2e7ee] border-b">
               <div className="w-20">
-                <Show when={book.coverImage} fallback={
-                  <img
-                    src="/empty-image.jpg"
-                    alt="Empty image"
-                    className="block aspect-[3/4] object-cover w-full rounded-md"
-                  />
-                }>
-                  <img
-                    src={book.coverImage}
-                    alt={book.title}
-                    className="block aspect-[3/4] object-cover w-full rounded-md"
-                    onError={({ currentTarget }) => {
-                      currentTarget.onerror = null; // prevents looping
-                      currentTarget.src = "/empty-image.jpg";
-                    }}
-                  />
-                </Show>
+                <img
+                  src={book.coverImage || "/empty-image.jpg"}
+                  alt={book.title}
+                  className="block aspect-[3/4] object-cover w-full rounded-md"
+                  onError={({ currentTarget }) => {
+                    currentTarget.onerror = null; // prevents looping
+                    currentTarget.src = "/empty-image.jpg";
+                  }}
+                />
               </div>
             </td>
             <td className="px-2.5 py-3 border-[#e2e7ee] border-b" style={{ borderLeft: "1px dashed #d5dce6" }}>

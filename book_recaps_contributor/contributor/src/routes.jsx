@@ -11,6 +11,7 @@ import RecapDetails, { recapDetailsAction, recapDetailsLoader } from "./routes/r
 import { sessionLoader } from "./routes/loaders/sessionLoader";
 import MainLayout from "./layouts/MainLayout";
 import { AuthProvider } from "./contexts/Auth";
+import Recaps, { recapsAction, recapsLoader } from "./routes/recaps/Recaps";
 
 export const routes = {
   login: '/login',
@@ -60,7 +61,9 @@ export const router = createBrowserRouter([
                 children: [
                   {
                     index: true,
-                    element: <div>Danh sách các Recaps</div>,
+                    element: <Recaps/>,
+                    loader: recapsLoader,
+                    action: recapsAction
                   },
                   {
                     path: routes.recapDetails,

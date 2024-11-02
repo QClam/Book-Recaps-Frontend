@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const ACCESS_TOKEN = "access_token";
+export const ACCESS_TOKEN = "access_token";
 
 export const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_ENDPOINT,

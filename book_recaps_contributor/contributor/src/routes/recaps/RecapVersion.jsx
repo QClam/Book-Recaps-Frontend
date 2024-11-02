@@ -670,6 +670,14 @@ const KeyIdeaItem = ({ keyIdea, recapVersion, handleDeleteKeyIdea, handleSaveKey
       return;
     }
 
+    if (!formData.Title) {
+      showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Title không được để trống',
+      });
+    }
+
     const formdata = new FormData();
 
     formdata.append('Title', formData.Title || "");
@@ -707,12 +715,7 @@ const KeyIdeaItem = ({ keyIdea, recapVersion, handleDeleteKeyIdea, handleSaveKey
   }
 
   return (
-    <div
-      className={cn({
-        "mb-4 bg-white shadow-sm border border-gray-300 p-4 rounded-md flex flex-col gap-2": true,
-        "opacity-50 cursor-progress": keyIdea.isSaving
-      })}
-    >
+    <div className="mb-4 bg-white shadow-sm border border-gray-300 p-4 rounded-md flex flex-col gap-2">
       <div className="flex gap-2 items-center">
         <input
           type="text"
@@ -747,8 +750,8 @@ const KeyIdeaItem = ({ keyIdea, recapVersion, handleDeleteKeyIdea, handleSaveKey
       />
       <Show when={keyIdea.image}>
         <div>
-          <div className="flex gap-2 items-center">
-            <p className="font-semibold mt-3">Image:</p>
+          <div className="flex gap-2 items-center mt-3">
+            <p className="font-semibold">Image:</p>
             <Show when={recapVersion.status === 0}>
               <button
                 type="button"
@@ -761,7 +764,6 @@ const KeyIdeaItem = ({ keyIdea, recapVersion, handleDeleteKeyIdea, handleSaveKey
             </Show>
           </div>
           <p className={cn({
-            "font-semibold": true,
             "text-gray-500 line-through": formData.RemoveImage
           })}>
             {keyIdea.image}
@@ -789,7 +791,7 @@ const KeyIdeaItem = ({ keyIdea, recapVersion, handleDeleteKeyIdea, handleSaveKey
         <div className="flex justify-end gap-2">
           <div className="flex gap-4 items-center">
             <Show when={keyIdea.isSaving}>
-              <ProgressSpinner style={{ width: '15px', height: '15px' }} strokeWidth="8"
+              <ProgressSpinner style={{ width: '10px', height: '10px' }} strokeWidth="8"
                                fill="var(--surface-ground)" animationDuration=".5s"/>
             </Show>
             <p className='italic font-semibold text-gray-500'>
