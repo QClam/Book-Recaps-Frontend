@@ -21,7 +21,7 @@ const BookApiCategory = () => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get(
-          "https://160.25.80.100:7124/api/category",
+          "https://160.25.80.100:7124/api/category/getallcategory",
           {
             headers: {
               'accept': '*/*',
@@ -125,7 +125,7 @@ const BookApiCategory = () => {
   return (
     <div className="categories-container">
       <h2>Categories</h2>
-      <p>Explore all categories</p>
+      {/* <p>Explore all categories</p> */}
       {error && <p className="error">{error}</p>}
       <div className="category-wrapper">
         {categories.map((category) => (

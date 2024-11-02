@@ -99,7 +99,7 @@ const getUserNotesKey = (userId) => `transcriptNotes_${userId}`;
               console.log("Highlighting sentence index:", sentence.sentence_index); // Log câu được highlight
   
               if (sentenceRefs.current[sentence.sentence_index]) {
-                sentenceRefs.current[sentence.sentence_index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                sentenceRefs.current[sentence.sentence_index];
               }
               found = true;
               break;
@@ -415,17 +415,17 @@ const getUserNotesKey = (userId) => `transcriptNotes_${userId}`;
       {/* Context Menu */}
       {contextMenu.visible && (
         <div
-          className="context-menu"
+          className="context-menu-menu"
           style={{ top: contextMenu.y, left: contextMenu.x }}
           ref={contextMenuRef}
         >
-          <div className="context-menu-item" onClick={handleHighlight}>
+          <div className="context-menu-item-item" onClick={handleHighlight}>
             🖍 Highlight
           </div>
-          <div className="context-menu-item" onClick={handleCopy}>
+          <div className="context-menu-item-item" onClick={handleCopy}>
             📋 Copy
           </div>
-          <div className="context-menu-item" onClick={handleTakeNote}>
+          <div className="context-menu-item-item" onClick={handleTakeNote}>
             📝 Take Note
           </div>
         </div>
@@ -446,6 +446,7 @@ const getUserNotesKey = (userId) => `transcriptNotes_${userId}`;
           placeholder="Enter your note here..."
           rows="5"
           cols="50"
+          className="enternote"
         />
         <div className="modal-buttonss">
           <button onClick={saveNote}>Save</button>

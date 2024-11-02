@@ -24,13 +24,25 @@ const RecapByContributor = () => {
           },
         }
       );
+  
       const recapData = recapResponse.data;
-
+  
+      console.log('Recap data:', recapData); // Check full structure for $ref
+  
       if (recapData.succeeded) {
         const recapsWithContributor = await Promise.all(
           recapData.data.$values.map(async (recap) => {
-            const contributor = await fetchContributorInfo(recap.userId);
-            return { ...recap, contributor };
+            if (recap.userId) {
+              const contributor = await fetchContributorInfo(recap.userId);
+              return { ...recap, contributor };
+            } else if (recap.$ref) {
+              console.error('Found $ref, resolving not implemented:', recap.$ref);
+              // Add logic here to resolve the reference
+              return { ...recap, contributor: null };
+            } else {
+              console.error('Missing userId and no $ref for recap:', recap);
+              return { ...recap, contributor: null };
+            }
           })
         );
         setRecaps(recapsWithContributor);
@@ -39,8 +51,8 @@ const RecapByContributor = () => {
       }
     } catch (error) {
       if (error.response && error.response.status === 401) {
-        await handleTokenRefresh(); // Refresh token if unauthorized
-        await fetchRecaps(); // Retry fetching recaps after refreshing token
+        await handleTokenRefresh();
+        await fetchRecaps();
       } else {
         setError('Error fetching recaps.');
       }
@@ -48,7 +60,7 @@ const RecapByContributor = () => {
       setLoading(false);
     }
   };
-
+  
   // Fetch contributor info
   const fetchContributorInfo = async (userId) => {
     try {
@@ -63,12 +75,13 @@ const RecapByContributor = () => {
       );
       const contributorData = contributorResponse.data;
 
-      if (contributorData.succeeded) {
+      if (contributorData.succeeded && contributorData.data) {
         return {
-          fullName: contributorData.data.fullName,
-          imageUrl: contributorData.data.imageUrl,
+          fullName: contributorData.data.fullName || 'Unknown', // Handle null value
+          imageUrl: contributorData.data.imageUrl || 'default-avatar.jpg', // Fallback image
         };
-      } else {
+      }
+       else {
         console.error('Failed to fetch contributor info:', contributorData.message);
         return null;
       }
@@ -121,9 +134,15 @@ const handleBookClick = (book) => {
         recaps.map((recap) => (
           <div key={recap.id} className="recap-item">
               <div className="recap-book" onClick={() => handleBookClick(recap.book)}>
+              {/* Kiểm tra nếu recap.book có dữ liệu */}
+          {recap.book && (
+            <>
               <img src={recap.book.coverImage} alt={recap.book.title} className="recap-book-image" />
               <h2>{recap.book.title}</h2>
               <p>{recap.book.description}</p>
+            </>
+          )}
+
             </div>
             <div className="recap-contributor">
               {recap.contributor ? (

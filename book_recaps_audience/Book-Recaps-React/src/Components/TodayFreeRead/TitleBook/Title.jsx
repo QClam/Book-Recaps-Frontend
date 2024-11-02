@@ -7,7 +7,7 @@ const Title = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('https://www.googleapis.com/books/v1/volumes?q=mom&key=AIzaSyDoWf3ws8elORVULfG9eeb0McMql-NugGc')
+    fetch('')
       .then((response) => response.json())
       .then((data) => {
         setBooks(data.items.slice(0, 6)); // Display first 6 books for layout purposes

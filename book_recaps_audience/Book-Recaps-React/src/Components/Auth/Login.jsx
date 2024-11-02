@@ -147,24 +147,28 @@ function Login() {
       if (accessToken && refreshToken) {
         localStorage.setItem("authToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
-        console.log("AccessToken saved to localStorage:", accessToken);
-        console.log("RefreshToken saved to localStorage:", refreshToken);
+        // console.log("AccessToken saved to localStorage:", accessToken);
+        // console.log("RefreshToken saved to localStorage:", refreshToken);
       } else {
         console.error("Tokens not found in API response");
         setError("Không tìm thấy token trong phản hồi của API.");
       }
     
-      navigate("/"); // Navigate to the home page after successful login
+      navigate("/explore"); // Navigate to the home page after successful login
     } catch (error) {
       console.error("Error logging in:", error.response ? error.response.data : error.message);
       setError("Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản và mật khẩu.");
     }
   };
   
+  const forgetPasswordClick = () => {
+    navigate("/forget-password");
+  }
+
 
   return (
     <div className="login-page">
-      <div className={`container ${isActive ? "active" : ""}`} id="container">
+      <div className={`containerner ${isActive ? "active" : ""}`} id="container">
         <div className="form-container sign-up">
           <form onSubmit={handleSignUp}>
             <h1>Đăng ký</h1>
@@ -249,12 +253,10 @@ function Login() {
               placeholder="Mật khẩu"
             />
             <button type="submit">Đăng nhập</button>
+            <a style={{textDecoration: "none", cursor: "pointer"}} onClick={() => forgetPasswordClick()}>Forget password</a>
             {error && <p style={{ color: 'red' }}>{error}</p>}
-            {/* Add the Forgot Password Link */}
-    <p>
-     Forgot Password?
-    </p>
-
+           
+   
           </form>
         </div>
 

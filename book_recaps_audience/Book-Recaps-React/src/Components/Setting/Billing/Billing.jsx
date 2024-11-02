@@ -4,7 +4,7 @@ import './Billing.scss';
 function Billing() {
   return (
     <div className="billing-container">
-      <h1>Bắt đầu dùng thử miễn phí 5 ngày</h1>
+      <h1>Bắt đầu dùng thử ngay</h1>
       <p>
         Nhận quyền truy cập đầy đủ vào BookRecaps. Bạn sẽ không bị tính phí cho đến khi kết thúc thời gian dùng thử miễn phí. Huỷ bất cứ lúc nào.
       </p>

@@ -6,7 +6,7 @@ const Report = () => {
   const navigate = useNavigate(); // Khởi tạo hàm điều hướng
 
     const handleHomeClick = () => {
-      navigate('/'); // Điều hướng đến trang chủ
+      navigate('/explore'); // Điều hướng đến trang chủ
     };
 
   return (

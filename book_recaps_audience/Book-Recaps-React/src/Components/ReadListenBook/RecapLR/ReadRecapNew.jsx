@@ -72,11 +72,11 @@ const ReadRecapNew = () => {
     navigate('/all-books-recap'); // Navigate to a page displaying all books
   };
 
-  const displayedBooks = showAll ? books : books.slice(8, 20); // Display the last 8 books
+  const displayedBooks = showAll ? books : books.slice(20, 32); // Display the last 8 books
 
   return (
     <div className="book-display-container">
-  <h2>Famous books</h2>
+  <h1 className="bookh1">Trending</h1>
   {error && <p className="error-message">{error}</p>}
   <div className="book-list-book">
     {Array.isArray(displayedBooks) && displayedBooks.length > 0 ? (

@@ -86,7 +86,7 @@ const AuthorApi = () => {
 
   return (
     <div className="author-page">
-      <h1>Authors</h1>
+      <h2>Authors</h2>
       {error && <div className="error-message">{error}</div>}
 
       {/* Nút để chuyển đổi thứ tự sắp xếp */}

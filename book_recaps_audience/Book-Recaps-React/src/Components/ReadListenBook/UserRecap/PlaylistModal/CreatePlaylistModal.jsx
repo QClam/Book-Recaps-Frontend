@@ -170,6 +170,7 @@ const handleSaveInSelectedPlaylists = async () => {
             placeholder="Playlist name"
             value={playlistName}
             onChange={(e) => setPlaylistName(e.target.value)}
+            className="playlistnameform"
           />
         </div>
 

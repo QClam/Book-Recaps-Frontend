@@ -71,7 +71,7 @@ const UserRecap = () => {
   };
   return (
     <div className="recap-wrapper">
-      <h2>User Recap</h2>
+      <h2>Popular </h2>
       {error && <p className="recap-error">{error}</p>}
       <div className="recap-book-grid">
         {Array.isArray(displayedBooks) && displayedBooks.length > 0 ? (

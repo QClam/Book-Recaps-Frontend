@@ -1,7 +1,7 @@
 .recap-list-item { 
   margin-bottom: 20px;    
   margin-top: 10px;
-   margin-left: 20px;
+  margin-left: 20px;
 }
 
 .audio-controllerer {
@@ -27,4 +27,96 @@
   &:hover {
     opacity: 0.8; /* Add a hover effect for better UX */
   }
+}
+
+
+.audio-player-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: white; /* Màu nền có thể điều chỉnh theo ý thích */
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+}
+
+.audio-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.progress-bar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  margin: 0 10px;
+}
+
+.progress-bar input {
+  flex: 1;
+  margin: 0 10px;
+  cursor: pointer;
+  -webkit-appearance: none; /* Remove default styling */
+  background: #131212; /* Light track background */
+  height: 5px;
+  border-radius: 5px;
+}
+
+.progress-bar input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ff0000; /* Red thumb */
+}
+
+.audio-control-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.audio-control-buttons button {
+  background: none;
+  border: none;
+  color: #121010; /* Button text color */
+  font-size: 20px;
+  cursor: pointer;
+  margin: 0 5px;
+  transition: color 0.3s;
+}
+
+.audio-control-buttons button:hover {
+  color: #ff0000; /* Change color on hover */
+}
+
+.volume-controls {
+  display: flex;
+  align-items: center;
+}
+
+.volume-controls .volume-slider {
+  margin: 0 10px;
+  -webkit-appearance: none;
+  background: #161616;
+  height: 5px;
+}
+
+.volume-controls .volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ff0000; /* Red thumb */
+}
+
+.playback-speed-controls select {
+  background-color: #e0dbdb; /* Dark background for select */
+  color: #161515; /* Text color */
+  border: none;
+  border-radius: 4px;
+  padding: 5px;
 }

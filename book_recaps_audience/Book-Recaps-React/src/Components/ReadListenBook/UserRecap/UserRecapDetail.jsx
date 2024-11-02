@@ -4,6 +4,7 @@ import axios from 'axios';
 import './UserRecapDetail.scss'; // Import the SCSS file
 import RecapItem from './RecapItem'; // Import component RecapItem
 import CreatePlaylistModal from './PlaylistModal/CreatePlaylistModal';
+import ReportIssueModal from './ReportIssueModal/ReportIssueModal';
 
 const UserRecapDetail = () => {
   const { id } = useParams(); // Get book ID from URL
@@ -16,6 +17,10 @@ const UserRecapDetail = () => {
   const [userId, setUserId] = useState(null); // State for user ID
   const [recapId, setRecapId] = useState(null); // State for recap ID
   const [recapVersionId, setRecapVersionId] = useState(null); // State for storing recapVersionId
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false); // State for report modal
+  const [successMessage, setSuccessMessage] = useState(null); // State for success message
+
+
   const handleSaveClick = () => {
     setIsModalOpen(true);
   };
@@ -23,6 +28,20 @@ const UserRecapDetail = () => {
   const closeModal = () => {
     setIsModalOpen(false);
   };
+
+  const openReportModal = () => {
+    setIsReportModalOpen(true);
+  };
+
+  const closeReportModal = () => {
+    setIsReportModalOpen(false);
+  };
+
+  // const handleReportSubmit = (reportData) => {
+  //   console.log("Reported Issue:", reportData);
+  //   // Here, you can add the code to send the report data to your backend API.
+  // };
+
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -119,8 +138,38 @@ const UserRecapDetail = () => {
     setLiked(!liked);
   };
 
+  // Function to handle form submission to API
+  const handleReportSubmit = async (reportData) => {
+    try {
+      const response = await axios.post('https://160.25.80.100:7124/api/supportticket/create', {
+        category: reportData.category,
+        description: reportData.description,
+        status: 0,
+        recapId: recapId,
+        userId: userId
+      }, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (response.status === 200) {
+        setSuccessMessage('Issue reported successfully!'); // Set success message
+        setTimeout(() => setSuccessMessage(null), 3000); // Clear message after 3 seconds
+      } else {
+        setErrorMessage('Failed to report the issue');
+      }
+    } catch (error) {
+      setErrorMessage('Error reporting the issue');
+      console.error('Error reporting issue:', error);
+    }
+  };
+
   return (
     <div className="book-info-container">
+       {successMessage && <p className="success-notice">{successMessage}</p>}
+
       {bookInfo ? (
         <div className="info-layout">
           <div className="left-info">
@@ -141,7 +190,7 @@ const UserRecapDetail = () => {
               </div>
               <div className="meta-row">
                 <div className="meta-icon meta-format">🎧 Audio & text</div>
-                <div className="meta-icon meta-key-ideas">💡 9 Key ideas</div>
+                <div className="meta-icon meta-key-ideas">💡 Key ideas</div>
               </div>
             </div>
             {/* Book Save and Like Section */}
@@ -160,6 +209,16 @@ const UserRecapDetail = () => {
                 recapId={recapId} // Use dynamic recap ID
                 userId={userId} // Use dynamic user ID
               />
+
+              {/* Add the "Report an Issue" icon here */}
+              <div className="report-issue">
+                <span onClick={openReportModal} style={{ cursor: "pointer", color: "blue" }}>
+                  🏳️ Report an issue
+                </span>
+              </div>
+              <ReportIssueModal isOpen={isReportModalOpen} onClose={closeReportModal} onSubmit={handleReportSubmit} />
+
+
             </div>
           </div>
           <div className="right-info">

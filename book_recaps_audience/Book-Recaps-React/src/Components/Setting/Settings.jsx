@@ -37,6 +37,10 @@ function Settings() {
     const handleViewBilling = () => {
         navigate('/billing'); // Navigate to the Billing route
     };
+
+    const handleBecomeContributor = () => {
+        navigate('/become-contributor');
+    }
      // Handle tab change
      const handleTabChange = (tab) => {
         setCurrentTab(tab);
@@ -323,7 +327,7 @@ function Settings() {
                     <li>
                         <p onClick={handleViewApplication}>View Application</p>
                     </li>
-                    <li>Become A Contributor</li>
+                    <li> <p onClick={handleBecomeContributor}>Become A Contributor</p></li>
                 </ul>
             </div>
             <div className="settings-content">

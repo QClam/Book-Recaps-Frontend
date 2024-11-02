@@ -3,6 +3,10 @@
     text-align: center;
     margin-top: 20px;
   
+   .bookh1 {
+    margin-bottom: 40px;
+    margin-top: -20px;
+   }
     .book-list-book {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -65,3 +69,5 @@
   .read-recap-container h2 {
     margin-right: 1200px;
   }
+
+ 

@@ -37,7 +37,7 @@ const CategoryByBookApi = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('https://160.25.80.100:7124/api/category', {
+        const response = await axios.get('https://160.25.80.100:7124/api/category/getallcategory', {
           headers: {
             'accept': '*/*',
             'Authorization': `Bearer ${accessToken}`,

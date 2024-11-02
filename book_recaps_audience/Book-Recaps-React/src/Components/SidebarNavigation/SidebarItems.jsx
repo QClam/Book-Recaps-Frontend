@@ -52,11 +52,11 @@ export const SidebarItems = [
         icon: <Settings />,
         link: "/settings",
     },
-    {
-        title: "Support",
-        icon: <HelpOutline />,
-        link: "/help",
-    },
+    // {
+    //     title: "Support",
+    //     icon: <HelpOutline />,
+    //     link: "/help",
+    // },
     // {
     //     title: "Logout",
     //     icon: <Logout />,

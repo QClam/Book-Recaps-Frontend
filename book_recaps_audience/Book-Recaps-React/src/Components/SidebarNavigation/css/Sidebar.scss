@@ -43,7 +43,7 @@
 }
 
 .SidebarList .row {
-  margin-right: 30px;
+  margin-right: 40px;
   display: flex;
   align-items: center;
   color: #fff;
@@ -98,7 +98,7 @@
   left: 0;
   width: 100%;
   max-height: 450px; /* Giới hạn chiều cao */
-  overflow-y: auto; /* Cuộn dọc nếu quá dài */
+  overflow-y: hidden; /* Cuộn dọc nếu quá dài */
   margin-top: 5px;
   z-index: 1001; /* Đảm bảo kết quả tìm kiếm nằm trên các thành phần khác */
 }
