@@ -13,7 +13,8 @@ import {
     LibraryBooks,
     Widgets,
     Notes,
-    Groups
+    Groups,
+    MenuBook
 } from "@mui/icons-material";
 
 export const SidebarItems = [
@@ -26,6 +27,11 @@ export const SidebarItems = [
         title: "Quản lý người dùng",
         icon: <Groups />,
         link: "/users",
+    },
+    {
+        title: "Quản lý sách",
+        icon: <MenuBook />,
+        link: "/books",
     },
     {
         title: "Doanh thu sách",

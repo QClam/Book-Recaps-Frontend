@@ -23,11 +23,11 @@
       height: 42px;
     }
 
-    th:nth-child(2),
-    th:nth-child(3),
-    th:nth-child(4) {
-      text-align: center;
-    }
+    // th:nth-child(2),
+    // th:nth-child(3),
+    // th:nth-child(4) {
+    //   text-align: center;
+    // }
 
     /* Căn phải cho cột "Năm sinh" */
     th:nth-child(5),
@@ -35,11 +35,11 @@
       text-align: right;
     }
 
-    td:nth-child(2),
-    td:nth-child(3),
-    td:nth-child(4) {
-      text-align: center;
-    }
+    // td:nth-child(2),
+    // td:nth-child(3),
+    // td:nth-child(4) {
+    //   text-align: center;
+    // }
 
     /* Căn phải cho cột "Năm sinh" */
     td:nth-child(5),

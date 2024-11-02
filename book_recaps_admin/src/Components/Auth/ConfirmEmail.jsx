@@ -77,16 +77,16 @@ function ConfirmEmail() {
         icon: "success",
         confirmButtonText: "OK",
       }).then(() => {
-        navigate("/"); // Redirect after SweetAlert is confirmed
+        navigate("/login"); // Redirect after SweetAlert is confirmed
       });
     }, 3000);
   };
 
   return (
-    <div>
+    <div style={{marginLeft: "10vw"}}>
       {loading ? (
         <div>
-          <div>
+          <div className="center">
             <InfinitySpin
               visible={true}
               width="200"
@@ -94,18 +94,12 @@ function ConfirmEmail() {
               ariaLabel="infinity-spin-loading"
             />
           </div>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
+          <div>
             <p>
               Chúng tôi đang xác nhận Email {email}, vui lòng chờ trong giây
               lát...
             </p>
-            <p>
+            <p className="center">
               {confirmationLink ? (
                 <a
                   href={confirmationLink}

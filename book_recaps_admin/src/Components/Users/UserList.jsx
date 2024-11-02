@@ -44,7 +44,7 @@ function UsersList() {
 
   const fetchUsers = async () => {
     try {
-      const response = await api.get("/users/getalluser", {
+      const response = await api.get("/api/users/getalluser", {
         headers: {
           accept: "*/*",
           Authorization: `Bearer ${token}`,
@@ -442,7 +442,6 @@ function UsersList() {
             <tr>
               <th>Họ & Tên</th>
               <th>Email</th>
-              <th>Ảnh Đại Diện</th>
               <th>Số Điện Thoại</th>
               <th>Ngày Sinh</th>
               <th>Vai trò</th>
@@ -454,18 +453,6 @@ function UsersList() {
               <tr key={user.id}>
                 <td>{user.fullName}</td>
                 <td>{user.email}</td>
-                <td>
-                  <img
-                    src={avatar}
-                    alt="avatar"
-                    style={{ width: 70, height: 70 }}
-                  />
-                  {/* <img
-                    src={user.imageUrl}
-                    alt="avatar"
-                    style={{ width: 70, height: 60 }}
-                  /> */}
-                </td>
                 <td>{user.phoneNumber}</td>
                 <td>{user.birthDate}</td>
                 <td>

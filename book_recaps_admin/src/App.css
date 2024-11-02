@@ -3,3 +3,7 @@ main {
   display: flex;
   margin-left: 250px;
 }
+
+.grecaptcha-badge { 
+  visibility: hidden !important;
+}
