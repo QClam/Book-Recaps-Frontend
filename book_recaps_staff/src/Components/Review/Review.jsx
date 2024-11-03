@@ -272,7 +272,7 @@ function Review() {
     );
 
     // Log để kiểm tra
-    // console.log("Current Sentence Index: ", sentenceIndex);
+    console.log("Current Sentence Index: ", sentenceIndex);
     // console.log("Comments: ", comments);
     // console.log("Existing Comment: ", existingComment);
     console.log("Target HTML: ", targetHtml); // Log đoạn HTML đã được target
@@ -416,21 +416,23 @@ function Review() {
   };
 
   const handleCheckPlagiarism = async () => {
-    try {
-      const response = await api.get('https://66eb9ee32b6cf2b89c5b1714.mockapi.io/Plagiarism');
-      const data = response.data; // Define data here
+    setTimeout(async () => {
+      try {
+        const response = await api.get('https://66eb9ee32b6cf2b89c5b1714.mockapi.io/Plagiarism');
+        const data = response.data;
 
-      if (data.length > 0) {
-        setPlagiarismResults(data[0].plagiarism_result); // Set plagiarism results
-        setMetadata(data[0].exsiting_recap_version_metadata[0]); // Set metadata
-        setHasResults(true);
-      } else {
-        alert('Không có kết quả kiểm tra.');
-        setHasResults(false);
+        if (data.length > 0) {
+          setPlagiarismResults(data[0].plagiarism_result);
+          setMetadata(data[0].exsiting_recap_version_metadata[0]);
+          setHasResults(true);
+        } else {
+          alert('Không có kết quả kiểm tra.');
+          setHasResults(false);
+        }
+      } catch (error) {
+        console.error('Error fetching plagiarism results:', error);
       }
-    } catch (error) {
-      console.error('Error fetching plagiarism results:', error);
-    }
+    }, 2000);
   };
 
   const handleDeleteResults = () => {
@@ -463,8 +465,16 @@ function Review() {
       <div className='transcript-section-container'>
         <h1>{recapStatus.versionName}</h1>
         <div className='button-group'>
-          <button onClick={() => handleChangeMode('comment')} style={{ backgroundColor: "#90c494" }}>Nhận xét</button>
-          <button onClick={() => handleChangeMode('plagiarism')} style={{ backgroundColor: "#c49c9c" }}>Kiểm tra đạo văn</button>
+          <button onClick={() => handleChangeMode('comment')}
+            style={{ backgroundColor: "#90c494", color: "#f0f0f0", opacity: mode === "comment" ? 1 : 0.6 }}
+          >
+            Nhận xét
+          </button>
+          <button onClick={() => handleChangeMode('plagiarism')}
+            style={{ backgroundColor: "#c49c9c", color: "#f0f0f0", opacity: mode === "plagiarism" ? 1 : 0.6 }}
+          >
+            Kiểm tra đạo văn
+          </button>
         </div>
         <br />
         <div>
@@ -478,18 +488,16 @@ function Review() {
                     return (
                       <div key={sectionIndex} className='transcript-section'>
                         <h2>Section {sectionIndex + 1}</h2>
-                        {section.transcriptSentences.map((sentence, sentenceIndexInSection) => {
-                          // Tính toán chỉ số toàn cục cho sentence
-                          const globalSentenceIndex = section.transcriptSentences.reduce(
-                            (acc, curr, idx) => acc + (idx < sentenceIndexInSection ? 1 : 0),
-                            0
-                          ) + sectionIndex * section.transcriptSentences.length;
+                        {section.transcriptSentences.map((sentence) => {
+                          // Use the existing sentence_index
+                          const globalSentenceIndex = sentence.sentence_index;
 
                           const existingComment = comments.find(
                             (comment) =>
                               comment.sentenceIndex === globalSentenceIndex.toString() &&
                               !comment.isDeleted
                           );
+
                           return (
                             <span
                               key={globalSentenceIndex}
@@ -498,32 +506,25 @@ function Review() {
                               onContextMenu={(e) => handleRightClick(e, sectionIndex, globalSentenceIndex, sentence.value.html)}
                             >
                               {sentence.value.html + ' '}
-                              {existingComment && (
-                                <span>📋</span>
+                              {existingComment && <span>📋</span>}
+                              {showInput && selectedIndex && selectedIndex.sectionIndex === sectionIndex && selectedIndex.sentenceIndex === globalSentenceIndex && (
+                                <div className='add-comment-container'>
+                                  <textarea
+                                    value={currentComment}
+                                    onChange={(e) => setCurrentComment(e.target.value)}
+                                    placeholder="Add a comment..."
+                                  />
+                                  <button onClick={() => handleTakenote(sentence.value.html, existingComment)} style={{ backgroundColor: "green" }}>
+                                    Take Note
+                                  </button>
+                                  <button onClick={() => setShowInput(false)} style={{ backgroundColor: "red" }}>
+                                    Cancel
+                                  </button>
+                                  <button style={{ backgroundColor: "#FF0000" }} onClick={() => handleDeleteComment(existingComment)} disabled={!existingComment}>
+                                    Xoá
+                                  </button>
+                                </div>
                               )}
-                              {showInput &&
-                                selectedIndex &&
-                                selectedIndex.sectionIndex === sectionIndex &&
-                                selectedIndex.sentenceIndex === globalSentenceIndex && (
-                                  <div className='add-comment-container'>
-                                    <textarea
-                                      value={currentComment}
-                                      onChange={(e) => setCurrentComment(e.target.value)}
-                                      placeholder="Add a comment..."
-                                    />
-                                    <button onClick={() => handleTakenote(sentence.value.html, existingComment)}
-                                      style={{ backgroundColor: "green" }}>
-                                      Take Note
-                                    </button>
-                                    <button onClick={() => setShowInput(false)}
-                                      style={{ backgroundColor: "red" }}>
-                                      Cancel</button>
-                                    <button style={{ backgroundColor: "#FF0000" }}
-                                      onClick={() => handleDeleteComment(existingComment)}
-                                      disabled={!existingComment}>
-                                      Xoá</button>
-                                  </div>
-                                )}
                             </span>
                           );
                         })}
@@ -541,18 +542,18 @@ function Review() {
                     return (
                       <div key={sectionIndex} className='transcript-section'>
                         <h2>Section {sectionIndex + 1}</h2>
-                        {section.transcriptSentences.map((sentence, sentenceIndexInSection) => {
-                          // Tính toán chỉ số toàn cục cho sentence
-                          const globalSentenceIndex = section.transcriptSentences.reduce(
-                            (acc, curr, idx) => acc + (idx < sentenceIndexInSection ? 1 : 0),
-                            0
-                          ) + sectionIndex * section.transcriptSentences.length;
+                        {section.transcriptSentences.map((sentence) => {
+                          // Use the existing sentence_index
+                          const globalSentenceIndex = sentence.sentence_index;
+                          const isPlagiarized = Array.isArray(plagiarismResults) && plagiarismResults.some(result => result.sentence === sentence.value.html);
+
                           return (
                             <span
                               key={globalSentenceIndex}
                               id={`word-${globalSentenceIndex}`}
                               style={{ cursor: 'pointer', position: 'relative' }}
                               onContextMenu={(e) => handleRightClick(e, sectionIndex, globalSentenceIndex)}
+                              className={isPlagiarized ? 'highlight' : ''}
                             >
                               {sentence.value.html + ' '}
                             </span>
@@ -565,6 +566,7 @@ function Review() {
               </div>
             </div>
           )}
+
         </div>
       </div>
 
@@ -578,7 +580,7 @@ function Review() {
                   <li>Staff: {profile.fullName}</li>
                   <li>{new Date(comment.createdAt).toLocaleDateString()}</li>
                   <li>Đoạn: {comment.targetText}</li>
-                  <li>Feedback: {comment.feedback}</li>
+                  <li>Take Note: {comment.feedback}</li>
                   <br />
                 </ul>
               ))}
@@ -587,17 +589,17 @@ function Review() {
               <h4>Ghi chú tổng:</h4>
               <textarea placeholder="Ghi chú ở đây..." className="comment-input" readOnly value={summaryNote}></textarea>
               <div className="status-buttons">
-                <button style={{ backgroundColor: "#f95700" }}
+                <button style={{ backgroundColor: "#f95700", color: "#f0f0f0" }}
                   onClick={handleNotAchieveButton}>
                   Chưa đạt</button>
-                <button style={{ backgroundColor: "green" }}
+                <button style={{ backgroundColor: "green", color: "#f0f0f0" }}
                   onClick={handleAchieveButton}>
                   Đạt</button>
               </div>
               <div className="status-buttons">
-                <button style={{ backgroundColor: "#f95700" }}
+                <button style={{ backgroundColor: "#f95700", color: "#f0f0f0" }}
                   onClick={confirmReject} disabled={summaryNote === "Đạt"}>Từ Chối</button>
-                <button style={{ backgroundColor: "#007bff" }}
+                <button style={{ backgroundColor: "#007bff", color: "#f0f0f0" }}
                   onClick={confirmApprove} disabled={summaryNote === "Chưa Đạt"}>Chấp Thuận</button>
               </div>
             </div>
@@ -608,12 +610,12 @@ function Review() {
               {!hasResults ? (
                 <>
                   <p>Chưa có kết quả kiểm tra</p>
-                  <button className='check-plagiarism' onClick={handleCheckPlagiarism}>
+                  <button className='check-plagiarism' onClick={handleCheckPlagiarism} style={{ backgroundColor: "#90c494", color: "#f0f0f0" }}>
                     Kiểm tra ngay
                   </button>
                 </>
               ) : (
-                <div>
+                <div className='plagiarism-result-container'>
                   <h3>Kết quả kiểm tra đạo văn</h3>
                   {plagiarismResults ? (
                     <div className='comment'>
@@ -635,6 +637,7 @@ function Review() {
                                 <p><strong>Tiêu đề sách:</strong> {metadata.book_title}</p>
                               </>
                             )}
+                            <br />
                             <hr />
                           </div>
                         ))}
