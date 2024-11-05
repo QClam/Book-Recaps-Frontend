@@ -6,12 +6,13 @@ import { Hourglass } from 'react-loader-spinner';
 import { fetchProfile } from '../Auth/Profile';
 import api from '../Auth/AxiosInterceptors';
 import './ReviewNote.scss';
+import axios from 'axios';
 
 function Review() {
   const [contentItem, setContentItem] = useState(null);
-  const { id } = useParams(); // Get the ID from the URL
+  const { id } = useParams(); // Bắt Id từ URL
   const [loading, setLoading] = useState(true);
-  const [recapStatus, setRecapStatus] = useState(null);
+  const [recapVersion, setRecapVersion] = useState(null);
   const [recapDetail, setRecapDetail] = useState(null);
   const [bookRecap, setBookRecap] = useState(null);
   const [transcript, setTranscript] = useState(null);
@@ -24,7 +25,11 @@ function Review() {
   const [profile, setProfile] = useState([]);
   const [plagiarismResults, setPlagiarismResults] = useState(null);
   const [hasResults, setHasResults] = useState(false);
-  const [metadata, setMetadata] = useState(null); // State to store metadata
+  const [metadata, setMetadata] = useState(null);
+  const [polling, setPolling] = useState(false);
+  const [plagiarismProcessing, setPlagiarismProcessing] = useState(false);
+
+
 
   const [mode, setMode] = useState('comment');
 
@@ -48,28 +53,29 @@ function Review() {
       setContentItem(recap);
       setSummaryNote(recap.comments);
       setRecapVersionId(recap.recapVersionId);
-      return recap.recapVersionId; // Return recapVersionId for the next request
+      return recap.recapVersionId; // Trả recapVersionId cho các req tiếp 
     } catch (error) {
       console.log('Error Fetching Content', error);
       Swal.fire('Error', 'Failed to fetch content.', 'error');
     }
   };
 
-  const fetchRecapVersion = async (recapVersionId) => {
+  const fetchRecapVersion = async (recapVersionId, controller = new AbortController()) => {
     try {
       const response = await api.get(
         `/version/${recapVersionId}`,
         {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          signal: controller.signal
         }
       );
       const recapVersionData = response.data.data;
-      setRecapStatus(recapVersionData);
+      setRecapVersion(recapVersionData);
+      console.log(recapVersionData);
+
       return {
         recapId: recapVersionData.recapId,
         transcriptUrl: recapVersionData.transcriptUrl,
+        plagiarismResults: recapVersionData.plagiarismCheckStatus,
       };
     } catch (error) {
       console.log('Error Fetching Recap Version', error);
@@ -107,6 +113,8 @@ function Review() {
         }
       );
       setBookRecap(response.data.data);
+      // console.log(response.data.data);
+
     } catch (error) {
       console.log('Error Fetching Book', error);
       Swal.fire('Error', 'Failed to fetch book details.', 'error');
@@ -195,7 +203,10 @@ function Review() {
           }
         }
       );
-      setRecapStatus(response.data);
+      setRecapVersion(response.data);
+
+      const id = recapVersionId;
+      const postPlagirism = await axios.post("https://ai.hieuvo.dev/plagiarism/add-recap-versions", id )
     } catch (error) {
       console.log('Error updating status', error);
       Swal.fire('Error', 'Failed to update status.', 'error');
@@ -238,7 +249,7 @@ function Review() {
           }
         }
       );
-      setRecapStatus(response.data);
+      setRecapVersion(response.data);
     } catch (error) {
       console.log('Error updating status', error);
       Swal.fire('Error', 'Failed to update status.', 'error');
@@ -272,10 +283,10 @@ function Review() {
     );
 
     // Log để kiểm tra
-    console.log("Current Sentence Index: ", sentenceIndex);
+    // console.log("Current Sentence Index: ", sentenceIndex);
     // console.log("Comments: ", comments);
     // console.log("Existing Comment: ", existingComment);
-    console.log("Target HTML: ", targetHtml); // Log đoạn HTML đã được target
+    console.log("Target HTML: ", targetHtml); // đoạn HTML đã được target
 
     if (existingComment) {
       setCurrentComment(existingComment.feedback); // Hiển thị comment hiện tại
@@ -300,8 +311,8 @@ function Review() {
       return;
     }
 
-    // Chúng ta đã có targetText từ handleRightClick
-    console.log("targetText: ", targetText);
+    // targetText từ handleRightClick
+    // console.log("targetText: ", targetText);
 
     const newComment = {
       reviewId: id,
@@ -416,29 +427,51 @@ function Review() {
   };
 
   const handleCheckPlagiarism = async () => {
-    setTimeout(async () => {
-      try {
-        const response = await api.get('https://66eb9ee32b6cf2b89c5b1714.mockapi.io/Plagiarism');
-        const data = response.data;
+    if (!recapVersionId) {
+      console.error("recapVersionId is not available");
+      return;
+    }
 
-        if (data.length > 0) {
-          setPlagiarismResults(data[0].plagiarism_result);
-          setMetadata(data[0].exsiting_recap_version_metadata[0]);
-          setHasResults(true);
-        } else {
-          alert('Không có kết quả kiểm tra.');
-          setHasResults(false);
+    setPlagiarismProcessing(true);
+
+    try {
+      // Gọi hàm check đạo văn trước
+      const initialResponse = await axios.get(`https://ai.hieuvo.dev/plagiarism/check-plagiarism/${recapVersionId}`);
+      console.log("Initial check response:", initialResponse.data);
+
+      // Start Polling sau khi call AI trên
+      setPolling(true);
+      const intervalId = setInterval(async () => {
+        try {
+          const response = await axios.get(`https://ai.hieuvo.dev/plagiarism/get-results/${recapVersionId}`);
+          const resultData = response.data;
+
+          // Check xem có kết quả trả về không
+          const { plagiarism_results, existing_recap_versions_metadata } = resultData;
+
+          if (plagiarism_results.length > 0) {
+            setPlagiarismResults(plagiarism_results);
+            setHasResults(true);
+            setMetadata(existing_recap_versions_metadata);
+            setPolling(false);
+            clearInterval(intervalId); // Clear interval
+          } else {
+            setPlagiarismResults([]); // set mảng rỗng nếu k có kết quả
+            setHasResults(false);
+          }
+          console.log("Polling for plagiarism results: ", resultData);
+        } catch (error) {
+          console.error("Error Fetching results during polling", error);
         }
-      } catch (error) {
-        console.error('Error fetching plagiarism results:', error);
-      }
-    }, 2000);
-  };
+      }, 2000);
 
-  const handleDeleteResults = () => {
-    // Reset the state to remove plagiarism results
-    setPlagiarismResults(null);
-    setHasResults(false);
+      // Clear khi interval unmount hoặc polling dừng
+      return () => clearInterval(intervalId);
+
+    } catch (error) {
+      console.error("Error Fetching initial plagiarism check", error);
+      setPlagiarismProcessing(false);
+    }
   };
 
   if (loading) {
@@ -463,7 +496,7 @@ function Review() {
   return (
     <div className='audio-grid'>
       <div className='transcript-section-container'>
-        <h1>{recapStatus.versionName}</h1>
+        <h1>{bookRecap.title}</h1>
         <div className='button-group'>
           <button onClick={() => handleChangeMode('comment')}
             style={{ backgroundColor: "#90c494", color: "#f0f0f0", opacity: mode === "comment" ? 1 : 0.6 }}
@@ -489,7 +522,6 @@ function Review() {
                       <div key={sectionIndex} className='transcript-section'>
                         <h2>Section {sectionIndex + 1}</h2>
                         {section.transcriptSentences.map((sentence) => {
-                          // Use the existing sentence_index
                           const globalSentenceIndex = sentence.sentence_index;
 
                           const existingComment = comments.find(
@@ -502,6 +534,7 @@ function Review() {
                             <span
                               key={globalSentenceIndex}
                               id={`word-${globalSentenceIndex}`}
+                              className='take-note'
                               style={{ cursor: 'pointer', position: 'relative' }}
                               onContextMenu={(e) => handleRightClick(e, sectionIndex, globalSentenceIndex, sentence.value.html)}
                             >
@@ -543,7 +576,6 @@ function Review() {
                       <div key={sectionIndex} className='transcript-section'>
                         <h2>Section {sectionIndex + 1}</h2>
                         {section.transcriptSentences.map((sentence) => {
-                          // Use the existing sentence_index
                           const globalSentenceIndex = sentence.sentence_index;
                           const isPlagiarized = Array.isArray(plagiarismResults) && plagiarismResults.some(result => result.sentence === sentence.value.html);
 
@@ -579,7 +611,7 @@ function Review() {
                 <ul key={comment.id}>
                   <li>Staff: {profile.fullName}</li>
                   <li>{new Date(comment.createdAt).toLocaleDateString()}</li>
-                  <li>Đoạn: {comment.targetText}</li>
+                  <li>Câu: {comment.targetText}</li>
                   <li>Take Note: {comment.feedback}</li>
                   <br />
                 </ul>
@@ -609,10 +641,15 @@ function Review() {
             <div className='plagiarism-side'>
               {!hasResults ? (
                 <>
-                  <p>Chưa có kết quả kiểm tra</p>
-                  <button className='check-plagiarism' onClick={handleCheckPlagiarism} style={{ backgroundColor: "#90c494", color: "#f0f0f0" }}>
-                    Kiểm tra ngay
-                  </button>
+                  <p>Chưa có kết quả kiểm tra, hãy nhấn nút Kiểm tra đạo văn</p>
+                  <div>
+                    <button className='check-plagiarism' onClick={handleCheckPlagiarism}
+                      style={{ backgroundColor: "#90c494", color: "#f0f0f0", marginRight: 10 }}
+                      disabled={plagiarismProcessing}
+                    >
+                      {plagiarismProcessing ? "Đang xử lý..." : "Kiểm tra đạo văn"}
+                    </button>
+                  </div>
                 </>
               ) : (
                 <div className='plagiarism-result-container'>
@@ -633,8 +670,8 @@ function Review() {
                             </div>
                             {metadata && (
                               <>
-                                <p><strong>Nhà cung cấp:</strong> {metadata.contributor_full_name}</p>
-                                <p><strong>Tiêu đề sách:</strong> {metadata.book_title}</p>
+                                <p><strong>Contributor:</strong> {metadata[0].contributor_full_name}</p>
+                                <p><strong>Tên cuốn sách:</strong> {metadata[0].book_title}</p>
                               </>
                             )}
                             <br />
@@ -646,9 +683,6 @@ function Review() {
                   ) : (
                     <p>Không có kết quả nào được tìm thấy.</p>
                   )}
-                  <button className='delete-results' onClick={handleDeleteResults}>
-                    Xóa kết quả
-                  </button>
                 </div>
               )}
             </div>
