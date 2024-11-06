@@ -3,9 +3,7 @@ import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3'
 
 import Sidebar from "./Components/Sidebar/Sidebar";
 import Overview from "./Components/Overview/Overview";
-import FeedbackContent from "./Components/Recaps/FeedbackContent";
 import Review from "./Components/Review/Review";
-import ReviewNote from "./Components/Review/ReviewNote";
 import Login from "./Components/Auth/Login";
 import UsersList from "./Components/Users/UsersList";
 import ConfirmEmail from "./Components/Auth/ConfirmEmail";
@@ -15,9 +13,9 @@ import UserProfile from "./Components/Auth/UserProfile";
 import ForgetPassword from "./Components/Auth/ForgetPassword";
 import Dashboard from "./Components/Dashboard/Dashboard";
 import AppealList from "./Components/Appeal/AppealList";
+import ReportList from "./Components/Report/ReportList";
 
 import "./App.css";
-import AppealResponse from "./Components/Appeal/AppealResponse";
 function App() {
   const location = useLocation();
   const isLoginPage = 
@@ -29,27 +27,23 @@ function App() {
     <main>
       {!isLoginPage && <Sidebar />}
       <Routes>
+      {/* Cần đăng nhập để vào route */}
         <Route path="/" element={<PrivateRoute> <RecapsList /> </PrivateRoute>} />
         <Route path="/recaps" element={<PrivateRoute> <RecapsList /> </PrivateRoute>} />
         <Route path="/overview" element={<PrivateRoute> <Overview /> </PrivateRoute>} />
-        <Route path="/feedback" element={<PrivateRoute> <FeedbackContent /> </PrivateRoute>} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/auth/confirm-email" element={<ConfirmEmail />} />
         <Route path="/users" element={<PrivateRoute> <UsersList /> </PrivateRoute>} />
         <Route path="/settings" element={<PrivateRoute> <UserProfile /> </PrivateRoute>} />
         <Route path="/dashboard" element={<Dashboard /> } />
-        <Route path="/appeal" element={<AppealList /> } />
-        <Route path="/appeal/response/:id" element={<AppealResponse /> } />
-        <Route path="/forget-password" element={ <ForgetPassword /> } />
+        <Route path="/appeals" element={<PrivateRoute> <AppealList /> </PrivateRoute> } />
+        <Route path="/reports" element={<PrivateRoute> <ReportList /> </PrivateRoute> } />
         <Route
           path="/review/content_version/:id"
           element={<PrivateRoute> <Review /> </PrivateRoute>} />
-        <Route
-          path="/note/content_version/:id"
-          element={
-            <PrivateRoute> <ReviewNote /> </PrivateRoute>
-          }
-        />
+
+      {/* Không cần đăng nhập để vào route */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/auth/confirm-email" element={<ConfirmEmail />} />
+          <Route path="/forget-password" element={ <ForgetPassword /> } />
       </Routes>
     </main>
   );

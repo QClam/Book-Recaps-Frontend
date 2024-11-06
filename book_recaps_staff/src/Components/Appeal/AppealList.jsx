@@ -1,49 +1,170 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Button,
+    TextField,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+} from "@mui/material";
+import Swal from 'sweetalert2';
+
+import { fetchProfile } from "../Auth/Profile";
 import api from "../Auth/AxiosInterceptors";
 import "./Appeal.scss";
 
+const resolveRefs = (data) => {
+    const refMap = new Map();
+    const createRefMap = (obj) => {
+        if (typeof obj !== "object" || obj === null) return;
+        if (obj.$id) {
+            refMap.set(obj.$id, obj);
+        }
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                createRefMap(obj[key]);
+            }
+        }
+    };
+    const resolveRef = (obj) => {
+        if (typeof obj !== "object" || obj === null) return obj;
+        if (obj.$ref) {
+            return refMap.get(obj.$ref);
+        }
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                obj[key] = resolveRef(obj[key]);
+            }
+        }
+        return obj;
+    };
+    createRefMap(data);
+    return resolveRef(data);
+};
+
+// function truncateText(text, maxLength) {
+//     if (text.length > maxLength) {
+//       return text.substring(0, maxLength) + "...";
+//     }
+//     return text;
+//   }
+
 function AppealList() {
     const [appeals, setAppeal] = useState([]);
-    const [users, setUsers] = useState([]);
+    const [selectedAppeal, setSelectedAppeal] = useState(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [responseText, setResponseText] = useState("");
+    const [profile, setProfile] = useState([]);
+    const [filterStatus, setFilterStatus] = useState("");
+    const [staffId, setStaffId] = useState("");
+
+    const [responseForm, setResponseForm] = useState({
+        id: "",
+        staffId: "",
+        response: "",
+    })
+
+    const maxLength = 100;
 
     const navigate = useNavigate();
+    const token = localStorage.getItem("access_token")
 
     const fetchAppeals = async () => {
         try {
             const response = await api.get("/api/appeal/getallappeals");
-            const appeals = response.data.data.$values;
+            const appeals = resolveRefs(response.data.data.$values);
             console.log(appeals);
-
             setAppeal(appeals);
         } catch (error) {
             console.error("Error Fetching", error);
         }
     };
 
-    const fetchUsers = async () => {
-        try {
-            const response = await api.get("/api/users/getalluser");
-            const users = response.data.$values;
-            setUsers(users);
-        } catch (error) { }
+    useEffect(() => {
+        fetchProfile(token, (profileData) => {
+            setProfile(profileData);
+            setStaffId(profileData.id);
+            setResponseForm((prevForm) => ({
+                ...prevForm,
+                staffId: profileData.id, // Cập nhật staffId vào form
+            }));
+        });
+    }, [token]);
+
+    const handleResponse = async () => {
+        Swal.fire({
+            title: 'Bạn có chắc chắn?',
+            text: 'Bạn có muốn gửi phản hồi này?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Có, gửi phản hồi!',
+            cancelButtonText: 'Hủy',
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const responseForm = {
+                        id: selectedAppeal.id,
+                        staffId: profile.id,
+                        response: responseText,
+                    };
+                    await api.put("/api/appeal/responseappealbystaff", responseForm);
+                    Swal.fire('Thành công!', 'Phản hồi của bạn đã được gửi.', 'success');
+                    closeDialog();
+                    fetchAppeals();
+                } catch (error) {
+                    console.error("Error Response", error);
+                    Swal.fire('Lỗi!', 'Đã xảy ra lỗi khi gửi phản hồi.', 'error');
+                }
+            }
+        });
+    };
+
+    const openDialog = (appeal) => {
+        setSelectedAppeal(appeal);
+        setIsDialogOpen(true);
+    };
+
+    const closeDialog = () => {
+        setIsDialogOpen(false);
+        setSelectedAppeal(null);
+        setResponseText("");
+    };
+
+    const handleResponseChange = (e) => {
+        setResponseText(e.target.value);
+    };
+
+    const handleStatusChange = (event) => {
+        setFilterStatus(event.target.value);
     };
 
     useEffect(() => {
         fetchAppeals();
-        fetchUsers();
     }, []);
-
-    // Tìm tên contributor hoặc staff theo ID
-    const getUserNameById = (id) => {
-        const user = users.find((user) => user.id === id);
-        return user ? user.fullName : "Chưa có Staff Response Kháng cáo này";
-    };
 
     return (
         <div>
             <div className="content-list">
                 <h2>Danh sách Kháng cáo của Contributor</h2>
+                <FormControl variant="outlined" style={{ minWidth: 200, marginBottom: 20 }} className="form-control">
+                    <InputLabel>{filterStatus === "" ? "Tất cả" : "Trạng thái"}</InputLabel>
+                    <Select
+                        value={filterStatus}
+                        onChange={handleStatusChange}
+                        label={filterStatus === "" ? "Tất cả" : "Trạng thái"}
+                    >
+                        <MenuItem value="">Tất cả</MenuItem>
+                        <MenuItem value={1}>Đang xử lý</MenuItem>
+                        <MenuItem value={2}>Đã xử lý</MenuItem>
+                    </Select>
+                </FormControl>
             </div>
             <div>
                 <table className="content-table table-appeal">
@@ -60,47 +181,79 @@ function AppealList() {
                         </tr>
                     </thead>
                     <tbody>
-                        {appeals.map((val) => (
-                            <tr key={val.id}>
-                                <td>{getUserNameById(val.contributorId)}</td>
-                                <td>{getUserNameById(val.staffId)}</td>
-                                <td>{val.reason}</td>
-                                <td>{val.response}</td>
-                                <td>{new Date(val.createdAt).toLocaleDateString()}</td>
-                                <td>
-                                    <button
-                                        onClick={() =>
-                                            navigate(`/review/content_version/${val.reviewId}`)
-                                        }
-                                    >
-                                        Xem Review
-                                    </button>
-                                </td>
-                                <td>
-                                    <button
-                                        onClick={() => navigate(`/appeal/response/${val.id}`)}
-                                    >
-                                        Phản hồi
-                                    </button>
-                                </td>
-                                <td>
-                                    {val.appealStatus === 1 ? (
-                                        <button style={{ backgroundColor: "#007bff" }}>
-                                            Under Review
+                        {appeals
+                            .filter((val) => filterStatus === "" || val.appealStatus === filterStatus)
+                            .filter((val) => val.appealStatus !== 0 && val.staff?.id === profile.id)
+                            .map((val) => (
+                                <tr key={val.id}>
+                                    <td>{val.contributor?.fullName}</td>
+                                    <td>{val.staff?.fullName || "Chưa có Staff phản hồi"}</td>
+                                    <td>{val.reason}</td>
+                                    <td>{val.response}</td>
+                                    <td>{new Date(val.createdAt).toLocaleDateString()}</td>
+                                    <td>
+                                        <button style={{ width: "150px" }}
+                                            onClick={() =>
+                                                navigate(`/review/content_version/${val.reviewId}`)
+                                            }
+                                        >
+                                            Xem Review
                                         </button>
-                                    ) : val.appealStatus === 2 ? (
-                                        <button style={{ backgroundColor: "green" }}>
-                                            Resolved
-                                        </button>
-                                    ) : (
-                                        <button>Unknow</button>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
+                                    </td>
+                                    <td>
+                                        <button onClick={() => openDialog(val)}
+                                            disabled={val.appealStatus === 2}
+                                            style={{ width: "150px" }}
+                                        >
+                                            Phản hồi</button>
+                                    </td>
+                                    <td>
+                                        {val.appealStatus === 1 ? (
+                                            <button style={{ backgroundColor: "#007bff", color: "#f0f0f0", width: "130px" }}>
+                                                Đang xử lý
+                                            </button>
+                                        ) : val.appealStatus === 2 ? (
+                                            <button style={{ backgroundColor: "green", color: "#f0f0f0", width: "120px" }}>
+                                                Đã xử lý
+                                            </button>
+                                        ) : (
+                                            <button>Unknow</button>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))
+                        }
+                        {appeals
+                            .filter((val) => filterStatus === "" || val.appealStatus === filterStatus)
+                            .filter((val) => val.appealStatus !== 0 && val.staff?.id === profile.id).length === 0 && (
+                                <tr>
+                                    <td colSpan="8" style={{ textAlign: 'center' }}>
+                                        Hiện tại không có kháng cáo
+                                    </td>
+                                </tr>
+                            )}
                     </tbody>
                 </table>
             </div>
+
+            <Dialog open={isDialogOpen} onClose={closeDialog} fullWidth>
+                <DialogTitle>Phản hồi Kháng cáo</DialogTitle>
+                <DialogContent>
+                    <p><strong>Nội dung kháng cáo:</strong> {selectedAppeal?.reason}</p>
+                    <TextField
+                        label="Phản hồi của bạn"
+                        multiline
+                        rows={4}
+                        fullWidth
+                        value={responseText}
+                        onChange={handleResponseChange}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={closeDialog} color="secondary">Đóng</Button>
+                    <Button color="primary" onClick={handleResponse}>Gửi Phản hồi</Button>
+                </DialogActions>
+            </Dialog>
         </div>
     );
 }
