@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
+import { isRoleMatched } from "../../utils/matchRole";
 import "./Login.scss";
 
 function Login() {
@@ -156,11 +158,18 @@ function Login() {
       );
 
       const { accessToken, refreshToken } = response.data.message.token;
+      const decoded = jwtDecode(accessToken);
       localStorage.setItem("access_token", accessToken);
       localStorage.setItem("refresh_token", refreshToken);
 
-      navigate("/recaps")
-      console.log("Login successfully", response.data);
+      // Decode token để lấy Role, nếu k phải Role thì không cho đăng nhập
+      if(isRoleMatched(decoded, "Staff")) {
+        navigate("/recaps")
+        console.log("Login successfully", response.data);
+      } else {
+        setError("Hãy dùng tài khoản của Staff để đăng nhập");
+        console.error("Role mismatch: Access denied");
+      }
     } catch (error) {
       setError("Tài khoản hoặc mật khẩu không đúng. Vui lòng kiểm tra lại");
       console.error("Error sending forget password request:", error.response?.data || error.message);
