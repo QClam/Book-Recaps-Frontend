@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
-import { Link, useParams } from 'react-router-dom';
+import { json, Link, useParams } from 'react-router-dom';
 import { Hourglass } from 'react-loader-spinner';
 
+import { handleFetchError } from '../../utils/handleError';
 import { fetchProfile } from '../Auth/Profile';
 import api from '../Auth/AxiosInterceptors';
 import './ReviewNote.scss';
@@ -206,7 +207,7 @@ function Review() {
       setRecapVersion(response.data);
 
       const id = recapVersionId;
-      const postPlagirism = await axios.post("https://ai.hieuvo.dev/plagiarism/add-recap-versions", id )
+      const postPlagirism = await axios.post("https://ai.hieuvo.dev/plagiarism/add-recap-versions", id)
     } catch (error) {
       console.log('Error updating status', error);
       Swal.fire('Error', 'Failed to update status.', 'error');
@@ -449,19 +450,25 @@ function Review() {
           // Check xem có kết quả trả về không
           const { plagiarism_results, existing_recap_versions_metadata } = resultData;
 
-          if (plagiarism_results.length > 0) {
+          if (plagiarism_results.length > 0 || existing_recap_versions_metadata > 0) {
             setPlagiarismResults(plagiarism_results);
             setHasResults(true);
             setMetadata(existing_recap_versions_metadata);
             setPolling(false);
             clearInterval(intervalId); // Clear interval
           } else {
+            console.log("No Plagirism detected");
             setPlagiarismResults([]); // set mảng rỗng nếu k có kết quả
-            setHasResults(false);
+            setMetadata([]);
+            setPolling(false);
+            setHasResults(true);
+            clearInterval(intervalId);
           }
           console.log("Polling for plagiarism results: ", resultData);
         } catch (error) {
           console.error("Error Fetching results during polling", error);
+          setPolling(false);
+          clearInterval(intervalId); // Stop polling on error
         }
       }, 2000);
 
@@ -469,8 +476,9 @@ function Review() {
       return () => clearInterval(intervalId);
 
     } catch (error) {
-      console.error("Error Fetching initial plagiarism check", error);
       setPlagiarismProcessing(false);
+      const err = handleFetchError(error);
+      throw json({error: err.error}, {status: err.status});
     }
   };
 
@@ -509,7 +517,6 @@ function Review() {
             Kiểm tra đạo văn
           </button>
         </div>
-        <br />
         <div>
         </div>
         <div className='transcript-container'>
@@ -654,7 +661,7 @@ function Review() {
               ) : (
                 <div className='plagiarism-result-container'>
                   <h3>Kết quả kiểm tra đạo văn</h3>
-                  {plagiarismResults ? (
+                  {plagiarismResults && plagiarismResults.length > 0 ? (
                     <div className='comment'>
                       <ul>
                         {plagiarismResults.map((result, index) => (
@@ -668,7 +675,7 @@ function Review() {
                                 </span></div>
                               </div>
                             </div>
-                            {metadata && (
+                            {metadata && metadata.length > 0 && (
                               <>
                                 <p><strong>Contributor:</strong> {metadata[0].contributor_full_name}</p>
                                 <p><strong>Tên cuốn sách:</strong> {metadata[0].book_title}</p>
@@ -681,7 +688,7 @@ function Review() {
                       </ul>
                     </div>
                   ) : (
-                    <p>Không có kết quả nào được tìm thấy.</p>
+                    <p>Không phát hiện đạo văn.</p>
                   )}
                 </div>
               )}

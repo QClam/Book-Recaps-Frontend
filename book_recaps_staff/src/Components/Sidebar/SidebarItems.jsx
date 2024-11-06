@@ -40,7 +40,12 @@ export const SidebarItems = [
   {
     title: "Kháng cáo",
     icon: <Gavel />,
-    link: "/appeal",
+    link: "/appeals",
+  },
+  {
+    title: "Report",
+    icon: <Gavel />,
+    link: "/reports",
   },
   {
     title: "Cài đặt",
