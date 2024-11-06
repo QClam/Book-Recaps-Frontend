@@ -4,21 +4,49 @@ import { Hourglass } from "react-loader-spinner";
 import Pagination from "@mui/material/Pagination";
 
 import { fetchProfile } from "../Auth/Profile";
-import api from '../Auth/AxiosInterceptors'
+import api from "../Auth/AxiosInterceptors";
 import "./Content.scss";
 import "../Loading.scss";
 
 function truncateText(text, maxLength) {
   if (text.length > maxLength) {
-    return text.substring(0, maxLength) + '...';
+    return text.substring(0, 100) + "...";
   }
   return text;
 }
 
+const resolveRefs = (data) => {
+  const refMap = new Map();
+  const createRefMap = (obj) => {
+    if (typeof obj !== "object" || obj === null) return;
+    if (obj.$id) {
+      refMap.set(obj.$id, obj);
+    }
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        createRefMap(obj[key]);
+      }
+    }
+  };
+  const resolveRef = (obj) => {
+    if (typeof obj !== "object" || obj === null) return obj;
+    if (obj.$ref) {
+      return refMap.get(obj.$ref);
+    }
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        obj[key] = resolveRef(obj[key]);
+      }
+    }
+    return obj;
+  };
+  createRefMap(data);
+  return resolveRef(data);
+};
+
 function RecapsList() {
   const [contentItems, setContentItems] = useState([]);
-  // const [recapsDetail, setRecapsDetail] = useState([]);
-  const [loading, setLoading] = useState(true); // Start loading as true
+  const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState([]);
   const [currentPage, setCurrentPage] = useState(1); // MUI Pagination uses 1-based indexing
   const [review, setReview] = useState([]);
@@ -40,24 +68,21 @@ function RecapsList() {
 
   const fetchRecaps = async () => {
     try {
-      const response = await api.get(
-        "/api/recap/Getallrecap",
-        {
-          headers: {
-            Accept: "*/*",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const recaps = response.data.data.$values;
+      const response = await api.get("/api/recap/Getallrecap", {
+        headers: {
+          Accept: "*/*",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      let recaps = resolveRefs(response.data.data.$values);
       console.log("Recaps: ", recaps);
 
-      // Process each recap to get version status and contributor
+      // Xử lý từng recap để get version status và contributor
       const updatedRecaps = await Promise.all(
         recaps.map(async (recap) => {
           let updatedRecap = { ...recap };
 
-          // Initial check for status from recapVersions array
+          // Check status từ recapVersions
           if (
             recap.recapVersions?.$values &&
             recap.recapVersions.$values.length > 0
@@ -71,14 +96,14 @@ function RecapsList() {
             updatedRecap.recapVersionId = "No ID";
           }
 
-          // Fetch version status from currentVersionId if available
+          // Fetch version status từ currentVersionId
           if (recap.currentVersionId) {
             try {
               const versionData = await fetchRecapVersion(
                 recap.currentVersionId
               );
               if (versionData.data?.status) {
-                updatedRecap.currentVersionStatus = versionData.data.status; // Overwrite with current version status if available
+                updatedRecap.currentVersionStatus = versionData.data.status; // Ghi đè status hiện tại nếu có
               }
               // console.log("Recap Version Data for ID", recap.currentVersionId, versionData);
             } catch (versionError) {
@@ -129,14 +154,11 @@ function RecapsList() {
   // Fetch version details
   const fetchRecapVersion = async (currentVersionId) => {
     try {
-      const response = await api.get(
-        `/version/${currentVersionId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await api.get(`/version/${currentVersionId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       // console.log("Recap Version: ", response.data);
 
       return response.data;
@@ -159,7 +181,7 @@ function RecapsList() {
       return response.data;
     } catch (error) {
       console.error("Error fetching user account: ", error);
-      return null; // Handle the error accordingly
+      return null; // Handle lỗi
     }
   };
 
@@ -171,15 +193,11 @@ function RecapsList() {
         comments: "Chưa Đạt",
       };
 
-      const response = await api.post(
-        "/api/review/createreview",
-        newReview,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await api.post("/api/review/createreview", newReview, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const reviewId = response.data.data?.id;
       if (reviewId) {
         console.log("Review created successfully:", response.data);
@@ -194,14 +212,11 @@ function RecapsList() {
 
   const fetchReview = async () => {
     try {
-      const response = await api.get(
-        `/api/review/getallreview`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await api.get(`/api/review/getallreview`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const reviews = response.data.data.$values;
       console.log("Reviews: ", reviews);
       setReview(reviews);
@@ -257,11 +272,14 @@ function RecapsList() {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <select value={selectedStatus} onChange={(e) => setSelectedStatus(e.target.value)}>
+        <select
+          value={selectedStatus}
+          onChange={(e) => setSelectedStatus(e.target.value)}
+        >
           <option value="">Tất cả</option>
-          <option value="1">Pending</option>
-          <option value="2">Approved</option>
-          <option value="3">Reject</option>
+          <option value="1">Đang xử lý</option>
+          <option value="2">Chấp thuận</option>
+          <option value="3">Từ chối</option>
         </select>
       </div>
       <div className="content-list">
@@ -279,7 +297,7 @@ function RecapsList() {
             </tr>
           </thead>
           <tbody>
-            {displayRecaps.map((val) => (
+            {displayRecaps.filter((val) => val.currentVersionStatus !== 0).map((val) => (
               <tr key={val.id}>
                 <td>{val.name}</td>
                 <td>{val.book?.title}</td>
@@ -289,7 +307,7 @@ function RecapsList() {
                 <td>
                   <button
                     className="button"
-                    style={{ backgroundColor: "green", color: "#fff" }}
+                    style={{ backgroundColor: "green", color: "#fff", width: "120px" }}
                     onClick={() => createReview(val.recapVersionId)}
                   >
                     Tạo Review
@@ -306,6 +324,7 @@ function RecapsList() {
                           backgroundColor: "#007bff",
                           color: "#fff",
                           marginLeft: 5,
+                          width: "130px"
                         }}
                         onClick={() =>
                           navigate(`/review/content_version/${rev.id}`)
@@ -319,28 +338,28 @@ function RecapsList() {
                   {val.currentVersionStatus === 1 ? (
                     <button
                       className="role-container"
-                      style={{ backgroundColor: "#007bff" }}
+                      style={{ backgroundColor: "#007bff", color: "#f0f0f0", width: "140px" }}
                     >
-                      Pending
+                      Đang xử lý
                     </button>
                   ) : val.currentVersionStatus === 2 ? (
                     <button
                       className="role-container"
-                      style={{ backgroundColor: "green" }}
+                      style={{ backgroundColor: "green", color: "#f0f0f0", width: "140px" }}
                     >
-                      Approved
+                      Chấp thuận
                     </button>
                   ) : val.currentVersionStatus === 3 ? (
                     <button
                       className="role-container"
-                      style={{ backgroundColor: "red" }}
+                      style={{ backgroundColor: "red", color: "#f0f0f0", width: "140px" }}
                     >
-                      Reject
+                      Từ chối
                     </button>
                   ) : (
                     <button
                       className="role-container"
-                      style={{ backgroundColor: "#5e6061" }}
+                      style={{ backgroundColor: "#5e6061", color: "#f0f0f0" }}
                     >
                       Unknow
                     </button>
@@ -361,18 +380,18 @@ function RecapsList() {
         showLastButton
         sx={{
           "& .MuiPaginationItem-root": {
-            color: isDarkMode ? "#fff" : "#000", // Change text color based on theme
-            backgroundColor: isDarkMode ? "#555" : "#f0f0f0", // Button background color based on theme
+            color: isDarkMode ? "#fff" : "#000",
+            backgroundColor: isDarkMode ? "#555" : "#f0f0f0", 
           },
           "& .MuiPaginationItem-root.Mui-selected": {
-            backgroundColor: isDarkMode ? "#306cce" : "#72a1ed", // Change color of selected page button
-            color: "#fff", // Ensure selected text is white for contrast
+            backgroundColor: isDarkMode ? "#306cce" : "#72a1ed", 
+            color: "#fff", 
           },
           "& .MuiPaginationItem-root.Mui-selected:hover": {
-            backgroundColor: isDarkMode ? "#2057a4" : "#5698d3", // Color on hover for selected button
+            backgroundColor: isDarkMode ? "#2057a4" : "#5698d3", 
           },
           "& .MuiPaginationItem-root:hover": {
-            backgroundColor: isDarkMode ? "#666" : "#e0e0e0", // Color on hover for non-selected buttons
+            backgroundColor: isDarkMode ? "#666" : "#e0e0e0", 
           },
         }}
       />
