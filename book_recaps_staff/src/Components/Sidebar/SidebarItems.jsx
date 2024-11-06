@@ -1,7 +1,7 @@
 import React from "react";
 
 import {
-  Home,
+  OutlinedFlag,
   Bookmark,
   SpaceDashboard,
   BorderColor,
@@ -44,7 +44,7 @@ export const SidebarItems = [
   },
   {
     title: "Report",
-    icon: <Gavel />,
+    icon: <OutlinedFlag />,
     link: "/reports",
   },
   {

@@ -11,6 +11,7 @@ import {
     InputLabel,
     Select,
     MenuItem,
+    Pagination,
 } from "@mui/material";
 import Swal from 'sweetalert2';
 
@@ -47,21 +48,16 @@ const resolveRefs = (data) => {
     return resolveRef(data);
 };
 
-// function truncateText(text, maxLength) {
-//     if (text.length > maxLength) {
-//       return text.substring(0, maxLength) + "...";
-//     }
-//     return text;
-//   }
-
 function AppealList() {
     const [appeals, setAppeal] = useState([]);
     const [selectedAppeal, setSelectedAppeal] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [responseText, setResponseText] = useState("");
     const [profile, setProfile] = useState([]);
-    const [filterStatus, setFilterStatus] = useState("");
     const [staffId, setStaffId] = useState("");
+    const [filterStatus, setFilterStatus] = useState("");
+    const [currentPage, setCurrentPage] = useState(1); // MUI Pagination uses 1-based indexing
+    const [isDarkMode, setIsDarkMode] = useState(true);
 
     const [responseForm, setResponseForm] = useState({
         id: "",
@@ -69,10 +65,15 @@ function AppealList() {
         response: "",
     })
 
-    const maxLength = 100;
-
     const navigate = useNavigate();
     const token = localStorage.getItem("access_token")
+
+    const appealsPerPage = 4;
+
+    const displayAppeals = appeals.slice(
+        (currentPage - 1) * appealsPerPage,
+        currentPage * appealsPerPage
+    );
 
     const fetchAppeals = async () => {
         try {
@@ -145,6 +146,10 @@ function AppealList() {
         setFilterStatus(event.target.value);
     };
 
+    const handlePageChange = (event, value) => {
+        setCurrentPage(value);
+    };
+
     useEffect(() => {
         fetchAppeals();
     }, []);
@@ -181,7 +186,7 @@ function AppealList() {
                         </tr>
                     </thead>
                     <tbody>
-                        {appeals
+                        {displayAppeals
                             .filter((val) => filterStatus === "" || val.appealStatus === filterStatus)
                             .filter((val) => val.appealStatus !== 0 && val.staff?.id === profile.id)
                             .map((val) => (
@@ -189,7 +194,7 @@ function AppealList() {
                                     <td>{val.contributor?.fullName}</td>
                                     <td>{val.staff?.fullName || "Chưa có Staff phản hồi"}</td>
                                     <td>{val.reason}</td>
-                                    <td>{val.response}</td>
+                                    <td>{val.response || "Chưa có phản hồi từ Staff"}</td>
                                     <td>{new Date(val.createdAt).toLocaleDateString()}</td>
                                     <td>
                                         <button style={{ width: "150px" }}
@@ -254,6 +259,32 @@ function AppealList() {
                     <Button color="primary" onClick={handleResponse}>Gửi Phản hồi</Button>
                 </DialogActions>
             </Dialog>
+
+            <Pagination
+                className="center"
+                count={Math.ceil(appeals.length / appealsPerPage)}
+                page={currentPage}
+                onChange={handlePageChange}
+                color="primary"
+                showFirstButton
+                showLastButton
+                sx={{
+                    "& .MuiPaginationItem-root": {
+                        color: isDarkMode ? "#fff" : "#000",
+                        backgroundColor: isDarkMode ? "#555" : "#f0f0f0",
+                    },
+                    "& .MuiPaginationItem-root.Mui-selected": {
+                        backgroundColor: isDarkMode ? "#306cce" : "#72a1ed",
+                        color: "#fff",
+                    },
+                    "& .MuiPaginationItem-root.Mui-selected:hover": {
+                        backgroundColor: isDarkMode ? "#2057a4" : "#5698d3",
+                    },
+                    "& .MuiPaginationItem-root:hover": {
+                        backgroundColor: isDarkMode ? "#666" : "#e0e0e0",
+                    },
+                }}
+            />
         </div>
     );
 }
