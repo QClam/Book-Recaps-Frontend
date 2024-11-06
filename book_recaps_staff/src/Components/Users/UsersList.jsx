@@ -3,6 +3,7 @@ import { Hourglass } from 'react-loader-spinner';
 import api from '../Auth/AxiosInterceptors';
 import Pagination from '@mui/material/Pagination';
 
+import empty_image from "../../data/empty-image.png"
 import './UsersList.scss';
 import '../Loading.scss';
 
@@ -79,7 +80,13 @@ function UsersList() {
                                 <td>{val.fullName}</td>
                                 <td>{val.userName}</td>
                                 <td>{val.email}</td>
-                                <td><img src={val.imageUrl} alt='Avatar' style={{ width: 80, height: 80 }} /></td>
+                                <td><img src={val.imageUrl || empty_image} 
+                                            alt='Avatar' 
+                                            style={{ width: 80, height: 80 }} 
+                                            onError={({currentTarget}) => {
+                                                currentTarget.onerror = null;
+                                                currentTarget.src = empty_image
+                                            }}/></td>
                                 <td>{val.birthDate}</td>
                                 <td>{val.phoneNumber}</td>
                             </tr>
