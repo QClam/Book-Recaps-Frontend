@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://160.25.80.100:7124/api",
+  baseURL: "https://160.25.80.100:7124",
 });
 
 const refreshAccessToken = async () => {
@@ -63,14 +63,14 @@ axios.interceptors.response.use(
   async (error) => {
     const originalRequest = error.config;
 
-    // Kiểm tra xem lỗi có phải là 401 (Unauthorized)
-    if (error.response.status === 401 && !originalRequest._retry) {
+    // Kiểm tra xem lỗi có phải là 401 (Unauthorized) và request chưa được retry
+    if (error.response && error.response.status === 401 && !originalRequest._retry) {
       console.log("Token hết hạn, đang gọi refreshAccessToken...");
 
       originalRequest._retry = true;
 
       try {
-        // Gọi hàm refreshAccessToken
+        // Gọi hàm refreshAccessToken để lấy token mới
         const newAccessToken = await refreshAccessToken();
 
         console.log("Token đã được làm mới:", newAccessToken);
@@ -83,7 +83,8 @@ axios.interceptors.response.use(
         return axios(originalRequest);
       } catch (refreshError) {
         console.error("Làm mới token thất bại:", refreshError);
-        // Nếu làm mới token thất bại, điều hướng đến trang login
+
+        // Nếu làm mới token thất bại, xóa token và điều hướng đến trang login
         localStorage.removeItem("access_token");
         localStorage.removeItem("refresh_token");
         window.location.href = "/login";

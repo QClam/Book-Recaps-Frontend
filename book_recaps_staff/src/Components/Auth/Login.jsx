@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
+import { isRoleMatched } from "../../utils/matchRole";
 import "./Login.scss";
 
 function Login() {
@@ -134,9 +136,6 @@ function Login() {
     }
   };
 
-
-  
-
   const handleLogin = async (e) => {
     e.preventDefault();
 
@@ -159,15 +158,27 @@ function Login() {
       );
 
       const { accessToken, refreshToken } = response.data.message.token;
+      const decoded = jwtDecode(accessToken);
       localStorage.setItem("access_token", accessToken);
       localStorage.setItem("refresh_token", refreshToken);
-      
-      navigate("/recaps")
-      console.log("Login successfully", response.data);
+
+      // Decode token để lấy Role, nếu k phải Role thì không cho đăng nhập
+      if(isRoleMatched(decoded, "Staff")) {
+        navigate("/recaps")
+        console.log("Login successfully", response.data);
+      } else {
+        setError("Hãy dùng tài khoản của Staff để đăng nhập");
+        console.error("Role mismatch: Access denied");
+      }
     } catch (error) {
-      setError("Đăng nhập thất bại", error);
+      setError("Tài khoản hoặc mật khẩu không đúng. Vui lòng kiểm tra lại");
+      console.error("Error sending forget password request:", error.response?.data || error.message);
     }
   };
+
+  const forgetPasswordClick = () => {
+    navigate("/forget-password");
+  }
 
   return (
     <div className="login-page">
@@ -237,7 +248,7 @@ function Login() {
         <div className="form-container sign-in">
           <form onSubmit={handleLogin}>
             <h1>Đăng nhập</h1>
-            <div className="social-icons">
+            {/* <div className="social-icons">
               <a href="#" className="icon">
                 <i className="fa-brands fa-google"></i>
               </a>
@@ -245,7 +256,7 @@ function Login() {
                 <i className="fa-brands fa-facebook"></i>
               </a>
             </div>
-            <span>hoặc sử dụng email để đăng nhập</span>
+            <span>hoặc sử dụng email để đăng nhập</span> */}
             <input
               type="email"
               value={email}
@@ -263,6 +274,7 @@ function Login() {
               onFocus={() => setError(null)}
             />
             <button type="submit">Đăng nhập</button>
+            <a style={{ textDecoration: "none", cursor: "pointer" }} onClick={() => forgetPasswordClick()}>Bạn quên mật khẩu</a>
             {error && <p style={{ color: "red" }}>{error}</p>}
           </form>
         </div>

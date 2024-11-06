@@ -1,66 +1,125 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
-// import { sampleData } from './ContentItems';
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { Hourglass } from "react-loader-spinner";
+import Pagination from "@mui/material/Pagination";
 
 import { fetchProfile } from "../Auth/Profile";
+import api from "../Auth/AxiosInterceptors";
 import "./Content.scss";
 import "../Loading.scss";
 
-// function truncateText(text, maxLength) {
-//   if (text.length > maxLength) {
-//     return text.substring(0, maxLength) + '...';
-//   }
-//   return text;
-// }
+function truncateText(text, maxLength) {
+  if (text.length > maxLength) {
+    return text.substring(0, 100) + "...";
+  }
+  return text;
+}
+
+const resolveRefs = (data) => {
+  const refMap = new Map();
+  const createRefMap = (obj) => {
+    if (typeof obj !== "object" || obj === null) return;
+    if (obj.$id) {
+      refMap.set(obj.$id, obj);
+    }
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        createRefMap(obj[key]);
+      }
+    }
+  };
+  const resolveRef = (obj) => {
+    if (typeof obj !== "object" || obj === null) return obj;
+    if (obj.$ref) {
+      return refMap.get(obj.$ref);
+    }
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        obj[key] = resolveRef(obj[key]);
+      }
+    }
+    return obj;
+  };
+  createRefMap(data);
+  return resolveRef(data);
+};
 
 function RecapsList() {
   const [contentItems, setContentItems] = useState([]);
-  // const [recapsDetail, setRecapsDetail] = useState([]);
-  const [loading, setLoading] = useState(true); // Start loading as true
+  const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1); // MUI Pagination uses 1-based indexing
+  const [review, setReview] = useState([]);
+  const [isDarkMode, setIsDarkMode] = useState(true);
   const [reviewForm, setReviewForm] = useState({
     staffId: "",
     recapVersionId: "",
     comments: "",
   });
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
+
   const token = localStorage.getItem("access_token");
   const navigate = useNavigate();
 
+  const recapsPerPage = 5;
+  const maxLength = 150;
+
   const fetchRecaps = async () => {
     try {
-      const response = await axios.get(
-        "https://160.25.80.100:7124/api/recap/Getallrecap",
-        {
-          headers: {
-            Accept: "*/*",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const recaps = response.data.data.$values;
+      const response = await api.get("/api/recap/Getallrecap", {
+        headers: {
+          Accept: "*/*",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      let recaps = resolveRefs(response.data.data.$values);
       console.log("Recaps: ", recaps);
 
-      // Call fetchRecapVersion and fetchContributor for each recap to get its current version status
+      // Xử lý từng recap để get version status và contributor
       const updatedRecaps = await Promise.all(
         recaps.map(async (recap) => {
           let updatedRecap = { ...recap };
 
-          // Fetch version status
-          if (recap.currentVersionId) {
-            const versionData = await fetchRecapVersion(recap.currentVersionId);
+          // Check status từ recapVersions
+          if (
+            recap.recapVersions?.$values &&
+            recap.recapVersions.$values.length > 0
+          ) {
             updatedRecap.currentVersionStatus =
-              versionData.data?.status || "Unknown";
+              recap.recapVersions.$values[0].status;
+            updatedRecap.recapVersionId = recap.recapVersions.$values[0].id;
+            // console.log("recapVersionId: ", updatedRecap.recapVersionId);
           } else {
             updatedRecap.currentVersionStatus = "No Version";
+            updatedRecap.recapVersionId = "No ID";
           }
 
-          // Fetch contributor data
+          // Fetch version status từ currentVersionId
+          if (recap.currentVersionId) {
+            try {
+              const versionData = await fetchRecapVersion(
+                recap.currentVersionId
+              );
+              if (versionData.data?.status) {
+                updatedRecap.currentVersionStatus = versionData.data.status; // Ghi đè status hiện tại nếu có
+              }
+              // console.log("Recap Version Data for ID", recap.currentVersionId, versionData);
+            } catch (versionError) {
+              console.log("Error fetching recap version:", versionError);
+            }
+          }
+
+          // Fetch contributor
           if (recap.userId) {
-            const contributorData = await fetchContributor(recap.userId);
-            updatedRecap.contributor = contributorData.data;
+            try {
+              const contributorData = await fetchContributor(recap.userId);
+              updatedRecap.contributor = contributorData.data;
+            } catch (contributorError) {
+              console.log("Error fetching contributor:", contributorError);
+              updatedRecap.contributor = { fullName: "Unknown" };
+            }
           } else {
             updatedRecap.contributor = { fullName: "Unknown" };
           }
@@ -69,10 +128,9 @@ function RecapsList() {
         })
       );
 
-      setContentItems(updatedRecaps); // Set the updated recaps with version status
+      setContentItems(updatedRecaps);
     } catch (error) {
       console.log("Error fetching data, using sample data as fallback:", error);
-      return [];
     } finally {
       setLoading(false);
     }
@@ -80,6 +138,7 @@ function RecapsList() {
 
   useEffect(() => {
     fetchRecaps();
+    fetchReview();
   }, []);
 
   useEffect(() => {
@@ -95,14 +154,13 @@ function RecapsList() {
   // Fetch version details
   const fetchRecapVersion = async (currentVersionId) => {
     try {
-      const response = await axios.get(
-        `https://160.25.80.100:7124/version/${currentVersionId}`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await api.get(`/version/${currentVersionId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      // console.log("Recap Version: ", response.data);
+
       return response.data;
     } catch (error) {
       console.log("Error Fetching currentVersionId: ", error);
@@ -111,19 +169,19 @@ function RecapsList() {
 
   const fetchContributor = async (userId) => {
     try {
-      const response = await axios.get(
-        `https://160.25.80.100:7124/api/users/get-user-account-byID?userId=${userId}`,
+      const response = await api.get(
+        `/api/users/get-user-account-byID?userId=${userId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      console.log("Contributor: ", response.data);
+      // console.log("Contributor: ", response.data);
       return response.data;
     } catch (error) {
       console.error("Error fetching user account: ", error);
-      return null; // Handle the error accordingly
+      return null; // Handle lỗi
     }
   };
 
@@ -132,28 +190,38 @@ function RecapsList() {
       const newReview = {
         staffId: reviewForm.staffId,
         recapVersionId: recapVersionId,
-        comments: "Hiện chưa có comment",
+        comments: "Chưa Đạt",
       };
 
-      const response = await axios.post(
-        "https://160.25.80.100:7124/api/review/createreview",
-        newReview,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const response = await api.post("/api/review/createreview", newReview, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       const reviewId = response.data.data?.id;
       if (reviewId) {
         console.log("Review created successfully:", response.data);
-        navigate(`/review/content_version/${reviewId}`, 
-        );
+        navigate(`/review/content_version/${reviewId}`);
       } else {
         console.error("Review created but ID not found.");
       }
     } catch (error) {
       console.error("Error creating review:", error);
+    }
+  };
+
+  const fetchReview = async () => {
+    try {
+      const response = await api.get(`/api/review/getallreview`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const reviews = response.data.data.$values;
+      console.log("Reviews: ", reviews);
+      setReview(reviews);
+    } catch (error) {
+      console.error("Error fetching review:", error);
     }
   };
 
@@ -173,65 +241,125 @@ function RecapsList() {
     );
   }
 
+  //Filter
+  const filteredRecaps = contentItems.filter((item) => {
+    const search = item.book?.title
+      .toLowerCase()
+      .includes(searchQuery.toLocaleLowerCase());
+    const status = selectedStatus
+      ? item.currentVersionStatus === parseInt(selectedStatus)
+      : true;
+    return search && status;
+  });
+
+  const displayRecaps = filteredRecaps.slice(
+    (currentPage - 1) * recapsPerPage,
+    currentPage * recapsPerPage
+  );
+  const handlePageChange = (event, value) => {
+    setCurrentPage(value);
+  };
+
   return (
     <div className="content-container">
       <div>
         <h2>Nội dung của Contributor</h2>
       </div>
+      <div className="search-filter-container">
+        <input
+          type="text"
+          placeholder="Tìm theo cuốn sách..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <select
+          value={selectedStatus}
+          onChange={(e) => setSelectedStatus(e.target.value)}
+        >
+          <option value="">Tất cả</option>
+          <option value="1">Đang xử lý</option>
+          <option value="2">Chấp thuận</option>
+          <option value="3">Từ chối</option>
+        </select>
+      </div>
       <div className="content-list">
         <table className="content-table">
           <thead>
             <tr>
-              <th>Chủ đề</th>
+              <th>Tên bản Recap</th>
+              <th>Tên cuốn sách</th>
               <th>Mô tả cuốn sách</th>
               <th>Tên Contributor</th>
               <th>Ngày</th>
               <th>Duyệt nội dung</th>
+              <th>Chi tiết bản duyệt</th>
               <th>Trạng thái</th>
             </tr>
           </thead>
           <tbody>
-            {contentItems.map((val) => (
+            {displayRecaps.filter((val) => val.currentVersionStatus !== 0).map((val) => (
               <tr key={val.id}>
+                <td>{val.name}</td>
                 <td>{val.book?.title}</td>
-                <td>{val.book?.description}</td>
+                <td>{truncateText(val.book?.description, maxLength)}</td>
                 <td>{val.contributor?.fullName}</td>
                 <td>{new Date(val.createdAt).toLocaleDateString()}</td>
                 <td>
                   <button
                     className="button"
-                    style={{ backgroundColor: "green", color: "#fff" }}
-                    onClick={() => createReview(val.currentVersionId, val.currentVersionStatus, val.book?.title, val.book?.description)}
+                    style={{ backgroundColor: "green", color: "#fff", width: "120px" }}
+                    onClick={() => createReview(val.recapVersionId)}
                   >
-                    Duyệt
+                    Tạo Review
                   </button>
+                </td>
+                <td>
+                  {review
+                    .filter((rev) => rev.recapVersionId === val.recapVersionId)
+                    .map((rev) => (
+                      <button
+                        key={rev.id}
+                        className="button"
+                        style={{
+                          backgroundColor: "#007bff",
+                          color: "#fff",
+                          marginLeft: 5,
+                          width: "130px"
+                        }}
+                        onClick={() =>
+                          navigate(`/review/content_version/${rev.id}`)
+                        }
+                      >
+                        Xem Review
+                      </button>
+                    ))}
                 </td>
                 <td>
                   {val.currentVersionStatus === 1 ? (
                     <button
                       className="role-container"
-                      style={{ backgroundColor: "#007bff" }}
+                      style={{ backgroundColor: "#007bff", color: "#f0f0f0", width: "140px" }}
                     >
-                      Pending
+                      Đang xử lý
                     </button>
                   ) : val.currentVersionStatus === 2 ? (
                     <button
                       className="role-container"
-                      style={{ backgroundColor: "green" }}
+                      style={{ backgroundColor: "green", color: "#f0f0f0", width: "140px" }}
                     >
-                      Approved
+                      Chấp thuận
                     </button>
                   ) : val.currentVersionStatus === 3 ? (
                     <button
                       className="role-container"
-                      style={{ backgroundColor: "red" }}
+                      style={{ backgroundColor: "red", color: "#f0f0f0", width: "140px" }}
                     >
-                      Reject
+                      Từ chối
                     </button>
                   ) : (
                     <button
                       className="role-container"
-                      style={{ backgroundColor: "#5e6061" }}
+                      style={{ backgroundColor: "#5e6061", color: "#f0f0f0" }}
                     >
                       Unknow
                     </button>
@@ -242,6 +370,31 @@ function RecapsList() {
           </tbody>
         </table>
       </div>
+      <Pagination
+        className="center"
+        count={Math.ceil(contentItems.length / recapsPerPage)}
+        page={currentPage}
+        onChange={handlePageChange}
+        color="primary"
+        showFirstButton
+        showLastButton
+        sx={{
+          "& .MuiPaginationItem-root": {
+            color: isDarkMode ? "#fff" : "#000",
+            backgroundColor: isDarkMode ? "#555" : "#f0f0f0", 
+          },
+          "& .MuiPaginationItem-root.Mui-selected": {
+            backgroundColor: isDarkMode ? "#306cce" : "#72a1ed", 
+            color: "#fff", 
+          },
+          "& .MuiPaginationItem-root.Mui-selected:hover": {
+            backgroundColor: isDarkMode ? "#2057a4" : "#5698d3", 
+          },
+          "& .MuiPaginationItem-root:hover": {
+            backgroundColor: isDarkMode ? "#666" : "#e0e0e0", 
+          },
+        }}
+      />
     </div>
   );
 }

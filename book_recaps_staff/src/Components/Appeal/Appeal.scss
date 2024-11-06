@@ -1,0 +1,74 @@
+.table-appeal {
+
+    th:nth-child(2), th:nth-child(3), th:nth-child(4), th:nth-child(5), th:nth-child(6), th:nth-child(7) {
+        text-align: center;
+    }
+
+    th:nth-child(8) {
+        text-align: right;
+    }
+
+    td:nth-child(5), td:nth-child(6), td:nth-child(7) {
+        text-align: center;
+    }
+
+    td:nth-child(8) {
+        text-align: right;
+    }
+}
+
+.swal2-container {
+    z-index: 2000 !important;
+}
+
+/* Default (Light Mode) */
+:root {
+    --form-control-bg: #fff; /* Light background */
+    --form-control-color: #000; /* Dark text */
+    --form-control-border: #ccc; /* Light border */
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --form-control-bg: #333; /* Dark background */
+        --form-control-color: #f0f0f0; /* Light text */
+        --form-control-border: #666; /* Dark border */
+    }
+}
+
+.form-control {
+    background-color: var(--form-control-bg);
+    color: var(--form-control-color);
+    border-radius: 4px;
+    min-width: 200px;
+    margin-bottom: 20px;
+    border: 1px solid var(--form-control-border);
+}
+
+.form-control .MuiInputLabel-outlined {
+    color: var(--form-control-color); /* Label color */
+}
+
+.form-control .MuiOutlinedInput-root {
+    color: var(--form-control-color); /* Input text color */
+}
+
+.form-control .MuiOutlinedInput-notchedOutline {
+    border-color: var(--form-control-border); /* Border color */
+}
+
+.form-control .MuiSelect-icon {
+    color: var(--form-control-color); /* Dropdown arrow color */
+}
+
+.form-control .MuiMenuItem-root {
+    background-color: var(--form-control-bg); /* Dropdown item background */
+    color: var(--form-control-color); /* Dropdown item text color */
+}
+
+.form-control .MuiMenuItem-root:hover {
+    background-color: var(--form-control-border); /* Hover background for dropdown items */
+    color: var(--form-control-color); /* Hover text color */
+}
+

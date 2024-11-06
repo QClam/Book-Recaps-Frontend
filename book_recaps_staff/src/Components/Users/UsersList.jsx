@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
 import { Hourglass } from 'react-loader-spinner';
 import api from '../Auth/AxiosInterceptors';
-import Pagination from '@mui/material/Pagination'; // Import MUI Pagination
+import Pagination from '@mui/material/Pagination';
 
+import empty_image from "../../data/empty-image.png"
 import './UsersList.scss';
 import '../Loading.scss';
 
@@ -20,10 +20,9 @@ function UsersList() {
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await api.get('/users/getalluser',
+                const response = await api.get('/api/users/getalluser',
                     {
                         headers: {
-                            Accept : "*/*",
                             Authorization: `Bearer ${token}`
                         }
                     }
@@ -81,7 +80,13 @@ function UsersList() {
                                 <td>{val.fullName}</td>
                                 <td>{val.userName}</td>
                                 <td>{val.email}</td>
-                                <td><img src={val.imageUrl} alt='Avatar' style={{ width: 80, height: 80 }} /></td>
+                                <td><img src={val.imageUrl || empty_image} 
+                                            alt='Avatar' 
+                                            style={{ width: 80, height: 80 }} 
+                                            onError={({currentTarget}) => {
+                                                currentTarget.onerror = null;
+                                                currentTarget.src = empty_image
+                                            }}/></td>
                                 <td>{val.birthDate}</td>
                                 <td>{val.phoneNumber}</td>
                             </tr>
