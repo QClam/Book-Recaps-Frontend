@@ -12,6 +12,9 @@ export function handleFetchError(error) {
     if (error.response.data?.message) {
       return { error: error.response.data.message, status: error.response.status, data: error.response.data.data };
     }
+    if (error.response.data?.error instanceof String) {
+      return { error: error.response.data.error, status: error.response.status };
+    }
     throw error;
   } else if (error.request) {
     // The request was made but no response was received

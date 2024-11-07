@@ -20,7 +20,7 @@ export const NavBar = () => {
         to={routes.dashboard}
         className="flex justify-start items-center py-2 px-5 gap-2.5 w-full h-16"
       >
-        <img src="/minimal-icon.svg" className="block h-8" alt="logo"/>
+        <img src="/icon.png" className="block h-10" alt="logo"/>
         <span className={cn("font-bold text-2xl", !isOpen && "hidden")}>
           Dashboard
         </span>

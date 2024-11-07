@@ -729,14 +729,16 @@ const KeyIdeaItem = ({ keyIdea, recapVersion, handleDeleteKeyIdea, handleSaveKey
         <div className="flex-1 text-right">
           {/*<p>Thứ tự: <span className="font-semibold">{keyIdea.order}</span></p>*/}
 
-          <button
-            type="button"
-            className="text-red-500 hover:text-red-700"
-            onClick={onClickRemoveKeyIdea}
-            disabled={keyIdea.isSaving || recapVersion.status !== 0}
-          >
-            Remove
-          </button>
+          <Show when={recapVersion.status === 0}>
+            <button
+              type="button"
+              className="text-red-500 hover:text-red-700"
+              onClick={onClickRemoveKeyIdea}
+              disabled={keyIdea.isSaving || recapVersion.status !== 0}
+            >
+              Remove
+            </button>
+          </Show>
         </div>
       </div>
       <textarea
