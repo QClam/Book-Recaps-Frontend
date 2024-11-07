@@ -42,6 +42,7 @@ function ReportList() {
     const [loading, setLoading] = useState(true);
     const [reports, setReports] = useState([]);
     const [selectedReport, setSelectedReport] = useState(null);
+    const [users, setUsers] = useState([]);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [responseText, setResponseText] = useState("");
     const [filterStatus, setFilterStatus] = useState("");
@@ -67,6 +68,19 @@ function ReportList() {
             throw json({ error: err.error }, { status: err.status });
         }
     };
+
+    const fetchUsers = async () => {
+
+        try {
+            const response = await api.get(`/api/users/getalluser`);
+            const users = response.data.$values;
+            // console.log(users);
+            setUsers(users);
+        } catch (error) {
+            const err = handleFetchError(error)
+            throw json({ error: err.error }, { status: err.status });
+        }
+    }
 
     const openDialog = (report) => {
         setSelectedReport(report);
@@ -121,7 +135,14 @@ function ReportList() {
 
     useEffect(() => {
         fetchReports();
+        fetchUsers();
     }, [])
+
+    const getUserNamebyId = (userId) => {
+        const user = users.find((user) => user.id.toString() === userId.toString());
+        // console.log("Matching user: ", user); // Kiểm tra user được tìm thấy
+        return user ? user.fullName : "Không xác định";
+    }
 
     if (!loading) {
         return (
@@ -162,7 +183,7 @@ function ReportList() {
                         <tr>
                             <th>Tên bản Recap</th>
                             <th>Tên cuốn sách</th>
-                            <th>Tên Contributor</th>
+                            <th>Tên Audience</th>
                             <th>Nội dung</th>
                             <th>Phản hồi từ Staff</th>
                             <th>Ngày</th>
@@ -177,7 +198,7 @@ function ReportList() {
                                 <tr key={val.id}>
                                     <td>{val.recaps?.name}</td>
                                     <td>Sách</td>
-                                    <td>{val.recaps?.user?.fullName}</td>
+                                    <td>{getUserNamebyId(val.userId)}</td>
                                     <td>{val.description}</td>
                                     <td>{val.response || "Chưa có phản hồi từ staff"}</td>
                                     <td>{new Date(val.createdAt).toLocaleDateString()}</td>
