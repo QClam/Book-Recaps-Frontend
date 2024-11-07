@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Route, Routes, useLocation } from "react-route
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3'
 
 import Sidebar from "./Components/Sidebar/Sidebar";
-import Overview from "./Components/Overview/Overview";
 import Review from "./Components/Review/Review";
 import Login from "./Components/Auth/Login";
 import UsersList from "./Components/Users/UsersList";
@@ -30,7 +29,6 @@ function App() {
       {/* Cần đăng nhập để vào route */}
         <Route path="/" element={<PrivateRoute> <RecapsList /> </PrivateRoute>} />
         <Route path="/recaps" element={<PrivateRoute> <RecapsList /> </PrivateRoute>} />
-        <Route path="/overview" element={<PrivateRoute> <Overview /> </PrivateRoute>} />
         <Route path="/users" element={<PrivateRoute> <UsersList /> </PrivateRoute>} />
         <Route path="/settings" element={<PrivateRoute> <UserProfile /> </PrivateRoute>} />
         <Route path="/dashboard" element={<Dashboard /> } />

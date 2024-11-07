@@ -22,11 +22,11 @@ export const SidebarItems = [
     icon: <SpaceDashboard />,
     link: "/dashboard",
   },
-  {
-    title: "Nội dung chờ duyệt",
-    icon: <Widgets />,
-    link: "/overview",
-  },
+  // {
+  //   title: "Nội dung chờ duyệt",
+  //   icon: <Widgets />,
+  //   link: "/overview",
+  // },
   {
     title: "Danh sách Recaps",
     icon: <LibraryBooks />,
