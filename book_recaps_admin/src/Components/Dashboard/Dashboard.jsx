@@ -1,116 +1,110 @@
-import React from 'react'
-import { Chart as ChartJS, defaults  } from 'chart.js/auto';
-import { Bar, Doughnut, Line } from 'react-chartjs-2'
+import React from 'react';
+import { DateRangePicker } from 'rsuite';
+import 'rsuite/dist/rsuite.min.css';
+import Grid from '@mui/material/Grid';
+import Paper from '@mui/material/Paper';
+import { Typography } from '@mui/material';
+import { BarChart, LocalOffer, Article, RemoveRedEye, AttachMoney } from '@mui/icons-material';
+import { Box } from '@mui/material';
 
-import './Dashboard.scss'
-
-import revenueData from "./data/revenueData.json";
-import sourceData from "./data/sourceData.json";
-
-defaults.maintainAspectRatio = false;
-defaults.responsive = true;
-
-defaults.plugins.title.display = true;
-defaults.plugins.title.align = "start";
-defaults.plugins.title.font.size = 20;
-defaults.plugins.title.color = "black";
+import './Dashboard.scss';
 
 function Dashboard() {
+    const overview = [
+        { title: 'Doanh thu gói Package', value: 24000000 },
+        { title: 'Số lượng Package đã bán', value: 1200 },
+        { title: 'Số bài viết mới', value: 20 },
+    ];
+    const views = [
+        { title: 'Tổng lượt View', value: 18247 },
+        { title: 'Doanh thu từ lượt View', value: 21000000 },
+        { title: 'Lợi nhuận từ lượt View', value: 1000000 },
+        { title: 'Tiền chi cho Publisher', value: 12000000 },
+        { title: 'Tiền chi cho Contributor', value: 9000000 },
+    ];
+    const platform = [
+        { title: 'Số dư hiện tại', value: 39000000 },
+    ];
+
+    const getIcon = (title) => {
+        switch (title) {
+            case 'Doanh thu gói Package':
+            case 'Doanh thu từ lượt View':
+            case 'Số dư hiện tại':
+                return <AttachMoney sx={{ position: 'absolute', bottom: 8, right: 8 }} />;
+            case 'Số lượng Package đã bán':
+                return <LocalOffer sx={{ position: 'absolute', bottom: 8, right: 8 }} />;
+            case 'Số bài viết mới':
+                return <Article sx={{ position: 'absolute', bottom: 8, right: 8 }} />;
+            case 'Tổng lượt View':
+                return <RemoveRedEye sx={{ position: 'absolute', bottom: 8, right: 8 }} />;
+            default:
+                return <BarChart sx={{ position: 'absolute', bottom: 8, right: 8 }} />;
+        }
+    };
+
+    const getUnit = (title) => {
+        if (title.includes('View')) return 'Views';
+        if (title.includes('Doanh thu') || title.includes('Lợi nhuận') || title.includes('Tiền chi') || title.includes('Số dư')) return 'VND';
+        if (title.includes('Package')) return 'Gói'
+        if (title.includes('bài viết')) return 'Bài'
+        return '';
+    };
+
+    const renderDataCards = (data) => {
+        return data.map((item, index) => (
+            <Grid item xs={4} sm={4} md={4} key={index}>
+                <Paper elevation={3} sx={{ padding: 2, position: 'relative' }}>
+                    <Typography variant="subtitle1">{item.title}</Typography>
+                    <Typography variant="h5">
+                        {item.value.toLocaleString()} {getUnit(item.title)}
+                    </Typography>
+                    {getIcon(item.title)}
+                </Paper>
+            </Grid>
+        ));
+    };
+
     return (
         <div className='dashboard-container'>
-            <div className="dataCard revenueCard">
-                <Line
-                    data={{
-                        labels: revenueData.map((data) => data.label),
-                        datasets: [
-                            {
-                                label: "Revenue",
-                                data: revenueData.map((data) => data.revenue),
-                                backgroundColor: "#064FF0",
-                                borderColor: "#064FF0",
-                            },
-                            {
-                                label: "Cost",
-                                data: revenueData.map((data) => data.cost),
-                                backgroundColor: "#FF3030",
-                                borderColor: "#FF3030",
-                            },
-                        ],
-                    }}
-                    options={{
-                        elements: {
-                            line: {
-                                tension: 0.5,
-                            },
-                        },
-                        plugins: {
-                            title: {
-                                text: "Monthly Revenue & Cost",
-                            },
-                        },
-                    }}
-                />
+            <div className='header'>
+                <div className="date-picker-container">
+                    <div className="date-picker">
+                        <DateRangePicker />
+                    </div>
+                </div>
             </div>
 
-            <div className="dataCard customerCard">
-                <Bar
-                    data={{
-                        labels: sourceData.map((data) => data.label),
-                        datasets: [
-                            {
-                                label: "Count",
-                                data: sourceData.map((data) => data.value),
-                                backgroundColor: [
-                                    "rgba(43, 63, 229, 0.8)",
-                                    "rgba(250, 192, 19, 0.8)",
-                                    "rgba(253, 135, 135, 0.8)",
-                                ],
-                                borderRadius: 5,
-                            },
-                        ],
-                    }}
-                    options={{
-                        plugins: {
-                            title: {
-                                text: "Revenue Source",
-                            },
-                        },
-                    }}
-                />
-            </div>
+            <div className="dashboard-body">
+                <div className="overview">
+                    <h4>Tổng quan</h4>
+                    <Box sx={{ flexGrow: 1, padding: 2 }}>
+                        <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12 }}>
+                            {renderDataCards(overview)}
+                        </Grid>
+                    </Box>
+                </div>
 
-            <div className="dataCard categoryCard">
-                <Doughnut
-                    data={{
-                        labels: sourceData.map((data) => data.label),
-                        datasets: [
-                            {
-                                label: "Count",
-                                data: sourceData.map((data) => data.value),
-                                backgroundColor: [
-                                    "rgba(43, 63, 229, 0.8)",
-                                    "rgba(250, 192, 19, 0.8)",
-                                    "rgba(253, 135, 135, 0.8)",
-                                ],
-                                borderColor: [
-                                    "rgba(43, 63, 229, 0.8)",
-                                    "rgba(250, 192, 19, 0.8)",
-                                    "rgba(253, 135, 135, 0.8)",
-                                ],
-                            },
-                        ],
-                    }}
-                    options={{
-                        plugins: {
-                            title: {
-                                text: "Revenue Sources",
-                            },
-                        },
-                    }}
-                />
+                <div className="view">
+                    <h4>Views</h4>
+                    <Box sx={{ flexGrow: 1, padding: 2 }}>
+                        <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12 }}>
+                            {renderDataCards(views)}
+                        </Grid>
+                    </Box>
+                </div>
+
+                <div className="platform">
+                    <h4>Nền Tảng</h4>
+                    <Box sx={{ flexGrow: 1, padding: 2 }}>
+                        <Grid container spacing={3} columns={{ xs: 4, sm: 8, md: 12 }}>
+                            {renderDataCards(platform)}
+                        </Grid>
+                    </Box>
+                </div>
             </div>
         </div>
-    )
+    );
 }
 
-export default Dashboard
+export default Dashboard;

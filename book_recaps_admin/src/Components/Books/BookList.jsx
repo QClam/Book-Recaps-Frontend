@@ -3,7 +3,7 @@ import api from '../Auth/AxiosInterceptors'
 import Pagination from "@mui/material/Pagination";
 import { Add, MoreHoriz } from "@mui/icons-material";
 import Modal from "react-modal";
-import avatar from "../../data/avarta.png"
+import empty_image from "../../data/empty-image.png"
 
 function BookList() {
 
@@ -99,11 +99,11 @@ function BookList() {
         <table className="content-table">
           <thead>
             <tr>
-              <th>Hình ảnh</th>
+              <th></th>
               <th>Tên Sách</th>
               <th>Tên Gốc</th>
               <th>Mô tả</th>
-              <th>Năm xuất bản</th>
+              <th>Xuất bản</th>
               <th>Tác giả</th>
               <th>Độ tuổi</th>
               <th></th>
@@ -113,12 +113,12 @@ function BookList() {
             {displayBooks.map((book) => (
               <tr key={book.id}>
                 <td><img
-                  src={book.coverImage || avatar}
+                  src={book.coverImage || empty_image}
                   alt="Book Cover"
                   style={{ width: 60, height: 60 }}
                   onError={(e) => {
                     e.currentTarget.onerror = null; // Đảm bảo không lặp lại sự kiện
-                    e.currentTarget.src = avatar; // Đặt lại ảnh nếu lỗi
+                    e.currentTarget.src = empty_image; // Đặt lại ảnh nếu lỗi
                   }}
                 /></td>
                 <td>{book.title}</td>

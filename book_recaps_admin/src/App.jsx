@@ -8,6 +8,7 @@ import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3';
 import ConfirmEmail from './Components/Auth/ConfirmEmail';
 import Dashboard from './Components/Dashboard/Dashboard';
 import BookList from './Components/Books/BookList';
+import PublisherPayout from './Components/Payout/PublisherPayout';
 
 
 function App() {
@@ -21,7 +22,8 @@ function App() {
       <Routes>
         <Route path="/" element={<PrivateRoute> <UsersList /> </PrivateRoute>} />
         <Route path="/users" element={<PrivateRoute> <UsersList /> </PrivateRoute>} />
-        <Route path="/dashboard" element={<PrivateRoute> <Dashboard /> </PrivateRoute>} />
+        <Route path="/dashboard" element={ <Dashboard />} />
+        <Route path="/publisher-payout" element={ <PublisherPayout />} />
         <Route path="/books" element={<PrivateRoute> <BookList /> </PrivateRoute>} />
         <Route path="/auth" element={<Login />} />
         <Route path="/auth/confirm-email" element={<ConfirmEmail />} />

@@ -2,7 +2,7 @@ import React from "react";
 
 import {
     Home,
-    Bookmark,
+    Paid,
     SpaceDashboard,
     BorderColor,
     AutoAwesome,
@@ -22,6 +22,11 @@ export const SidebarItems = [
         title: "Tổng quan",
         icon: <Widgets />,
         link: "/dashboard",
+    },
+    {
+        title: "Quyết toán",
+        icon: <Paid />,
+        link: "/publisher-payout",
     },
     {
         title: "Quản lý người dùng",
