@@ -6,6 +6,7 @@ import RecapItem from './RecapItem'; // Import component RecapItem
 import CreatePlaylistModal from './PlaylistModal/CreatePlaylistModal';
 import ReportIssueModal from './ReportIssueModal/ReportIssueModal';
 
+
 const UserRecapDetail = () => {
   const { id } = useParams(); // Get book ID from URL
   const [bookInfo, setBookInfo] = useState(null);
@@ -42,6 +43,12 @@ const UserRecapDetail = () => {
   //   // Here, you can add the code to send the report data to your backend API.
   // };
 
+  useEffect(() => {
+    if (bookInfo && bookInfo.title) {
+      localStorage.setItem("selectedBookTitle", bookInfo.title); // Lưu tên sách vào localStorage
+    }
+  }, [bookInfo]);
+  
 
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -113,11 +120,19 @@ const UserRecapDetail = () => {
         // Set the recapId and recapVersionId from the first recap if available
         if (validRecaps.length > 0) {
           const firstRecap = validRecaps[0].data;
+          const recapVersions = firstRecap.recapVersions?.$values;
+
           setRecapId(firstRecap.id); // Set recapId from the first recap
-          setRecapVersionId(firstRecap.currentVersion.id); // Set recapVersionId from currentVersion
+          //setRecapVersionId(firstRecap.currentVersion.id); // Set recapVersionId from currentVersion
            // Log both recapId and recapVersionId
       console.log("Recap ID:", firstRecap.id);
-      console.log("Recap Version ID:", firstRecap.currentVersion.id);
+      //console.log("Recap Version ID:", firstRecap.currentVersion.id);
+      if (recapVersions && recapVersions.length > 0) {
+        setRecapVersionId(recapVersions[0].id); // Set recapVersionId từ recapVersions
+        console.log("Recap Version ID:", recapVersions[0].id); // Log recapVersionId để kiểm tra
+      }
+
+
         }
         
       } catch (error) {
@@ -184,7 +199,12 @@ const UserRecapDetail = () => {
             <div className="description-container">
               <p>{bookInfo.description || 'No description available.'}</p>
             </div>
-            <p className="category">Category: Unknown</p>
+            <p className="category">
+            Category: {bookInfo.categories && bookInfo.categories.$values.length > 0 
+              ? bookInfo.categories.$values[0].name 
+              : 'Unknown'}
+          </p>
+
             <div className="book-detail-meta">
               <div className="meta-row">
               </div>

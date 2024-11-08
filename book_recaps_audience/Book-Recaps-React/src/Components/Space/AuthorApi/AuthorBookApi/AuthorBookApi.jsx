@@ -3,6 +3,36 @@ import axios from 'axios';
 import { useLocation, useNavigate } from 'react-router-dom';
 import "../AuthorBookApi/AuthorBookApi.scss";
 
+const resolveRefs = (data) => {
+  const refMap = new Map();
+  const createRefMap = (obj) => {
+    if (typeof obj !== "object" || obj === null) return;
+    if (obj.$id) {
+      refMap.set(obj.$id, obj);
+    }
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        createRefMap(obj[key]);
+      }
+    }
+  };
+  const resolveRef = (obj) => {
+    if (typeof obj !== "object" || obj === null) return obj;
+    if (obj.$ref) {
+      return refMap.get(obj.$ref);
+    }
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        obj[key] = resolveRef(obj[key]);
+      }
+    }
+    return obj;
+  };
+  createRefMap(data);
+  return resolveRef(data);
+};
+
+
 const AuthorBookApi = () => {
   const [books, setBooks] = useState([]);
   const [error, setError] = useState(null);
@@ -21,7 +51,7 @@ const AuthorBookApi = () => {
           },
         });
 
-        const allBooks = response.data.data.$values || [];
+        const allBooks = resolveRefs(response.data.data.$values || []);
         const authorBooks = allBooks.filter(book => 
           book.authors.$values.some(a => a.id === author.id)
         );
@@ -70,7 +100,15 @@ const AuthorBookApi = () => {
       <div className="books-grid">
         {books.map(book => (
           <div className="book-cardrd" key={book.id} onClick={() => handleBookClick(book.id)}>
-            <img src={book.coverImage || 'https://via.placeholder.com/150'} alt={book.title} />
+            <img 
+  src={book.coverImage || 'https://via.placeholder.com/150'} 
+  alt={book.title} 
+  onError={({ currentTarget }) => {
+    currentTarget.onerror = null; // Ngăn chặn lặp lại lỗi
+    currentTarget.src = 'https://via.placeholder.com/150'; // Đặt ảnh mặc định
+  }} 
+/>
+
             <h3>{book.title}</h3>
             <p className="book-author"><strong>Author:</strong> {book.authors?.$values?.map(author => author.name).join(', ')}</p>
           </div>

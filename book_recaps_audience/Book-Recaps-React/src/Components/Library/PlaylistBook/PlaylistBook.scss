@@ -5,7 +5,7 @@ $hover-color: #e6e6e6;
 $button-color: #0073e6;
 $border-radius: 4px;
 
-.playlist-container {
+.playlist-container-container {
   padding: 20px;
 //   background-color: $primary-color;
   margin-top: -100px;
@@ -40,12 +40,12 @@ $border-radius: 4px;
       margin-bottom: 10px;
     }
 
-    .book-list {
+    .book-list-list {
       display: flex;
       flex-wrap: wrap;
       gap: 15px;
 
-      .book-item {
+      .book-item-item {
         display: flex;
         align-items: center;
         background-color: #fff;

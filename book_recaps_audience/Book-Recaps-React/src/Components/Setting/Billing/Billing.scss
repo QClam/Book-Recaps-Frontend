@@ -3,7 +3,7 @@
     margin: 0 auto;
     max-width: 900px;
     padding: 20px;
-  
+    margin-top: -20px;
     h1 {
       font-size: 2.2rem;
       color: #1a1a1a;
@@ -13,6 +13,25 @@
       margin: 10px 0;
       font-size: 1rem;
       color: #666;
+    }
+
+  }
+  
+  .logo-container {
+    display: flex; /* Đảm bảo các phần tử con nằm ngang */
+    align-items: center; /* Căn giữa theo chiều dọc */
+    justify-content: flex-start; /* Đảm bảo logo nằm ở bên trái */
+    //padding: 10px; /* Thêm một chút padding nếu cần */
+  }
+  
+  .logobr {
+    width: 60px; /* Thu nhỏ kích thước logo */
+    height: auto; /* Đảm bảo tỷ lệ khung hình logo không bị méo */
+    cursor: pointer; /* Thêm con trỏ chuột khi hover lên logo */
+    transition: transform 0.3s ease; /* Thêm hiệu ứng khi hover */
+     margin-left: 390px;
+    &:hover {
+      transform: scale(1.1); /* Tăng kích thước một chút khi hover */
     }
   }
   
@@ -56,13 +75,16 @@
           font-size: 2rem;
           font-weight: bold;
           color: #1a1a1a;
+          cursor: pointer;
+          margin-left: 100px;
         }
   
         .billed {
           color: #666;
-          font-size: 1rem;
+          font-size: 1.1rem;
           margin-top: 5px;
-  
+          cursor: pointer;
+          margin-left: 100px;
           strong {
             color: #1a1a1a;
           }

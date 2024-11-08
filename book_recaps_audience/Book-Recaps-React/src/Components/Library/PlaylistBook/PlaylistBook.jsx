@@ -137,7 +137,7 @@ const PlaylistBook = () => {
   }
 
   return (
-    <div className="playlist-container">
+    <div className="playlist-container-container">
       <h2>My Playlists</h2>
       {playlists.length === 0 ? (
         <p>No playlists found.</p>
@@ -159,7 +159,7 @@ const PlaylistBook = () => {
             {playlist.playListItems.$values.length === 0 ? (
               <p>No books in this playlist.</p>
             ) : (
-              <div className="book-list">
+              <div className="book-list-list">
                 {playlist.playListItems.$values.map((item) => {
                   const book = books.find(book => 
                     book.recaps.$values.some(recap => recap.id === item.recapId)
@@ -168,7 +168,7 @@ const PlaylistBook = () => {
                   return (
                     <div 
                       key={item.id} 
-                      className="book-item" 
+                      className="book-item-item" 
                       onDoubleClick={() => handleBookClick(book)} // Add onClick event
                       style={{ cursor: 'pointer' }} // Optional: Style to indicate clickable
                     >

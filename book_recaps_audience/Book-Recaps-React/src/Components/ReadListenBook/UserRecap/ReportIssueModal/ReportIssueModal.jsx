@@ -20,7 +20,7 @@ const ReportIssueModal = ({ isOpen, onClose, onSubmit }) => {
         <h3>Report an Issue</h3>
         <form onSubmit={handleSubmit}>
           <label>
-            Category:
+            Title:
             <input
               type="text"
               value={category}
@@ -29,7 +29,7 @@ const ReportIssueModal = ({ isOpen, onClose, onSubmit }) => {
             />
           </label>
           <label>
-            Description:
+            Describe the issue:
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}

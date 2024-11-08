@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import { FaSyncAlt, FaUndo, FaForward, FaVolumeUp, FaVolumeDown, FaPlay, FaPause } from 'react-icons/fa';
 import Transcript from './Transcript';
 import './RecapItem.scss';
-import AudioPlayer from './AudiPlayModal/AudioPlayer';
 
 const RecapItem = ({ recapDetail, accessToken, userId }) => {
   const audioRef = useRef(null);
@@ -11,21 +10,23 @@ const RecapItem = ({ recapDetail, accessToken, userId }) => {
   const [isLooping, setIsLooping] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [duration, setDuration] = useState(0);
-  //const [volume, setVolume] = useState(1); // Volume state (1 = max volume)
-  const [playbackRate, setPlaybackRate] = useState(1); // Playback speed state
   const [volume, setVolume] = useState(0.5);
+  const [playbackRate, setPlaybackRate] = useState(1);
+
+  // Check if `recapDetail` and `recapVersions` are present
+  const recapVersion = recapDetail?.data?.recapVersions?.$values[0] || null;
 
   useEffect(() => {
-    if (recapDetail && recapDetail.data.currentVersion) {
-      setIsGenAudio(recapDetail.data.currentVersion.isGenAudio);
+    if (recapVersion) {
+      setIsGenAudio(recapVersion.isGenAudio);
     }
-  }, [recapDetail]);
+  }, [recapVersion]);
 
   useEffect(() => {
     if (audioRef.current) {
       audioRef.current.volume = volume;
     }
-  }, [volume]); 
+  }, [volume]);
 
   const handleTimeUpdate = () => {
     if (audioRef.current) {
@@ -39,16 +40,16 @@ const RecapItem = ({ recapDetail, accessToken, userId }) => {
     }
   };
 
-  const handlePlayPause = () => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.pause();
-      } else {
-        audioRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
+  // // const handlePlayPause = () => {
+  //   if (audioRef.current) {
+  //     if (isPlaying) {
+  //       audioRef.current.pause();
+  //     } else {
+  //       audioRef.current.play();
+  //     }
+  //     setIsPlaying(!isPlaying);
+  //   }
+  // };
 
   const handleSeek = (e) => {
     if (audioRef.current) {
@@ -57,13 +58,18 @@ const RecapItem = ({ recapDetail, accessToken, userId }) => {
     }
   };
 
-  const handleSentenceClick = (startTime) => {
+  const handleSentenceClick = async (startTime) => {
     if (audioRef.current) {
       audioRef.current.currentTime = parseFloat(startTime);
-      audioRef.current.play();
-      setIsPlaying(true);
+      try {
+        await audioRef.current.play();
+        setIsPlaying(true);
+      } catch (error) {
+        console.error("Playback error on sentence click:", error);
+      }
     }
   };
+  
 
   const toggleLoop = () => {
     setIsLooping(!isLooping);
@@ -78,16 +84,21 @@ const RecapItem = ({ recapDetail, accessToken, userId }) => {
     }
   };
 
-   // Toggle play/pause
-   const togglePlayPause = () => {
-    if (isPlaying) {
-      audioRef.current.pause();
-    } else {
-      audioRef.current.play();
+  const handlePlayPause = async () => {
+    if (audioRef.current) {
+      try {
+        if (isPlaying) {
+          await audioRef.current.pause();
+        } else {
+          await audioRef.current.play();
+        }
+        setIsPlaying(!isPlaying);
+      } catch (error) {
+        console.error("Playback error:", error);
+      }
     }
-    setIsPlaying(!isPlaying);
   };
-
+  
 
   const handlePlaybackRateChange = (e) => {
     const newRate = parseFloat(e.target.value);
@@ -99,17 +110,17 @@ const RecapItem = ({ recapDetail, accessToken, userId }) => {
 
   return (
     <li className="recap-list-item">
-      {recapDetail && recapDetail.data.currentVersion && (
+      {recapVersion && (
         <>
-          {recapDetail.data.currentVersion.transcriptUrl && (
+          {recapVersion.transcriptUrl && (
             <Transcript
-              transcriptUrl={recapDetail.data.currentVersion.transcriptUrl}
+              transcriptUrl={recapVersion.transcriptUrl}
               accessToken={accessToken}
               onSentenceClick={handleSentenceClick}
               currentTime={currentTime}
               isGenAudio={isGenAudio}
               userId={userId}
-              recapVersionId={recapDetail.data.currentVersion.id}
+              recapVersionId={recapVersion.id}
             />
           )}
 
@@ -119,7 +130,7 @@ const RecapItem = ({ recapDetail, accessToken, userId }) => {
               onTimeUpdate={handleTimeUpdate}
               onEnded={handleAudioEnded}
               onLoadedMetadata={handleLoadedMetadata}
-              src={recapDetail.data.currentVersion.audioURL}
+              src={recapVersion.audioURL}
             />
 
             <div className="audio-controls">
@@ -139,7 +150,7 @@ const RecapItem = ({ recapDetail, accessToken, userId }) => {
                 <button onClick={() => handleSeek({ target: { value: currentTime - 15 } })}>
                   <FaUndo /> 15
                 </button>
-                <button onClick={togglePlayPause} className="play-pause-button">
+                <button onClick={handlePlayPause} className="play-pause-button">
                 {isPlaying ? <FaPause /> : <FaPlay />}
               </button>
 
@@ -150,6 +161,8 @@ const RecapItem = ({ recapDetail, accessToken, userId }) => {
                   <FaSyncAlt color={isLooping ? 'grey' : 'black'} />
                 </button>
               </div>
+
+
 
               <div className="volume-controls">
               <FaVolumeDown className="volume-icon" />
@@ -164,9 +177,7 @@ const RecapItem = ({ recapDetail, accessToken, userId }) => {
               />
               <FaVolumeUp className="volume-icon" />
             </div>
-
-
-              <div className="playback-speed-controls">
+            <div className="playback-speed-controls">
                 
                 <select
                   id="playbackRate"
@@ -182,15 +193,14 @@ const RecapItem = ({ recapDetail, accessToken, userId }) => {
                   <option value="2">2x</option>
                 </select>
               </div>
+
             </div>
           </div>
+            {/* <AudioPlayer audioURL={recapDetail.data.currentVersion.audioURL}  audioRef={audioRef}/> */}
 
-    {/* <AudioPlayer audioURL={recapDetail.data.currentVersion.audioURL}  audioRef={audioRef}/> */}
         </>
       )}
     </li>
-
-    
   );
 };
 

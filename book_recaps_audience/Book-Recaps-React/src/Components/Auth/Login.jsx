@@ -172,14 +172,14 @@ function Login() {
         <div className="form-container sign-up">
           <form onSubmit={handleSignUp}>
             <h1>Đăng ký</h1>
-            <div className="social-icons">
+            {/* <div className="social-icons">
               <a href="#" className="icon">
                 <i className="fa-brands fa-google"></i>
               </a>
               <a href="#" className="icon">
                 <i className="fa-brands fa-facebook"></i>
               </a>
-            </div>
+            </div> */}
             <span>hoặc sử dụng email để đăng ký</span>
             <input
               required
@@ -229,14 +229,14 @@ function Login() {
         <div className="form-container sign-in">
           <form onSubmit={handleLogin}>
             <h1>Đăng nhập</h1>
-            <div className="social-icons">
+            {/* <div className="social-icons">
               <a href="#" className="icon">
                 <i className="fa-brands fa-google"></i>
               </a>
               <a href="#" className="icon">
                 <i className="fa-brands fa-facebook"></i>
               </a>
-            </div>
+            </div> */}
             <span>hoặc sử dụng email để đăng nhập</span>
             <input
               type="email"

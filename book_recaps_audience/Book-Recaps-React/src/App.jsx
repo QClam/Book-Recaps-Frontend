@@ -32,6 +32,8 @@ import RecapByContributor from "./Components/ContributorItem/RecapByContributor/
 import ConfirmEmail from "./Components/Auth/ConfirmEmail";
 import ForgetPassword from "./Components/Auth/ForgetPassword";
 import ContributorTerm from "./Components/Setting/BecomeContributor/ContributorTerm";
+import ContributorRecaps from "./Components/ContributorItem/ContributorRecaps/ContributorRecaps";
+import Result from "./Components/Setting/Billing/Result/Result";
 //import PrivateRoute from "./Components/PrivateRoute";
 
 function App() {
@@ -71,7 +73,7 @@ function App() {
                 <Route element={<MainLayout />}>
                 <Route path="/search" element={<SearchResults />} />
 
-                <Route path="/" element={<Explore />} />
+                {/* <Route path="/" element={<Explore />} /> */}
                 
                 <Route path="/explore" element={<Explore />} />
                 
@@ -91,6 +93,7 @@ function App() {
 
                 {/* Contributor Item */}
                 <Route path="/contributor" element={<RecapByContributor />} />
+                {/* <Route path="/contributor-recaps/:userId" element={<ContributorRecaps />} /> */}
 
                 
                 <Route path="/books" element={<BookFree />} />
@@ -116,6 +119,7 @@ function App() {
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/application" element={<Application />} />
                 <Route path="/billing" element={<Billing />} />
+                <Route path="/*" element={<Result />} />
                 <Route path="/help" element={<Report />} />
                 <Route path="/become-contributor" element={<ContributorTerm />} />
                {/* <Route path="/read" element={<ReadBook key={new Date().getTime()} />} /> */}               

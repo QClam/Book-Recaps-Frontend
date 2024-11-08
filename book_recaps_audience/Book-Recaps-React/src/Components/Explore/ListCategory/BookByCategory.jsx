@@ -15,8 +15,8 @@ const BooksByCategory = () => {
     useEffect(() => {
         const fetchBooksByCategory = async () => {
             try {
-                const apiKey = 'AIzaSyDoWf3ws8elORVULfG9eeb0McMql-NugGc';
-                const response = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=subject:${category}&key=${apiKey}`);
+                
+                const response = await axios.get(``);
                 setBooks(response.data.items);
             } catch (error) {
                 console.error('Error fetching books:', error);
