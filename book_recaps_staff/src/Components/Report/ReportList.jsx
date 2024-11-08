@@ -197,7 +197,7 @@ function ReportList() {
                             .map((val) => (
                                 <tr key={val.id}>
                                     <td>{val.recaps?.name}</td>
-                                    <td>Sách</td>
+                                    <td>{val.recaps?.book?.title}</td>
                                     <td>{getUserNamebyId(val.userId)}</td>
                                     <td>{val.description}</td>
                                     <td>{val.response || "Chưa có phản hồi từ staff"}</td>
