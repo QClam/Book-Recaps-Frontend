@@ -43,7 +43,7 @@ function Dashboard() {
     };
 
     const getUnit = (title) => {
-        if (title.includes('View')) return 'Views';
+        if (title.includes('Tổng lượt View')) return 'Views';
         if (title.includes('Doanh thu') || title.includes('Lợi nhuận') || title.includes('Tiền chi') || title.includes('Số dư')) return 'VND';
         if (title.includes('Package')) return 'Gói'
         if (title.includes('bài viết')) return 'Bài'

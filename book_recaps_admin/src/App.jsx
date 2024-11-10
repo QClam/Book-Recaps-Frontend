@@ -12,6 +12,9 @@ import PublisherPayout from './Components/Payout/PublisherPayout';
 import CreatePublisherPayout from './Components/Payout/CreatePublisherPayout';
 import HistoryPublisherPayout from './Components/Payout/HistoryPublisherPayout';
 import DetailPublihserPayout from './Components/Payout/DetailPublihserPayout';
+import ContractsList from './Components/Contracts/ContractsList';
+import ContractDetail from './Components/Contracts/ContractDetail';
+import CreateContract from './Components/Contracts/CreateContract';
 
 
 function App() {
@@ -31,6 +34,9 @@ function App() {
         <Route path="/payout-history" element={ <HistoryPublisherPayout />} />
         <Route path="/payout-history/:id" element={ <DetailPublihserPayout />} />
         <Route path="/books" element={<PrivateRoute> <BookList /> </PrivateRoute>} />
+        <Route path="/contracts" element={<PrivateRoute> <ContractsList /> </PrivateRoute>} />
+        <Route path="/contract/create" element={<PrivateRoute> <CreateContract /> </PrivateRoute>} />
+        <Route path="/contract/:contractId" element={<PrivateRoute> <ContractDetail /> </PrivateRoute>} />
         <Route path="/auth" element={<Login />} />
         <Route path="/auth/confirm-email" element={<ConfirmEmail />} />
       </Routes>

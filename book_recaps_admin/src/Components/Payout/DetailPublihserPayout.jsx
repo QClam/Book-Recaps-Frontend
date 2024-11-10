@@ -101,7 +101,7 @@ function DetailPublihserPayout() {
                                         <Typography variant="body1">30.000.000 VND</Typography>
                                     </Box>
                                     <Box display="flex" justifyContent="space-between">
-                                        <Link href={`/image`} underline="hover">Hình ảnh</Link>
+                                        <Link href={`https://d1hjkbq40fs2x4.cloudfront.net/2017-08-21/files/landscape-photography_1645.jpg`} underline="hover">Hình ảnh</Link>
                                     </Box>
                                 </Paper>
                             </Grid>

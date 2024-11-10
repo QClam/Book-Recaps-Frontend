@@ -39,9 +39,9 @@ export const SidebarItems = [
         link: "/books",
     },
     {
-        title: "Doanh thu sách",
+        title: "Hợp đồng",
         icon: <LibraryBooks />,
-        link: "/content",
+        link: "/contracts",
     },
     {
         title: "Cài đặt",
