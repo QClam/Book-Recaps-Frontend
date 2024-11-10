@@ -3,9 +3,8 @@ import { DateRangePicker } from 'rsuite';
 import 'rsuite/dist/rsuite.min.css';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
-import { Typography } from '@mui/material';
+import { Typography, Box } from '@mui/material';
 import { BarChart, LocalOffer, Article, RemoveRedEye, AttachMoney } from '@mui/icons-material';
-import { Box } from '@mui/material';
 
 import './Dashboard.scss';
 

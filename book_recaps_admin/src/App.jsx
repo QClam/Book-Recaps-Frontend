@@ -9,6 +9,9 @@ import ConfirmEmail from './Components/Auth/ConfirmEmail';
 import Dashboard from './Components/Dashboard/Dashboard';
 import BookList from './Components/Books/BookList';
 import PublisherPayout from './Components/Payout/PublisherPayout';
+import CreatePublisherPayout from './Components/Payout/CreatePublisherPayout';
+import HistoryPublisherPayout from './Components/Payout/HistoryPublisherPayout';
+import DetailPublihserPayout from './Components/Payout/DetailPublihserPayout';
 
 
 function App() {
@@ -24,6 +27,9 @@ function App() {
         <Route path="/users" element={<PrivateRoute> <UsersList /> </PrivateRoute>} />
         <Route path="/dashboard" element={ <Dashboard />} />
         <Route path="/publisher-payout" element={ <PublisherPayout />} />
+        <Route path="/publisher-payout-create/:id" element={ <CreatePublisherPayout />} />
+        <Route path="/payout-history" element={ <HistoryPublisherPayout />} />
+        <Route path="/payout-history/:id" element={ <DetailPublihserPayout />} />
         <Route path="/books" element={<PrivateRoute> <BookList /> </PrivateRoute>} />
         <Route path="/auth" element={<Login />} />
         <Route path="/auth/confirm-email" element={<ConfirmEmail />} />
