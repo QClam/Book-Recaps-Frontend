@@ -155,7 +155,7 @@ function AppealList() {
     }, []);
 
     return (
-        <div>
+        <div className="appeal-container">
             <div className="content-list">
                 <h2>Danh sách Kháng cáo của Contributor</h2>
                 <FormControl variant="outlined" style={{ minWidth: 200, marginBottom: 20 }} className="form-control">

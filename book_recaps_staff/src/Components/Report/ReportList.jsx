@@ -204,7 +204,7 @@ function ReportList() {
                                     <td>{new Date(val.createdAt).toLocaleDateString()}</td>
                                     <td><button onClick={() => openDialog(val)}
                                         disabled={val.status === 2}
-                                        style={{ width: "150px" }}
+                                        style={{ width: "150px", backgroundColor: "green" }}
                                     >
                                         Phản hồi</button></td>
                                     <td>{val.status === 1 ? (
