@@ -272,7 +272,7 @@ const BookInfo = () => {
   const bookInfo = useAsyncValue();
 
   return (
-    <div className="mb-4 flex items-center gap-4 border-b pb-4 border-gray-300">
+    <div className="mb-4 mt-3 flex items-center gap-4 border-b pb-4 border-gray-300">
       <img
         src={bookInfo.coverImage || "/empty-image.jpg"}
         alt="Book Cover"
@@ -343,7 +343,12 @@ const ListRecapVersions = () => {
           <th scope="col"
               className="px-2.5 py-[8.7px] font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
               style={{ borderLeft: "1px dashed #d5dce6" }}>
-            Hành động
+            Ngày tạo
+          </th>
+          <th scope="col"
+              className="px-2.5 py-[8.7px] font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
+              style={{ borderLeft: "1px dashed #d5dce6" }}>
+            Ngày cập nhật
           </th>
         </tr>
         </thead>
@@ -374,7 +379,10 @@ const ListRecapVersions = () => {
                 }/>
             </td>
             <td className="px-2.5 py-3 border-[#e2e7ee] border-b" style={{ borderLeft: "1px dashed #d5dce6" }}>
-              ...
+              {version.createdAt ? new Date(version.createdAt).toLocaleDateString() : 'N/A'}
+            </td>
+            <td className="px-2.5 py-3 border-[#e2e7ee] border-b" style={{ borderLeft: "1px dashed #d5dce6" }}>
+              {version.updatedAt ? new Date(version.updatedAt).toLocaleDateString() : 'N/A'}
             </td>
           </tr>
         ))}

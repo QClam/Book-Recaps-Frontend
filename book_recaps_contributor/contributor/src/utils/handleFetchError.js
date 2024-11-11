@@ -15,7 +15,7 @@ export function handleFetchError(error) {
     if (error.response.data?.error instanceof String) {
       return { error: error.response.data.error, status: error.response.status };
     }
-    throw error;
+    return { error: "Đã xảy ra lỗi", status: error.response.status || 500 };
   } else if (error.request) {
     // The request was made but no response was received
     console.log(error.request);
