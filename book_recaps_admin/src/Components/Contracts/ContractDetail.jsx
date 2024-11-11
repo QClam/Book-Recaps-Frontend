@@ -43,7 +43,7 @@ function ContractDetail() {
                     <Card variant="outlined">
                         <CardContent>
                             <Box display="flex" gap={1} alignItems="center" mb={2}>
-                                <Typography>Tên Publisher: Nhờ HA thêm field sau</Typography>
+                                <Typography>Tên Publisher: {contract.publisher?.publisherName}</Typography>
                             </Box>
                             <Box display="flex" gap={1} mb={2}>
                                 <Typography>Phần trăm chia sẻ doanh thu:</Typography>

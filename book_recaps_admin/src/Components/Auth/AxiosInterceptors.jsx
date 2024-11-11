@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "https://160.25.80.100:7124",
+  baseURL: "https://bookrecaps.cloud",
 });
 
 const refreshAccessToken = async () => {

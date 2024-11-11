@@ -5,6 +5,35 @@ import { Hourglass } from 'react-loader-spinner';
 
 import './Contract.scss'
 
+const resolveRefs = (data) => {
+  const refMap = new Map();
+  const createRefMap = (obj) => {
+      if (typeof obj !== "object" || obj === null) return;
+      if (obj.$id) {
+          refMap.set(obj.$id, obj);
+      }
+      for (const key in obj) {
+          if (obj.hasOwnProperty(key)) {
+              createRefMap(obj[key]);
+          }
+      }
+  };
+  const resolveRef = (obj) => {
+      if (typeof obj !== "object" || obj === null) return obj;
+      if (obj.$ref) {
+          return refMap.get(obj.$ref);
+      }
+      for (const key in obj) {
+          if (obj.hasOwnProperty(key)) {
+              obj[key] = resolveRef(obj[key]);
+          }
+      }
+      return obj;
+  };
+  createRefMap(data);
+  return resolveRef(data);
+};
+
 function ContractsList() {
 
   const [contracts, setContracts] = useState([]);
@@ -15,7 +44,7 @@ function ContractsList() {
   const fetchContracts = async () => {
     try {
       const response = await api.get('/api/Contract/getallcontract')
-      const contracts = response.data.data.$values;
+      const contracts = resolveRefs(response.data.data.$values);
       setContracts(contracts);
       console.log(contracts);
       setLoading(false);
@@ -67,7 +96,7 @@ function ContractsList() {
           <TableBody>
             {contracts.map((item) => (
               <TableRow key={item.id}>
-                <TableCell>Sẽ nhờ HA thêm field sau</TableCell>
+                <TableCell>{item.publisher?.publisherName}</TableCell>
                 <TableCell>{item.revenueSharePercentage}%</TableCell>
                 <TableCell>{item.startDate}</TableCell>
                 <TableCell>{item.endDate}</TableCell>

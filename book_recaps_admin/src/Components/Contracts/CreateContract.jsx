@@ -16,6 +16,7 @@ import {
     InputLabel,
 } from "@mui/material";
 import axios from "axios";
+import api from "../Auth/AxiosInterceptors";
 
 function CreateContract() {
     const [startDate, setStartDate] = useState("");
@@ -29,9 +30,28 @@ function CreateContract() {
         revenueSharePercentage: 0,
         startDate: startDate,
         endDate: endDate,
-        status: 1,
+        status: 0,
         autoRenew: false,
     });
+
+    const resetContractForm = () => {
+        setContractForm({
+            isPublisherApproved: false,
+            publisherId: "",
+            revenueSharePercentage: 0,
+            startDate: "",
+            endDate: "",
+            status: 0,
+            autoRenew: false,
+        });
+    };
+
+    const handlePublisherIdChange = (e) => {
+        setContractForm((prevForm) => ({
+            ...prevForm,
+            publisherId: e.target.value,
+        }));
+    };
 
     const handleInputChange = (e) => {
         const value = e.target.value;
@@ -53,7 +73,7 @@ function CreateContract() {
     };
 
     const handleRevenueShareChange = (e) => {
-    
+
         const value = e.target.value;
 
         // Kiểm tra nếu giá trị là một số và nằm trong phạm vi 0 - 100
@@ -66,10 +86,10 @@ function CreateContract() {
                     ...prevForm,
                     revenueSharePercentage: numberValue,
                 }));
-            } else {              
-                console.log("Phần trăm chia sẻ doanh thu phải từ 0 đến 100");              
+            } else {
+                console.log("Phần trăm chia sẻ doanh thu phải từ 0 đến 100");
             }
-        } else {          
+        } else {
             console.log("Vui lòng nhập một số hợp lệ");
         }
     };
@@ -96,22 +116,46 @@ function CreateContract() {
         }));
     };
 
-    const handleCreateContract = async () => {
+    const handleDraftContract = async () => {
         const contractFormData = {
-            publisherId: publisherName,
+            publisherId: contractForm.publisherId,
             revenueSharePercentage: contractForm.revenueSharePercentage,
             startDate: contractForm.startDate,
             endDate: contractForm.endDate,
             autoRenew: contractForm.autoRenew,
-            status: contractForm.status,
+            status: 0,
         };
         try {
-            const response = await axios.post(
-                "https://66eb9ee32b6cf2b89c5b1714.mockapi.io/Contract",
+            const response = await api.post(
+                "/api/Contract/create",
                 contractFormData
             );
             setContractForm(response.data);
             console.log("Contract Form: ", response.data);
+            alert("Draft thành công")
+            resetContractForm();
+        } catch (error) {
+            console.log("Error Posting", error);
+        }
+    };
+
+    const handleCreateContract = async () => {
+        const contractFormData = {
+            publisherId: contractForm.publisherId,
+            revenueSharePercentage: contractForm.revenueSharePercentage,
+            startDate: contractForm.startDate,
+            endDate: contractForm.endDate,
+            autoRenew: contractForm.autoRenew,
+            status: 1,
+        };
+        try {
+            const response = await api.post(
+                "/api/Contract/create",
+                contractFormData
+            );
+            setContractForm(response.data);
+            console.log("Contract Form: ", response.data);
+            alert("Tạo thành công")
         } catch (error) {
             console.log("Error Posting", error);
         }
@@ -143,10 +187,11 @@ function CreateContract() {
                             <Box display="flex" gap={1} alignItems="center" mb={1}>
                                 <Typography>Publisher: </Typography>
                                 <TextField
+                                    variant="outlined"
                                     label="Tên nhà xuất bản"
                                     sx={{ width: 350 }}
-                                    value={publisherName}
-                                    onChange={handleInputChange}
+                                    value={contractForm.publisherId}
+                                    onChange={handlePublisherIdChange}
                                 />
                             </Box>
                             {filteredPublishers.length > 0 && (
@@ -226,7 +271,7 @@ function CreateContract() {
                                 >
                                     Gửi
                                 </Button>
-                                <Button variant="contained" color="success">
+                                <Button variant="contained" color="success" onClick={handleDraftContract}>
                                     Lưu chỉnh sửa
                                 </Button>
                             </Box>
