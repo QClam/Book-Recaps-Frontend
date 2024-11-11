@@ -24,10 +24,9 @@ function Review() {
   const [showInput, setShowInput] = useState(false);
   const [recapVersionId, setRecapVersionId] = useState(null);
   const [profile, setProfile] = useState([]);
-  const [plagiarismResults, setPlagiarismResults] = useState(null);
+  const [plagiarismResults, setPlagiarismResults] = useState([]);
   const [hasResults, setHasResults] = useState(false);
-  const [metadata, setMetadata] = useState(null);
-  const [polling, setPolling] = useState(false);
+  const [metadata, setMetadata] = useState([]);
   const [plagiarismProcessing, setPlagiarismProcessing] = useState(false);
 
 
@@ -74,9 +73,9 @@ function Review() {
       console.log(recapVersionData);
 
       return {
-        recapId: recapVersionData.recapId,
+        recapId: recapVersionData.recapId,      
         transcriptUrl: recapVersionData.transcriptUrl,
-        plagiarismResults: recapVersionData.plagiarismCheckStatus,
+        plagiarismCheckStatus: recapVersionData.plagiarismCheckStatus,
       };
     } catch (error) {
       console.log('Error Fetching Recap Version', error);
@@ -427,60 +426,99 @@ function Review() {
     }
   };
 
+  const checkPlagiarism = async () => {
+
+    if (!recapVersionId) {
+      console.error("recapVersionId is not available");
+      return;
+    }
+    try {
+      const response = await axios.get(
+        `https://ai.hieuvo.dev/plagiarism/check-plagiarism/${recapVersionId}`
+      );
+      console.log("Initial check response:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Error checking plagiarism:", error);
+      return null;
+    }
+  };
+
+  const getPlagiarismResults = async (controller) => {
+
+    if (!recapVersionId) {
+      console.error("recapVersionId is not available");
+      return;
+    }
+    try {
+      const response = await axios.get(
+        `https://ai.hieuvo.dev/plagiarism/get-results/${recapVersionId}`,
+        {
+          signal: controller.signal,
+        }
+      );
+      const resultData = response.data;
+      console.log("Két quả:", response.data);
+      const { plagiarism_results, existing_recap_versions_metadata } = resultData;
+      if (plagiarism_results.length > 0 || existing_recap_versions_metadata > 0) {
+        setPlagiarismResults(plagiarism_results);
+        setMetadata(existing_recap_versions_metadata);
+        setHasResults(true);
+      } else {
+        setPlagiarismResults([]);
+        setMetadata([]);
+        setHasResults(true);
+      }
+      return resultData;
+    } catch (error) {
+      console.error("Error fetching plagiarism results:", error);
+      return null;
+    }
+  };
+
   const handleCheckPlagiarism = async () => {
     if (!recapVersionId) {
       console.error("recapVersionId is not available");
       return;
     }
-
     setPlagiarismProcessing(true);
-
+  
+    const controller = new AbortController();
     try {
-      // Gọi hàm check đạo văn trước
-      const initialResponse = await axios.get(`https://ai.hieuvo.dev/plagiarism/check-plagiarism/${recapVersionId}`);
-      console.log("Initial check response:", initialResponse.data);
-
-      // Start Polling sau khi call AI trên
-      setPolling(true);
-      const intervalId = setInterval(async () => {
-        try {
-          const response = await axios.get(`https://ai.hieuvo.dev/plagiarism/get-results/${recapVersionId}`);
-          const resultData = response.data;
-
-          // Check xem có kết quả trả về không
-          const { plagiarism_results, existing_recap_versions_metadata } = resultData;
-
-          if (plagiarism_results.length > 0 || existing_recap_versions_metadata > 0) {
-            setPlagiarismResults(plagiarism_results);
-            setHasResults(true);
-            setMetadata(existing_recap_versions_metadata);
-            setPolling(false);
-            clearInterval(intervalId); // Clear interval
-          } else {
-            console.log("No Plagirism detected");
-            setPlagiarismResults([]); // set mảng rỗng nếu k có kết quả
-            setMetadata([]);
-            setPolling(false);
-            setHasResults(true);
-            clearInterval(intervalId);
-          }
-          console.log("Polling for plagiarism results: ", resultData);
-        } catch (error) {
-          console.error("Error Fetching results during polling", error);
-          setPolling(false);
-          clearInterval(intervalId); // Stop polling on error
+      
+      console.log("Starting initial plagiarism check...");
+      const initialResponse = await checkPlagiarism(); 
+      if (!initialResponse) {
+        console.error("Failed to initiate plagiarism check.");
+        setPlagiarismProcessing(false);
+        return;
+      }
+       
+      let pollingComplete = false;
+      while (!pollingComplete) {
+        console.log("Polling for plagiarism check status...");
+        const result = await fetchRecapVersion(recapVersionId, controller);
+  
+        if (result?.plagiarismCheckStatus === 2) {
+          console.log("Plagiarism check completed.");
+          setRecapVersion(result);
+          pollingComplete = true;
+        } else {
+          console.log("Plagiarism check not completed yet, status:", result?.plagiarismCheckStatus);
+          await new Promise((resolve) => setTimeout(resolve, 1500)); 
         }
-      }, 2000);
+      }
 
-      // Clear khi interval unmount hoặc polling dừng
-      return () => clearInterval(intervalId);
-
+      console.log("Fetching plagiarism results...");
+      await getPlagiarismResults(controller);
     } catch (error) {
+      console.error("Error during plagiarism checking process:", error);
+    } finally {
       setPlagiarismProcessing(false);
-      const err = handleFetchError(error);
-      throw json({error: err.error}, {status: err.status});
+      controller.abort(); // Abort any ongoing fetch
+      console.log("Polling process aborted.");
     }
-  };
+  };  
 
   if (loading) {
     return (
@@ -655,6 +693,12 @@ function Review() {
                       disabled={plagiarismProcessing}
                     >
                       {plagiarismProcessing ? "Đang xử lý..." : "Kiểm tra đạo văn"}
+                    </button>
+                    <button className='check-plagiarism' onClick={getPlagiarismResults}
+                      style={{ backgroundColor: "#90c494", color: "#f0f0f0", marginRight: 10 }}
+                      disabled={plagiarismProcessing}
+                    >
+                      Lấy Kết Quả
                     </button>
                   </div>
                 </>
