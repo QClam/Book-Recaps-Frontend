@@ -565,7 +565,7 @@ function Review() {
                   {transcript.transcriptSections.map((section, sectionIndex) => {
                     return (
                       <div key={sectionIndex} className='transcript-section'>
-                        <h2>Section {sectionIndex + 1}</h2>
+                        <h2>Key Idea {sectionIndex + 1}</h2>
                         {section.transcriptSentences.map((sentence) => {
                           const globalSentenceIndex = sentence.sentence_index;
 
@@ -619,7 +619,7 @@ function Review() {
                   {transcript.transcriptSections.map((section, sectionIndex) => {
                     return (
                       <div key={sectionIndex} className='transcript-section'>
-                        <h2>Section {sectionIndex + 1}</h2>
+                        <h2>Key Idea {sectionIndex + 1}</h2>
                         {section.transcriptSentences.map((sentence) => {
                           const globalSentenceIndex = sentence.sentence_index;
                           const isPlagiarized = Array.isArray(plagiarismResults) && plagiarismResults.some(result => result.sentence === sentence.value.html);
