@@ -1,0 +1,27 @@
+.book-table {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 20px;
+  }
+  
+  .book-table table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .book-table th, .book-table td {
+    padding: 10px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  .book-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }
+  
+  .book-table td img {
+    max-width: 50px;
+    height: auto;
+  }
+  

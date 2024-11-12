@@ -1,0 +1,151 @@
+.contract-manager {
+  padding: 20px;
+  background-color: #f9f9f9;
+  margin-left: 270px;
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+
+    h2 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .search-input {
+      padding: 8px 12px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      width: 250px;
+    }
+  }
+
+  .status-filters {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+
+    label {
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      
+      input[type="checkbox"] {
+        margin-right: 5px;
+      }
+    }
+  }
+
+  .contract-table {
+    width: 105%;
+    height: 300px;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+
+    thead {
+      background-color: #f2f2f2;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+
+      th {
+        padding: 12px 15px;
+        font-weight: 600;
+        text-align: left;
+        border-bottom: 2px solid #ddd;
+        position: relative;
+        font-size: 0.95rem;
+      }
+    }
+
+    tbody {
+      tr {
+        &:hover {
+          background-color: #f9f9f9;
+        }
+      }
+
+      td {
+        padding: 10px 15px;
+        border-bottom: 1px solid #ddd;
+        vertical-align: middle;
+        font-size: 0.95rem;
+        height: 100px;
+        &.status {
+          font-weight: 600;
+          text-transform: capitalize;
+
+          &.pending { color: #f39c12; }
+          &.notstarted { color: #3498db; }
+          &.approved { color: #2ecc71; }
+          &.expired { color: #e74c3c; }
+          &.rejected { color: #e74c3c; }
+        }
+
+        .action {
+          position: relative;
+
+          button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            font-size: 1.2rem;
+            color: #333;
+            transition: color 0.2s;
+
+            &:hover {
+              color: #007bff;
+            }
+          }
+
+          .action-menu {
+            position: absolute;
+            background: #fff;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+            padding: 2px 0;
+            border-radius: 4px;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            min-width: 100px;
+           
+        
+             // Default: Open Downwards
+    &.down {
+      top: 30px;
+    }
+
+    // Open Upwards when near the bottom
+    &.up {
+      bottom: 30px;
+    }
+
+
+            button {
+              background: none;
+              border: none;
+              width: 100%;
+              text-align: left;
+              padding: 10px 15px;
+              font-size: 0.9rem;
+              cursor: pointer;
+              transition: background-color 0.2s;
+              white-space: nowrap;
+              &:hover {
+                background-color: #f2f2f2;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

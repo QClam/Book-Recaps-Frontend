@@ -61,3 +61,14 @@
     }
   }
 }
+.logout {
+  cursor: pointer;
+  padding: 10px;
+  color: #fff; /* Màu chữ */
+  transition: color 0.3s;
+  margin-left: 12px;
+}
+
+.logout:hover {
+  color: #ff6666; /* Màu khi hover */
+}

@@ -1,0 +1,44 @@
+.payout-detail {
+   margin-top: -200px;
+    h3, h4 {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      
+    }
+  
+    .payout-info {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      margin-left: 300px;
+      div {
+        p {
+          font-size: 14px;
+          margin: 5px 0;
+  
+          span {
+            font-weight: normal;
+          }
+        }
+      }
+    }
+  
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      margin-left: 300px;
+      
+      th, td {
+        padding: 10px;
+        border: 1px solid #000;
+      }
+  
+      th {
+        background-color: #f0f0f0;
+        font-weight: bold;
+      }
+    }
+  }
+  

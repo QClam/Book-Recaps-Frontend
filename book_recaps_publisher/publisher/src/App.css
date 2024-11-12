@@ -12,3 +12,6 @@
   background-color: #f4f6f9;
   min-height: 100vh;
 }
+.grecaptcha-badge { 
+  visibility: hidden !important;
+}
