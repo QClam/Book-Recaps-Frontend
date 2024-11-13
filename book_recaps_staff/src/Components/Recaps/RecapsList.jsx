@@ -127,7 +127,7 @@ function RecapsList() {
           return updatedRecap;
         })
       );
-
+      updatedRecaps.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setContentItems(updatedRecaps);
     } catch (error) {
       console.log("Error fetching data, using sample data as fallback:", error);

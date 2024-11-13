@@ -60,6 +60,7 @@ function ReportList() {
         try {
             const response = await api.get('/api/supportticket/getallsupportticket');
             let reports = resolveRefs(response.data.data.$values);
+            reports.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))
             console.log("Reports: ", reports);
             setReports(reports);
             return reports.id;

@@ -68,7 +68,7 @@ function AppealList() {
     const navigate = useNavigate();
     const token = localStorage.getItem("access_token")
 
-    const appealsPerPage = 4;
+    const appealsPerPage = 3;
 
     const displayAppeals = appeals.slice(
         (currentPage - 1) * appealsPerPage,
@@ -79,6 +79,7 @@ function AppealList() {
         try {
             const response = await api.get("/api/appeal/getallappeals");
             const appeals = resolveRefs(response.data.data.$values);
+            appeals.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))
             console.log(appeals);
             setAppeal(appeals);
         } catch (error) {
