@@ -33,8 +33,7 @@ function ContractDetail() {
 
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
-    const [publisherName, setPublisherName] = useState("");
-    const [filteredPublishers, setFilteredPublishers] = useState([]);
+    const [publishers, setPublishsers] = useState([]);
 
     const [contractForm, setContractForm] = useState({
         isPublisherApproved: false,
@@ -59,6 +58,18 @@ function ContractDetail() {
             console.error("Error Fetching Contract Details", error);
         }
     };
+
+    const fetchPublishers = async () => {
+        try {
+            const response = await api.get('/api/publisher/getallpublishers');
+            const publishers = response.data.$values;
+            setPublishsers(publishers);
+            console.log("Publishers: ", publishers);
+
+        } catch (error) {
+            console.error("Error Fetching Publishers", error);
+        }
+    }
 
     const handlePublisherIdChange = (e) => {
         setContractForm((prevForm) => ({
@@ -170,6 +181,7 @@ function ContractDetail() {
 
     useEffect(() => {
         getContractDetail();
+        fetchPublishers();
     }, [contractId])
 
     useEffect(() => {
@@ -198,12 +210,22 @@ function ContractDetail() {
                                 <Grid item xs={12} md={6}>
                                     <Box display="flex" alignItems="center">
                                         <Typography sx={{ width: 150 }}>Publisher:</Typography>
-                                        <TextField
+                                        <Select
                                             variant="outlined"
                                             sx={{ width: 360 }}
                                             value={contractForm.publisherId}
                                             onChange={handlePublisherIdChange}
-                                        />
+                                            displayEmpty
+                                        >
+                                            <MenuItem value="" disabled>
+                                                Chọn Publisher
+                                            </MenuItem>
+                                            {publishers.map((publisher) => (
+                                                <MenuItem key={publisher.id} value={publisher.id}>
+                                                    {publisher.publisherName}
+                                                </MenuItem>
+                                            ))}
+                                        </Select>
                                     </Box>
                                 </Grid>
 

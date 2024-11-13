@@ -90,7 +90,7 @@ function AddContractBooks({ contractId }) {
                                     <Typography variant="body1">{item.title}</Typography>
                                     <Typography variant="body1">Xuất bản năm: {item.publicationYear}</Typography>
                                     {item.ageLimit === 0 ? (
-                                        <Typography variant="body1">Giới hạn tuổi: Không giới</Typography>
+                                        <Typography variant="body1">Giới hạn tuổi: Không giới hạn</Typography>
                                     ) : (
                                         <Typography variant="body1">Giới hạn tuổi: {item.ageLimit}</Typography>
                                     )}
