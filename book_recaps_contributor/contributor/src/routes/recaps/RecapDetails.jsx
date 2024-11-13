@@ -71,6 +71,10 @@ export async function recapDetailsAction({ request, params }) {
     const isPublished = formData.get('isPublished') === 'on';
     const name = formData.get('name');
 
+    if (!name) {
+      return { error: "Vui lòng điền tên recap" };
+    }
+
     try {
       const response = await axiosInstance2.put('/recaps/' + params.recapId, {
         name, isPublished, isPremium
@@ -438,6 +442,7 @@ const RightSidePanel = () => {
               type="text"
               placeholder="Recap name"
               name="name"
+              required
               value={recapData.name || ''}
               onChange={(e) => setRecapData({ ...recapData, name: e.target.value })}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"

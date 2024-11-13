@@ -1,6 +1,6 @@
 import { axiosInstance, axiosInstance2 } from "../../utils/axios";
 import { handleFetchError } from "../../utils/handleFetchError";
-import { Await, defer, json, useAsyncValue, useLoaderData, useNavigate } from "react-router-dom";
+import { Await, defer, json, Link, useAsyncValue, useLoaderData, useNavigate } from "react-router-dom";
 import { Suspense, useEffect, useState } from "react";
 import { TabPanel, TabView } from 'primereact/tabview';
 import Show from "../../components/Show";
@@ -54,16 +54,43 @@ const getTranscript = async (versionId, request) => {
 
 const getReview = async (versionId, request) => {
   try {
-    const response = await axiosInstance.get('/api/review/getreviewbyrecapversionid/' + versionId, {
+    const response = await axiosInstance2.get('/reviews/by-recap-version/' + versionId, {
       signal: request.signal
     });
-    return response.data.data;
+    return response.data;
   } catch (error) {
     const err = handleFetchError(error);
     console.log("err", err);
     return null;
   }
 }
+
+const getPlagiarismResults = async (versionId, controller) => {
+  try {
+    const response = await axiosInstance2.get(
+      "/plagiarism/get-results/" + versionId,
+      {
+        signal: controller.signal,
+      }
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching plagiarism results:", error);
+    return null;
+  }
+};
+
+const checkPlagiarism = async (versionId) => {
+  try {
+    const response = await axiosInstance2.get(
+      "/plagiarism/check-plagiarism/" + versionId
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error checking plagiarism:", error);
+    return null;
+  }
+};
 
 export const recapVersionLoader = async ({ params, request }) => {
   const recapVersion = await getRecapVersion(params.versionId, request);
@@ -85,6 +112,7 @@ const RecapVersion = () => {
   const { recapVersion, keyIdeas, bookInfo, transcript, review } = useLoaderData();
   const [ recapVersionData, setRecapVersionData ] = useState(recapVersion);
   const [ activeIndex, setActiveIndex ] = useState(0);
+  const [ plagiarismResults, setPlagiarismResults ] = useState(null);
 
   return (
     <div className="relative flex h-full">
@@ -168,7 +196,26 @@ const RecapVersion = () => {
             </Suspense>
           </TabPanel>
           <TabPanel header="Kiểm tra đạo văn">
-            Plagiarism check
+            <Suspense
+              fallback={
+                <div className="h-32 flex gap-2 justify-center items-center">
+                  <div>
+                    <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
+                                     fill="var(--surface-ground)" animationDuration=".5s"/>
+                  </div>
+                  <p>Loading key ideas...</p>
+                </div>
+              }>
+              <Await
+                resolve={keyIdeas}
+                errorElement={
+                  <div className="h-32 flex gap-2 justify-center items-center">
+                    Error loading key ideas!
+                  </div>
+                }>
+                <PlagiarsimCheck plagiarismResults={plagiarismResults}/>
+              </Await>
+            </Suspense>
           </TabPanel>
         </TabView>
       </div>
@@ -176,6 +223,8 @@ const RecapVersion = () => {
       <RightSidePanel
         recapVersionData={recapVersionData}
         setRecapVersionData={setRecapVersionData}
+        plagiarismResults={plagiarismResults}
+        setPlagiarismResults={setPlagiarismResults}
         activeIndex={activeIndex}
       />
     </div>
@@ -184,7 +233,13 @@ const RecapVersion = () => {
 
 export default RecapVersion;
 
-const RightSidePanel = ({ recapVersionData, setRecapVersionData, activeIndex }) => {
+const RightSidePanel = ({
+                          recapVersionData,
+                          setRecapVersionData,
+                          plagiarismResults,
+                          setPlagiarismResults,
+                          activeIndex
+                        }) => {
   const [ uploadingAudio, setUploadingAudio ] = useState(false);
   const [ updatingName, setUpdatingName ] = useState(false);
   const navigate = useNavigate();
@@ -289,6 +344,15 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData, activeIndex }) 
   const handleUpdateName = async () => {
     if (updatingName) return;
 
+    if (!recapVersionData.versionName) {
+      showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Version name cannot be empty',
+      });
+      return;
+    }
+
     try {
       setUpdatingName(true);
       await axiosInstance2.put('/recap-versions/change-name/' + recapVersionData.id, {
@@ -329,11 +393,10 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData, activeIndex }) 
 
     setUploadingAudio(true);
     try {
-      const request = new AbortController();
       const response = await axiosInstance.put('/change-recapversion-status', {
         recapVersionId: recapVersionData.id,
         status: 1
-      }, { signal: request.signal });
+      });
 
       showToast({
         severity: 'success',
@@ -376,46 +439,45 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData, activeIndex }) 
 
   return (
     <div className="border-l border-gray-300 bg-white h-full py-8 px-6 w-[330px]">
-      <div className="sticky top-8">
-        <div className={cn({ 'hidden': activeIndex !== 0 })}>
-          <div className="mb-4">
-            <h2 className="text-2xl font-bold text-gray-900">Recap Version</h2>
+      <div className={cn("sticky top-8", { 'hidden': activeIndex !== 0 })}>
+        <div className="mb-4">
+          <h2 className="text-2xl font-bold text-gray-900">Recap Version</h2>
 
-            <Show when={loading}>
-              <div className="flex gap-2 items-center mt-3">
-                <div>
-                  <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
-                                   fill="var(--surface-ground)" animationDuration=".5s"/>
-                </div>
-                <p>Updating...</p>
+          <Show when={loading}>
+            <div className="flex gap-2 items-center mt-3">
+              <div>
+                <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
+                                 fill="var(--surface-ground)" animationDuration=".5s"/>
               </div>
-            </Show>
-          </div>
-          {/* Version name */}
-          <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Version name</label>
-            <div className="flex items-center gap-2">
-              <input
-                type="text"
-                placeholder="Version name"
-                value={recapVersionData.versionName || ''}
-                onChange={(e) => setRecapVersionData({ ...recapVersionData, versionName: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
-              />
-              <button
-                type="button"
-                disabled={loading}
-                onClick={handleUpdateName}
-                className="px-4 py-2 text-white border bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300 disabled:opacity-50">
-                Save
-              </button>
+              <p>Updating...</p>
             </div>
+          </Show>
+        </div>
+        {/* Version name */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Version name</label>
+          <div className="flex items-center gap-2">
+            <input
+              type="text"
+              placeholder="Version name"
+              value={recapVersionData.versionName || ''}
+              onChange={(e) => setRecapVersionData({ ...recapVersionData, versionName: e.target.value })}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+            />
+            <button
+              type="button"
+              disabled={loading}
+              onClick={handleUpdateName}
+              className="px-4 py-2 text-white border bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300 disabled:opacity-50">
+              Save
+            </button>
           </div>
+        </div>
 
-          {/* Status */}
-          <div className="mb-4">
-            <span className="text-sm font-medium text-gray-700 mr-1">Status:</span>
-            <span className="font-semibold">
+        {/* Status */}
+        <div className="mb-4">
+          <span className="text-sm font-medium text-gray-700 mr-1">Status:</span>
+          <span className="font-semibold">
             <Badge
               value={getStatus(recapVersionData.status)}
               // size="large"
@@ -426,111 +488,118 @@ const RightSidePanel = ({ recapVersionData, setRecapVersionData, activeIndex }) 
                       'danger'
               }/>
           </span>
-          </div>
+        </div>
 
-          {/* Audio Upload */}
+        {/* Audio Upload */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-1">Audio:</label>
+          <div className="flex items-center space-x-2">
+            <input
+              type="text"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none read-only:bg-gray-100"
+              defaultValue={recapVersionData.audioURL}
+              placeholder="Audio URL"
+              readOnly
+            />
+          </div>
+        </div>
+
+        <Show when={recapVersionData.audioURL}>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Audio:</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Audio transcript:</label>
             <div className="flex items-center space-x-2">
               <input
                 type="text"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none read-only:bg-gray-100"
-                defaultValue={recapVersionData.audioURL}
-                placeholder="Audio URL"
+                defaultValue={recapVersionData.transcriptUrl}
+                placeholder="Audio transcript URL"
                 readOnly
               />
             </div>
-          </div>
-
-          <Show when={recapVersionData.audioURL}>
-            <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-1">Audio transcript:</label>
-              <div className="flex items-center space-x-2">
-                <input
-                  type="text"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none read-only:bg-gray-100"
-                  defaultValue={recapVersionData.transcriptUrl}
-                  placeholder="Audio transcript URL"
-                  readOnly
-                />
-              </div>
-              <Show when={recapVersionData.transcriptStatus === 1} fallback={
-                recapVersionData.transcriptStatus === 0 ? (
-                  <p className="text-xs mt-1 text-red-500">
-                    Transcript generation failed. Please try uploading the audio again.
-                  </p>
-                ) : null
-              }>
-                <div className="flex gap-2 items-center mt-3">
-                  <div>
-                    <ProgressSpinner style={{ width: '15px', height: '15px' }} strokeWidth="8"
-                                     fill="var(--surface-ground)" animationDuration=".5s"/>
-                  </div>
-                  <p>Generating transcript...</p>
-                </div>
-              </Show>
-            </div>
-          </Show>
-          <Show when={recapVersionData.status === 0 && recapVersionData.transcriptStatus !== 1}>
-            <>
-              {/* Generate Audio Button */}
-              <div className="mb-4">
-                <button
-                  type="button"
-                  disabled={loading}
-                  onClick={handleGenerateAudio}
-                  className="w-full px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300 disabled:opacity-50">
-                  Generate audio
-                </button>
-                <p className="block text-xs text-gray-500 mt-2">Generate audio using AI (recommended)</p>
-                <p className="block text-center text-xs text-gray-500 mt-2">Or</p>
-              </div>
-
-              <div className="relative mb-4">
-                <input
-                  type="file"
-                  className="absolute inset-0 opacity-0 cursor-pointer"
-                  onChange={handleUploadAudio}
-                />
-                <button
-                  type="button"
-                  className="w-full px-4 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-400 focus:outline-none disabled:opacity-50"
-                  disabled={loading}
-                >
-                  Upload audio
-                </button>
-              </div>
-
-              <Divider/>
-              <div>
-                <button
-                  type="button"
-                  disabled={loading}
-                  onClick={handleSubmitForReview}
-                  className="w-full px-4 py-2 text-white bg-indigo-500 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring focus:ring-indigo-300 disabled:opacity-50">
-                  Submit for review
-                </button>
-              </div>
-            </>
-          </Show>
-        </div>
-
-        <div className={cn({ 'hidden': activeIndex !== 1 })}>
-          <Suspense
-            fallback={
-              <div className="h-32 flex gap-2 justify-center items-center">
+            <Show when={recapVersionData.transcriptStatus === 1} fallback={
+              recapVersionData.transcriptStatus === 0 ? (
+                <p className="text-xs mt-1 text-red-500">
+                  Transcript generation failed. Please try uploading the audio again.
+                </p>
+              ) : null
+            }>
+              <div className="flex gap-2 items-center mt-3">
                 <div>
-                  <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
+                  <ProgressSpinner style={{ width: '15px', height: '15px' }} strokeWidth="8"
                                    fill="var(--surface-ground)" animationDuration=".5s"/>
                 </div>
-                <p>Loading review...</p>
+                <p>Generating transcript...</p>
               </div>
-            }>
-            <Await resolve={review}>
-              <StaffReviewNotes/>
-            </Await>
-          </Suspense>
-        </div>
+            </Show>
+          </div>
+        </Show>
+        <Show when={recapVersionData.status === 0 && recapVersionData.transcriptStatus !== 1}>
+          <>
+            {/* Generate Audio Button */}
+            <div className="mb-4">
+              <button
+                type="button"
+                disabled={loading}
+                onClick={handleGenerateAudio}
+                className="w-full px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300 disabled:opacity-50">
+                Generate audio
+              </button>
+              <p className="block text-xs text-gray-500 mt-2">Generate audio using AI (recommended)</p>
+              <p className="block text-center text-xs text-gray-500 mt-2">Or</p>
+            </div>
+
+            <div className="relative mb-4">
+              <input
+                type="file"
+                className="absolute inset-0 opacity-0 cursor-pointer"
+                onChange={handleUploadAudio}
+              />
+              <button
+                type="button"
+                className="w-full px-4 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-400 focus:outline-none disabled:opacity-50"
+                disabled={loading}
+              >
+                Upload audio
+              </button>
+            </div>
+
+            <Divider/>
+            <div>
+              <button
+                type="button"
+                disabled={loading}
+                onClick={handleSubmitForReview}
+                className="w-full px-4 py-2 text-white bg-indigo-500 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring focus:ring-indigo-300 disabled:opacity-50">
+                Submit for review
+              </button>
+            </div>
+          </>
+        </Show>
+      </div>
+
+      <div className={cn({ 'hidden': activeIndex !== 1 })}>
+        <Suspense
+          fallback={
+            <div className="h-32 flex gap-2 justify-center items-center">
+              <div>
+                <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
+                                 fill="var(--surface-ground)" animationDuration=".5s"/>
+              </div>
+              <p>Loading review...</p>
+            </div>
+          }>
+          <Await resolve={review}>
+            <StaffReviewNotes/>
+          </Await>
+        </Suspense>
+      </div>
+
+      <div className={cn({ 'hidden': activeIndex !== 2 })}>
+        <PlagiarismResults
+          plagiarismResults={plagiarismResults}
+          setPlagiarismResults={setPlagiarismResults}
+          recapVersionData={recapVersionData}
+        />
       </div>
     </div>
   )
@@ -930,42 +999,52 @@ const StaffReviews = ({ review }) => {
     }
   };
 
-  const reviewNotes = review.reviewNotes.$values || [];
+  const reviewNotes = review.reviewNotes || [];
 
   return (
     <div>
-      {transcript.transcriptSections.map((section, sectionIndex) => {
-        return (
-          <div
-            key={sectionIndex}
-            className="mb-4 bg-white shadow-sm border border-gray-300 p-4 rounded-md flex flex-col gap-2"
-          >
-            <div className="space-y-2">
-              <h2 className="text-lg font-semibold text-gray-900">
-                Section {sectionIndex + 1}
-              </h2>
-              <p>
-                {section.transcriptSentences.map((sentence) => (
-                  <span
-                    key={sentence.sentence_index}
-                    id={`highlight-${sentence.sentence_index}`}
-                    onClick={() => handleHighlightClick(sentence.sentence_index)}
-                    className={cn({
-                      'bg-yellow-200 cursor-pointer transition-colors hover:bg-yellow-300': reviewNotes.some((note) => Number(note.sentenceIndex) === sentence.sentence_index)
-                    })}>{sentence.value.html} </span>
-                ))}
-              </p>
+      <div className="mt-6 flex gap-4 justify-end items-center mb-4">
+        <Link to="/appeal-history" className="text-blue-500 hover:underline ml-2">Lịch sử phản hồi</Link>
+        <button
+          className="px-4 py-2 text-white bg-orange-400 rounded-md hover:bg-orange-500 focus:outline-none focus:ring focus:ring-orange-200"
+        >
+          Phản hồi xét duyệt
+        </button>
+      </div>
+      <div>
+        {transcript.transcriptSections.map((section, sectionIndex) => {
+          return (
+            <div
+              key={sectionIndex}
+              className="mb-4 bg-white shadow-sm border border-gray-300 p-4 rounded-md flex flex-col gap-2"
+            >
+              <div className="space-y-2">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  Section {sectionIndex + 1}
+                </h2>
+                <p>
+                  {section.transcriptSentences.map((sentence) => (
+                    <span
+                      key={sentence.sentence_index}
+                      id={`highlight-${sentence.sentence_index}`}
+                      onClick={() => handleHighlightClick(sentence.sentence_index)}
+                      className={cn({
+                        'bg-yellow-200 py-0.5 cursor-pointer transition-colors hover:bg-yellow-300': reviewNotes.some((note) => Number(note.sentenceIndex) === sentence.sentence_index)
+                      })}>{sentence.value.html} </span>
+                  ))}
+                </p>
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </div>
     </div>
   )
 }
 
 const StaffReviewNotes = () => {
   const review = useAsyncValue();
-  const reviewNotes = review?.reviewNotes.$values || [];
+  const reviewNotes = review?.reviewNotes || [];
 
   if (reviewNotes.length === 0) {
     return (
@@ -988,32 +1067,148 @@ const StaffReviewNotes = () => {
   }
 
   return (
-    <div>
+    <div className="">
       <h2 className="text-2xl font-semibold mb-4">Comments</h2>
 
-      {reviewNotes.map((note) => (
-          <div
-            key={note.id}
-            id={`note-${note.sentenceIndex}`}
-            onClick={() => handleOnClickHighlight(note.sentenceIndex)}
-            className="bg-white shadow-md rounded-lg p-4 mb-4 border border-gray-200 transition-transform transform cursor-pointer transition-colors hover:scale-105"
-          >
-            <div className="flex justify-between">
-              <h3 className="text-md font-bold text-gray-700">Staff name</h3>
-              <span
-                className="text-sm text-gray-500"
-              >{note.createdAt ? new Date(note.createdAt).toLocaleDateString() : 'N/A'}</span>
+      <div>
+        {reviewNotes.map((note) => (
+            <div
+              key={note.id}
+              id={`note-${note.sentenceIndex}`}
+              onClick={() => handleOnClickHighlight(note.sentenceIndex)}
+              className="bg-white shadow-md rounded-lg p-4 mb-4 border border-gray-200 transition-transform transform cursor-pointer transition-colors hover:scale-105"
+            >
+              <div className="flex justify-between">
+                <h3 className="text-md font-bold text-gray-700">Staff name</h3>
+                <span
+                  className="text-sm text-gray-500"
+                >{note.createdAt ? new Date(note.createdAt).toLocaleDateString() : 'N/A'}</span>
+              </div>
+              <p className="text-gray-600 mt-2">{note.feedback}</p>
             </div>
-            <p className="text-gray-600 mt-2">{note.feedback}</p>
-          </div>
-        )
-      )}
+          )
+        )}
+      </div>
 
       <div className="mt-6">
         <h3 className="text-md font-semibold mb-2">Ghi chú tổng:</h3>
         <div className="w-full italic font-semibold text-gray-400">
           {review.comments}
         </div>
+      </div>
+
+    </div>
+  )
+}
+
+const PlagiarsimCheck = ({ plagiarismResults }) => {
+
+  return (
+    <div>
+      <code>
+        <pre>{JSON.stringify(plagiarismResults, null, 2)}</pre>
+      </code>
+    </div>
+  )
+}
+
+const PlagiarismResults = ({ recapVersionData, plagiarismResults, setPlagiarismResults }) => {
+  const [ recapVersion, setRecapVersion ] = useState(recapVersionData);
+  const [ plagiarismProcessing, setPlagiarismProcessing ] = useState(false);
+  const [ loading, setLoading ] = useState(false);
+
+  useEffect(() => {
+    let interval = null;
+    const controller = new AbortController();
+    let isRequestActive = false;
+
+    if (recapVersion?.plagiarismCheckStatus === 1) {
+      interval = setInterval(async () => {
+        if (!isRequestActive) {
+          isRequestActive = true;
+          try {
+            const result = await getRecapVersion(recapVersion.id, controller);
+
+            if (result.plagiarismCheckStatus !== 1) {
+              setRecapVersion(result);
+              clearInterval(interval);
+            }
+          } catch (error) {
+            console.error("Error polling for recap version:", error);
+            clearInterval(interval);
+          } finally {
+            isRequestActive = false;
+          }
+        }
+      }, 1500);
+    }
+
+    return () => {
+      if (interval) clearInterval(interval);
+      controller.abort(); // Abort any ongoing fetch
+    };
+  }, [ recapVersion?.plagiarismCheckStatus, recapVersion?.id ]);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    const fetchPlagiarismResults = async () => {
+      setPlagiarismProcessing(true);
+      const results = await getPlagiarismResults(recapVersion?.id, controller);
+      setPlagiarismResults(results);
+      setPlagiarismProcessing(false);
+    };
+
+    if (recapVersion && recapVersion?.plagiarismCheckStatus === 2)
+      fetchPlagiarismResults();
+
+    return () => {
+      controller.abort();
+    };
+  }, [ recapVersion ]);
+
+  const getInfo = async () => {
+    if (loading) return;
+    setLoading(true);
+
+    const controller = new AbortController();
+    const data = await getRecapVersion(recapVersion.id, controller);
+    setRecapVersion(data);
+    setLoading(false);
+  };
+
+  const onCheckPlagiarism = async () => {
+    if (loading || !recapVersion || recapVersion.plagiarismCheckStatus === 1)
+      return;
+
+    setLoading(true);
+    setPlagiarismResults(null);
+    await checkPlagiarism(recapVersion.id);
+    await getInfo(); // Refresh version info to get the new plagiarism check status
+  };
+
+  return (
+    <div>
+      <button
+        className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300"
+        onClick={onCheckPlagiarism}
+        disabled={
+          loading || !recapVersion || recapVersion.plagiarismCheckStatus === 1
+        }
+      >
+        {loading ? "Checking..." : "Check plagiarism"}
+      </button>
+      <div className="">
+        <h3>Plagiarism results:</h3>
+        {plagiarismProcessing || recapVersion?.plagiarismCheckStatus === 1 ? (
+          <p>Loading...</p>
+        ) : plagiarismResults ? (
+          <code>
+            <pre>{JSON.stringify(plagiarismResults, null, 2)}</pre>
+          </code>
+        ) : (
+          <p>No results yet...</p>
+        )}
       </div>
     </div>
   )
