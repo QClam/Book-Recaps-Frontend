@@ -1,8 +1,11 @@
 import { Box, Button, Grid, Link, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import React, { useState } from 'react'
+import { useParams } from 'react-router-dom';
 import * as XLSX from 'xlsx'
 
 function DetailPublihserPayout() {
+
+    const { historyId, id } = useParams();
 
     const payoutData = [
         {
@@ -44,6 +47,7 @@ function DetailPublihserPayout() {
             <Box padding={3}>
                 {/* Quyết toán tiền bản quyền */}
                 <Typography variant='h5'>Quyết toán bản quyền</Typography>
+                <Typography variant='h5'>Detail for Publisher ID: {historyId}, Payout ID: {id}</Typography>
                 <Box>
                     <Box sx={{ flexGrow: 1, padding: 2 }}>
                         <Grid container spacing={3}>

@@ -2,8 +2,11 @@ import React, { useState } from 'react';
 import {
     Box, Typography, TextField, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Link, Grid
 } from '@mui/material';
+import { useParams } from 'react-router-dom';
 
 function PublisherPayout() { 
+
+    const {id} = useParams();
 
     const [newPayout, setNewPayout] = useState({
         fromDate: '01/02/2010',
@@ -89,7 +92,7 @@ function PublisherPayout() {
                                         <Typography variant="body1">30.000.000 VND</Typography>
                                     </Box>
                                     <Box display="flex" justifyContent="space-between">
-                                        <Link href={`/payout-history`} underline="hover">Xem lịch sử quyết toán</Link>
+                                        <Link href={`/publisher-payout-history/${id}`} underline="hover">Xem lịch sử quyết toán</Link>
                                     </Box>
                                 </Paper>
                             </Grid>

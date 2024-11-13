@@ -69,7 +69,7 @@ function AddContractAttachment({ contractId }) {
             setContractAttachment(contractAttachment);
             console.log("Hàng đính kèm: ", contractAttachment);
             handleClose();
-            fetchContractDetail();
+            getContractDetail();
         } catch (error) {
             console.error("Error Posting", error);
         }

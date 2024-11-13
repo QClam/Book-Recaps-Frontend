@@ -1,29 +1,32 @@
 import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 import React from 'react'
+import { useParams } from 'react-router-dom';
 
 function HistoryPublisherPayout() {
+
+    const {historyId} = useParams();
 
     const payoutHistoryData = [
         {
             id:'1',
             name: 'Publisher A',
-            fromDate: '01-02-2010',
+            fromDate: '19-09-2024',
             toDate: new Date().toISOString().slice(0, 10),
             revenue: '12.000.000 VND',
             status: 'Hoàn thành',
         },
         {
             id:'2',
-            name: 'Publisher B',
-            fromDate: '01-02-2010',
+            name: 'Publisher A',
+            fromDate: '19-10-2024',
             toDate: new Date().toISOString().slice(0, 10),
             revenue: '8.000.000 VND',
             status: 'Hoàn thành',
         },
         {
             id:'3',
-            name: 'Publisher C',
-            fromDate: '01-02-2010',
+            name: 'Publisher A',
+            fromDate: '19-11-2024',
             toDate: new Date().toISOString().slice(0, 10),
             revenue: '15.000.000 VND',
             status: 'Hoàn thành',
@@ -54,7 +57,7 @@ function HistoryPublisherPayout() {
                                     <TableCell>{item.toDate}</TableCell>
                                     <TableCell>{item.revenue}</TableCell>
                                     <TableCell>{item.status}</TableCell>
-                                    <TableCell><Button href={`payout-history/${item.id}`}>Xem chi tiết</Button></TableCell>
+                                    <TableCell><Button href={`/publisher-payout-history/${historyId}/detail/${item.id}`}>Xem chi tiết</Button></TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

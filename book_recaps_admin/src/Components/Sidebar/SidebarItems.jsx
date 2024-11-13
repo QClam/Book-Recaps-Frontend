@@ -14,7 +14,8 @@ import {
     Widgets,
     Notes,
     Groups,
-    MenuBook
+    MenuBook,
+    CurrencyExchange
 } from "@mui/icons-material";
 
 export const SidebarItems = [
@@ -24,9 +25,14 @@ export const SidebarItems = [
         link: "/dashboard",
     },
     {
-        title: "Quyết toán",
+        title: "Quyết toán cho NXB",
         icon: <Paid />,
         link: "/publisher-payout",
+    },
+    {
+        title: "Quyết toán cho Contributor",
+        icon: <CurrencyExchange />,
+        link: "/contributor-payout",
     },
     {
         title: "Quản lý người dùng",
