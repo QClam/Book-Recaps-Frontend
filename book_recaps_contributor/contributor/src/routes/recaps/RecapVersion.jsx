@@ -919,13 +919,13 @@ const StaffReviews = ({ review }) => {
     );
   }
 
-  const handleHighlightClick = (id) => {
-    const cardElement = document.getElementById(`note-${id}`);
+  const handleHighlightClick = (sentenceIndex) => {
+    const cardElement = document.getElementById(`note-${sentenceIndex}`);
     if (cardElement) {
       cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      cardElement.classList.add('bg-yellow-100'); // Add the focus class for animation
+      cardElement.classList.add('!bg-yellow-100'); // Add the focus class for animation
       setTimeout(() => {
-        cardElement.classList.remove('bg-yellow-100'); // Remove the focus class after 1s
+        cardElement.classList.remove('!bg-yellow-100'); // Remove the focus class after 1s
       }, 1000);
     }
   };
@@ -977,12 +977,12 @@ const StaffReviewNotes = () => {
   }
 
   const handleOnClickHighlight = (sentenceIndex) => {
-    const cardElement = document.getElementById(`highlight-${sentenceIndex}`);
-    if (cardElement) {
-      cardElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      cardElement.classList.add('bg-red-200'); // Add the focus class for animation
+    const sentenceElement = document.getElementById(`highlight-${sentenceIndex}`);
+    if (sentenceElement) {
+      sentenceElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      sentenceElement.classList.add('!bg-red-200'); // Add the focus class for animation
       setTimeout(() => {
-        cardElement.classList.remove('bg-red-200'); // Remove the focus class after 1s
+        sentenceElement.classList.remove('!bg-red-200'); // Remove the focus class after 1s
       }, 1000);
     }
   }
