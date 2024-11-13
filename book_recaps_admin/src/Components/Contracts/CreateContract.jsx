@@ -14,6 +14,7 @@ import {
     Select,
     MenuItem,
     InputLabel,
+    Input,
 } from "@mui/material";
 import axios from "axios";
 import api from "../Auth/AxiosInterceptors";
@@ -139,23 +140,18 @@ function CreateContract() {
         }
     };
 
-    const handleCreateContract = async () => {
+    const handleSendContract = async () => {
         const contractFormData = {
-            publisherId: contractForm.publisherId,
-            revenueSharePercentage: contractForm.revenueSharePercentage,
-            startDate: contractForm.startDate,
-            endDate: contractForm.endDate,
-            autoRenew: contractForm.autoRenew,
             status: 1,
         };
         try {
-            const response = await api.post(
-                "/api/Contract/create",
+            const response = await api.put(
+                `/api/Contract/change-status/${id}`,
                 contractFormData
             );
             setContractForm(response.data);
             console.log("Contract Form: ", response.data);
-            alert("Tạo thành công")
+            alert("Gửi thành công")
         } catch (error) {
             console.log("Error Posting", error);
         }
@@ -188,7 +184,6 @@ function CreateContract() {
                                 <Typography>Publisher: </Typography>
                                 <TextField
                                     variant="outlined"
-                                    label="Tên nhà xuất bản"
                                     sx={{ width: 350 }}
                                     value={contractForm.publisherId}
                                     onChange={handlePublisherIdChange}
@@ -220,11 +215,11 @@ function CreateContract() {
                             <Box display="flex" gap={1} mb={2} alignItems="center">
                                 <Typography>Phần trăm chia sẻ doanh thu: </Typography>
                                 <TextField
-                                    label="Nhập số. Ví dụ: 10, 20"
                                     onChange={handleRevenueShareChange}
                                     name="revenueSharePercentage"
                                     type="number"
                                     value={contractForm.revenueSharePercentage}
+                                    sx={{ width: 80 }}
                                 />
                             </Box>
                             <Box display="flex" gap={1} mb={2} alignItems="center">
@@ -267,7 +262,7 @@ function CreateContract() {
                                 <Button
                                     variant="contained"
                                     color="primary"
-                                    onClick={handleCreateContract}
+                                    
                                 >
                                     Gửi
                                 </Button>
