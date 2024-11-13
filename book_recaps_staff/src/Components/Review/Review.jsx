@@ -206,7 +206,7 @@ function Review() {
       setRecapVersion(response.data);
 
       const id = recapVersionId;
-      const postPlagirism = await axios.post("https://ai.hieuvo.dev/plagiarism/add-recap-versions", id)
+      const postPlagirism = await axios.post("https://ai.hieuvo.dev/plagiarism/add-recap-versions", [id])
     } catch (error) {
       console.log('Error updating status', error);
       Swal.fire('Error', 'Failed to update status.', 'error');
