@@ -27,6 +27,7 @@ import { TbPlus } from "react-icons/tb";
 import { Dialog } from "primereact/dialog";
 import TextInput from "../../components/form/TextInput";
 import { cn } from "../../utils/cn";
+import Modal from "../../components/modal";
 
 const getRecapInfo = async (recapId, request) => {
   try {
@@ -164,47 +165,51 @@ const RecapDetails = () => {
     <div className="relative flex h-full">
       <Dialog
         visible={dialogVisible}
-        modal
         onHide={() => {
           if (!dialogVisible) return;
           setDialogVisible(false);
         }}
         content={({ hide }) => (
-          <Form className="flex flex-col py-4 px-5 gap-1 bg-white rounded" method="post">
-            <input type="hidden" name="recapId" value={recap.id}/>
-            <input type="hidden" name="userId" value={recap.userId}/>
-            <TextInput
-              id="name"
-              label="Version name:"
-              name="name"
-              placeholder="Tên version"
-              required
-            />
-            <div className="flex justify-end gap-2 mt-3">
-              <button
-                className={cn({
-                  "text-white bg-indigo-600 rounded py-2 px-4 border font-medium hover:bg-indigo-700": true,
-                  "opacity-50 cursor-not-allowed": navigation.state === "loading"
-                })}
-                type="submit"
-                disabled={navigation.state === "submitting"}
-              >
-                {navigation.state === "loading" ? "Loading..." : "Tạo"}
-              </button>
+          <Modal.Wrapper width="400px">
+            <Modal.Header title="Tạo phiên bản bài viết mới" onClose={(e) => hide(e)}/>
+            <Modal.Body className="pb-0">
+              <Form className="flex flex-col gap-1" method="post">
+                <input type="hidden" name="recapId" value={recap.id}/>
+                <input type="hidden" name="userId" value={recap.userId}/>
+                <TextInput
+                  id="name"
+                  label="Tên phiên bản:"
+                  name="name"
+                  placeholder="Tên phiên bản mới"
+                  required
+                />
+                <Modal.Footer className="-mx-5 mt-5 justify-end gap-3">
+                  <button
+                    className={cn({
+                      "text-white bg-gray-200 rounded py-1.5 px-3 border font-semibold hover:bg-gray-300": true,
+                      "opacity-50 cursor-not-allowed": navigation.state === "loading"
+                    })}
+                    type="button"
+                    onClick={hide}
+                    disabled={navigation.state === "submitting"}
+                  >
+                    Hủy
+                  </button>
 
-              <button
-                className={cn({
-                  "text-white bg-gray-200 rounded py-2 px-4 border font-medium hover:bg-gray-300": true,
-                  "opacity-50 cursor-not-allowed": navigation.state === "loading"
-                })}
-                type="button"
-                onClick={hide}
-                disabled={navigation.state === "submitting"}
-              >
-                Hủy
-              </button>
-            </div>
-          </Form>
+                  <button
+                    className={cn({
+                      "text-white bg-indigo-600 rounded py-1.5 px-3 border font-semibold hover:bg-indigo-700": true,
+                      "opacity-50 cursor-not-allowed": navigation.state === "loading"
+                    })}
+                    type="submit"
+                    disabled={navigation.state === "submitting"}
+                  >
+                    {navigation.state === "loading" ? "Loading..." : "Tạo"}
+                  </button>
+                </Modal.Footer>
+              </Form>
+            </Modal.Body>
+          </Modal.Wrapper>
         )}
       />
       <div className="flex-1 pb-8 px-6 overflow-y-auto">

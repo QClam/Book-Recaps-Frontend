@@ -27,6 +27,7 @@ import { ProgressSpinner } from "primereact/progressspinner";
 import { routes } from "../../routes";
 import { useToast } from "../../contexts/Toast";
 import CustomBreadCrumb from "../../components/CustomBreadCrumb";
+import Modal from "../../components/modal";
 
 const getBooks = async (q, category, page, request) => {
   try {
@@ -171,50 +172,54 @@ const CreateRecap = () => {
       <CustomBreadCrumb items={[ { label: "Create Recap" } ]}/>
       <Dialog
         visible={dialogVisible}
-        modal
         onHide={() => {
           if (!dialogVisible) return;
           setDialogVisible(false);
         }}
         content={({ hide }) => (
-          <Form className="flex flex-col py-4 px-5 gap-1 bg-white rounded" method="post">
-            <input type="hidden" name="bookId" value={chosenBookId}/>
-            <input type="hidden" name="userId" value={user.id}/>
-            <TextInput
-              id="name"
-              label="Recap name:"
-              name="name"
-              placeholder="Tên bài viết tóm tắt"
-              required
-            />
-            <div className="flex justify-end gap-2 mt-3">
-              <button
-                className={cn({
-                  "text-white bg-indigo-600 rounded py-2 px-4 border font-medium hover:bg-indigo-700": true,
-                  "opacity-50 cursor-not-allowed": navigation.state === "loading"
-                })}
-                type="submit"
-                disabled={navigation.state === "loading"}
-              >
-                {navigation.state === "loading" ? "Loading..." : "Tạo"}
-              </button>
+          <Modal.Wrapper width="400px">
+            <Modal.Header title="Tạo bài viết tóm tắt" onClose={(e) => hide(e)}/>
+            <Modal.Body className="pb-0">
+              <Form className="flex flex-col gap-1" method="post">
+                <input type="hidden" name="bookId" value={chosenBookId}/>
+                <input type="hidden" name="userId" value={user.id}/>
+                <TextInput
+                  id="name"
+                  label="Tên bài viết:"
+                  name="name"
+                  placeholder="Tên bài viết tóm tắt"
+                  required
+                />
+                <Modal.Footer className="-mx-5 mt-5 justify-end gap-3">
+                  <button
+                    className={cn({
+                      "text-white bg-gray-200 rounded py-1.5 px-3 border font-semibold hover:bg-gray-300": true,
+                      "opacity-50 cursor-not-allowed": navigation.state === "loading"
+                    })}
+                    type="button"
+                    onClick={(e) => {
+                      setChosenBookId("");
+                      hide(e);
+                    }}
+                    disabled={navigation.state === "loading"}
+                  >
+                    Hủy
+                  </button>
 
-              <button
-                className={cn({
-                  "text-white bg-gray-200 rounded py-2 px-4 border font-medium hover:bg-gray-300": true,
-                  "opacity-50 cursor-not-allowed": navigation.state === "loading"
-                })}
-                type="button"
-                onClick={(e) => {
-                  setChosenBookId("");
-                  hide(e);
-                }}
-                disabled={navigation.state === "loading"}
-              >
-                Hủy
-              </button>
-            </div>
-          </Form>
+                  <button
+                    className={cn({
+                      "text-white bg-indigo-600 rounded py-1.5 px-3 border font-semibold hover:bg-indigo-700": true,
+                      "opacity-50 cursor-not-allowed": navigation.state === "loading"
+                    })}
+                    type="submit"
+                    disabled={navigation.state === "loading"}
+                  >
+                    {navigation.state === "loading" ? "Loading..." : "Tạo"}
+                  </button>
+                </Modal.Footer>
+              </Form>
+            </Modal.Body>
+          </Modal.Wrapper>
         )}
       />
       <div className="bg-white border border-gray-200 rounded shadow-sm p-4">
@@ -255,7 +260,7 @@ const CreateRecap = () => {
         <div className="col-start-4 col-end-7 flex gap-2.5">
           <button
             className={cn({
-              "text-white bg-indigo-600 rounded py-2 px-4 border font-medium hover:bg-indigo-700": true,
+              "text-white bg-indigo-600 rounded py-1.5 px-3 border font-semibold hover:bg-indigo-700": true,
               "opacity-50 cursor-not-allowed": navigation.state === "loading"
             })}
             type="submit"
