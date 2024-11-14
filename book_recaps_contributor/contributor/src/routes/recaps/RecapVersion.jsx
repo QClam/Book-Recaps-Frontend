@@ -666,7 +666,7 @@ const ListKeyIdeas = () => {
 }
 
 const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
-  const { setKeyIdeas } = useRecapVersion();
+  const { setKeyIdeas, setPlagiarismResults } = useRecapVersion();
   const { showToast } = useToast();
   const [ formData, setFormData ] = useState({
     Title: keyIdea.title,
@@ -776,6 +776,7 @@ const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
           isSaving: false
         }) : idea
       ));
+      setPlagiarismResults(null);
 
     } catch (error) {
       console.error(error);
@@ -812,6 +813,7 @@ const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
       const response = await axiosInstance.delete('/api/keyidea/delete/' + keyIdea.id);
       console.log(response.data);
       setKeyIdeas((prevIdeas) => prevIdeas.filter(idea => idea.id !== keyIdea.id));
+      setPlagiarismResults(null);
       showToast({
         severity: 'success',
         summary: 'Success',
