@@ -21,6 +21,8 @@ function AddContractAttachment({ contractId }) {
         file: null,
     });
 
+    const disableUpdate = contract.status === 1 || contract.status === 2 || contract.status === 3;
+
     const getContractDetail = async () => {
         try {
             const result = await fetchContractDetail(contractId);
@@ -78,7 +80,7 @@ function AddContractAttachment({ contractId }) {
     return (
         <div >
             <Typography variant="h6" gutterBottom>Tài liệu đính kèm</Typography>
-            <Button color='primary' variant='outlined' onClick={handleOpen} sx={{ margin: 1 }}>
+            <Button color='primary' variant='outlined' onClick={handleOpen} sx={{ margin: 1 }} disabled={disableUpdate}>
                 Thêm tài liệu
             </Button>
 

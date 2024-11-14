@@ -20,6 +20,8 @@ function AddContractBooks({ contractId }) {
     const [selectedBookIds, setSelectedBookIds] = useState([]);
     const [searchBook, setSearchBook] = useState("");
 
+    const disableUpdate = contract.status === 1 || contract.status === 2 || contract.status === 3;
+
     const getContractDetail = async () => {
         try {
             const result = await fetchContractDetail(contractId);
@@ -70,7 +72,7 @@ function AddContractBooks({ contractId }) {
     return (
         <div style={{ marginTop: 20 }}>
             <Typography variant="h6" gutterBottom>Các cuốn sách xin cấp bản quyền</Typography>
-            <Button color='primary' variant='outlined' onClick={handleOpen} sx={{ margin: 1 }}>
+            <Button color='primary' variant='outlined' onClick={handleOpen} sx={{ margin: 1 }} disabled={disableUpdate}>
                 Cập nhật sách
             </Button>
 
@@ -89,11 +91,6 @@ function AddContractBooks({ contractId }) {
                                     </Box>
                                     <Typography variant="body1">{item.title}</Typography>
                                     <Typography variant="body1">Xuất bản năm: {item.publicationYear}</Typography>
-                                    {item.ageLimit === 0 ? (
-                                        <Typography variant="body1">Giới hạn tuổi: Không giới hạn</Typography>
-                                    ) : (
-                                        <Typography variant="body1">Giới hạn tuổi: {item.ageLimit}</Typography>
-                                    )}
                                 </CardContent>
                             </Card>
                         </Grid>

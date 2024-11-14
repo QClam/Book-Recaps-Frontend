@@ -46,6 +46,8 @@ function ContractDetail() {
         autoRenew: false,
     });
 
+    const disableUpdate = contract.status === 1 || contract.status === 2 || contract.status === 3;
+
     const getContractDetail = async () => {
         try {
             const result = await fetchContractDetail(contractId);
@@ -216,6 +218,7 @@ function ContractDetail() {
                                             value={contractForm.publisherId}
                                             onChange={handlePublisherIdChange}
                                             displayEmpty
+                                            disabled={disableUpdate}
                                         >
                                             <MenuItem value="" disabled>
                                                 Chọn Publisher
@@ -238,6 +241,7 @@ function ContractDetail() {
                                             type="number"
                                             value={contractForm.revenueSharePercentage}
                                             sx={{ width: 80 }}
+                                            disabled={disableUpdate}
                                         />
                                     </Box>
                                 </Grid>
@@ -251,7 +255,7 @@ function ContractDetail() {
                                             value={contractForm.startDate}
                                             onChange={handleStartDateChange}
                                             InputLabelProps={{ shrink: true }}
-
+                                            disabled={disableUpdate}
                                         />
                                     </Box>
                                 </Grid>
@@ -264,7 +268,7 @@ function ContractDetail() {
                                             value={contractForm.endDate}
                                             onChange={handleEndDateChange}
                                             InputLabelProps={{ shrink: true }}
-
+                                            disabled={disableUpdate}
                                         />
                                     </Box>
                                 </Grid>
@@ -275,7 +279,7 @@ function ContractDetail() {
                                         <Select
                                             value={contractForm.autoRenew}
                                             onChange={handleAutoRenewChange}
-
+                                            disabled={disableUpdate}
                                         >
                                             <MenuItem value={true}>Có</MenuItem>
                                             <MenuItem value={false}>Không</MenuItem>
@@ -285,10 +289,10 @@ function ContractDetail() {
 
                                 <Grid item xs={12}>
                                     <Box display="flex" justifyContent="flex-end" gap={2}>
-                                        <Button variant="contained" color="primary" onClick={handleSendContract}>
+                                        <Button variant="contained" color="primary" onClick={handleSendContract} disabled={disableUpdate}>
                                             Gửi
                                         </Button>
-                                        <Button variant="contained" color="success" onClick={handleSaveContract}>
+                                        <Button variant="contained" color="success" onClick={handleSaveContract} disabled={disableUpdate}>
                                             Lưu chỉnh sửa
                                         </Button>
                                     </Box>
