@@ -975,7 +975,7 @@ const StaffReviews = ({ review }) => {
                         id={`highlight-${sentence.sentence_index}`}
                         onClick={() => handleClickForHighlight(`note-${sentence.sentence_index}`, [ '!bg-yellow-100' ])}
                         className={cn({
-                          'bg-yellow-200 py-0.5 cursor-pointer transition-colors hover:bg-yellow-300': reviewNotes.some((note) => Number(note.sentenceIndex) === sentence.sentence_index)
+                          'bg-yellow-200 py-0.5 cursor-pointer transition-all hover:bg-yellow-300': reviewNotes.some((note) => Number(note.sentenceIndex) === sentence.sentence_index)
                         })}>{sentence.value.html}</span>{' '}
                     </Fragment>
                   ))}
@@ -1045,8 +1045,8 @@ const PlagiarismCheck = () => {
   }
 
   const splitIntoSentences = (text) => {
-    return text.split(/(?<=[.!?])\s*/);
-  }
+    return text.split(/(?<=[.!?])\s+/);
+  };
 
   function processKeyIdeasWithGlobalIndices(ideas) {
     let sentenceIndex = 0; // Initialize the global sentence index
@@ -1055,10 +1055,11 @@ const PlagiarismCheck = () => {
       .filter(keyIdea => keyIdea.body) // Filter out key ideas without a body
       .map(keyIdea => {
         // Split the body into sentences and add global indices
-        const sentences = splitIntoSentences(keyIdea.body.trim()).map(sentence => ({
-          sentence_index: sentenceIndex++, // Use and increment the global sentence index
-          value: sentence.trim()
-        }));
+        const sentences = splitIntoSentences(keyIdea.body.trim())
+          .map(sentence => ({
+            sentence_index: sentenceIndex++, // Use and increment the global sentence index
+            value: sentence.trim()
+          }));
 
         return {
           title: keyIdea.title,
@@ -1089,7 +1090,7 @@ const PlagiarismCheck = () => {
                         id={`highlight-plagiarism-${sentence.sentence_index}`}
                         onClick={() => handleClickForHighlight(`card-plagiarism-${sentence.sentence_index}-0`, [ '!bg-yellow-100' ])}
                         className={cn({
-                          'bg-yellow-200 py-0.5 cursor-pointer transition-colors hover:bg-yellow-300': isPlagiarized
+                          'bg-yellow-200 py-0.5 cursor-pointer transition-all hover:bg-yellow-300': isPlagiarized
                         })}>{sentence.value}</span>{' '}
                     </Fragment>
                   )
@@ -1240,7 +1241,7 @@ const PlagiarismResults = () => {
                 <div className="bg-gray-200 rounded h-4 my-2 overflow-hidden">
                   <div className="h-full bg-red-300" style={{ width: `${result.similarity_score * 100}%` }}></div>
                 </div>
-                <p className="font-bold text-right">${result.similarity_score * 100}%</p>
+                <p className="font-bold text-right">${Number(result.similarity_score * 100).toFixed(1)}%</p>
               </div>
             ))}
           </div>
