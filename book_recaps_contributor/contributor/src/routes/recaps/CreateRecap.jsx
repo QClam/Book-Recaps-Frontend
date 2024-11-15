@@ -97,7 +97,7 @@ export async function createRecapAction({ request }) {
     });
 
     return redirect(generatePath(routes.recapVersionDetails, {
-      recapId: response.data.data.id,
+      // recapId: response.data.data.id,
       versionId: response.data.data.currentVersionId
     }));
   } catch (error) {
@@ -193,7 +193,7 @@ const CreateRecap = () => {
                 <Modal.Footer className="-mx-5 mt-5 justify-end gap-3">
                   <button
                     className={cn({
-                      "text-white bg-gray-200 rounded py-1.5 px-3 border font-semibold hover:bg-gray-300": true,
+                      "bg-gray-200 rounded py-1.5 px-3 border font-semibold hover:bg-gray-300": true,
                       "opacity-50 cursor-not-allowed": navigation.state === "loading"
                     })}
                     type="button"

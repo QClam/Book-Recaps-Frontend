@@ -1,10 +1,11 @@
-import { Await, defer, json, Link, useAsyncValue, useLoaderData, useNavigate } from "react-router-dom";
+import { Await, defer, generatePath, json, Link, useAsyncValue, useLoaderData, useNavigate } from "react-router-dom";
 import { Fragment, Suspense, useEffect, useMemo, useState } from "react";
 import { useDebounce } from "react-use";
 import { TabPanel, TabView } from 'primereact/tabview';
 import { ProgressSpinner } from "primereact/progressspinner";
 import { Divider } from 'primereact/divider';
 import { Badge } from "primereact/badge";
+import { Dialog } from "primereact/dialog";
 
 import { axiosInstance, axiosInstance2 } from "../../utils/axios";
 import { handleFetchError } from "../../utils/handleFetchError";
@@ -15,6 +16,9 @@ import { useToast } from "../../contexts/Toast";
 import { getBookInfoByRecap } from "../fetch";
 import CustomBreadCrumb from "../../components/CustomBreadCrumb";
 import { RecapVersionProvider, useRecapVersion } from "../../contexts/RecapVersion";
+import Modal from "../../components/modal";
+import TextInput from "../../components/form/TextInput";
+import { useAuth } from "../../contexts/Auth";
 
 const getRecapVersion = async (versionId, request) => {
   try {
@@ -96,8 +100,8 @@ const checkPlagiarism = async (versionId) => {
 
 export const recapVersionLoader = async ({ params, request }) => {
   const recapVersion = await getRecapVersion(params.versionId, request);
+  const bookInfo = getBookInfoByRecap(recapVersion.recapId, request);
   const keyIdeas = getKeyIdeas(params.versionId, request);
-  const bookInfo = getBookInfoByRecap(params.recapId, request);
   const transcript = getTranscript(params.versionId, request);
   const review = getReview(params.versionId, request);
 
@@ -119,7 +123,7 @@ const RecapVersion = () => {
         <div className="flex-1 pb-8 px-6 overflow-y-auto">
           <CustomBreadCrumb items={[
             { label: "Recaps", path: routes.recaps },
-            { label: "Recap details", path: routes.recaps + "/" + recapVersion.recapId },
+            { label: "Recap details", path: generatePath(routes.recapDetails, { recapId: recapVersion.recapId }) },
             { label: recapVersion.versionName || "Version details" }
           ]}/>
 
@@ -164,6 +168,23 @@ const handleClickForHighlight = (targetId, appliedClasses = []) => {
     setTimeout(() => {
       targetElement.classList.remove(...appliedClasses); // Remove the focus class after 1s
     }, 1000);
+  }
+}
+
+const getRecapVersionStatusStr = (status) => {
+  switch (status) {
+    case 0:
+      return "Draft";
+    case 1:
+      return "Pending review";
+    case 2:
+      return "Approved";
+    case 3:
+      return "Rejected";
+    case 4:
+      return "Superseded";
+    default:
+      return "Unknown"
   }
 }
 
@@ -455,23 +476,6 @@ const RecapVersionDetails = () => {
     }
   }
 
-  const getStatus = (status) => {
-    switch (status) {
-      case 0:
-        return "Draft";
-      case 1:
-        return "Pending review";
-      case 2:
-        return "Approved";
-      case 3:
-        return "Rejected";
-      case 4:
-        return "Superseded";
-      default:
-        return "Unknown"
-    }
-  }
-
   const loading = uploadingAudio || updatingName;
 
   return (
@@ -516,7 +520,7 @@ const RecapVersionDetails = () => {
         <span className="text-sm font-medium text-gray-700 mr-1">Status:</span>
         <span className="font-semibold">
             <Badge
-              value={getStatus(recapVersion.status)}
+              value={getRecapVersionStatusStr(recapVersion.status)}
               // size="large"
               severity={
                 recapVersion.status === 0 ? 'warning' :
@@ -928,8 +932,113 @@ const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
   )
 }
 
+const CreateAppealDialog = ({ dialogVisible, setDialogVisible, reviewId }) => {
+  const { user } = useAuth();
+  const { showToast } = useToast();
+  const [ reason, setReason ] = useState('');
+  const [ isCreatingAppeal, setIsCreatingAppeal ] = useState(false);
+
+  const onCreateAppeal = async () => {
+    if (isCreatingAppeal) return;
+    if (!reason) {
+      showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Vui lòng nhập nội dung kháng cáo',
+      });
+      return;
+    }
+
+    if (!confirm("Bạn có chắc chắn muốn tạo đơn kháng cáo?")) return;
+
+    setIsCreatingAppeal(true);
+    try {
+      await axiosInstance.post('/api/appeal/createappeal', {
+        reviewId,
+        contributorId: user.id,
+        reason
+      });
+
+      showToast({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Đơn kháng cáo đã được tạo thành công',
+      });
+
+      setDialogVisible(false);
+      setIsCreatingAppeal(false);
+    } catch (error) {
+      console.error(error);
+      const err = handleFetchError(error);
+      showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: err.error,
+      });
+
+      setIsCreatingAppeal(false);
+    }
+  }
+  return (
+    <Dialog
+      visible={dialogVisible}
+      onHide={() => {
+        if (!dialogVisible) return;
+        setDialogVisible(false);
+        setReason('');
+      }}
+      content={({ hide }) => (
+        <Modal.Wrapper width="400px">
+          <Modal.Header title="Tạo đơn kháng cáo" onClose={hide}/>
+          <Modal.Body className="pb-0">
+            <div className="flex flex-col gap-1">
+              <TextInput
+                id="reason"
+                label="Nội dung:"
+                name="reason"
+                placeholder="Nội dung đơn"
+                required
+                onKeyPress={(e) => e.key === 'Enter' && onCreateAppeal()}
+                onChange={(e) => setReason(e.target.value)}
+                disabled={isCreatingAppeal}
+              />
+              <Modal.Footer className="-mx-5 mt-5 justify-end gap-3">
+                <button
+                  className={cn({
+                    "bg-gray-200 rounded py-1.5 px-3 border font-semibold hover:bg-gray-300": true,
+                    "opacity-50 cursor-not-allowed": isCreatingAppeal
+                  })}
+                  type="button"
+                  onClick={hide}
+                  disabled={isCreatingAppeal}
+                >
+                  Hủy
+                </button>
+
+                <button
+                  className={cn({
+                    "text-white bg-indigo-600 rounded py-1.5 px-3 border font-semibold hover:bg-indigo-700": true,
+                    "opacity-50 cursor-not-allowed": isCreatingAppeal
+                  })}
+                  type="button"
+                  disabled={isCreatingAppeal}
+                  onClick={onCreateAppeal}
+                >
+                  {isCreatingAppeal ? "Loading..." : "Gửi"}
+                </button>
+              </Modal.Footer>
+            </div>
+          </Modal.Body>
+        </Modal.Wrapper>
+      )}
+    />
+  )
+}
+
 const StaffReviews = ({ review }) => {
   const transcript = useAsyncValue();
+  const { recapVersion } = useRecapVersion();
+  const [ dialogVisible, setDialogVisible ] = useState(false);
 
   if (!review) {
     return (
@@ -951,14 +1060,30 @@ const StaffReviews = ({ review }) => {
 
   return (
     <div>
-      <div className="mt-6 flex gap-4 justify-end items-center mb-4">
-        <Link to="/appeal-history" className="text-blue-500 hover:underline ml-2">Lịch sử phản hồi</Link>
-        <button
-          className="px-4 py-2 text-white bg-orange-400 rounded-md hover:bg-orange-500 focus:outline-none focus:ring focus:ring-orange-200"
-        >
-          Tạo phản hồi xét duyệt
-        </button>
-      </div>
+      <CreateAppealDialog
+        reviewId={review.id}
+        dialogVisible={dialogVisible}
+        setDialogVisible={setDialogVisible}
+      />
+
+      {/* Only show when recap version got rejected */}
+      <Show when={recapVersion.status === 3}>
+        <div className="mt-6 flex gap-4 justify-end items-center mb-4">
+          <Link
+            to={generatePath(routes.reviewAppeals, { reviewId: review.id })}
+            className="text-blue-500 hover:underline ml-2"
+          >
+            Lịch sử đơn kháng cáo
+          </Link>
+          <button
+            className="px-4 py-2 text-white bg-orange-400 rounded-md hover:bg-orange-500 focus:outline-none focus:ring focus:ring-orange-200"
+            onClick={() => setDialogVisible(true)}
+          >
+            Tạo đơn kháng cáo
+          </button>
+        </div>
+      </Show>
+
       <div>
         {transcript.transcriptSections.map((section, sectionIndex) => {
           return (
@@ -1026,7 +1151,7 @@ const StaffReviewNotes = () => {
             className="bg-white shadow-md rounded-lg p-4 mb-4 border border-gray-200 transition-all transform cursor-pointer hover:scale-105"
           >
             <div className="flex justify-between">
-              <h3 className="text-md font-bold text-gray-700">Staff name</h3>
+              <h3 className="text-md font-bold text-gray-700">{note.staff?.fullName}</h3>
               <span
                 className="text-sm text-gray-500"
               >{note.createdAt ? new Date(note.createdAt).toLocaleDateString() : 'N/A'}</span>
@@ -1070,38 +1195,44 @@ const PlagiarismCheck = () => {
       });
   }
 
+  const ideas = processKeyIdeasWithGlobalIndices(keyIdeas);
+
   return (
     <div>
-      {processKeyIdeasWithGlobalIndices(keyIdeas).map((idea, idx) => {
-        return (
-          <div
-            key={idx + (idea.title || "title")}
-            className="mb-4 bg-white shadow-sm border border-gray-300 p-4 rounded-md flex flex-col gap-2"
-          >
-            <div className="space-y-2">
-              <h2 className="text-lg font-semibold text-gray-900">
-                {idea.title || "(Chưa có tiêu đề)"}
-              </h2>
-              <p>
-                {idea.body.map((sentence) => {
-                  const isPlagiarized = plagiarismResults?.plagiarism_results.some((result) => result.sentence_index === sentence.sentence_index);
+      <Show when={ideas.length > 0} fallback={
+        <p className="text-center text-gray-500 mt-4">No key idea found</p>
+      }>
+        {ideas.map((idea, idx) => {
+          return (
+            <div
+              key={idx + (idea.title || "title")}
+              className="mb-4 bg-white shadow-sm border border-gray-300 p-4 rounded-md flex flex-col gap-2"
+            >
+              <div className="space-y-2">
+                <h2 className="text-lg font-semibold text-gray-900">
+                  {idea.title || "(Chưa có tiêu đề)"}
+                </h2>
+                <p>
+                  {idea.body.map((sentence) => {
+                    const isPlagiarized = plagiarismResults?.plagiarism_results.some((result) => result.sentence_index === sentence.sentence_index);
 
-                  return (
-                    <Fragment key={sentence.sentence_index}>
+                    return (
+                      <Fragment key={sentence.sentence_index}>
                       <span
                         id={`highlight-plagiarism-${sentence.sentence_index}`}
                         onClick={() => handleClickForHighlight(`card-plagiarism-${sentence.sentence_index}-0`, [ '!bg-yellow-100' ])}
                         className={cn({
                           'bg-yellow-200 py-0.5 cursor-pointer transition-all hover:bg-yellow-300': isPlagiarized
                         })}>{sentence.value}</span>{' '}
-                    </Fragment>
-                  )
-                })}
-              </p>
+                      </Fragment>
+                    )
+                  })}
+                </p>
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
+      </Show>
     </div>
   )
 }

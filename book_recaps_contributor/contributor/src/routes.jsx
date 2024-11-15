@@ -12,6 +12,7 @@ import { sessionLoader } from "./routes/loaders/sessionLoader";
 import MainLayout from "./layouts/MainLayout";
 import { AuthProvider } from "./contexts/Auth";
 import Recaps, { recapsAction, recapsLoader } from "./routes/recaps/Recaps";
+import ReviewAppeals, { reviewAppealsLoader } from "./routes/ReviewAppeals";
 
 export const routes = {
   login: '/login',
@@ -20,13 +21,15 @@ export const routes = {
   recaps: '/recaps',
   recapDetails: '/recaps/:recapId',
   createRecap: '/recaps-create',
-  recapVersionDetails: '/recaps/:recapId/version/:versionId',
+  recapVersionDetails: '/recaps/versions/:versionId',
   keyIdea: '/key-idea',
   books: '/books',
   bookDetails: '/books/:bookId',
   contact: '/contact',
   profile: '/profile',
   billingInvoices: '/billing-invoices',
+  appeals: '/appeals',
+  reviewAppeals: '/reviews/:reviewId/appeals',
 }
 
 export const router = createBrowserRouter([
@@ -66,6 +69,11 @@ export const router = createBrowserRouter([
                     action: recapsAction
                   },
                   {
+                    path: routes.recapVersionDetails,
+                    element: <RecapVersion/>,
+                    loader: recapVersionLoader,
+                  },
+                  {
                     path: routes.recapDetails,
                     children: [
                       {
@@ -74,11 +82,6 @@ export const router = createBrowserRouter([
                         loader: recapDetailsLoader,
                         action: recapDetailsAction
                       },
-                      {
-                        path: routes.recapVersionDetails,
-                        element: <RecapVersion/>,
-                        loader: recapVersionLoader,
-                      }
                     ]
                   },
                 ]
@@ -89,6 +92,11 @@ export const router = createBrowserRouter([
                 loader: booksLoader,
                 action: createRecapAction
               },
+              {
+                path: routes.reviewAppeals,
+                loader: reviewAppealsLoader,
+                element: <ReviewAppeals/>
+              }
             ]
           }
         ]

@@ -28,6 +28,7 @@ import { Dialog } from "primereact/dialog";
 import TextInput from "../../components/form/TextInput";
 import { cn } from "../../utils/cn";
 import Modal from "../../components/modal";
+import Table from "../../components/table";
 
 const getRecapInfo = async (recapId, request) => {
   try {
@@ -156,9 +157,10 @@ const RecapDetails = () => {
   }, [ actionData ]);
 
   if (actionData?.success && actionData.method === 'post') {
-    return <Navigate to={generatePath(routes.recapVersionDetails,
-      { recapId: recap.id, versionId: actionData.data.id })
-    }/>
+    return <Navigate to={generatePath(routes.recapVersionDetails, {
+      // recapId: recap.id,
+      versionId: actionData.data.id
+    })}/>
   }
 
   return (
@@ -186,7 +188,7 @@ const RecapDetails = () => {
                 <Modal.Footer className="-mx-5 mt-5 justify-end gap-3">
                   <button
                     className={cn({
-                      "text-white bg-gray-200 rounded py-1.5 px-3 border font-semibold hover:bg-gray-300": true,
+                      "bg-gray-200 rounded py-1.5 px-3 border font-semibold hover:bg-gray-300": true,
                       "opacity-50 cursor-not-allowed": navigation.state === "loading"
                     })}
                     type="button"
@@ -313,7 +315,7 @@ const BookInfo = () => {
 const ListRecapVersions = () => {
   const recapVersions = useAsyncValue();
 
-  const getStatus = (status) => {
+  const getStatusStr = (status) => {
     switch (status) {
       case 0:
         return "Draft";
@@ -331,73 +333,58 @@ const ListRecapVersions = () => {
   }
 
   return (
-    <div className="flex flex-col border border-gray-200 rounded overflow-x-auto shadow-sm">
-      <table className="min-w-full table-fixed">
-        <thead className="bg-[#f8fafc] text-left">
-        <tr>
-          <th scope="col"
-              className="pl-[18px] px-2.5 py-[8.7px] font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]">
-            Tên version
-          </th>
-          <th scope="col"
-              className="px-2.5 py-[8.7px] font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
-              style={{ borderLeft: "1px dashed #d5dce6" }}>
-            Version number
-          </th>
-          <th scope="col"
-              className="px-2.5 py-[8.7px] font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
-              style={{ borderLeft: "1px dashed #d5dce6" }}>
-            Trạng thái
-          </th>
-          <th scope="col"
-              className="px-2.5 py-[8.7px] font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
-              style={{ borderLeft: "1px dashed #d5dce6" }}>
-            Ngày tạo
-          </th>
-          <th scope="col"
-              className="px-2.5 py-[8.7px] font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
-              style={{ borderLeft: "1px dashed #d5dce6" }}>
-            Ngày cập nhật
-          </th>
-        </tr>
-        </thead>
-        <tbody>
+    <Table.Container>
+      <Table.Head columns={[
+        'Tên version',
+        'Version number',
+        'Trạng thái',
+        'Ngày tạo',
+        'Ngày cập nhật'
+      ]}/>
+      <Table.Body
+        when={recapVersions.length > 0}
+        fallback={
+          <Table.Row>
+            <Table.Cell colSpan="100" className="h-32 text-center">
+              <div className="flex gap-2 justify-center items-center">
+                <p>Danh sách phiên bản trống</p>
+              </div>
+            </Table.Cell>
+          </Table.Row>
+        }
+      >
         {recapVersions.map((version) => (
-          <tr key={version.id} className="hover:bg-gray-100 odd:bg-white even:bg-gray-50 text-[#333c48]">
-            <td className="px-2.5 py-1 pl-[18px] font-semibold border-[#e2e7ee] border-b">
+          <Table.Row key={version.id}>
+            <Table.Cell isFirstCell={true}>
               <div className="min-w-60">
                 <Link
-                  to={generatePath(routes.recapVersionDetails, { recapId: version.recapId, versionId: version.id })}
+                  to={generatePath(routes.recapVersionDetails, {
+                    // recapId: version.recapId,
+                    versionId: version.id
+                  })}
                   className="min-w-full line-clamp-2 break-words hover:underline text-indigo-500"
                 >
                   {version.versionName || <span className="italic">(Chưa có tên)</span>}
                 </Link>
               </div>
-            </td>
-            <td className="px-2.5 py-3 border-[#e2e7ee] border-b" style={{ borderLeft: "1px dashed #d5dce6" }}>
-              {version.versionNumber}
-            </td>
-            <td className="px-2.5 py-3 border-[#e2e7ee] border-b" style={{ borderLeft: "1px dashed #d5dce6" }}>
+            </Table.Cell>
+            <Table.Cell>{version.versionNumber}</Table.Cell>
+            <Table.Cell>
               <Badge
-                value={getStatus(version.status)}
+                value={getStatusStr(version.status)}
                 severity={
                   version.status === 0 ? 'warning' :
                     version.status === 1 ? 'info' :
                       version.status === 2 ? 'success' :
                         'danger'
                 }/>
-            </td>
-            <td className="px-2.5 py-3 border-[#e2e7ee] border-b" style={{ borderLeft: "1px dashed #d5dce6" }}>
-              {version.createdAt ? new Date(version.createdAt).toLocaleDateString() : 'N/A'}
-            </td>
-            <td className="px-2.5 py-3 border-[#e2e7ee] border-b" style={{ borderLeft: "1px dashed #d5dce6" }}>
-              {version.updatedAt ? new Date(version.updatedAt).toLocaleDateString() : 'N/A'}
-            </td>
-          </tr>
+            </Table.Cell>
+            <Table.Cell>{version.createdAt ? new Date(version.createdAt).toLocaleDateString() : 'N/A'}</Table.Cell>
+            <Table.Cell>{version.updatedAt ? new Date(version.updatedAt).toLocaleDateString() : 'N/A'}</Table.Cell>
+          </Table.Row>
         ))}
-        </tbody>
-      </table>
-    </div>
+      </Table.Body>
+    </Table.Container>
   );
 }
 
