@@ -17,8 +17,8 @@ import { getBookInfoByRecap } from "../fetch";
 import CustomBreadCrumb from "../../components/CustomBreadCrumb";
 import { RecapVersionProvider, useRecapVersion } from "../../contexts/RecapVersion";
 import Modal from "../../components/modal";
-import TextInput from "../../components/form/TextInput";
 import { useAuth } from "../../contexts/Auth";
+import TextArea from "../../components/form/TextArea";
 
 const getRecapVersion = async (versionId, request) => {
   try {
@@ -992,7 +992,7 @@ const CreateAppealDialog = ({ dialogVisible, setDialogVisible, reviewId }) => {
           <Modal.Header title="Tạo đơn kháng cáo" onClose={hide}/>
           <Modal.Body className="pb-0">
             <div className="flex flex-col gap-1">
-              <TextInput
+              <TextArea
                 id="reason"
                 label="Nội dung:"
                 name="reason"
@@ -1151,7 +1151,7 @@ const StaffReviewNotes = () => {
             className="bg-white shadow-md rounded-lg p-4 mb-4 border border-gray-200 transition-all transform cursor-pointer hover:scale-105"
           >
             <div className="flex justify-between">
-              <h3 className="text-md font-bold text-gray-700">{note.staff?.fullName}</h3>
+              <h3 className="text-md font-bold text-gray-700">{review?.staff?.fullName}</h3>
               <span
                 className="text-sm text-gray-500"
               >{note.createdAt ? new Date(note.createdAt).toLocaleDateString() : 'N/A'}</span>

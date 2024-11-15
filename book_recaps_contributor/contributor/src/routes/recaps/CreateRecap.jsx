@@ -19,7 +19,6 @@ import { handleFetchError } from "../../utils/handleFetchError";
 import TextInput from "../../components/form/TextInput";
 import { TbSearch } from "react-icons/tb";
 import Select from "../../components/form/Select";
-import Show from "../../components/Show";
 import { cn } from "../../utils/cn";
 import { useAuth } from "../../contexts/Auth";
 import { Dialog } from "primereact/dialog";
@@ -28,13 +27,15 @@ import { routes } from "../../routes";
 import { useToast } from "../../contexts/Toast";
 import CustomBreadCrumb from "../../components/CustomBreadCrumb";
 import Modal from "../../components/modal";
+import Table from "../../components/table";
 
-const getBooks = async (q, category, page, request) => {
+const getBooks = async (q, category, publisher, page, request) => {
   try {
     const response = await axiosInstance2.get('/books/search', {
       params: {
         q,
         category,
+        publisher,
         page
       },
       signal: request.signal
@@ -61,21 +62,40 @@ const getCategories = async (request) => {
   }
 }
 
+const getPublishers = async (request) => {
+  try {
+    const response = await axiosInstance.get('/api/publisher/getallpublishers', {
+      signal: request.signal
+    });
+    return (response.data.$values.map((publisher) => ({
+      value: publisher.id,
+      label: publisher.publisherName
+    })));
+  } catch (error) {
+    const err = handleFetchError(error);
+    throw json({ error: err.error }, { status: err.status });
+  }
+}
+
 export async function booksLoader({ request }) {
   const url = new URL(request.url);
   const q = url.searchParams.get("q");
   const category = url.searchParams.get("category");
+  const publisher = url.searchParams.get("publisher");
   const page = url.searchParams.get("page");
 
-  const booksPromise = getBooks(q, category, page, request);
+  const booksPromise = getBooks(q, category, publisher, page, request);
   const categories = await getCategories(request);
+  const publishers = await getPublishers(request);
 
   return defer({
     booksPagination: booksPromise,
     categories,
+    publishers,
     params: {
       q,
       category,
+      publisher,
       page
     }
   });
@@ -112,7 +132,7 @@ export async function createRecapAction({ request }) {
 }
 
 const CreateRecap = () => {
-  const { booksPagination, categories, params: { q, category } } = useLoaderData();
+  const { booksPagination, categories, publishers, params: { q, category, publisher } } = useLoaderData();
   const actionData = useActionData();
   let [ , setSearchParams ] = useSearchParams();
   const navigation = useNavigation()
@@ -124,7 +144,8 @@ const CreateRecap = () => {
   useEffect(() => {
     document.getElementById("q").value = decodeURIComponent(q ?? "");
     document.getElementById("category").value = category ?? "";
-  }, [ q, category ]);
+    document.getElementById("publisher").value = publisher ?? "";
+  }, [ q, category, publisher ]);
 
   useEffect(() => {
     if (actionData?.error) {
@@ -257,7 +278,16 @@ const CreateRecap = () => {
             defaultValue={category}
           />
         </div>
-        <div className="col-start-4 col-end-7 flex gap-2.5">
+        <div className="col-span-1">
+          <Select
+            id="publisher"
+            placeholder="Nhà xuất bản"
+            name="publisher"
+            options={publishers ?? []}
+            defaultValue={publisher}
+          />
+        </div>
+        <div className="col-start-5 col-end-7 flex gap-2.5">
           <button
             className={cn({
               "text-white bg-indigo-600 rounded py-1.5 px-3 border font-semibold hover:bg-indigo-700": true,
@@ -279,73 +309,47 @@ const CreateRecap = () => {
         </div>
       </Form>
 
-      <div className="flex flex-col border border-gray-200 rounded overflow-x-auto shadow-sm">
-        <table className="min-w-full table-fixed">
-          <thead className="bg-[#f8fafc] text-left">
-          <tr>
-            <th scope="col"
-                className="pl-[18px] px-2.5 py-[8.7px] font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]">
-              Hình ảnh
-            </th>
-            <th scope="col"
-                className="px-2.5 py-[8.7px] font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
-                style={{ borderLeft: "1px dashed #d5dce6" }}>
-              Tiêu đề
-            </th>
-            <th scope="col"
-                className="px-2.5 py-[8.7px] font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
-                style={{ borderLeft: "1px dashed #d5dce6" }}>
-              Tác giả
-            </th>
-            <th scope="col"
-                className="px-2.5 py-[8.7px] font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
-                style={{ borderLeft: "1px dashed #d5dce6" }}>
-              Thể loại
-            </th>
-            <th scope="col"
-                className="px-2.5 py-[8.7px] font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
-                style={{ borderLeft: "1px dashed #d5dce6" }}>
-              Năm xuất bản
-            </th>
-            <th scope="col"
-                className="px-2.5 py-[8.7px] font-medium text-[#637286] tracking-wider border-[#e2e7ee] border-b leading-6 shadow-[0_-10px_0_white]"
-                style={{ borderLeft: "1px dashed #d5dce6" }}>
-              Hành động
-            </th>
-          </tr>
-          </thead>
-          <Suspense
-            fallback={
+      <Table.Container>
+        <Table.Head columns={[
+          'Hình ảnh',
+          'Tiêu đề',
+          'Tác giả',
+          'Thể loại',
+          'Năm xuất bản',
+          'Nhà xuất bản',
+          'Hành động'
+        ]}/>
+        <Suspense
+          fallback={
+            <tbody>
+            <tr>
+              <td className="h-32 text-center" colSpan="100">
+                <div className="flex gap-2 justify-center items-center">
+                  <div>
+                    <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
+                                     fill="var(--surface-ground)" animationDuration=".5s"/>
+                  </div>
+                  <p>Loading books...</p>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          }
+        >
+          <Await
+            resolve={booksPagination}
+            errorElement={
               <tbody>
               <tr>
-                <td className="h-32 text-center" colSpan="100">
-                  <div className="flex gap-2 justify-center items-center">
-                    <div>
-                      <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
-                                       fill="var(--surface-ground)" animationDuration=".5s"/>
-                    </div>
-                    <p>Loading books...</p>
-                  </div>
-                </td>
+                <td className="h-32 text-center" colSpan="100">Error loading books!</td>
               </tr>
               </tbody>
             }
           >
-            <Await
-              resolve={booksPagination}
-              errorElement={
-                <tbody>
-                <tr>
-                  <td className="h-32 text-center" colSpan="100">Error loading books!</td>
-                </tr>
-                </tbody>
-              }
-            >
-              <BooksTable handleClickCreate={handleClickCreate}/>
-            </Await>
-          </Suspense>
-        </table>
-      </div>
+            <BooksTable handleClickCreate={handleClickCreate}/>
+          </Await>
+        </Suspense>
+      </Table.Container>
 
       <Suspense>
         <Await resolve={booksPagination}>
@@ -363,8 +367,7 @@ function BooksTable({ handleClickCreate }) {
   const navigation = useNavigation();
 
   return (
-    <tbody>
-    <Show
+    <Table.Body
       when={navigation.state !== "loading"}
       fallback={
         <tr>
@@ -378,62 +381,64 @@ function BooksTable({ handleClickCreate }) {
             </div>
           </td>
         </tr>
-      }>
-      <>
-        {paginationData.items.map((book) => (
-          <tr key={book.id} className="hover:bg-gray-100 odd:bg-white even:bg-gray-50 text-[#333c48]">
-            <td className="px-2.5 py-1 pl-[18px] font-semibold border-[#e2e7ee] border-b">
-              <div className="w-20">
-                <img
-                  src={book.coverImage || "/empty-image.jpg"}
-                  alt={book.title}
-                  className="block aspect-[3/4] object-cover w-full rounded-md"
-                  onError={({ currentTarget }) => {
-                    currentTarget.onerror = null; // prevents looping
-                    currentTarget.src = "/empty-image.jpg";
-                  }}
-                />
-              </div>
-            </td>
-            <td className="px-2.5 py-3 border-[#e2e7ee] border-b" style={{ borderLeft: "1px dashed #d5dce6" }}>
-              <div className="min-w-60">
-                <Link
-                  to={generatePath(routes.bookDetails, { bookId: book.id })}
-                  className="min-w-full line-clamp-2 break-words hover:underline text-indigo-500"
-                >
-                  {book.title}
-                </Link>
-              </div>
-            </td>
-            <td className="px-2.5 py-3 border-[#e2e7ee] border-b" style={{ borderLeft: "1px dashed #d5dce6" }}>
-              <div className="min-w-28">
-                <p className="min-w-full line-clamp-2 break-words">
-                  {book.authors.map((author) => author.name).join(", ")}
-                </p>
-              </div>
-            </td>
-            <td className="px-2.5 py-3 border-[#e2e7ee] border-b" style={{ borderLeft: "1px dashed #d5dce6" }}>
-              <div className="min-w-28">
-                <p className="min-w-full line-clamp-2 break-words">
-                  {book.categories.map((category) => category.name).join(", ")}
-                </p>
-              </div>
-            </td>
-            <td className="px-2.5 py-3 border-[#e2e7ee] border-b" style={{ borderLeft: "1px dashed #d5dce6" }}>
-              {book.publicationYear}
-            </td>
-            <td className="px-2.5 py-3 border-[#e2e7ee] border-b" style={{ borderLeft: "1px dashed #d5dce6" }}>
-              <button
-                onClick={() => handleClickCreate(book.id)}
-                className="flex justify-center items-center gap-1 px-5 py-2 font-semibold bg-indigo-600 text-white rounded hover:bg-indigo-800">
-                Tạo&nbsp;tóm&nbsp;tắt
-              </button>
-            </td>
-          </tr>
-        ))}
-      </>
-    </Show>
-    </tbody>
+      }
+    >
+      {paginationData.items.map((book) => (
+        <Table.Row key={book.id}>
+          <Table.Cell isFirstCell={true}>
+            <div className="w-20">
+              <img
+                src={book.coverImage || "/empty-image.jpg"}
+                alt={book.title}
+                className="block aspect-[3/4] object-cover w-full rounded-md"
+                onError={({ currentTarget }) => {
+                  currentTarget.onerror = null; // prevents looping
+                  currentTarget.src = "/empty-image.jpg";
+                }}
+              />
+            </div>
+          </Table.Cell>
+          <Table.Cell>
+            <div className="min-w-60">
+              <Link
+                to={generatePath(routes.bookDetails, { bookId: book.id })}
+                className="min-w-full line-clamp-2 break-words hover:underline text-indigo-500"
+              >
+                {book.title}
+              </Link>
+            </div>
+          </Table.Cell>
+          <Table.Cell>
+            <div className="min-w-28">
+              <p className="min-w-full line-clamp-2 break-words">
+                {book.authors.map((author) => author.name).join(", ")}
+              </p>
+            </div>
+          </Table.Cell>
+          <Table.Cell>
+            <div className="min-w-28">
+              <p className="min-w-full line-clamp-2 break-words">
+                {book.categories.map((category) => category.name).join(", ")}
+              </p>
+            </div>
+          </Table.Cell>
+          <Table.Cell>
+            {book.publicationYear}
+          </Table.Cell>
+          <Table.Cell>
+            {book.publisher.name}
+          </Table.Cell>
+          <Table.Cell>
+            <button
+              onClick={() => handleClickCreate(book.id)}
+              className="flex justify-center items-center gap-1 px-5 py-2 font-semibold bg-indigo-600 text-white rounded hover:bg-indigo-800"
+            >
+              Tạo&nbsp;tóm&nbsp;tắt
+            </button>
+          </Table.Cell>
+        </Table.Row>
+      ))}
+    </Table.Body>
   )
 }
 

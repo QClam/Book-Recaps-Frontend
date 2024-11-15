@@ -8,6 +8,7 @@ const Head = ({ columns }) => (
         key={index}
         isHeader={true}
         isFirstCell={index === 0}
+        className="whitespace-nowrap"
       >
         {column}
       </Cell>

@@ -77,10 +77,14 @@ const ReviewAppeals = () => {
         >
           {appeals.map((appeal) => (
             <Table.Row key={appeal.id}>
-              <Table.Cell isFirstCell={true}>{appeal.reason}</Table.Cell>
+              <Table.Cell isFirstCell={true}>
+                <div className="min-w-28">{appeal.reason}</div>
+              </Table.Cell>
               <Table.Cell>{appeal.createdAt ? new Date(appeal.createdAt).toLocaleString() : 'N/A'}</Table.Cell>
-              <Table.Cell>{appeal.response}</Table.Cell>
-              <Table.Cell>{appeal.staff ? appeal.staff.fullName : 'N/A'}</Table.Cell>
+              <Table.Cell>
+                <div className="min-w-28">{appeal.response}</div>
+              </Table.Cell>
+              <Table.Cell>{appeal.staff?.fullName}</Table.Cell>
               <Table.Cell>
                 <Badge
                   value={getAppealStatusStr(appeal.appealStatus)}
