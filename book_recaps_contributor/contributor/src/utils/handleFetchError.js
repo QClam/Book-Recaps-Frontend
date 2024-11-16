@@ -12,7 +12,7 @@ export function handleFetchError(error) {
     if (error.response.data?.message) {
       return { error: error.response.data.message, status: error.response.status, data: error.response.data.data };
     }
-    if (error.response.data?.error instanceof String) {
+    if (error.response.data?.error) {
       return { error: error.response.data.error, status: error.response.status };
     }
     return { error: "Đã xảy ra lỗi", status: error.response.status || 500 };

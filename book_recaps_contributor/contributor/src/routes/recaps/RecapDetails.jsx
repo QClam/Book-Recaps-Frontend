@@ -12,7 +12,8 @@ import {
   useActionData,
   useAsyncValue,
   useLoaderData,
-  useNavigation
+  useNavigation,
+  useSubmit
 } from "react-router-dom";
 import { getBookInfoByRecap } from "../fetch";
 import { axiosInstance, axiosInstance2 } from "../../utils/axios";
@@ -23,7 +24,7 @@ import { Badge } from "primereact/badge";
 import { InputSwitch } from "primereact/inputswitch";
 import { useToast } from "../../contexts/Toast";
 import CustomBreadCrumb from "../../components/CustomBreadCrumb";
-import { TbPlus } from "react-icons/tb";
+import { TbPlus, TbTrash } from "react-icons/tb";
 import { Dialog } from "primereact/dialog";
 import TextInput from "../../components/form/TextInput";
 import { cn } from "../../utils/cn";
@@ -55,7 +56,9 @@ const getRecapVersions = async (recapId, request) => {
   }
 }
 
-const updateRecap = async (recapId, formData) => {
+const updateRecap = async (recapId, request) => {
+  const formData = await request.formData();
+
   const isPremium = formData.get('isPremium') === 'on';
   const isPublished = formData.get('isPublished') === 'on';
   const name = formData.get('name');
@@ -68,6 +71,8 @@ const updateRecap = async (recapId, formData) => {
   try {
     const response = await axiosInstance2.put('/recaps/' + recapId, {
       name, isPublished, isPremium, currentVersionId
+    }, {
+      signal: request.signal
     });
 
     return {
@@ -86,7 +91,9 @@ const updateRecap = async (recapId, formData) => {
   }
 }
 
-const createRecapVersion = async (formData) => {
+const createRecapVersion = async (request) => {
+  const formData = await request.formData();
+
   const recapId = formData.get('recapId');
   const contributorId = formData.get('userId');
   const versionName = formData.get('name');
@@ -98,6 +105,8 @@ const createRecapVersion = async (formData) => {
   try {
     const response = await axiosInstance.post('/api/recap/create-version', {
       recapId, contributorId, versionName
+    }, {
+      signal: request.signal
     });
 
     return {
@@ -105,6 +114,56 @@ const createRecapVersion = async (formData) => {
       success: true,
       method: 'post'
     }
+  } catch (error) {
+    const err = handleFetchError(error);
+    console.log("err", err);
+
+    if (err.status === 401) {
+      return redirect(routes.logout);
+    }
+    return err;
+  }
+}
+
+const deleteVersionFromPlagiarismDB = async (versionId) => {
+  try {
+    const response = await axiosInstance2.delete('/plagiarism/delete-recap-version/' + versionId);
+    return response.data;
+  } catch (error) {
+    return handleFetchError(error);
+  }
+}
+
+const deleteVersion = async (request) => {
+  const formData = await request.formData();
+
+  const versionId = formData.get('versionId');
+  const isCurrent = formData.get('isCurrent') === 'true';
+  const isRecapPublished = formData.get('isRecapPublished') === 'true';
+  const versionStatus = formData.get('versionStatus');
+
+  if (!versionId) {
+    return { error: "Version id not found." };
+  }
+
+  if (isCurrent && isRecapPublished) {
+    return { error: "Cannot delete current version of a published recap." };
+  }
+
+  try {
+    const response = await axiosInstance.delete('/api/recap/softdeleteversion/' + versionId, {
+      signal: request.signal
+    });
+
+    if (Number(versionStatus) === 2) {
+      deleteVersionFromPlagiarismDB(versionId).then()
+    }
+
+    return {
+      data: response.data,
+      success: true,
+      method: 'put'
+    };
   } catch (error) {
     const err = handleFetchError(error);
     console.log("err", err);
@@ -129,13 +188,13 @@ export const recapDetailsLoader = async ({ params, request }) => {
 }
 
 export async function recapDetailsAction({ request, params }) {
-  const formData = await request.formData();
-
-  switch (request.method.toLowerCase()) {
-    case 'put':
-      return await updateRecap(params.recapId, formData);
-    case 'post':
-      return await createRecapVersion(formData);
+  switch (request.method) {
+    case 'PUT':
+      return await updateRecap(params.recapId, request);
+    case 'POST':
+      return await createRecapVersion(request);
+    case 'DELETE':
+      return await deleteVersion(request);
     default:
       return null;
   }
@@ -294,6 +353,8 @@ export default RecapDetails;
 const ListRecapVersions = () => {
   const { recap } = useLoaderData();
   const recapVersions = useAsyncValue();
+  const navigation = useNavigation();
+  const submit = useSubmit();
 
   const getStatusStr = (status) => {
     switch (status) {
@@ -319,7 +380,8 @@ const ListRecapVersions = () => {
         'Version number',
         'Trạng thái',
         'Ngày tạo',
-        'Ngày cập nhật'
+        'Ngày cập nhật',
+        ''
       ]}/>
       <Table.Body
         when={recapVersions.length > 0}
@@ -333,43 +395,68 @@ const ListRecapVersions = () => {
           </tr>
         }
       >
-        {recapVersions.map((version) => (
-          <Table.Row key={version.id}>
-            <Table.Cell isFirstCell={true}>
-              <div className="min-w-60 relative">
-                <Link
-                  to={generatePath(routes.recapVersionDetails, {
-                    // recapId: version.recapId,
-                    versionId: version.id
-                  })}
-                  className="min-w-full line-clamp-2 break-words hover:underline text-indigo-500 font-semibold"
-                >
-                  {version.versionName || <span className="italic">(Chưa đặt tên)</span>}
-                </Link>
-              </div>
-            </Table.Cell>
-            <Table.Cell>
-              <div className="flex items-center gap-4">
-                <span>{version.versionNumber}</span>
-                {recap.currentVersionId === version.id && (
-                  <span className="bg-yellow-400 text-xs font-semibold rounded-full px-2 py-1">Current</span>
-                )}
-              </div>
-            </Table.Cell>
-            <Table.Cell>
-              <Badge
-                value={getStatusStr(version.status)}
-                severity={
-                  version.status === 0 ? 'warning' :
-                    version.status === 1 ? 'info' :
-                      version.status === 2 ? 'success' :
-                        'danger'
-                }/>
-            </Table.Cell>
-            <Table.Cell>{version.createdAt ? new Date(version.createdAt).toLocaleDateString() : 'N/A'}</Table.Cell>
-            <Table.Cell>{version.updatedAt ? new Date(version.updatedAt).toLocaleDateString() : 'N/A'}</Table.Cell>
-          </Table.Row>
-        ))}
+        {recapVersions.map((version) => {
+          const isCurrent = version.id === recap.currentVersionId;
+
+          return (
+            <Table.Row key={version.id}>
+              <Table.Cell isFirstCell={true}>
+                <div className="min-w-60 relative">
+                  <Link
+                    to={generatePath(routes.recapVersionDetails, {
+                      // recapId: version.recapId,
+                      versionId: version.id
+                    })}
+                    className="min-w-full line-clamp-2 break-words hover:underline text-indigo-500 font-semibold"
+                  >
+                    {version.versionName || <span className="italic">(Chưa đặt tên)</span>}
+                  </Link>
+                </div>
+              </Table.Cell>
+              <Table.Cell>
+                <div className="flex items-center gap-4">
+                  <span>{version.versionNumber}</span>
+                  {isCurrent && (
+                    <span className="bg-yellow-400 text-xs font-semibold rounded-full px-2 py-1">Current</span>
+                  )}
+                </div>
+              </Table.Cell>
+              <Table.Cell>
+                <Badge
+                  value={getStatusStr(version.status)}
+                  severity={
+                    version.status === 0 ? 'warning' :
+                      version.status === 1 ? 'info' :
+                        version.status === 2 ? 'success' :
+                          'danger'
+                  }/>
+              </Table.Cell>
+              <Table.Cell>{version.createdAt ? new Date(version.createdAt).toLocaleDateString() : 'N/A'}</Table.Cell>
+              <Table.Cell>{version.updatedAt ? new Date(version.updatedAt).toLocaleDateString() : 'N/A'}</Table.Cell>
+              <Table.Cell>
+                <Form method="delete" onSubmit={(e) => {
+                  e.preventDefault();
+                  if (confirm("Are you sure you want to delete this version?")) {
+                    submit(e.currentTarget, { method: "delete" });
+                  }
+                }}>
+                  <input type="hidden" name="versionId" value={version.id}/>
+                  <input type="hidden" name="versionStatus" value={version.status}/>
+                  <input type="hidden" name="isCurrent" value={isCurrent.toString()}/>
+                  <input type="hidden" name="isRecapPublished" value={recap.isPublished.toString()}/>
+                  <button
+                    className="border rounded p-1 hover:bg-indigo-200 disabled:opacity-50 disabled:cursor-progress"
+                    type="submit"
+                    title="Delete version"
+                    disabled={navigation.state === 'submitting' || navigation.state === 'loading'}
+                  >
+                    <span className="text-lg"><TbTrash/></span>
+                  </button>
+                </Form>
+              </Table.Cell>
+            </Table.Row>
+          )
+        })}
       </Table.Body>
     </Table.Container>
   )
@@ -383,7 +470,7 @@ const RightSidePanel = () => {
   const navigation = useNavigation();
   const { showToast } = useToast();
 
-  const loading = navigation.state === 'submitting';
+  const loading = navigation.state === 'submitting' && navigation.formMethod === 'put';
 
   useEffect(() => {
     if (actionData?.success && actionData.method === 'put') {
@@ -396,6 +483,11 @@ const RightSidePanel = () => {
       setRecapData(actionData.data);
     }
   }, [ actionData ]);
+
+  useEffect(() => {
+    if (JSON.stringify(recap) === JSON.stringify(recapData)) return;
+    setRecapData(recap);
+  }, [ recap ]);
 
   return (
     <div className="border-l border-gray-300 bg-white h-full py-8 px-6 w-[330px]">
