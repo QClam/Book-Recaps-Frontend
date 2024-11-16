@@ -177,7 +177,7 @@ const RecapsList = () => {
   return (
     <div className="grid grid-cols-5 gap-5">
       {recaps.map((recap) => (
-        <div key={recap.id} className="border rounded-lg shadow p-4 relative hover:shadow-lg">
+        <div key={recap.id} className="border rounded-lg shadow p-4 relative bg-white hover:shadow-lg">
           {recap.isPremium && (
             <span className="absolute top-2 right-2 bg-yellow-400 text-xs rounded px-2 py-1">Premium</span>
           )}
@@ -188,7 +188,8 @@ const RecapsList = () => {
             <Image
               src={recap.book.coverImage || "/empty-image.jpg"}
               alt={recap.book.title}
-              className="block overflow-hidden aspect-[3/4] object-cover w-full rounded-md bg-white"
+              imageClassName="aspect-[3/4] object-cover w-full bg-gray-50"
+              className="block overflow-hidden rounded-md shadow-md"
             />
           </Link>
           <div className="relative">

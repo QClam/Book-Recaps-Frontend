@@ -366,7 +366,8 @@ function BooksTable({ handleClickCreate }) {
               <Image
                 src={book.coverImage || "/empty-image.jpg"}
                 alt={book.title}
-                className="block overflow-hidden aspect-[3/4] object-cover w-full rounded-md bg-white"
+                className="block overflow-hidden rounded-md shadow-md"
+                imageClassName="aspect-[3/4] object-cover w-full bg-white"
                 preview
               />
             </div>
