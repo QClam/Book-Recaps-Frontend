@@ -22,6 +22,7 @@ import { ProgressSpinner } from "primereact/progressspinner";
 import { cn } from "../../utils/cn";
 import { routes } from "../../routes";
 import { useToast } from "../../contexts/Toast";
+import { Image } from "primereact/image";
 
 async function getRecaps(published, request) {
   try {
@@ -184,14 +185,10 @@ const RecapsList = () => {
             to={generatePath(routes.recapDetails, { recapId: recap.id })}
             className="block bg-gray-200 mb-4"
           >
-            <img
+            <Image
               src={recap.book.coverImage || "/empty-image.jpg"}
               alt={recap.book.title}
-              className="block aspect-[3/4] object-cover w-full rounded-md"
-              onError={({ currentTarget }) => {
-                currentTarget.onerror = null; // prevents looping
-                currentTarget.src = "/empty-image.jpg";
-              }}
+              className="block overflow-hidden aspect-[3/4] object-cover w-full rounded-md bg-white"
             />
           </Link>
           <div className="relative">

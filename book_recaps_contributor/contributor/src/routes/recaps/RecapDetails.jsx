@@ -29,6 +29,7 @@ import TextInput from "../../components/form/TextInput";
 import { cn } from "../../utils/cn";
 import Modal from "../../components/modal";
 import Table from "../../components/table";
+import BookInfo from "../../components/BookInfo";
 
 const getRecapInfo = async (recapId, request) => {
   try {
@@ -233,7 +234,7 @@ const RecapDetails = () => {
               Error loading book info!
             </div>
           }>
-            <BookInfo/>
+            {(book) => <BookInfo book={book}/>}
           </Await>
         </Suspense>
 
@@ -255,7 +256,7 @@ const RecapDetails = () => {
               </div>
             }>
 
-            <div className="mb-4 flex justify-end">
+            <div className="my-4 flex justify-end">
               <button
                 type="button"
                 className="flex justify-center items-center gap-1 px-5 py-2 font-semibold bg-indigo-600 text-white rounded hover:bg-indigo-800"
@@ -278,39 +279,6 @@ const RecapDetails = () => {
 }
 
 export default RecapDetails;
-
-const BookInfo = () => {
-  const bookInfo = useAsyncValue();
-
-  return (
-    <div className="mb-4 mt-3 flex items-center gap-4 border-b pb-4 border-gray-300">
-      <img
-        src={bookInfo.coverImage || "/empty-image.jpg"}
-        alt="Book Cover"
-        className="w-24 aspect-[3/4] object-cover rounded-md shadow-md"
-        onError={({ currentTarget }) => {
-          currentTarget.onerror = null; // prevents looping
-          currentTarget.src = "/empty-image.jpg";
-        }}
-      />
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">{bookInfo.title}</h1>
-        <p className="text-lg text-gray-700">
-          <span className="font-semibold text-black">Tác giả: </span>
-          <span>{bookInfo.authors.map((author) => author.name).join(", ")}</span>
-        </p>
-        <p className="text-lg text-gray-700">
-          <span className="font-semibold text-black">Thể loại: </span>
-          <span>{bookInfo.categories.map((cate) => cate.name).join(", ")}</span>
-        </p>
-        <p className="text-lg text-gray-700">
-          <span className="font-semibold text-black">Năm xuất bản: </span>
-          <span>{bookInfo.publicationYear}</span>
-        </p>
-      </div>
-    </div>
-  )
-}
 
 const ListRecapVersions = () => {
   const recapVersions = useAsyncValue();
@@ -344,13 +312,13 @@ const ListRecapVersions = () => {
       <Table.Body
         when={recapVersions.length > 0}
         fallback={
-          <Table.Row>
+          <tr>
             <Table.Cell colSpan="100" className="h-32 text-center">
               <div className="flex gap-2 justify-center items-center">
-                <p>Danh sách phiên bản trống</p>
+                <p>No versions found!</p>
               </div>
             </Table.Cell>
-          </Table.Row>
+          </tr>
         }
       >
         {recapVersions.map((version) => (
@@ -362,7 +330,7 @@ const ListRecapVersions = () => {
                     // recapId: version.recapId,
                     versionId: version.id
                   })}
-                  className="min-w-full line-clamp-2 break-words hover:underline text-indigo-500"
+                  className="min-w-full line-clamp-2 break-words hover:underline text-indigo-500 font-semibold"
                 >
                   {version.versionName || <span className="italic">(Chưa có tên)</span>}
                 </Link>
@@ -385,7 +353,8 @@ const ListRecapVersions = () => {
         ))}
       </Table.Body>
     </Table.Container>
-  );
+  )
+    ;
 }
 
 const RightSidePanel = () => {

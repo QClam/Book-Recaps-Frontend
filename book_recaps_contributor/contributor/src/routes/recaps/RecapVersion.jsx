@@ -19,6 +19,7 @@ import { RecapVersionProvider, useRecapVersion } from "../../contexts/RecapVersi
 import Modal from "../../components/modal";
 import { useAuth } from "../../contexts/Auth";
 import TextArea from "../../components/form/TextArea";
+import BookInfo from "../../components/BookInfo";
 
 const getRecapVersion = async (versionId, request) => {
   try {
@@ -134,7 +135,7 @@ const RecapVersion = () => {
                 Error loading book info!
               </div>
             }>
-              <BookInfo/>
+              {(book) => <BookInfo book={book}/>}
             </Await>
           </Suspense>
 
@@ -263,39 +264,6 @@ const RightSidePanel = () => {
 
       <div className={cn({ 'hidden': activeIndex !== 2 })}>
         <PlagiarismResults/>
-      </div>
-    </div>
-  )
-}
-
-const BookInfo = () => {
-  const bookInfo = useAsyncValue();
-
-  return (
-    <div className="flex items-center gap-4 border-b-2 pb-6 border-gray-200 mt-3">
-      <img
-        src={bookInfo.coverImage || "/empty-image.jpg"}
-        alt="Book Cover"
-        className="w-24 aspect-[3/4] object-cover rounded-md shadow-md"
-        onError={({ currentTarget }) => {
-          currentTarget.onerror = null; // prevents looping
-          currentTarget.src = "/empty-image.jpg";
-        }}
-      />
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">{bookInfo.title}</h1>
-        <p className="text-lg text-gray-700">
-          <span className="font-semibold text-black">Tác giả: </span>
-          <span>{bookInfo.authors.map((author) => author.name).join(", ")}</span>
-        </p>
-        <p className="text-lg text-gray-700">
-          <span className="font-semibold text-black">Thể loại: </span>
-          <span>{bookInfo.categories.map((cate) => cate.name).join(", ")}</span>
-        </p>
-        <p className="text-lg text-gray-700">
-          <span className="font-semibold text-black">Năm xuất bản: </span>
-          <span>{bookInfo.publicationYear}</span>
-        </p>
       </div>
     </div>
   )

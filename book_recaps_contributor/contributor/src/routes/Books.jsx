@@ -6,28 +6,31 @@ import {
   json,
   Link,
   Navigate,
-  redirect,
   useActionData,
   useAsyncValue,
   useLoaderData,
+  useMatch,
   useNavigation,
   useSearchParams
 } from "react-router-dom";
-import { Suspense, useEffect, useState } from "react";
-import { axiosInstance, axiosInstance2 } from "../../utils/axios";
-import { handleFetchError } from "../../utils/handleFetchError";
-import TextInput from "../../components/form/TextInput";
-import { TbSearch } from "react-icons/tb";
-import Select from "../../components/form/Select";
-import { cn } from "../../utils/cn";
-import { useAuth } from "../../contexts/Auth";
 import { Dialog } from "primereact/dialog";
 import { ProgressSpinner } from "primereact/progressspinner";
-import { routes } from "../../routes";
-import { useToast } from "../../contexts/Toast";
-import CustomBreadCrumb from "../../components/CustomBreadCrumb";
-import Modal from "../../components/modal";
-import Table from "../../components/table";
+import { Suspense, useEffect, useState } from "react";
+import { TbSearch } from "react-icons/tb";
+
+import { axiosInstance, axiosInstance2 } from "../utils/axios";
+import { handleFetchError } from "../utils/handleFetchError";
+import TextInput from "../components/form/TextInput";
+import Select from "../components/form/Select";
+import { cn } from "../utils/cn";
+import { useAuth } from "../contexts/Auth";
+import { routes } from "../routes";
+import { useToast } from "../contexts/Toast";
+import CustomBreadCrumb from "../components/CustomBreadCrumb";
+import Modal from "../components/modal";
+import Table from "../components/table";
+import Show from "../components/Show";
+import { Image } from "primereact/image";
 
 const getBooks = async (q, category, publisher, page, request) => {
   try {
@@ -101,37 +104,7 @@ export async function booksLoader({ request }) {
   });
 }
 
-export async function createRecapAction({ request }) {
-  const formData = await request.formData();
-  const bookId = formData.get('bookId');
-  const contributorId = formData.get('userId');
-  const name = formData.get('name');
-
-  if (!bookId || !contributorId || !name) {
-    return { error: "Vui lòng điền đầy đủ thông tin" };
-  }
-
-  try {
-    const response = await axiosInstance.post('/api/recap/createrecap', {
-      bookId, contributorId, name
-    });
-
-    return redirect(generatePath(routes.recapVersionDetails, {
-      // recapId: response.data.data.id,
-      versionId: response.data.data.currentVersionId
-    }));
-  } catch (error) {
-    const err = handleFetchError(error);
-    console.log("err", err);
-
-    if (err.status === 401) {
-      return redirect(routes.logout);
-    }
-    return err;
-  }
-}
-
-const CreateRecap = () => {
+const Books = () => {
   const { booksPagination, categories, publishers, params: { q, category, publisher } } = useLoaderData();
   const actionData = useActionData();
   let [ , setSearchParams ] = useSearchParams();
@@ -140,6 +113,10 @@ const CreateRecap = () => {
   const { showToast } = useToast();
   const [ dialogVisible, setDialogVisible ] = useState(false);
   const [ chosenBookId, setChosenBookId ] = useState("");
+
+  const matchBooksRoute = useMatch(routes.books);
+
+  const isBooksRoute = !!matchBooksRoute;
 
   useEffect(() => {
     document.getElementById("q").value = decodeURIComponent(q ?? "");
@@ -190,7 +167,7 @@ const CreateRecap = () => {
 
   return (
     <>
-      <CustomBreadCrumb items={[ { label: "Create Recap" } ]}/>
+      <CustomBreadCrumb items={[ { label: isBooksRoute ? "Books" : "Create Recap" } ]}/>
       <Dialog
         visible={dialogVisible}
         onHide={() => {
@@ -243,12 +220,16 @@ const CreateRecap = () => {
           </Modal.Wrapper>
         )}
       />
-      <div className="bg-white border border-gray-200 rounded shadow-sm p-4">
-        <h1 className="font-semibold text-lg">Tạo bài viết tóm tắt mới</h1>
-        <p>
-          Chọn một quyển sách từ danh sách dưới đây để tạo bài viết tóm tắt mới.
-        </p>
-      </div>
+      <Show when={!isBooksRoute} fallback={
+        <h1 className="mt-4 mb-6 text-xl font-semibold text-gray-900">Danh mục sách có thể tóm tắt</h1>
+      }>
+        <div className="bg-white border border-gray-200 rounded shadow-sm p-4">
+          <h1 className="font-semibold text-lg">Tạo bài viết tóm tắt mới</h1>
+          <p>
+            Chọn một quyển sách từ danh sách dưới đây để tạo bài viết tóm tắt mới.
+          </p>
+        </div>
+      </Show>
       <Form id="search-form" role="search" className="grid grid-cols-6 gap-1 my-3">
         <div className="relative col-span-2">
           <TextInput
@@ -360,24 +341,19 @@ const CreateRecap = () => {
   );
 }
 
-export default CreateRecap;
+export default Books;
 
 function BooksTable({ handleClickCreate }) {
   const paginationData = useAsyncValue();
-  const navigation = useNavigation();
 
   return (
     <Table.Body
-      when={navigation.state !== "loading"}
+      when={paginationData.items && paginationData.items.length > 0}
       fallback={
         <tr>
           <td className="h-32 text-center" colSpan="100">
             <div className="flex gap-2 justify-center items-center">
-              <div>
-                <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
-                                 fill="var(--surface-ground)" animationDuration=".5s"/>
-              </div>
-              <p>Loading books...</p>
+              <p>No books found!</p>
             </div>
           </td>
         </tr>
@@ -387,14 +363,11 @@ function BooksTable({ handleClickCreate }) {
         <Table.Row key={book.id}>
           <Table.Cell isFirstCell={true}>
             <div className="w-20">
-              <img
+              <Image
                 src={book.coverImage || "/empty-image.jpg"}
                 alt={book.title}
-                className="block aspect-[3/4] object-cover w-full rounded-md"
-                onError={({ currentTarget }) => {
-                  currentTarget.onerror = null; // prevents looping
-                  currentTarget.src = "/empty-image.jpg";
-                }}
+                className="block overflow-hidden aspect-[3/4] object-cover w-full rounded-md bg-white"
+                preview
               />
             </div>
           </Table.Cell>
@@ -402,7 +375,7 @@ function BooksTable({ handleClickCreate }) {
             <div className="min-w-60">
               <Link
                 to={generatePath(routes.bookDetails, { bookId: book.id })}
-                className="min-w-full line-clamp-2 break-words hover:underline text-indigo-500"
+                className="min-w-full line-clamp-2 break-words hover:underline text-indigo-500 font-semibold"
               >
                 {book.title}
               </Link>
