@@ -55,52 +55,38 @@ const getRecapVersions = async (recapId, request) => {
   }
 }
 
-export const recapDetailsLoader = async ({ params, request }) => {
-  const recap = await getRecapInfo(params.recapId, request);
-  const recapVersions = getRecapVersions(params.recapId, request);
-  const bookInfo = getBookInfoByRecap(params.recapId, request);
+const updateRecap = async (recapId, formData) => {
+  const isPremium = formData.get('isPremium') === 'on';
+  const isPublished = formData.get('isPublished') === 'on';
+  const name = formData.get('name');
+  const currentVersionId = formData.get('currentVersionId');
 
-  return defer({
-    recapVersions,
-    recap,
-    bookInfo
-  });
-}
-
-export async function recapDetailsAction({ request, params }) {
-  if (request.method.toLowerCase() === 'put') {
-    const formData = await request.formData();
-    const isPremium = formData.get('isPremium') === 'on';
-    const isPublished = formData.get('isPublished') === 'on';
-    const name = formData.get('name');
-
-    if (!name) {
-      return { error: "Vui lòng điền tên recap" };
-    }
-
-    try {
-      const response = await axiosInstance2.put('/recaps/' + params.recapId, {
-        name, isPublished, isPremium
-      });
-
-      return {
-        data: response.data,
-        success: true,
-        method: 'put'
-      };
-    } catch (error) {
-      const err = handleFetchError(error);
-      console.log("err", err);
-
-      if (err.status === 401) {
-        return redirect(routes.logout);
-      }
-      return err;
-    }
+  if (!name) {
+    return { error: "Vui lòng điền tên recap" };
   }
 
-  // Create new version
-  const formData = await request.formData();
+  try {
+    const response = await axiosInstance2.put('/recaps/' + recapId, {
+      name, isPublished, isPremium, currentVersionId
+    });
+
+    return {
+      data: response.data,
+      success: true,
+      method: 'put'
+    };
+  } catch (error) {
+    const err = handleFetchError(error);
+    console.log("err", err);
+
+    if (err.status === 401) {
+      return redirect(routes.logout);
+    }
+    return err;
+  }
+}
+
+const createRecapVersion = async (formData) => {
   const recapId = formData.get('recapId');
   const contributorId = formData.get('userId');
   const versionName = formData.get('name');
@@ -127,6 +113,31 @@ export async function recapDetailsAction({ request, params }) {
       return redirect(routes.logout);
     }
     return err;
+  }
+}
+
+export const recapDetailsLoader = async ({ params, request }) => {
+  const recap = await getRecapInfo(params.recapId, request);
+  const recapVersions = getRecapVersions(params.recapId, request);
+  const bookInfo = getBookInfoByRecap(params.recapId, request);
+
+  return defer({
+    recapVersions,
+    recap,
+    bookInfo
+  });
+}
+
+export async function recapDetailsAction({ request, params }) {
+  const formData = await request.formData();
+
+  switch (request.method.toLowerCase()) {
+    case 'put':
+      return await updateRecap(params.recapId, formData);
+    case 'post':
+      return await createRecapVersion(formData);
+    default:
+      return null;
   }
 }
 
@@ -281,6 +292,7 @@ const RecapDetails = () => {
 export default RecapDetails;
 
 const ListRecapVersions = () => {
+  const { recap } = useLoaderData();
   const recapVersions = useAsyncValue();
 
   const getStatusStr = (status) => {
@@ -324,7 +336,7 @@ const ListRecapVersions = () => {
         {recapVersions.map((version) => (
           <Table.Row key={version.id}>
             <Table.Cell isFirstCell={true}>
-              <div className="min-w-60">
+              <div className="min-w-60 relative">
                 <Link
                   to={generatePath(routes.recapVersionDetails, {
                     // recapId: version.recapId,
@@ -332,11 +344,18 @@ const ListRecapVersions = () => {
                   })}
                   className="min-w-full line-clamp-2 break-words hover:underline text-indigo-500 font-semibold"
                 >
-                  {version.versionName || <span className="italic">(Chưa có tên)</span>}
+                  {version.versionName || <span className="italic">(Chưa đặt tên)</span>}
                 </Link>
               </div>
             </Table.Cell>
-            <Table.Cell>{version.versionNumber}</Table.Cell>
+            <Table.Cell>
+              <div className="flex items-center gap-4">
+                <span>{version.versionNumber}</span>
+                {recap.currentVersionId === version.id && (
+                  <span className="bg-yellow-400 text-xs font-semibold rounded-full px-2 py-1">Current</span>
+                )}
+              </div>
+            </Table.Cell>
             <Table.Cell>
               <Badge
                 value={getStatusStr(version.status)}
@@ -358,7 +377,7 @@ const ListRecapVersions = () => {
 }
 
 const RightSidePanel = () => {
-  const { recap } = useLoaderData();
+  const { recap, recapVersions } = useLoaderData();
   const [ recapData, setRecapData ] = useState(recap);
   const actionData = useActionData();
   const navigation = useNavigation();
@@ -437,6 +456,50 @@ const RightSidePanel = () => {
           <InputSwitch checked={recapData.isPremium}
                        onChange={(e) => setRecapData({ ...recapData, isPremium: e.value })}
                        name="isPremium"/>
+        </div>
+
+        {/* Current Version */}
+
+        <div>
+          <label className="block font-medium text-gray-700 mb-1">Current version:</label>
+          <div className="flex items-center gap-2">
+            <Suspense
+              fallback={
+                <div className="flex gap-2 items-center">
+                  <div>
+                    <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
+                                     fill="var(--surface-ground)" animationDuration=".5s"/>
+                  </div>
+                  <p>Loading versions...</p>
+                </div>
+              }>
+              <Await resolve={recapVersions} errorElement={
+                <div className="flex gap-2 items-center">
+                  <p>Error loading versions!</p>
+                </div>
+              }>
+                {(versions) => (
+                  <select
+                    name="currentVersionId"
+                    required
+                    value={recapData.currentVersionId || ''}
+                    onChange={(e) => setRecapData({ ...recapData, currentVersionId: e.target.value })}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+                  >
+                    <option value="" disabled>Select version</option>
+                    {versions.map((version) => (
+                      <option
+                        key={version.id}
+                        value={version.id}
+                      >
+                        {version.versionNumber} - {version.versionName || "(Chưa đặt tên)"}
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </Await>
+            </Suspense>
+          </div>
         </div>
 
         <div>

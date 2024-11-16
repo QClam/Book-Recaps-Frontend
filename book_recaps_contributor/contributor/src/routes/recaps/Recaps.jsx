@@ -1,10 +1,8 @@
 import { Suspense, useEffect } from 'react';
 import CustomBreadCrumb from "../../components/CustomBreadCrumb";
-import { TbTrash } from "react-icons/tb";
 import {
   Await,
   defer,
-  Form,
   generatePath,
   json,
   Link,
@@ -198,6 +196,9 @@ const RecapsList = () => {
                 {recap.name || `"${recap.book.title}"`}
               </Link>
             </h2>
+            <p className="text-gray-600 mb-2 italic line-clamp-1" title={recap.book.title}>
+              <strong>Sách:</strong> {recap.book.title}
+            </p>
             <p className="text-sm">
               Trạng thái: <span className={cn({
               "font-semibold": true,
@@ -205,13 +206,15 @@ const RecapsList = () => {
               "text-red-500": !recap.isPublished
             })}>{recap.isPublished ? "Công khai" : "Ẩn"}</span>
             </p>
-            <p className="text-sm">Ngày tạo: {recap.createdAt ? new Date(recap.createdAt).toLocaleDateString() : 'N/A'}</p>
-            <Form className="absolute bottom-0 right-0" method="delete">
-              <input type="hidden" name="recapId" value={recap.id}/>
-              <button className="border rounded p-1 hover:bg-gray-100" type="submit">
-                <span className="text-lg"><TbTrash/></span>
-              </button>
-            </Form>
+            <p className="text-sm">
+              Ngày tạo: {recap.createdAt ? new Date(recap.createdAt).toLocaleDateString() : 'N/A'}
+            </p>
+            {/*<Form className="absolute bottom-0 right-0" method="delete">*/}
+            {/*  <input type="hidden" name="recapId" value={recap.id}/>*/}
+            {/*  <button className="border rounded p-1 hover:bg-gray-100" type="submit">*/}
+            {/*    <span className="text-lg"><TbTrash/></span>*/}
+            {/*  </button>*/}
+            {/*</Form>*/}
           </div>
         </div>
       ))}

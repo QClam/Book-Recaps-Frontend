@@ -12,7 +12,8 @@ const Cell = ({ children, isFirstCell = false, isHeader = false, className = "",
       {children}
     </th>
   ) : (
-    <td className={cn(dataClass, isFirstCell ? firstCellClass : borderLeftClass, className)} colSpan={colSpan}>
+    <td className={cn(dataClass, isFirstCell ? firstCellClass : borderLeftClass, className)}
+        colSpan={colSpan}>
       {children}
     </td>
   );
