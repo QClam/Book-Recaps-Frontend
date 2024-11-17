@@ -1095,7 +1095,7 @@ const StaffReviews = ({ review }) => {
             >
               <div className="space-y-2">
                 <h2 className="text-lg font-semibold text-gray-900">
-                  Section {sectionIndex + 1}
+                  {section.title || "(Chưa có tiêu đề)"}
                 </h2>
                 <p>
                   {section.transcriptSentences.map((sentence) => (
