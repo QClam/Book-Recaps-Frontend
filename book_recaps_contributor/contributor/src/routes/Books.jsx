@@ -175,7 +175,7 @@ const Books = () => {
           setDialogVisible(false);
         }}
         content={({ hide }) => (
-          <Modal.Wrapper width="400px">
+          <Modal.Wrapper>
             <Modal.Header title="Tạo bài viết tóm tắt" onClose={(e) => hide(e)}/>
             <Modal.Body className="pb-0">
               <Form className="flex flex-col gap-1" method="post">

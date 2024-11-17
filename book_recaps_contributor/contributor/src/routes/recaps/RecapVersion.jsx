@@ -20,6 +20,7 @@ import Modal from "../../components/modal";
 import { useAuth } from "../../contexts/Auth";
 import TextArea from "../../components/form/TextArea";
 import BookInfo from "../../components/BookInfo";
+import axios from "axios";
 
 const getRecapVersion = async (versionId, request) => {
   try {
@@ -271,10 +272,12 @@ const RightSidePanel = () => {
 
 const RecapVersionDetails = () => {
   const { recapVersion, setRecapVersion } = useRecapVersion();
-  const [ uploadingAudio, setUploadingAudio ] = useState(false);
-  const [ updatingName, setUpdatingName ] = useState(false);
   const navigate = useNavigate();
   const { showToast } = useToast();
+
+  const [ uploadingAudio, setUploadingAudio ] = useState(false);
+  const [ updatingName, setUpdatingName ] = useState(false);
+  const [ previewDialogVisible, setPreviewDialogVisible ] = useState(false);
 
   // if recapVersionData.transcriptStatus === 1, then keep polling for the transcript status until it's 2
   useEffect(() => {
@@ -542,6 +545,37 @@ const RecapVersionDetails = () => {
           </Show>
         </div>
       </Show>
+
+      {/*TODO: Preview audio and transcript*/}
+      <Show when={recapVersion.transcriptUrl && recapVersion.audioURL && recapVersion.transcriptStatus === 2}>
+        <>
+          <div className="mb-4">
+            <button
+              type="button"
+              className="text-blue-500 hover:underline p-0 text-start"
+              onClick={() => setPreviewDialogVisible(true)}
+            >
+              Preview audio and transcript
+            </button>
+          </div>
+
+          <Dialog
+            visible={previewDialogVisible}
+            onHide={() => {
+              if (!previewDialogVisible) return;
+              setPreviewDialogVisible(false);
+            }}
+            content={({ hide }) => (
+              <AudioTranscriptPreview
+                hide={hide}
+                isOpen={previewDialogVisible}
+                audioUrl={recapVersion.audioURL}
+                transcriptUrl={recapVersion.transcriptUrl}/>
+            )}
+          />
+        </>
+      </Show>
+
       <Show when={recapVersion.status === 0 && recapVersion.transcriptStatus !== 1}>
         <>
           {/* Generate Audio Button */}
@@ -956,7 +990,7 @@ const CreateAppealDialog = ({ dialogVisible, setDialogVisible, reviewId }) => {
         setReason('');
       }}
       content={({ hide }) => (
-        <Modal.Wrapper width="400px">
+        <Modal.Wrapper>
           <Modal.Header title="Tạo đơn kháng cáo" onClose={hide}/>
           <Modal.Body className="pb-0">
             <div className="flex flex-col gap-1">
@@ -1353,5 +1387,87 @@ const PlagiarismResults = () => {
         )}
       </div>
     </div>
+  )
+}
+
+const AudioTranscriptPreview = ({ hide, isOpen, audioUrl, transcriptUrl }) => {
+  const [ loading, setLoading ] = useState(false);
+  const [ transcript, setTranscript ] = useState(null);
+  const [ audioLoaded, setAudioLoaded ] = useState(false);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    if (isOpen && audioUrl && transcriptUrl) {
+      setLoading(true);
+      setTranscript(null);
+      setAudioLoaded(false);
+      fetchTranscript(controller);
+    }
+
+    return () => controller.abort();
+  }, [ isOpen, audioUrl, transcriptUrl ]);
+
+  useEffect(() => {
+    if (audioLoaded && transcript) {
+      setLoading(false);
+    }
+  }, [ audioLoaded, transcript ]);
+
+  const fetchTranscript = async (controller) => {
+    try {
+      const response = await axios.get(transcriptUrl, {
+        signal: controller.signal
+      });
+      const data = response.data;
+      setTranscript(data);
+    } catch (error) {
+      console.error("Error fetching transcript:", error);
+    }
+  };
+
+  const handleAudioLoaded = () => {
+    setAudioLoaded(true);
+  };
+
+  return (
+    <Modal.Wrapper className="w-screen max-w-screen-sm">
+      <Modal.Header title="Preview audio and transcript" onClose={hide}/>
+      <Modal.Body className="">
+        <div className="h-96 overflow-y-auto border p-3 mb-4 bg-gray-100 shadow-inner">
+          <Show when={!loading} fallback={
+            <div className="flex gap-2 items-center mt-3">
+              <div>
+                <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
+                                 fill="var(--surface-ground)" animationDuration=".5s"/>
+              </div>
+              <p>Loading...</p>
+            </div>
+          }>
+            <Show when={transcript} fallback={<p className="text-center text-gray-500">No transcript found</p>}>
+              <pre className="leading-relaxed">
+                <code>{JSON.stringify(transcript, null, 2)}</code>
+              </pre>
+            </Show>
+          </Show>
+
+        </div>
+        <audio controls onCanPlayThrough={handleAudioLoaded} className={cn("w-full", {
+          "opacity-50 cursor-progress": !audioLoaded
+        })}>
+          <source src={audioUrl} type="audio/wav"/>
+          Your browser does not support the audio element.
+        </audio>
+      </Modal.Body>
+      <Modal.Footer className="justify-end gap-3">
+        <button
+          className="bg-gray-200 rounded py-1.5 px-3 border font-semibold hover:bg-gray-300"
+          type="button"
+          onClick={hide}
+        >
+          Đóng
+        </button>
+      </Modal.Footer>
+    </Modal.Wrapper>
   )
 }
