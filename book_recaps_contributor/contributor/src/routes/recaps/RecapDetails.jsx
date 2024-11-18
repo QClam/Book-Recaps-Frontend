@@ -62,7 +62,7 @@ const updateRecap = async (recapId, request) => {
   const isPremium = formData.get('isPremium') === 'on';
   const isPublished = formData.get('isPublished') === 'on';
   const name = formData.get('name');
-  const currentVersionId = formData.get('currentVersionId');
+  const currentVersionId = formData.get('currentVersionId') || null;
 
   if (!name) {
     return { error: "Vui lòng điền tên recap" };
@@ -573,12 +573,11 @@ const RightSidePanel = () => {
                 {(versions) => (
                   <select
                     name="currentVersionId"
-                    required
                     value={recapData.currentVersionId || ''}
                     onChange={(e) => setRecapData({ ...recapData, currentVersionId: e.target.value })}
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
                   >
-                    <option value="" disabled>Select version</option>
+                    <option value="">Select version</option>
                     {versions.map((version) => (
                       <option
                         key={version.id}
