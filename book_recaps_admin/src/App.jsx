@@ -18,6 +18,7 @@ import CreateContract from './Components/Contracts/CreateContract';
 import ContributorPayout from './Components/Contributor-Payout/ContributorPayout';
 import HistoryContributorPayout from './Components/Contributor-Payout/HistoryContributorPayout';
 import DetailContributorPayout from './Components/Contributor-Payout/DetailContributorPayout';
+import PublisherList from './Components/Users/PublisherList';
 
 
 function App() {
@@ -40,6 +41,7 @@ function App() {
         <Route path="/contributor-payout-history/:historyId" element={ <HistoryContributorPayout />} />
         <Route path="/contributor-payout-history/:historyId/detail/:id" element={ <DetailContributorPayout />} />
         <Route path="/books" element={<PrivateRoute> <BookList /> </PrivateRoute>} />
+        <Route path="/publishsers" element={<PrivateRoute> <PublisherList /> </PrivateRoute>} />
         <Route path="/contracts" element={<PrivateRoute> <ContractsList /> </PrivateRoute>} />
         <Route path="/contract/create" element={<PrivateRoute> <CreateContract /> </PrivateRoute>} />
         <Route path="/contract/:contractId" element={<PrivateRoute> <ContractDetail /> </PrivateRoute>} />

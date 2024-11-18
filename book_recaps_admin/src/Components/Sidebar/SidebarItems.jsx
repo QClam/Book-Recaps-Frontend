@@ -1,21 +1,13 @@
 import React from "react";
 
 import {
-    Home,
     Paid,
-    SpaceDashboard,
-    BorderColor,
-    AutoAwesome,
-    Settings,
-    HelpOutline,
-    Logout,
-    GifBox,
     LibraryBooks,
     Widgets,
-    Notes,
     Groups,
     MenuBook,
-    CurrencyExchange
+    CurrencyExchange,
+    People
 } from "@mui/icons-material";
 
 export const SidebarItems = [
@@ -40,6 +32,11 @@ export const SidebarItems = [
         link: "/users",
     },
     {
+        title: "Thông tin NXB",
+        icon: <People />,
+        link: "/publishsers",
+    },
+    {
         title: "Quản lý sách",
         icon: <MenuBook />,
         link: "/books",
@@ -48,10 +45,5 @@ export const SidebarItems = [
         title: "Hợp đồng",
         icon: <LibraryBooks />,
         link: "/contracts",
-    },
-    {
-        title: "Cài đặt",
-        icon: <Settings />,
-        link: "/settings",
     },
 ];

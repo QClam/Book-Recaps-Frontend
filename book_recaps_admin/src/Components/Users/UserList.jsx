@@ -12,7 +12,6 @@ import { useNavigate } from "react-router-dom";
 import api from "../Auth/AxiosInterceptors";
 import "./UserList.scss";
 import "../Loading.scss";
-import avatar from "../../data/avarta.png"
 
 Modal.setAppElement("#root"); // Set the root element for the modal
 
@@ -156,7 +155,7 @@ function UsersList() {
       };
 
       const response = await axios.post(
-        "https://160.25.80.100:7124/api/register",
+        "https://bookrecaps.cloud/api/register",
         newUser
       );
       console.log("Register Successfully", newUser);
@@ -186,30 +185,30 @@ function UsersList() {
     }
   };
 
-  const handleUpdateUser = async () => {
-    if (!validateForm()) {
-      return;
-    }
+  // const handleUpdateUser = async () => {
+  //   if (!validateForm()) {
+  //     return;
+  //   }
 
-    try {
-      const updatedUser = {
-        fullName: registerForm.fullName,
-        phoneNumber: registerForm.phoneNumber,
-      };
+  //   try {
+  //     const updatedUser = {
+  //       fullName: registerForm.fullName,
+  //       phoneNumber: registerForm.phoneNumber,
+  //     };
 
-      const response = await axios.put(
-        `https://66e3e75ed2405277ed124249.mockapi.io/users/${editingUserId}`,
-        updatedUser
-      );
-      setUsers(
-        users.map((user) => (user.id === editingUserId ? response.data : user))
-      );
-      resetForm();
-    } catch (error) {
-      console.error("Error registering user:", error);
-      setError("Đăng ký thất bại.");
-    }
-  };
+  //     const response = await axios.put(
+  //       `https://66e3e75ed2405277ed124249.mockapi.io/users/${editingUserId}`,
+  //       updatedUser
+  //     );
+  //     setUsers(
+  //       users.map((user) => (user.id === editingUserId ? response.data : user))
+  //     );
+  //     resetForm();
+  //   } catch (error) {
+  //     console.error("Error registering user:", error);
+  //     setError("Đăng ký thất bại.");
+  //   }
+  // };
 
   const handleChangeRole = async (userId, newRole) => {
     Swal.fire({
@@ -225,7 +224,7 @@ function UsersList() {
       if (result.isConfirmed) {
         try {
           const response = await axios.put(
-            `https://160.25.80.100:7124/api/update-user-role/${newRole}`,
+            `https://bookrecaps.cloud/api/update-user-role/${newRole}`,
             null, // No body content needed
             {
               params: { userId: userId }, // Adding userId as a query parameter
@@ -283,7 +282,7 @@ function UsersList() {
       if (result.isConfirmed) {
         try {
           const response = await axios.delete(
-            `https://160.25.80.100:7124/api/users/delete-user-account`, // Adjusted the URL
+            `https://bookrecaps.cloud/api/users/delete-user-account`,
             {
               headers: {
                 accept: "*/*",
@@ -526,7 +525,7 @@ function UsersList() {
         open={Boolean(anchorEl)} // Menu is open if anchorEl is set
         onClose={handleMenuClose}
       >
-        <MenuItem onClick={handleSubmenu}>Thay đổi Vai trò</MenuItem>
+        <MenuItem onClick={handleSubmenu} disabled={selectedUser?.roleType === 3}>Thay đổi Vai trò</MenuItem>
         <Menu
           anchorEl={submenuAnchorEl}
           open={submenuOpen}
@@ -574,7 +573,7 @@ function UsersList() {
         <MenuItem
           onClick={() => {
             handleMenuClose();
-            handleDeleteUser(selectedUser.id); // Delete the selected user
+            handleDeleteUser(selectedUser.id);
           }}
         >
           Xóa
