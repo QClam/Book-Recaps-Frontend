@@ -127,7 +127,7 @@ function RecapsList() {
           return updatedRecap;
         })
       );
-      updatedRecaps.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      // updatedRecaps.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       setContentItems(updatedRecaps);
     } catch (error) {
       console.log("Error fetching data, using sample data as fallback:", error);
@@ -309,6 +309,7 @@ function RecapsList() {
                     className="button"
                     style={{ backgroundColor: "green", color: "#fff", width: "120px" }}
                     onClick={() => createReview(val.recapVersionId)}
+                    disabled={val.currentVersionStatus !== 1}
                   >
                     Tạo Review
                   </button>

@@ -3,7 +3,7 @@ import axios from 'axios';
 
 export const fetchProfile = async (token, setProfile) => {
     try {
-        const response = await axios.get('https://160.25.80.100:7124/api/personal/profile', {
+        const response = await axios.get('https://bookrecaps.cloud/api/personal/profile', {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

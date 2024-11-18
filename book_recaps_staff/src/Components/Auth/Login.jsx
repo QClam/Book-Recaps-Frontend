@@ -100,7 +100,7 @@ function Login() {
       };
 
       const response = await axios.post(
-        "https://160.25.80.100:7124/api/register",
+        "https://bookrecaps.cloud/api/register",
         newUser
       );
       console.log("Register Successfully", newUser);
@@ -149,7 +149,7 @@ function Login() {
       const token = await executeRecaptcha("login");
 
       const response = await axios.post(
-        "https://160.25.80.100:7124/api/tokens",
+        "https://bookrecaps.cloud/api/tokens",
         {
           email,
           password,
@@ -163,7 +163,7 @@ function Login() {
       localStorage.setItem("refresh_token", refreshToken);
 
       // Decode token để lấy Role, nếu k phải Role thì không cho đăng nhập
-      if(isRoleMatched(decoded, "Staff")) {
+      if (isRoleMatched(decoded, "Staff")) {
         navigate("/recaps")
         console.log("Login successfully", response.data);
       } else {
@@ -172,7 +172,8 @@ function Login() {
       }
     } catch (error) {
       setError("Tài khoản hoặc mật khẩu không đúng. Vui lòng kiểm tra lại");
-      console.error("Error sending forget password request:", error.response?.data || error.message);
+      const err = handleFetchError(error);
+      throw json({ error: err.error }, { status: err.status });
     }
   };
 
