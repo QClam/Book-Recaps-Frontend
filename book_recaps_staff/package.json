@@ -27,6 +27,7 @@
     "react-loader-spinner": "^6.1.6",
     "react-paginate": "^8.2.0",
     "react-router-dom": "^6.26.2",
+    "rsuite": "^5.74.2",
     "sweetalert2": "^11.14.0"
   },
   "devDependencies": {
