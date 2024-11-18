@@ -26,7 +26,7 @@ function Login() {
       const token = await executeRecaptcha("login");
 
       const response = await axios.post(
-        "https://160.25.80.100:7124/api/tokens",
+        "https://bookrecaps.cloud/api/tokens",
         {
           email,
           password,

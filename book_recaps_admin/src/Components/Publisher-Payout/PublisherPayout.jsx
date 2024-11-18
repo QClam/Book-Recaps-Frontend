@@ -1,68 +1,102 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import './PublisherPayout.scss'
+import {
+    Box,
+    Typography,
+    Table,
+    TableHead,
+    TableBody,
+    TableRow,
+    TableCell,
+    Button,
+    Paper,
+    TableContainer
+} from '@mui/material';
 
 function PublisherPayout() {
+    const navigate = useNavigate();
 
-  const navigate = useNavigate();
-  // Dữ liệu mẫu
-  const payoutData = [
-    {
-      id: '1',
-      name: 'Publisher A',
-      payoutPeriod: '01/11/2024 - 01/12/2024',
-      newRevenue: '12.000.000 VND',
-    },
-    {
-      id: '2',
-      name: 'Publisher B',
-      payoutPeriod: '01/10/2024 - 01/11/2024',
-      newRevenue: '8.000.000 VND',
-    },
-    {
-      id: '3',
-      name: 'Publisher C',
-      payoutPeriod: '01/09/2024 - 01/10/2024',
-      newRevenue: '15.000.000 VND',
-    },
-  ];
+    // Dữ liệu mẫu
+    const payoutData = [
+        {
+            id: '1',
+            name: 'Publisher A',
+            payoutPeriod: '01/11/2024 - 01/12/2024',
+            newRevenue: '12.000.000 VND',
+            status: 'Hoàn tất',
+        },
+        {
+            id: '2',
+            name: 'Publisher B',
+            payoutPeriod: '01/10/2024 - 01/11/2024',
+            newRevenue: '8.000.000 VND',
+            status: 'Hoàn tất',
+        },
+        {
+            id: '3',
+            name: 'Publisher C',
+            payoutPeriod: '01/09/2024 - 01/10/2024',
+            newRevenue: '15.000.000 VND',
+            status: 'Hoàn tất',
+        },
+    ];
 
-  const createPayout = async (id) => {
-    navigate(`/publisher-payout-create/${id}`)
-  }
+    const createPayout = (id) => {
+        navigate(`/publisher-payout-create/${id}`);
+    };
 
-  return (
-    <div className='publisher-payout-container'>
-      <div>
-        <h3>Quyết toán tiền bản quyền</h3>
-      </div>
-      <div className='content-table'>
-        <table>
-          <thead>
-            <tr>
-              <th>Tên</th>
-              <th>Đợt quyết toán gần nhất</th>
-              <th>Doanh thu mới</th>
-              <th></th>
-            </tr>
-          </thead>
-          <tbody>
-            {payoutData.map((item, index) => (
-              <tr key={item.id}>
-                <td>{item.name}</td>
-                <td>{item.payoutPeriod}</td>
-                <td>{item.newRevenue}</td>
-                <td>
-                  <button style={{ backgroundColor: '#9fc5f8' }} onClick={() => createPayout(item.id)}>Thanh toán</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  )
+    return (
+        <Box sx={{ padding: '24px', width: '80vw' }}>
+            {/* Tiêu đề */}
+            <Typography variant="h5" gutterBottom>
+                Quyết toán tiền bản quyền
+            </Typography>
+
+            <Box display="flex" justifyContent="flex-end" mt={2} padding={2}>
+                <Button variant="contained" color="primary">
+                    Tạo mới
+                </Button>
+            </Box>
+
+            {/* Bảng quyết toán */}
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell><strong>Tên</strong></TableCell>
+                            <TableCell><strong>Đợt quyết toán gần nhất</strong></TableCell>
+                            <TableCell><strong>Tổng tiền đã chi</strong></TableCell>
+                            <TableCell><strong>Trạng thái</strong></TableCell>
+                            <TableCell></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {payoutData.map((item) => (
+                            <TableRow key={item.id}>
+                                <TableCell>{item.name}</TableCell>
+                                <TableCell>{item.payoutPeriod}</TableCell>
+                                <TableCell>{item.newRevenue}</TableCell>
+                                <TableCell>{item.status}</TableCell>
+                                <TableCell align="center">
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={() => createPayout(item.id)}
+                                        sx={{
+                                            backgroundColor: '#9fc5f8',
+                                            '&:hover': { backgroundColor: '#6b9edb' },
+                                        }}
+                                    >
+                                        Thanh toán
+                                    </Button>
+                                </TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Box>
+    );
 }
 
-export default PublisherPayout
+export default PublisherPayout;
