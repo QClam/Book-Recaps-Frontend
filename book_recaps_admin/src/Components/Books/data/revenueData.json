@@ -1,0 +1,62 @@
+[
+    {
+      "label": "Tháng 1",
+      "revenue": 64854,
+      "cost": 32652
+    },
+    {
+      "label": "Tháng 2",
+      "revenue": 54628,
+      "cost": 42393
+    },
+    {
+      "label": "Tháng 3",
+      "revenue": 117238,
+      "cost": 50262
+    },
+    {
+      "label": "Tháng 4",
+      "revenue": 82830,
+      "cost": 64731
+    },
+    {
+      "label": "Tháng 5",
+      "revenue": 91208,
+      "cost": 41893
+    },
+    {
+      "label": "Tháng 6",
+      "revenue": 103609,
+      "cost": 83809
+    },
+    {
+      "label": "Tháng 7",
+      "revenue": 90974,
+      "cost": 44772
+    },
+    {
+      "label": "Tháng 8",
+      "revenue": 82919,
+      "cost": 37590
+    },
+    {
+      "label": "Tháng 9",
+      "revenue": 62407,
+      "cost": 43349
+    },
+    {
+      "label": "Tháng 10",
+      "revenue": 82528,
+      "cost": 45324
+    },
+    {
+      "label": "Tháng 11",
+      "revenue": 56979,
+      "cost": 47978
+    },
+    {
+      "label": "Tháng 12",
+      "revenue": 87436,
+      "cost": 39175
+    }
+  ]
