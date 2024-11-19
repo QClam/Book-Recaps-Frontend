@@ -15,6 +15,7 @@ import {
 
 function PublisherPayout() {
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
 
     // Dữ liệu mẫu
     const payoutData = [
@@ -44,6 +45,20 @@ function PublisherPayout() {
     const createPayout = (id) => {
         navigate(`/publisher-payout-create/${id}`);
     };
+
+    if (loading) {
+        return (
+          <div className="loading">
+            <Hourglass
+              visible={true}
+              height="80"
+              width="80"
+              ariaLabel="hourglass-loading"
+              colors={["#306cce", "#72a1ed"]}
+            />
+          </div>
+        );
+      }
 
     return (
         <Box sx={{ padding: '24px', width: '80vw' }}>

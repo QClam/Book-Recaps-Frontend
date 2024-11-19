@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import api from '../Auth/AxiosInterceptors'
 import Pagination from "@mui/material/Pagination";
-import { Add, MoreHoriz } from "@mui/icons-material";
+import { Add, MoreHoriz, Visibility } from "@mui/icons-material";
 import Modal from "react-modal";
 import empty_image from "../../data/empty-image.png"
+import { Button } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 
 function BookList() {
 
@@ -28,6 +30,8 @@ function BookList() {
     coverImage: "",
     authorImage: "",
   });
+
+  const navigate = useNavigate();
 
   const validateForm = () => {
     const errors = {};
@@ -79,6 +83,10 @@ function BookList() {
     currentPage * booksPerPage
   );
 
+  const detailBook = async (id) => {
+    navigate(`/book/${id}`)
+  }
+
   const handlePageChange = (event, value) => {
     setCurrentPage(value);
   };
@@ -127,6 +135,7 @@ function BookList() {
                 <td>{book.publicationYear}</td>
                 <td> {book.authors.$values ? book.authors.$values.map(author => author.name).join(", ") : "N/A"}</td>
                 <td>{book.ageLimit}</td>
+                <td><Button onClick={() => detailBook(book.id)}><Visibility /></Button></td>
               </tr>
             ))}
           </tbody>
