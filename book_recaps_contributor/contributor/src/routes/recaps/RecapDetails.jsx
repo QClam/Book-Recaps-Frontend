@@ -59,13 +59,13 @@ const getRecapVersions = async (recapId, request) => {
 const updateRecap = async (recapId, request) => {
   const formData = await request.formData();
 
-  const isPremium = formData.get('isPremium') === 'on';
-  const isPublished = formData.get('isPublished') === 'on';
+  const isPremium = formData.get('isPremium') === 'true';
+  const isPublished = formData.get('isPublished') === 'true';
   const name = formData.get('name');
   const currentVersionId = formData.get('currentVersionId') || null;
 
   if (!name) {
-    return { error: "Vui lòng điền tên recap" };
+    return { error: "Vui lòng điền tên recap", method: 'put' };
   }
 
   try {
@@ -87,7 +87,7 @@ const updateRecap = async (recapId, request) => {
     if (err.status === 401) {
       return redirect(routes.logout);
     }
-    return err;
+    return { ...err, method: 'put' };
   }
 }
 
@@ -208,7 +208,7 @@ const RecapDetails = () => {
   const { showToast } = useToast();
 
   useEffect(() => {
-    if (actionData?.error) {
+    if (actionData?.error && actionData.method !== 'put') {
       showToast({
         severity: 'error',
         summary: 'Error',
@@ -256,7 +256,7 @@ const RecapDetails = () => {
                   placeholder="Tên phiên bản mới"
                   required
                 />
-                <Modal.Footer className="-mx-5 mt-5 justify-end gap-3">
+                <Modal.Footer className="-mx-5 mt-5 justify-end gap-3 text-sm">
                   <button
                     className={cn({
                       "bg-gray-200 rounded py-1.5 px-3 border font-semibold hover:bg-gray-300": true,
@@ -482,6 +482,15 @@ const RightSidePanel = () => {
 
       setRecapData(actionData.data);
     }
+    if (actionData?.error && actionData.method === 'put') {
+      showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: actionData.error,
+      });
+
+      setRecapData(recap);
+    }
   }, [ actionData ]);
 
   useEffect(() => {
@@ -517,7 +526,8 @@ const RightSidePanel = () => {
               required
               value={recapData.name || ''}
               onChange={(e) => setRecapData({ ...recapData, name: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300 read-only:bg-gray-100"
+              readOnly={loading || recap.isPublished}
             />
           </div>
         </div>
@@ -530,10 +540,11 @@ const RightSidePanel = () => {
               value={recapData.isPublished ? 'Published' : 'Private'}
               severity={recapData.isPublished ? 'success' : 'danger'}
             />
+            <input type="hidden" name="isPublished" value={recapData.isPublished}/>
           </div>
           <InputSwitch checked={recapData.isPublished}
                        onChange={(e) => setRecapData({ ...recapData, isPublished: e.value })}
-                       name="isPublished"/>
+                       disabled={loading}/>
         </div>
 
         {/*  Premium*/}
@@ -544,16 +555,18 @@ const RightSidePanel = () => {
               value={recapData.isPremium ? 'True' : 'False'}
               severity={recapData.isPremium ? 'success' : 'danger'}
             />
+            <input type="hidden" name="isPremium" value={recapData.isPremium}/>
           </div>
           <InputSwitch checked={recapData.isPremium}
                        onChange={(e) => setRecapData({ ...recapData, isPremium: e.value })}
-                       name="isPremium"/>
+                       disabled={loading || recap.isPublished}/>
         </div>
 
         {/* Current Version */}
 
         <div>
           <label className="block font-medium text-gray-700 mb-1">Current version:</label>
+          <input type="hidden" name="currentVersionId" value={recapData.currentVersionId || ''}/>
           <div className="flex items-center gap-2">
             <Suspense
               fallback={
@@ -572,10 +585,10 @@ const RightSidePanel = () => {
               }>
                 {(versions) => (
                   <select
-                    name="currentVersionId"
                     value={recapData.currentVersionId || ''}
                     onChange={(e) => setRecapData({ ...recapData, currentVersionId: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-gray-100"
+                    disabled={loading || recap.isPublished}
                   >
                     <option value="">Select version</option>
                     {versions.map((version) => (
@@ -596,7 +609,7 @@ const RightSidePanel = () => {
         <div>
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || navigation.state === 'loading'}
             className="w-full bg-blue-500 text-white py-2 rounded-md font-medium disabled:bg-gray-300 hover:bg-blue-700"
           >
             Update

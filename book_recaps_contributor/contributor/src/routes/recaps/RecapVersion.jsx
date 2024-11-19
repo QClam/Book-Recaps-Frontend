@@ -1004,7 +1004,7 @@ const CreateAppealDialog = ({ dialogVisible, setDialogVisible, reviewId }) => {
                 onChange={(e) => setReason(e.target.value)}
                 disabled={isCreatingAppeal}
               />
-              <Modal.Footer className="-mx-5 mt-5 justify-end gap-3">
+              <Modal.Footer className="-mx-5 mt-5 justify-end gap-3 text-sm">
                 <button
                   className={cn({
                     "bg-gray-200 rounded py-1.5 px-3 border font-semibold hover:bg-gray-300": true,
@@ -1459,7 +1459,7 @@ const AudioTranscriptPreview = ({ hide, isOpen, audioUrl, transcriptUrl }) => {
           Your browser does not support the audio element.
         </audio>
       </Modal.Body>
-      <Modal.Footer className="justify-end gap-3">
+      <Modal.Footer className="justify-end gap-3 text-sm">
         <button
           className="bg-gray-200 rounded py-1.5 px-3 border font-semibold hover:bg-gray-300"
           type="button"

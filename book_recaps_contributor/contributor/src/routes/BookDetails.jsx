@@ -83,7 +83,7 @@ const BookDetails = () => {
                   placeholder="Tên bài viết tóm tắt"
                   required
                 />
-                <Modal.Footer className="-mx-5 mt-5 justify-end gap-3">
+                <Modal.Footer className="-mx-5 mt-5 justify-end gap-3 text-sm">
                   <button
                     className={cn({
                       "bg-gray-200 rounded py-1.5 px-3 border font-semibold hover:bg-gray-300": true,
