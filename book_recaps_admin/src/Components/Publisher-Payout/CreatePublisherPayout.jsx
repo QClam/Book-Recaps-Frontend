@@ -1,37 +1,99 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     Box, Typography, TextField, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Link, Grid
 } from '@mui/material';
-import { useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import dayjs from 'dayjs';
 
-function PublisherPayout() { 
+import api from '../Auth/AxiosInterceptors';
 
-    const {id} = useParams();
+function PublisherPayout() {
 
-    const [newPayout, setNewPayout] = useState({
-        fromDate: '01/02/2010',
-        toDate: new Date().toISOString().slice(0, 10), // current date
-        notes: '',
-        image: null,
-    });
+    const { id } = useParams();
+    const location = useLocation();
+    const navigate = useNavigate();
 
-    const payoutData = [
-        {
-            title: '...',
-            fromDate: '01-02-2010',
-            toDate: new Date().toISOString().slice(0, 10),
-            revenue: '12.000.000 VND',
-            contractId: 'contract id',
-        },
-        // Add more rows as needed
-    ];
+    const publisher = location.state; // Dữ liệu từ PublisherPayout 
+    const [books, setBooks] = useState(location.state?.bookDetails.$values || []);
 
-    const handleComplete = () => {
-        alert('Hoàn tất');
-    }; 
+    const [description, setDescription] = useState('');
+    const [image, setImage] = useState('');
+    const [previewImage, setPreviewImage] = useState(null); // URL preview ảnh
+    const [selectedImage, setSelectedImage] = useState(null); // File ảnh
+
+    console.log('Location State:', location.state);
+    if (!publisher) {
+        console.error('No initialData provided');
+    } else {
+        console.log('Initial Data:', publisher);
+        console.log('Books:', publisher?.bookDetails.$values);
+    }
+
+    const handleNoteChange = (event) => {
+        const note = event.target.value;
+        setDescription(note);
+    }
+
+    // Nếu không nhận đc state thì back về trang trước
+    useEffect(() => {
+        if (!publisher) {
+            alert('Dữ liệu không hợp lệ. Điều hướng về trang trước.');
+            navigate(-1); // Quay lại trang trước
+        }
+    }, [publisher, navigate]);
+
+    // Format Date để Render UI
+    const formatDate = (date) => {
+        return date ? new Date(date).toLocaleDateString() : 'N/A';
+    };
+
+    // Format Date để post lên Swagger
+    const formatDateISO = (date) => {
+        return date ? dayjs(date).format('YYYY-MM-DD') : null; // Định dạng yyyy-mm-dd
+    };
+
+    // Xử lý khi chọn ảnh
+    const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const preview = URL.createObjectURL(file); // Tạo URL xem trước ảnh
+            setPreviewImage(preview); // Cập nhật preview
+            setSelectedImage(file); // Lưu file ảnh vào state
+        }
+    };
+
+    const postPayoutForm = async () => {
+
+        if (!selectedImage) {
+            alert('Vui lòng chọn ảnh trước khi gửi!');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('ImageURL', selectedImage); // Gắn tệp ảnh vào FormData
+
+        const params = {
+            description: description || "Không có ghi chú",
+            toDate: formatDateISO(publisher?.toDate),
+        }
+
+        try {
+            const response = await api.post(
+                `/api/PublisherPayout/createpayout/${publisher?.publisherId}`, formData, { params });
+            console.log('Quyết Toán:', response.data.data);
+            alert('Tạo quyết toán thành công!');
+        } catch (error) {
+            console.error('Error:', error.response?.data || error.message);
+            alert('Không thể tạo quyết toán. Vui lòng thử lại.');
+        }
+    }
+
+    const handleComplete = async () => {
+        await postPayoutForm();
+    };
 
     return (
-        <div className='publisher-payout-container'>
+        <Box sx={{ width: "80vw" }}>
             <Box padding={3}>
                 {/* Quyết toán tiền bản quyền */}
                 <Typography variant='h5'>Quyết toán bản quyền</Typography>
@@ -52,7 +114,7 @@ function PublisherPayout() {
                                         <Typography variant="body1" fontWeight="bold">
                                             Nhà xuất bản:
                                         </Typography>
-                                        <Typography variant="body1">Nhà xuất bản 1 thành viên</Typography>
+                                        <Typography variant="body1">{publisher.publisherName || 'N/A'}</Typography>
                                     </Box>
                                     <Box display="flex" justifyContent="space-between" mb={1}>
                                         <Typography variant="body1" fontWeight="bold">
@@ -81,15 +143,17 @@ function PublisherPayout() {
                                 >
                                     <Box display="flex" justifyContent="space-between" mb={1}>
                                         <Typography variant="body1" fontWeight="bold">
-                                            Đợt quyết toán gần nhất:
+                                            Đợt quyết toán:
                                         </Typography>
-                                        <Typography variant="body1">01/10/2024 tới 01/11/2024</Typography>
+                                        <Typography variant="body1">
+                                            {formatDate(publisher?.fromDate)} - {formatDate(publisher?.toDate)}
+                                        </Typography>
                                     </Box>
                                     <Box display="flex" justifyContent="space-between" mb={1}>
                                         <Typography variant="body1" fontWeight="bold">
-                                            Tổng chi gần nhất:
+                                            Tổng chi:
                                         </Typography>
-                                        <Typography variant="body1">30.000.000 VND</Typography>
+                                        <Typography variant="body1">{publisher.totalEarnings || 0} VND</Typography>
                                     </Box>
                                     <Box display="flex" justifyContent="space-between">
                                         <Link href={`/publisher-payout-history/${id}`} underline="hover">Xem lịch sử quyết toán</Link>
@@ -104,12 +168,46 @@ function PublisherPayout() {
                 <Box borderBottom={1} mb={3} pb={2}>
                     <Typography variant="h6" gutterBottom>Tạo quyết toán mới</Typography>
                     <Box display="flex" gap={2}>
-                        <TextField label="From" value={newPayout.fromDate}  fullWidth />
-                        <TextField label="To" value={newPayout.toDate}  fullWidth />
-                        <Button variant="outlined" component="label" fullWidth>
-                            Upload
-                            <input type="file" hidden onChange={(e) => setNewPayout({ ...newPayout, image: e.target.files[0] })} />
-                        </Button>
+                        <TextField label="Từ ngày" value={formatDate(publisher?.fromDate)} />
+                        <TextField label="Đến ngày" value={formatDate(publisher?.toDate)} />
+
+                        <Box display="flex"
+                            alignItems="center"
+                        >
+                            {previewImage && (
+                                <img
+                                    src={previewImage}
+                                    alt="Preview"
+                                    style={{
+                                        width: '300px',
+                                        height: 'auto',
+                                        border: '1px solid #ddd',
+                                        borderRadius: '8px',
+                                        padding: '4px',
+                                        marginRight: '16px',
+                                    }}
+                                />
+                            )}
+
+                            <Button
+                                variant="outlined"
+                                component="label"
+                                sx={{
+                                    mt: 2,
+                                    display: 'block',
+                                    margin: '0 auto',
+                                    zIndex: 1,
+                                }}
+                            >
+                                {previewImage ? "Chọn lại ảnh" : "Tải ảnh lên"}
+                                <input
+                                    type="file"
+                                    hidden
+                                    accept="image/*"
+                                    onChange={handleFileChange}
+                                />
+                            </Button>
+                        </Box>
                     </Box>
                     <Box mt={2}>
                         <TextField
@@ -117,8 +215,8 @@ function PublisherPayout() {
                             multiline
                             rows={4}
                             fullWidth
-                            value={newPayout.notes}
-                            onChange={(e) => setNewPayout({ ...newPayout, notes: e.target.value })}
+                            value={description}
+                            onChange={handleNoteChange}
                         />
                     </Box>
                 </Box>
@@ -134,17 +232,15 @@ function PublisherPayout() {
                                     <TableCell>Từ ngày</TableCell>
                                     <TableCell>Tới ngày</TableCell>
                                     <TableCell>Doanh thu</TableCell>
-                                    <TableCell>Hợp đồng</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {payoutData.map((item, index) => (
-                                    <TableRow key={index}>
-                                        <TableCell>{item.title}</TableCell>
-                                        <TableCell>{item.fromDate}</TableCell>
-                                        <TableCell>{item.toDate}</TableCell>
-                                        <TableCell>{item.revenue}</TableCell>
-                                        <TableCell>{item.contractId}</TableCell>
+                                {books.map((item) => (
+                                    <TableRow key={item.bookId}>
+                                        <TableCell>{item.bookTitle}</TableCell>
+                                        <TableCell>{formatDate(publisher?.fromDate)}</TableCell>
+                                        <TableCell>{formatDate(publisher?.toDate)}</TableCell>
+                                        <TableCell>{item.bookEarnings} VND</TableCell>
                                     </TableRow>
                                 ))}
                             </TableBody>
@@ -154,11 +250,11 @@ function PublisherPayout() {
 
                 {/* Tổng tiền và hoàn tất */}
                 <Box display="flex" justifyContent="space-between" mt={3}>
-                    <Typography variant="h6">Tổng tiền: 30.000.000 VND</Typography>
+                    <Typography variant="h6">Tổng tiền: {publisher.totalEarnings} VND</Typography>
                     <Button variant="contained" color="primary" onClick={handleComplete}>Hoàn tất</Button>
                 </Box>
             </Box >
-        </div>
+        </Box>
     );
 }
 

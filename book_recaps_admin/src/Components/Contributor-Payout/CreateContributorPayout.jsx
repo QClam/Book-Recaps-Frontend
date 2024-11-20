@@ -1,6 +1,8 @@
 import { Box, Button, Grid, Link, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import dayjs from 'dayjs';
+
 import api from '../Auth/AxiosInterceptors';
 
 function CreateContributorPayout() {
@@ -18,6 +20,7 @@ function CreateContributorPayout() {
         description: '',
         toDate: '',
     })
+    
     console.log('Location State:', location.state);
     if (!contributor) {
         console.error('No initialData provided');
@@ -46,7 +49,7 @@ function CreateContributorPayout() {
 
     // Format Date để post lên Swagger
     const formatDateISO = (date) => {
-        return date ? new Date(date).toLocaleDateString('en-us') : null; // Định dạng yyyy-mm-dd
+        return date ? dayjs(date).format('YYYY-MM-DD') : null; // Định dạng yyyy-mm-dd
     };
 
     const postPayoutForm = async () => {
@@ -62,13 +65,12 @@ function CreateContributorPayout() {
             alert('Tạo quyết toán thành công!');
         } catch (error) {
             console.error('Lỗi khi tạo quyết toán:', error);
-            alert('Không thể tạo quyết toán. Vui lòng thử lại.');
+            alert('Không thể tạo quyết toán. Vui lòng thử lại. Thiếu ghi chú');
         }
     }
 
     const handleComplete = async () => {
         await postPayoutForm();
-        alert('Hoàn tất');
     };
 
     return (

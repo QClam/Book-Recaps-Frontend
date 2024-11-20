@@ -87,7 +87,7 @@ function PublisherList() {
                                 Tài khoản Ngân Hàng
                             </TableCell>
                             <TableCell sx={{ fontWeight: "bold" }}>
-                                Phần trăm lợi nhuận
+                                Lợi nhuận
                             </TableCell>
                             <TableCell></TableCell>
                         </TableRow>
@@ -98,7 +98,7 @@ function PublisherList() {
                                 <TableCell>{item.publisherName}</TableCell>
                                 <TableCell>{item.contactInfo}</TableCell>
                                 <TableCell>{item.bankAccount}</TableCell>
-                                <TableCell>{item.revenueSharePercentage}</TableCell>
+                                <TableCell>{item.revenueSharePercentage} %</TableCell>
                                 <TableCell>
                                     <Button
                                         variant="outlined"
@@ -155,7 +155,7 @@ function PublisherList() {
                     )}
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleClose} color="primary">
+                    <Button onClick={handleClose} color="error">
                         Hủy
                     </Button>
                     <Button onClick={updatePublisher} color="primary" variant="contained">

@@ -123,6 +123,7 @@ function ContributorPayout() {
         }
     };
 
+    // Select tên Contributor trong form tạo quyết toán
     const handleContributorChange = (event) => {
         const contributorId = event.target.value;
 
@@ -142,6 +143,8 @@ function ContributorPayout() {
         setSelectedContributorName(contributorName);
         setStartDate(startDate);
         setEndDate(endDate);
+        console.log(startDate);
+
     };
 
     if (loading) {
