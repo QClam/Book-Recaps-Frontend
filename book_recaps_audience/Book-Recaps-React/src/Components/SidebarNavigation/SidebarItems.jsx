@@ -3,11 +3,12 @@ import React from 'react';
 import { Home, Search, LibraryBooks, Person, BorderColor, MenuBook, Settings, HelpOutline, Logout, Category, AutoAwesome  } from '@mui/icons-material';
 
 export const SidebarItems = [
-    // {
-    //     title: "For You",
-    //     icon: <Home />,
-    //     link: "/for-you",
-    // },
+    {
+        title: "Home",
+        icon: <Home />,
+        link: "/home",
+    },
+
     {
         title: "Explore",
         icon: <Search />,
@@ -34,24 +35,30 @@ export const SidebarItems = [
         link: "/playlist",
     },
     
-    // {
-    //     title: "Highlights",
-    //     icon: <BorderColor />,
-    //     link: "/highlights",
-    // },
-    {
-        title: "Recap",
-        icon: <AutoAwesome />,
-        link: "/contributor",
-    },
-    
 
+
+    // {
+    //     title: "Recap",
+    //     icon: <AutoAwesome />,
+    //     link: "/contributor",
+    // },
+    
+    {
+        title: "History",
+        icon: <BorderColor />,
+        link: "/history",
+    },
     
     {
         title: "Settings",
         icon: <Settings />,
         link: "/settings",
     },
+    // {
+    //     title: "New",
+    //     icon: <HelpOutline />,
+    //     link: "/new",
+    // },
     // {
     //     title: "Support",
     //     icon: <HelpOutline />,

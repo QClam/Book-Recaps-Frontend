@@ -284,21 +284,21 @@ const getUserNotesKey = (userId) => `transcriptNotes_${userId}`;
     }
 
     // Fetch highlights from the server as well
-    // const fetchUserHighlights = async () => {
-    //   try {
-    //     const response = await axios.get(`https://160.25.80.100:7124/api/highlight/gethighlightbyrecapid/${recapVersionId}?userId=${userId}`);
-    //     if (response.data && response.data.data && response.data.data.$values) {
-    //       const apiHighlights = response.data.data.$values.map(item => `sentence-${item.sentenceIndex}`);
-    //       setHighlightedSentences(apiHighlights);
-    //       // Save to localStorage for persistence
-    //       localStorage.setItem(getUserHighlightsKey(userId), JSON.stringify(apiHighlights));
-    //     }
-    //   } catch (error) {
-    //     console.error("Error fetching highlights:", error);
-    //   }
-    // };
+    const fetchUserHighlights = async () => {
+      try {
+        const response = await axios.get(`https://160.25.80.100:7124/api/highlight/gethighlightbyrecapid/${recapVersionId}?userId=${userId}`);
+        if (response.data && response.data.data && response.data.data.$values) {
+          const apiHighlights = response.data.data.$values.map(item => `sentence-${item.sentenceIndex}`);
+          setHighlightedSentences(apiHighlights);
+          // Save to localStorage for persistence
+          localStorage.setItem(getUserHighlightsKey(userId), JSON.stringify(apiHighlights));
+        }
+      } catch (error) {
+        console.error("Error fetching highlights:", error);
+      }
+    };
 
-    // fetchUserHighlights();
+    fetchUserHighlights();
   }, [userId, recapVersionId]); 
 
 
@@ -383,6 +383,9 @@ const getUserNotesKey = (userId) => `transcriptNotes_${userId}`;
       <h4>Transcript:</h4>
       {transcriptContent && transcriptContent.transcriptSections.map((section, sectionIndex) => (
         <div key={sectionIndex} className="transcript-part">
+           {/* Display the title of the section */}
+           {section.title && <h3 className="transcript-title">{section.title}</h3>}
+
           {section.transcriptSentences.map((sentence, sentenceIndex) => {
             const time = sentence.start;
             const sentenceId = `sentence-${sectionIndex}-${sentenceIndex}`;

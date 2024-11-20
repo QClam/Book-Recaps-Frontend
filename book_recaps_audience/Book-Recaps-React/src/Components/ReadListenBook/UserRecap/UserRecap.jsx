@@ -64,6 +64,8 @@ const UserRecap = () => {
     navigate(`/user-recap-detail/${book.id}`); // Navigate to UserRecapDetail with the book ID
   };
 
+
+  
   const displayedBooks = showAll ? books : books.slice(0, 12); // Show first 8 books by default
 
   const truncateTitle = (title) => {

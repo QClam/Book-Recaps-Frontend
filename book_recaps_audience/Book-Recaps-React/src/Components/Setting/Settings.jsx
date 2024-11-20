@@ -29,6 +29,7 @@ function Settings() {
     const [imageUpdateModalOpen, setImageUpdateModalOpen] = useState(false)
     const [imageFile, setImageFile] = useState(null); // New state to store selected image file
     const [imageUploadLoading, setImageUploadLoading] = useState(false);
+    const [subscriptionPackageName, setSubscriptionPackageName] = useState('');
 
     const handleViewApplication = () => {
         navigate('/application'); // Navigate to the Application route
@@ -74,6 +75,12 @@ function Settings() {
                         birthDate: data.birthDate || '',
                         address: data.address || '',
                     });
+                    // Fetch subscription package if available
+            if (data.subscriptions && data.subscriptions.$values.length > 0) {
+                const subscriptionPackageId = data.subscriptions.$values[0].subscriptionPackageId;
+                fetchSubscriptionPackage(subscriptionPackageId); // Fetch subscription package name
+            }
+
                 } else {
                     console.error('Profile data is not available');
                 }
@@ -95,6 +102,32 @@ function Settings() {
             [name]: value,
         }));
     };
+
+    // Fetch subscription package name based on subscriptionPackageId
+   const fetchSubscriptionPackage = async (subscriptionPackageId) => {
+    const accessToken = localStorage.getItem('authToken');
+    try {
+        const response = await fetch(`https://160.25.80.100:7124/api/subscriptionpackages/getpackagebyid/${subscriptionPackageId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${accessToken}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+
+        const packageData = await response.json();
+        if (packageData && packageData.data) {
+            setSubscriptionPackageName(packageData.data.name); // Set the subscription package name
+        }
+    } catch (error) {
+        console.error('Error fetching subscription package:', error);
+    }
+};
+
 
     // Handle profile update
     const handleUpdateProfile = async () => {
@@ -372,6 +405,11 @@ function Settings() {
                                 <span>No Image Available</span>
                             )}
                         </div>
+                        <div className="info-item">
+                    <label>Subscription Package</label>
+                    <span>{subscriptionPackageName || "No subscription"}</span> {/* Display subscription package name */}
+                </div>
+
                          {/* Image Upload Section */}
                          {/* <div>
                     <h3>Update Profile Image</h3>

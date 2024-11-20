@@ -6,6 +6,35 @@ import RecapItem from './RecapItem'; // Import component RecapItem
 import CreatePlaylistModal from './PlaylistModal/CreatePlaylistModal';
 import ReportIssueModal from './ReportIssueModal/ReportIssueModal';
 
+const resolveRefs = (data) => {
+  const refMap = new Map();
+  const createRefMap = (obj) => {
+    if (typeof obj !== "object" || obj === null) return;
+    if (obj.$id) {
+      refMap.set(obj.$id, obj);
+    }
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        createRefMap(obj[key]);
+      }
+    }
+  };
+  const resolveRef = (obj) => {
+    if (typeof obj !== "object" || obj === null) return obj;
+    if (obj.$ref) {
+      return refMap.get(obj.$ref);
+    }
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        obj[key] = resolveRef(obj[key]);
+      }
+    }
+    return obj;
+  };
+  createRefMap(data);
+  return resolveRef(data);
+};
+
 
 const UserRecapDetail = () => {
   const { id } = useParams(); // Get book ID from URL
@@ -20,6 +49,8 @@ const UserRecapDetail = () => {
   const [recapVersionId, setRecapVersionId] = useState(null); // State for storing recapVersionId
   const [isReportModalOpen, setIsReportModalOpen] = useState(false); // State for report modal
   const [successMessage, setSuccessMessage] = useState(null); // State for success message
+  const [likeCount, setLikeCount] = useState(0); // State to store the number of likes
+  const [recapId2, setRecapId2] = useState(null);  // Khai báo recapId2 từ useState
 
 
   const handleSaveClick = () => {
@@ -43,6 +74,7 @@ const UserRecapDetail = () => {
   //   // Here, you can add the code to send the report data to your backend API.
   // };
 
+  
   useEffect(() => {
     if (bookInfo && bookInfo.title) {
       localStorage.setItem("selectedBookTitle", bookInfo.title); // Lưu tên sách vào localStorage
@@ -82,8 +114,15 @@ const UserRecapDetail = () => {
         });
 
         if (response.data.succeeded) {
-          setBookInfo(response.data.data);
-          fetchRecapList(response.data.data.recaps.$values);
+          // resolveRefs(setBookInfo(response.data.data));
+          // resolveRefs(fetchRecapList(response.data.data.recaps.$values));
+          const resolvedData = resolveRefs(response.data.data);
+        setBookInfo(resolvedData);
+        
+        // Fetch the list of recaps associated with the book
+        const recaps = resolvedData.recaps?.$values || [];
+        fetchRecapList(recaps);
+
         } else {
           setErrorMessage('Failed to fetch book details');
         }
@@ -106,7 +145,7 @@ const UserRecapDetail = () => {
                 'Content-Type': 'application/json',
               },
             });
-            return recapResponse.data;
+            return resolveRefs(recapResponse.data);
           } catch (error) {
             console.error(`Error fetching recap with ID: ${recap.id}`, error);
             return null;
@@ -115,6 +154,7 @@ const UserRecapDetail = () => {
     
         const fetchedRecaps = await Promise.all(detailsPromises);
         const validRecaps = fetchedRecaps.filter(recap => recap !== null);
+    
         setRecapList(validRecaps);
     
         // Set the recapId and recapVersionId from the first recap if available
@@ -149,9 +189,10 @@ const UserRecapDetail = () => {
     return <p className="error-notice">{errorMessage}</p>;
   }
 
-  const handleLikeClick = () => {
-    setLiked(!liked);
-  };
+
+  // const handleLikeClick = () => {
+  //   setLiked(!liked);
+  // };
 
   // Function to handle form submission to API
   const handleReportSubmit = async (reportData) => {
@@ -180,6 +221,96 @@ const UserRecapDetail = () => {
       console.error('Error reporting issue:', error);
     }
   };
+
+  // 1. Lấy số lượng like và trạng thái like từ API khi component được render lần đầu tiên
+  useEffect(() => { 
+    // Kiểm tra trạng thái like từ localStorage khi người dùng đã like trước đó
+    const savedLikedState = localStorage.getItem(`liked_${userId}_${recapId}`);
+    if (savedLikedState) {
+      setLiked(JSON.parse(savedLikedState)); // Cập nhật trạng thái like từ localStorage
+    }
+  
+    const fetchLikeCount = async () => {
+      try {
+        console.log("recapId:", recapId); 
+        const response = await axios.get(
+          `https://160.25.80.100:7124/api/likes/count/${recapId}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+            },
+          }
+        );
+        
+        if (response.status === 200) {
+          setLikeCount(response.data.data); // Cập nhật số lượng like từ API
+        } else {
+          console.error('Error fetching like count:', response.data);
+        }
+      } catch (error) {
+        console.error('Error fetching like count:', error.response?.data || error.message);
+      }
+    };
+  
+    fetchLikeCount(); // Gọi API để lấy số lượng like khi component mount
+  }, [recapId, accessToken, userId]); // Fetch lại khi recapId, accessToken hoặc userId thay đổi
+  
+  // 2. Hàm xử lý khi người dùng nhấn like hoặc hủy like
+  const handleLikeClick = async () => {
+    try {
+      console.log("recapId:", recapId); 
+      let response;
+      if (liked) {
+        // Gửi yêu cầu DELETE để hủy like
+        response = await axios.delete(
+          `https://160.25.80.100:7124/api/likes/remove/${recapId}`,
+          {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+            },
+          }
+        );
+  
+        if (response.status === 200) {
+          const newLikedState = false;
+          setLiked(newLikedState); // Cập nhật trạng thái like
+          localStorage.setItem(`liked_${userId}_${recapId}`, JSON.stringify(newLikedState)); // Lưu trạng thái like vào localStorage cho người dùng cụ thể
+          // Cập nhật số lượng like ngay lập tức sau khi hủy like
+          setLikeCount(likeCount - 1); // Giảm số lượng like
+        } else {
+          console.error('Error removing like:', response.data);
+        }
+      } else {
+        // Gửi yêu cầu POST để thêm like
+        response = await axios.post(
+          `https://160.25.80.100:7124/api/likes/createlike/${recapId}`,
+          {
+            recapId: recapId, 
+            userId: userId, 
+          },
+          {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+  
+        if (response.status === 200) {
+          const newLikedState = true;
+          setLiked(newLikedState); // Cập nhật trạng thái like
+          localStorage.setItem(`liked_${userId}_${recapId}`, JSON.stringify(newLikedState)); // Lưu trạng thái like vào localStorage cho người dùng cụ thể
+          // Cập nhật số lượng like ngay lập tức sau khi like
+          setLikeCount(likeCount + 1); // Tăng số lượng like
+        } else {
+          console.error('Error liking recap:', response.data);
+        }
+      }
+    } catch (error) {
+      console.error('Error handling like action:', error.response?.data || error.message);
+    }
+  };
+  
 
   return (
     <div className="book-info-container">
@@ -218,9 +349,16 @@ const UserRecapDetail = () => {
               <span className="saved-label" onClick={handleSaveClick}>
                 🔖 Save in My Playlist
               </span>
-              <span className="saved-like" onClick={handleLikeClick}>
-                {liked ? '❤️ Liked' : '🤍 Like'}
-              </span>
+              <span
+        className={`saved-like ${liked ? 'liked' : 'not-liked'}`}
+        onClick={handleLikeClick}
+        style={{ color: liked ? 'red' : 'black' }} // Đổi màu trái tim khi liked
+      >
+        {liked ? '❤️ Liked' : '🤍 Like'}
+      </span>
+      <h3>{likeCount} Likes</h3> {/* Hiển thị số lượng like */}
+
+
 
               {/* Modal for playlist creation */}
               <CreatePlaylistModal
@@ -246,10 +384,13 @@ const UserRecapDetail = () => {
             {bookInfo.recaps && bookInfo.recaps.$values.length > 0 ? (
               <ul className="recap-items">
                 {recapList.map((recapDetail) => (
+                  
                   <RecapItem key={recapDetail.data.id} recapDetail={recapDetail} accessToken={accessToken} 
                   userId={userId} // Pass userId here
                    recapVersionId={recapVersionId} // Pass recapVersionId here
+                   recapId={recapId}
                   />
+                  
                 ))}
               </ul>
             ) : (

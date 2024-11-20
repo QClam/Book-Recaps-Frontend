@@ -121,10 +121,16 @@ const PlaylistBook = () => {
   };
   
 
-  const handleBookClick = (book) => {
-    // Chỉ điều hướng nếu nhấp chuột trái
+  // const handleBookClick = (book) => {
+  //   // Chỉ điều hướng nếu nhấp chuột trái
    
-      navigate(`/user-recap-detail/${book.id}`);
+  //     navigate(`/user-recap-detail/${book.id}`);
+   
+  // };
+
+  const handleBookClick = (book) => {
+   
+      navigate(`/user-recap-detail-item/${book.id}`);
    
   };
   

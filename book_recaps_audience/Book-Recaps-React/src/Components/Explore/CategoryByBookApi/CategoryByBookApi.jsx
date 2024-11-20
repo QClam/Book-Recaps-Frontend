@@ -183,9 +183,14 @@ const CategoryByBookApi = () => {
       );
 
    // Hàm điều hướng khi click vào sách
-   const handleBookClick = (id) => {
-    navigate(`/user-recap-detail/${id}`); // Navigate to UserRecapDetail with the book ID
+  //  const handleBookClick = (id) => {
+  //   navigate(`/user-recap-detail/${id}`); // Navigate to UserRecapDetail with the book ID
+  // };
+
+  const handleBookClick = (id) => {
+    navigate(`/user-recap-detail-item/${id}`); // Navigate to UserRecapDetail with the book ID
   };
+
 
   return (
     <div className="custom-category-wrapper">

@@ -109,6 +109,8 @@ const Application = () => {
            
             <th>Descriptions</th>
             <th>Status</th>
+            
+            <th>Response</th>
             <th>Create Date</th>
           </tr>
         </thead>
@@ -124,6 +126,8 @@ const Application = () => {
                 {ticket.status === 0 ? 'Inprogress' : 'Done'}
 
               </td>
+              
+              <td>{ticket.response }</td>
               <td>{new Date(ticket.createdAt).toLocaleDateString()}</td>
             </tr>
           ))}

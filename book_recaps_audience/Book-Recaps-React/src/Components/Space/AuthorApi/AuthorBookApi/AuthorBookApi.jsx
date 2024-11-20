@@ -89,9 +89,14 @@ const AuthorBookApi = () => {
     }
   };
 
+  // const handleBookClick = (id) => {
+  //   navigate(`/user-recap-detail/${id}`); // Navigate to UserRecapDetail with the book ID
+  // };
+
   const handleBookClick = (id) => {
-    navigate(`/user-recap-detail/${id}`); // Navigate to UserRecapDetail with the book ID
+    navigate(`/user-recap-detail-item/${id}`); // Navigate to UserRecapDetail with the book ID
   };
+
 
   return (
     <div className="author-books-page">

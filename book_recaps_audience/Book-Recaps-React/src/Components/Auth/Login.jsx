@@ -147,19 +147,35 @@ function Login() {
       if (accessToken && refreshToken) {
         localStorage.setItem("authToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
-        // console.log("AccessToken saved to localStorage:", accessToken);
-        // console.log("RefreshToken saved to localStorage:", refreshToken);
+       
+        // Fetch the user's profile to check if they have completed onboarding
+      const profileResponse = await axios.get("https://160.25.80.100:7124/api/personal/profile", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const { isOnboarded } = profileResponse.data;
+
+      if (isOnboarded) {
+        // Redirect to /explore if the user is onboarded
+        navigate("/explore");
       } else {
-        console.error("Tokens not found in API response");
-        setError("Không tìm thấy token trong phản hồi của API.");
+        // Redirect to /onboarding if the user is not onboarded
+        navigate("/onboarding");
       }
-    
-      navigate("/explore"); // Navigate to the home page after successful login
-    } catch (error) {
-      console.error("Error logging in:", error.response ? error.response.data : error.message);
-      setError("Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản và mật khẩu.");
+    } else {
+      console.error("Tokens not found in API response");
+      setError("Không tìm thấy token trong phản hồi của API.");
     }
-  };
+  } catch (error) {
+    console.error("Error logging in:", error.response ? error.response.data : error.message);
+    setError("Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản và mật khẩu.");
+  }
+};
+
+
+
   
   const forgetPasswordClick = () => {
     navigate("/forget-password");

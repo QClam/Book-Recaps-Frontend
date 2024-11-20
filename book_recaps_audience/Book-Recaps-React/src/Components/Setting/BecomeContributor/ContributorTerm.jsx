@@ -2,6 +2,9 @@ import React, { useState } from 'react';
 import './ContributorTerm.scss';
 import axios from 'axios';
 import RecapImage from "../../../image/removeBR.png";
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const ContributorTerm = () => {
   const [formData, setFormData] = useState({
     agreed: false,
@@ -79,11 +82,13 @@ const ContributorTerm = () => {
           } catch (retryError) {
             console.error("Retry failed:", retryError);
             setError("Failed to update role after token refresh.");
+            toast.error("Something went wrong, please try again.", { position: "top-center" }); 
           }
         }
       } else {
         console.error("Error during submission:", error);
         setError("An error occurred. Please try again.");
+        toast.error("Bạn đã trở thành Contributor rồi.", { position: "top-right" }); 
       }
     }
   };
@@ -174,7 +179,7 @@ const ContributorTerm = () => {
         </label>
         </div>
 
-        <div className="form-group">
+        {/* <div className="form-group">
           <label>Name</label>
           <div className="name-fields">
             <input
@@ -218,7 +223,7 @@ const ContributorTerm = () => {
             onChange={handleChange}
             required
         />
-        </div>
+        </div> */}
 
             {error && <p className="error-message">{error}</p>}
             <button type="submit" className="submit-button">Submit</button>

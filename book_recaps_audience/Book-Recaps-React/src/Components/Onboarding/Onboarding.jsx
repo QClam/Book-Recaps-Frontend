@@ -322,7 +322,7 @@ const Onboarding = ({ onComplete = () => {} }) => {
           <p>We will tailor your experience based on your preferences.</p>
           {/* <p>Improvement: {preferences.improvement}</p>  */}
           <p>Topics: {preferences.topics.join(', ')}</p>
-          <p>Format: {preferences.format}</p>
+        
           <p>Desired Book: {preferences.desiredBook}</p>
           <p>Authors: {preferences.authors.join(', ')}</p>
         </div>

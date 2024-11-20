@@ -129,8 +129,12 @@ const BookListCategory = () => {
   //   navigate(`/bookdetailbook/${id}`); // Sử dụng id của sách để điều hướng
   // };
 
+  // const handleBookClick = (id) => {
+  //   navigate(`/user-recap-detail/${id}`); // Navigate to UserRecapDetail with the book ID
+  // };
+
   const handleBookClick = (id) => {
-    navigate(`/user-recap-detail/${id}`); // Navigate to UserRecapDetail with the book ID
+    navigate(`/user-recap-detail-item/${id}`); // Navigate to UserRecapDetail with the book ID
   };
   //chạy qua class BookDetailBook qua tiep RecapDetail
 

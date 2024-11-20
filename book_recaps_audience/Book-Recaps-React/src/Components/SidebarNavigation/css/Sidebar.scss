@@ -11,7 +11,7 @@
   justify-content: space-between;
   padding: 0 20px;
   z-index: 1000; /* Đảm bảo Sidebar nằm trên các thành phần khác */
-  margin-right: 10px;
+  margin-right: 5px;
 }
 
 .Sidebar-bar {
@@ -25,7 +25,7 @@
   display: flex;
   align-items: center;
   margin-left: 10px;
-  margin-right: 30px; /* Khoảng cách giữa logo và danh sách */
+  margin-right: 20px; /* Khoảng cách giữa logo và danh sách */
 }
 
 .SidebarLogo img {
@@ -43,7 +43,7 @@
 }
 
 .SidebarList .row {
-  margin-right: 40px;
+  margin-right: 20px;
   display: flex;
   align-items: center;
   color: #fff;

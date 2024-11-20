@@ -263,7 +263,7 @@ const BookApi = () => {
   //   navigate(`/bookdetailbook/${id}`); // Use the book's id for navigation
   // };
   const handleBookClick = (id) => {
-    navigate(`/user-recap-detail/${id}`); // Navigate to UserRecapDetail with the book ID
+    navigate(`/user-recap-detail-item/${id}`); // Navigate to UserRecapDetail with the book ID
   };
 
   return (

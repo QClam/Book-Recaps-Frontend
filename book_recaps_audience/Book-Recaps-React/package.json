@@ -33,6 +33,7 @@
     "react-router-dom": "^6.26.2",
     "react-scripts": "^5.0.1",
     "react-slick": "^0.30.2",
+    "react-toastify": "^10.0.6",
     "react-use": "^17.5.1",
     "reactjs-editor": "^10.0.1",
     "sass": "^1.78.0",
