@@ -8,8 +8,16 @@ function CreateContributorPayout() {
     const { id } = useParams();
     const location = useLocation();
     const navigate = useNavigate();
+
     const contributor = location.state; // Dữ liệu từ ContributorPayout 
     const [recaps, setRecps] = useState(location.state?.recapDetails.$values || []);
+    const [description, setDescription] = useState('');
+
+    const [payoutForm, setPayoutForm] = useState({
+        contributorId: '',
+        description: '',
+        toDate: '',
+    })
     console.log('Location State:', location.state);
     if (!contributor) {
         console.error('No initialData provided');
@@ -18,23 +26,48 @@ function CreateContributorPayout() {
         console.log('Recaps:', contributor?.recapDetails);
     }
 
-    const [newPayout, setNewPayout] = useState({
-        fromDate: '01-02-2010',
-        toDate: new Date().toISOString().slice(0, 10), // current date
-        notes: '',
-        image: null,
-    });
+    const handleNoteChange = (event) => {
+        const note = event.target.value;
+        setDescription(note);
+    }
 
-    // Nếu cần fallback data khi không nhận được state
+    // Nếu không nhận đc state thì back về trang trước
     useEffect(() => {
         if (!contributor) {
-            // Nếu không có `state`, điều hướng về trang trước hoặc xử lý fallback
             alert('Dữ liệu không hợp lệ. Điều hướng về trang trước.');
             navigate(-1); // Quay lại trang trước
         }
     }, [contributor, navigate]);
 
-    const handleComplete = () => {
+    // Format Date để Render UI
+    const formatDate = (date) => {
+        return date ? new Date(date).toLocaleDateString() : 'N/A';
+    };
+
+    // Format Date để post lên Swagger
+    const formatDateISO = (date) => {
+        return date ? new Date(date).toLocaleDateString('en-us') : null; // Định dạng yyyy-mm-dd
+    };
+
+    const postPayoutForm = async () => {
+
+        const params = {
+            description: description,
+            toDate: formatDateISO(contributor?.todate),
+        }
+
+        try {
+            const response = await api.post(`/api/contributorpayout/createpayout/${contributor?.contributorId}`, null, { params });
+            console.log('Quyết Toán:', response.data);
+            alert('Tạo quyết toán thành công!');
+        } catch (error) {
+            console.error('Lỗi khi tạo quyết toán:', error);
+            alert('Không thể tạo quyết toán. Vui lòng thử lại.');
+        }
+    }
+
+    const handleComplete = async () => {
+        await postPayoutForm();
         alert('Hoàn tất');
     };
 
@@ -60,19 +93,13 @@ function CreateContributorPayout() {
                                         <Typography variant="body1" fontWeight="bold">
                                             Tên Contributor:
                                         </Typography>
-                                        <Typography variant="body1">{contributor.contributorName}</Typography>
-                                    </Box>
-                                    <Box display="flex" justifyContent="space-between" mb={1}>
-                                        <Typography variant="body1" fontWeight="bold">
-                                            Tài khoản ngân hàng:
-                                        </Typography>
-                                        <Typography variant="body1">...</Typography>
+                                        <Typography variant="body1">{contributor.contributorName || 'N/A'}</Typography>
                                     </Box>
                                     <Box display="flex" justifyContent="space-between">
                                         <Typography variant="body1" fontWeight="bold">
                                             Thông tin liên hệ:
                                         </Typography>
-                                        <Typography variant="body1">...</Typography>
+                                        <Typography variant="body1">{contributor.email || 'N/A'}</Typography>
                                     </Box>
                                 </Paper>
                             </Grid>
@@ -89,17 +116,17 @@ function CreateContributorPayout() {
                                 >
                                     <Box display="flex" justifyContent="space-between" mb={1}>
                                         <Typography variant="body1" fontWeight="bold">
-                                            Đợt quyết toán gần nhất:
+                                            Đợt quyết toán:
                                         </Typography>
                                         <Typography variant="body1">
-                                            {new Date(contributor.fromdate).toLocaleDateString()} - {new Date(contributor.todate).toLocaleDateString()}
+                                            {formatDate(contributor?.fromdate)} - {formatDate(contributor?.todate)}
                                         </Typography>
                                     </Box>
                                     <Box display="flex" justifyContent="space-between" mb={1}>
                                         <Typography variant="body1" fontWeight="bold">
-                                            Tổng chi gần nhất:
+                                            Tổng chi:
                                         </Typography>
-                                        <Typography variant="body1">{contributor.totalEarnings} VND</Typography>
+                                        <Typography variant="body1">{contributor.totalEarnings || 0} VND</Typography>
                                     </Box>
                                     <Box display="flex" justifyContent="space-between">
                                         <Link href={`/contributor-payout-history/${id}`} underline="hover">Xem lịch sử quyết toán</Link>
@@ -114,12 +141,8 @@ function CreateContributorPayout() {
                 <Box borderBottom={1} mb={3} pb={2}>
                     <Typography variant="h6" gutterBottom>Tạo quyết toán mới</Typography>
                     <Box display="flex" gap={2}>
-                        <TextField label="From" value={new Date(contributor.fromdate).toLocaleDateString()} fullWidth />
-                        <TextField label="To" value={new Date(contributor.todate).toLocaleDateString()} fullWidth />
-                        <Button variant="outlined" component="label" fullWidth>
-                            Upload
-                            <input type="file" hidden onChange={(e) => setNewPayout({ ...newPayout, image: e.target.files[0] })} />
-                        </Button>
+                        <TextField label="Từ ngày" value={formatDate(contributor?.fromdate)} disabled />
+                        <TextField label="Đến ngày" value={formatDate(contributor?.todate)} disabled />
                     </Box>
                     <Box mt={2}>
                         <TextField
@@ -127,15 +150,15 @@ function CreateContributorPayout() {
                             multiline
                             rows={4}
                             fullWidth
-                            value={newPayout.notes}
-                            onChange={(e) => setNewPayout({ ...newPayout, notes: e.target.value })}
+                            value={description}
+                            onChange={handleNoteChange}
                         />
                     </Box>
                 </Box>
 
-                {/* Books Table */}
+                {/* Recaps Table */}
                 <Box>
-                    <Typography variant="h6" gutterBottom>Books</Typography>
+                    <Typography variant="h6" gutterBottom>Recaps</Typography>
                     <TableContainer component={Paper}>
                         <Table>
                             <TableHead>
@@ -144,15 +167,15 @@ function CreateContributorPayout() {
                                     <TableCell>Từ ngày</TableCell>
                                     <TableCell>Tới ngày</TableCell>
                                     <TableCell>Lượt xem</TableCell>
-                                    <TableCell>Doanh thu</TableCell>
+                                    <TableCell>Doanh thu (VND)</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
                                 {recaps.map((item) => (
                                     <TableRow key={item.recapId}>
                                         <TableCell>{item.recapName}</TableCell>
-                                        <TableCell>{new Date(contributor.fromdate).toLocaleDateString()}</TableCell>
-                                        <TableCell>{new Date(contributor.todate).toLocaleDateString()}</TableCell>
+                                        <TableCell>{formatDate(contributor?.fromdate)}</TableCell>
+                                        <TableCell>{formatDate(contributor?.todate)}</TableCell>
                                         <TableCell>{item.viewCount}</TableCell>
                                         <TableCell>{item.recapEarnings}</TableCell>
                                     </TableRow>

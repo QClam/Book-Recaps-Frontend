@@ -115,7 +115,7 @@ function ContributorPayout() {
         try {
             const data = await inputCreatePayout();
             setOpenModal(false);
-            alert(`Đã tạo quyết toán cho ${selectedContributorName} từ ngày: ${startDate} đến ngày: ${endDate}`);
+            // alert(`Đã tạo quyết toán cho ${selectedContributorName} từ ngày: ${startDate} đến ngày: ${endDate}`);
             navigate(`/contributor-payout-create/${selectedContributor}`, { state: data });
         } catch (error) {
             console.error("Error creating payout", error);
@@ -133,7 +133,7 @@ function ContributorPayout() {
         // Tìm endDate của quyết toán gần nhất để paste vô Form
         const selectedPayout = payouts.find((payout) => payout.contributorId === contributorId);
         const startDate = selectedPayout?.todate
-            ? new Date(selectedPayout.todate).toISOString().split('T')[0]
+            ? dayjs(selectedPayout.todate).format('YYYY-MM-DD')
             : '';
         const endDate = dayjs().format('YYYY-MM-DD');
 
@@ -181,7 +181,7 @@ function ContributorPayout() {
                         {payouts.map((item) => (
                             <TableRow key={item.contributorId}>
                                 <TableCell>{item.contributorName}</TableCell>
-                                <TableCell>{new Date(item.fromdate).toLocaleDateString()} - {new Date(item.todate).toLocaleDateString()}</TableCell>
+                                <TableCell> {dayjs(item.fromdate).format('DD/MM/YYYY')} - {dayjs(item.todate).format('DD/MM/YYYY')}</TableCell>
                                 <TableCell>{item.totalEarnings}</TableCell>
                                 <TableCell>{item.status}</TableCell>
                                 <TableCell>
