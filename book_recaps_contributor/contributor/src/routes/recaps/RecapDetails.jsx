@@ -31,6 +31,7 @@ import { cn } from "../../utils/cn";
 import Modal from "../../components/modal";
 import Table from "../../components/table";
 import BookInfo from "../../components/BookInfo";
+import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 const getRecapInfo = async (recapId, request) => {
   try {
@@ -204,8 +205,9 @@ const RecapDetails = () => {
   const { recapVersions, bookInfo, recap } = useLoaderData();
   const actionData = useActionData();
   const navigation = useNavigation()
-  const [ dialogVisible, setDialogVisible ] = useState(false);
   const { showToast } = useToast();
+  const [ dialogVisible, setDialogVisible ] = useState(false);
+  const [ activeTab, setActiveTab ] = useState('versions');
 
   useEffect(() => {
     if (actionData?.error && actionData.method !== 'put') {
@@ -308,39 +310,62 @@ const RecapDetails = () => {
           </Await>
         </Suspense>
 
-        <Suspense
-          fallback={
-            <div className="h-32 flex gap-2 justify-center items-center">
-              <div>
-                <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
-                                 fill="var(--surface-ground)" animationDuration=".5s"/>
-              </div>
-              <p>Loading versions...</p>
-            </div>
-          }>
-          <Await
-            resolve={recapVersions}
-            errorElement={
+        <div className="my-4 flex justify-between">
+          <div className="flex gap-3 items-center">
+            <button
+              type="button"
+              className="flex justify-center items-center gap-1 px-5 py-2 font-semibold bg-indigo-600 text-white rounded hover:bg-indigo-800 disabled:cursor-default disabled:opacity-50 disabled:!bg-gray-600"
+              onClick={() => setActiveTab('versions')}
+              disabled={activeTab === 'versions'}
+            >
+              Versions
+            </button>
+            <button
+              type="button"
+              className="flex justify-center items-center gap-1 px-5 py-2 font-semibold bg-indigo-600 text-white rounded hover:bg-indigo-800 disabled:cursor-default disabled:opacity-50 disabled:!bg-gray-600"
+              onClick={() => setActiveTab('income')}
+              disabled={activeTab === 'income'}
+            >
+              Thu nhập
+            </button>
+          </div>
+
+          <button
+            type="button"
+            className="flex justify-center items-center gap-1 px-5 py-2 font-semibold bg-indigo-600 text-white rounded hover:bg-indigo-800"
+            onClick={() => setDialogVisible(true)}
+          >
+            <TbPlus/>
+            <span>Tạo version mới</span>
+          </button>
+        </div>
+
+        <div className={cn({ "hidden": activeTab !== 'versions' })}>
+          <Suspense
+            fallback={
               <div className="h-32 flex gap-2 justify-center items-center">
-                Error loading versions!
+                <div>
+                  <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
+                                   fill="var(--surface-ground)" animationDuration=".5s"/>
+                </div>
+                <p>Loading versions...</p>
               </div>
             }>
+            <Await
+              resolve={recapVersions}
+              errorElement={
+                <div className="h-32 flex gap-2 justify-center items-center">
+                  Error loading versions!
+                </div>
+              }>
+              <ListRecapVersions/>
+            </Await>
+          </Suspense>
+        </div>
 
-            <div className="my-4 flex justify-end">
-              <button
-                type="button"
-                className="flex justify-center items-center gap-1 px-5 py-2 font-semibold bg-indigo-600 text-white rounded hover:bg-indigo-800"
-                onClick={() => setDialogVisible(true)}
-              >
-                <TbPlus/>
-                <span>
-                  Tạo version mới
-                </span>
-              </button>
-            </div>
-            <ListRecapVersions/>
-          </Await>
-        </Suspense>
+        <div className={cn({ "hidden": activeTab !== 'income' })}>
+          <RecapVersionStats/>
+        </div>
       </div>
 
       <RightSidePanel/>
@@ -459,8 +484,210 @@ const ListRecapVersions = () => {
         })}
       </Table.Body>
     </Table.Container>
-  )
-    ;
+  );
+}
+
+const oneWeekAgo = new Date();
+oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+const RecapVersionStats = () => {
+  const [ fromDate, setFromDate ] = useState(oneWeekAgo.toISOString().split('T')[0]);
+  const [ toDate, setToDate ] = useState(new Date().toISOString().split('T')[0]);
+  const [ activeTab, setActiveTab ] = useState('views');
+
+  const dashboardData = [
+    {
+      date: "2021-09-01",
+      views: 100,
+      watchTime: 200,
+      earning: 1000
+    },
+    {
+      date: "2021-09-02",
+      views: 200,
+      watchTime: 400,
+      earning: 2000
+    },
+    {
+      date: "2021-09-03",
+      views: 300,
+      watchTime: 600,
+      earning: 3000
+    },
+    {
+      date: "2021-09-04",
+      views: 400,
+      watchTime: 800,
+      earning: 4000
+    },
+    {
+      date: "2021-09-05",
+      views: 500,
+      watchTime: 1000,
+      earning: 5000
+    },
+    {
+      date: "2021-09-06",
+      views: 600,
+      watchTime: 1200,
+      earning: 6000
+    },
+    {
+      date: "2021-09-07",
+      views: 700,
+      watchTime: 1400,
+      earning: 7000
+    },
+  ]
+
+  const applyDateFilter = () => {
+    // Convert dates to UTC format before sending to the backend
+    const fromDateUTC = new Date(fromDate).toISOString();
+    const toDateUTC = new Date(toDate).toISOString();
+
+    console.log(`Filtering from ${fromDateUTC} to ${toDateUTC}`);
+  };
+
+  const color = {
+    stroke: {
+      views: "#82ca9d",
+      watchTime: "#8884d8",
+      earning: "#f0ad4e"
+    },
+    fill: {
+      views: "url(#colorViews)",
+      watchTime: "url(#colorWatchTime)",
+      earning: "url(#colorEarning)"
+    },
+    name: {
+      views: "Views",
+      watchTime: "Watch time",
+      earning: "Earning"
+    }
+  }
+
+  return (
+    <div className="p-4 bg-white rounded-lg shadow-md">
+      <div className="flex justify-between mb-4 gap-4">
+        <div className="flex-1 py-4 px-6 rounded-md bg-gray-100 space-y-1 border border-gray-300">
+          <div className="text-lg font-semibold text-gray-700">
+            Tổng lượt xem
+          </div>
+          <p className="text-sm italic text-gray-500">
+            (All time)
+          </p>
+          <p className="text-2xl font-bold">
+            100.000 views
+          </p>
+        </div>
+        <div className="flex-1 py-4 px-6 rounded-md bg-gray-100 space-y-1 border border-gray-300">
+          <div className="text-lg font-semibold text-gray-700">
+            Quyết toán gần nhất
+          </div>
+          <p className="text-sm italic text-gray-500">
+            (Từ 2021-09-01 đến 2021-09-07)
+          </p>
+          <p className="text-2xl font-bold">
+            100.000 VND
+          </p>
+        </div>
+      </div>
+
+      <div className="flex gap-4 mb-4 justify-end">
+        <div className="flex items-center gap-4">
+          <label className="block mb-1 font-semibold">From:</label>
+          <input
+            type="date"
+            value={fromDate}
+            onChange={(e) => setFromDate(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-gray-100"
+          />
+        </div>
+        <div className="flex items-center gap-4">
+          <label className="block mb-1 font-semibold">To:</label>
+          <input
+            type="date"
+            value={toDate}
+            onChange={(e) => setToDate(e.target.value)}
+            className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-gray-100"
+          />
+        </div>
+        <button
+          onClick={applyDateFilter}
+          className="px-4 py-2 bg-blue-500 font-semibold text-white rounded-md"
+        >
+          Apply
+        </button>
+      </div>
+
+      <div className="flex justify-between gap-3 text-center mb-4">
+        <button
+          className={cn("flex-1 rounded-md bg-gray-100", {
+            "bg-blue-500 text-white py-3": activeTab === 'views',
+          })}
+          onClick={() => setActiveTab('views')}
+        >
+          <div className="text-2xl font-bold">1000</div>
+          <div>Views</div>
+        </button>
+        <button
+          className={cn("flex-1 rounded-md bg-gray-100", {
+            "bg-blue-500 text-white py-3": activeTab === 'watchTime',
+          })}
+          onClick={() => setActiveTab('watchTime')}
+        >
+          <div className="text-2xl font-bold">4000</div>
+          <div>Watch time (minutes)</div>
+        </button>
+        <button
+          className={cn("flex-1 rounded-md bg-gray-100", {
+            "bg-blue-500 text-white py-3": activeTab === 'earning',
+          })}
+          onClick={() => setActiveTab('earning')}
+        >
+          <div className="text-2xl font-bold">2.000.000</div>
+          <div>Earning (VND)</div>
+        </button>
+      </div>
+
+      <div>
+        <ResponsiveContainer width="100%" height={430} aspect={16 / 9}>
+          <AreaChart data={dashboardData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+            <defs>
+              <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8}/>
+                <stop offset="95%" stopColor="#82ca9d" stopOpacity={0}/>
+              </linearGradient>
+              <linearGradient id="colorWatchTime" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#8884d8" stopOpacity={0.8}/>
+                <stop offset="95%" stopColor="#8884d8" stopOpacity={0}/>
+              </linearGradient>
+              <linearGradient id="colorEarning" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#f0ad4e" stopOpacity={0.8}/>
+                <stop offset="95%" stopColor="#f0ad4e" stopOpacity={0}/>
+              </linearGradient>
+            </defs>
+            <XAxis dataKey="date"/>
+            <YAxis/>
+            <CartesianGrid strokeDasharray="3 3"/>
+            <Tooltip/>
+            <Legend verticalAlign="bottom" height={36} wrapperStyle={{
+              bottom: -10,
+              width: '100%',
+            }}/>
+            <Area
+              type="monotone"
+              fillOpacity={1}
+              dataKey={activeTab}
+              stroke={color.stroke[activeTab]}
+              fill={color.fill[activeTab]}
+              name={color.name[activeTab]}
+            />
+          </AreaChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
 }
 
 const RightSidePanel = () => {

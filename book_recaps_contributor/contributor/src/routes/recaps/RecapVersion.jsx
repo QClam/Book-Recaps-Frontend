@@ -338,7 +338,12 @@ const RecapVersionDetails = () => {
       });
 
     } catch (error) {
-      console.error('Error uploading file:', error);
+      const err = handleFetchError(error);
+      showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: err.error,
+      });
     } finally {
       setUploadingAudio(false);
     }
@@ -594,6 +599,7 @@ const RecapVersionDetails = () => {
           <div className="relative mb-4">
             <input
               type="file"
+              accept="audio/wav, .wav"
               className="absolute inset-0 opacity-0 cursor-pointer"
               onChange={handleUploadAudio}
             />

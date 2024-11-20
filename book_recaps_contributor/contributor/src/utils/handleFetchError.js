@@ -9,6 +9,9 @@ export function handleFetchError(error) {
     if (error.response.status === 401) {
       return { error: "Phiên đăng nhập đã hết hạn", status: 401 };
     }
+    if (error.response.status === 413) {
+      return { error: "Dung lượng file quá lớn", status: 413 };
+    }
     if (error.response.data?.message) {
       return { error: error.response.data.message, status: error.response.status, data: error.response.data.data };
     }
@@ -18,7 +21,8 @@ export function handleFetchError(error) {
     return { error: "Đã xảy ra lỗi", status: error.response.status || 500 };
   } else if (error.request) {
     // The request was made but no response was received
-    console.log(error.request);
+    console.log(error);
+
     return { error: "Không nhận được phản hồi từ máy chủ", status: 401 };
   } else {
     // Something happened in setting up the request that triggered an Error
