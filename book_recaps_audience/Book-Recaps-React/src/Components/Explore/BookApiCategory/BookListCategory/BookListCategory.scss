@@ -1,62 +1,89 @@
+/* BookListCategory.scss */
+
 .book-list-container {
-  text-align: center;
-  margin: 20px;
-  margin-right: 1200px;
-  margin-top: -70px;
+  padding: 20px;
+  //background-color: #f9f9f9;
+  color: #333;
+  max-width: 1200px;
+  margin: 0 auto;
+  
+
   h2 {
-    font-size: 24px;
-    margin-bottom: 20px;
-    color: #333;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #5a5a5a;
+    text-align: center;
+    margin-bottom: 30px;
+    margin-top: -80px;
   }
 
   .error {
-    color: red;
-    margin-top: 10px;
+    color: #ff4d4d;
+    text-align: center;
+    font-size: 1rem;
+    margin: 10px 0;
+  }
+}
+
+.books-container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* Fixed to 4 columns */
+  gap: 30px;
+  margin-bottom: 20px;
+  margin-top: 20px;
+}
+
+.book-item {
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform 0.3s, box-shadow 0.3s;
+  /* Updated dimensions */
+  width: calc(100% - 0.5cm); /* Adjust for slight increase */
+  height: calc(100% + 0.5cm); /* Adjust for slight increase */
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
   }
 
+  &:focus {
+    outline: 2px solid #8d82e0;
+    outline-offset: 2px;
+  }
+
+  .book-cover {
+    width: 100%;
+    height: 300px; /* Increased height for a larger cover image */
+    object-fit: cover;
+    border-bottom: 1px solid #e0e0e0;
+  }
+
+  .book-title {
+    font-size: 1.1rem;
+    color: #333;
+    font-weight: 600;
+    margin: 12px 16px 4px;
+    line-height: 1.4;
+  }
+
+  .book-author {
+    font-size: 0.9rem;
+    color: #666;
+    margin: 0 16px 16px;
+  }
+}
+
+@media (max-width: 1024px) {
   .books-container {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center; // Align items in the center
-    gap: 20px; // Space between the books
+    grid-template-columns: repeat(2, 1fr); /* Two columns on medium screens */
   }
+}
 
-  .book-item {
-    background-color: #f0f8f4; // Light green background
-    border-radius: 10px;
-    border: 1px solid #ddd;
-    padding: 15px;
-    max-width: 200px; // Limit width of the book cards
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s;
-    text-align: center; // Center align content
-
-    &:hover {
-      transform: scale(1.05); // Slight zoom effect on hover
-      cursor: pointer;
-    }
-
-    img.book-cover {
-      // max-width: 100%;
-      width: 200px;
-      height: 300px;
-      border-radius: 8px;
-      // height: auto;
-      object-fit: cover;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    h3.book-title {
-      font-size: 18px;
-      margin: 10px 0;
-      font-weight: bold;
-      color: #333;
-    }
-
-    p.book-author {
-      font-size: 14px;
-      color: #666;
-      margin: 5px 0;
-    }
+@media (max-width: 480px) {
+  .books-container {
+    grid-template-columns: 1fr; /* Single column on small screens */
   }
 }

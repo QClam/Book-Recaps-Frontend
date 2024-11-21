@@ -147,35 +147,55 @@ function Login() {
       if (accessToken && refreshToken) {
         localStorage.setItem("authToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
-        console.log("AccessToken saved to localStorage:", accessToken);
-        console.log("RefreshToken saved to localStorage:", refreshToken);
+       
+        // Fetch the user's profile to check if they have completed onboarding
+      const profileResponse = await axios.get("https://160.25.80.100:7124/api/personal/profile", {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+
+      const { isOnboarded } = profileResponse.data;
+
+      if (isOnboarded) {
+        // Redirect to /explore if the user is onboarded
+        navigate("/explore");
       } else {
-        console.error("Tokens not found in API response");
-        setError("Không tìm thấy token trong phản hồi của API.");
+        // Redirect to /onboarding if the user is not onboarded
+        navigate("/onboarding");
       }
-    
-      navigate("/"); // Navigate to the home page after successful login
-    } catch (error) {
-      console.error("Error logging in:", error.response ? error.response.data : error.message);
-      setError("Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản và mật khẩu.");
+    } else {
+      console.error("Tokens not found in API response");
+      setError("Không tìm thấy token trong phản hồi của API.");
     }
-  };
+  } catch (error) {
+    console.error("Error logging in:", error.response ? error.response.data : error.message);
+    setError("Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản và mật khẩu.");
+  }
+};
+
+
+
   
+  const forgetPasswordClick = () => {
+    navigate("/forget-password");
+  }
+
 
   return (
     <div className="login-page">
-      <div className={`container ${isActive ? "active" : ""}`} id="container">
+      <div className={`containerner ${isActive ? "active" : ""}`} id="container">
         <div className="form-container sign-up">
           <form onSubmit={handleSignUp}>
             <h1>Đăng ký</h1>
-            <div className="social-icons">
+            {/* <div className="social-icons">
               <a href="#" className="icon">
                 <i className="fa-brands fa-google"></i>
               </a>
               <a href="#" className="icon">
                 <i className="fa-brands fa-facebook"></i>
               </a>
-            </div>
+            </div> */}
             <span>hoặc sử dụng email để đăng ký</span>
             <input
               required
@@ -225,14 +245,14 @@ function Login() {
         <div className="form-container sign-in">
           <form onSubmit={handleLogin}>
             <h1>Đăng nhập</h1>
-            <div className="social-icons">
+            {/* <div className="social-icons">
               <a href="#" className="icon">
                 <i className="fa-brands fa-google"></i>
               </a>
               <a href="#" className="icon">
                 <i className="fa-brands fa-facebook"></i>
               </a>
-            </div>
+            </div> */}
             <span>hoặc sử dụng email để đăng nhập</span>
             <input
               type="email"
@@ -249,12 +269,10 @@ function Login() {
               placeholder="Mật khẩu"
             />
             <button type="submit">Đăng nhập</button>
+            <a style={{textDecoration: "none", cursor: "pointer"}} onClick={() => forgetPasswordClick()}>Forget password</a>
             {error && <p style={{ color: 'red' }}>{error}</p>}
-            {/* Add the Forgot Password Link */}
-    <p>
-     Forgot Password?
-    </p>
-
+           
+   
           </form>
         </div>
 

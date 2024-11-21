@@ -1,5 +1,5 @@
 
-.container {
+.containerner {
   background-color: #fff;
   border-radius: 30px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
@@ -7,13 +7,14 @@
   overflow: hidden;
   width: 1004px;
   max-width: 70%;
-  min-height: 380px;
+  min-height: 580px;
   color: black;
   // margin-left: 10%;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-left: 200px;
+  margin-left: 250px;
+  margin-top: 50px;
 
   p {
     font-size: 14px;
@@ -27,7 +28,7 @@
   }
 
   a {
-    color: #333;
+    color: #595656;
     font-size: 13px;
     text-decoration: none;
     margin: 15px 0 10px;
@@ -197,4 +198,8 @@
 .toggle-right {
   right: 0;
   transform: translateX(0);
+}
+
+.toggle-container p {
+  color: white;
 }

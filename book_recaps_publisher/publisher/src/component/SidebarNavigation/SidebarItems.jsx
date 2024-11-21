@@ -3,36 +3,48 @@ import React from 'react'
 //import { Home, Search, Bookmark, SpaceDashboard, BorderColor, AutoAwesome, Settings, HelpOutline, Logout, GifBox } from '@mui/icons-material';
 
 export const SidebarItems = [
-    {
-        title: "Overview",
+    // {
+    //     title: "Overview",
        
-        link: "/overview",
-    },
+    //     link: "/overview",
+    // },
+
     {
-        title: "Contract",
+        title: "Dashboard",
        
-        link: "/contract",
+        link: "/dashboard",
     },
+
+    // {
+    //     title: "Contract",
+       
+    //     link: "/contract",
+    // },
     {
         title: "Book Management",
         
         link: "/bookmanager",
     },
     {
+        title: "Contract Managerment",
+       
+        link: "/contractmanager",
+    },
+    {
         title: "Earnings ",
        
         link: "/earnings",
     },
-    {
-        title: "Notifications ",
+    // {
+    //     title: "Notifications ",
        
-        link: "/notifications",
-    },
-    {
-        title: "Feedback ",
+    //     link: "/notifications",
+    // },
+    // {
+    //     title: "Feedback ",
        
-        link: "/feedback",
-    },
+    //     link: "/feedback",
+    // },
     {
         title: "Settings",
       

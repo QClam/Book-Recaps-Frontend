@@ -3,12 +3,14 @@
     overflow-y: hidden;
     padding: 10px;
     border: 1px solid #ccc;
+    margin-top: 20px;
   }
   
   .transcript-sentence {
     cursor: pointer;
-    padding: 1px;
+    padding: -3px;
     transition: background-color 0.3s;
+    font-size: 17px;
    
     
   }
@@ -26,32 +28,35 @@
     background-color: #ffeeba; /* Màu vàng nhạt để highlight */
   }
   
-  /* Context Menu */
-  .context-menu {
+  .context-menu-menu {
     position: absolute;
-    background-color: #ffffff;
-    border: 1px solid #ccc;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
-    z-index: 1000;
-    width: 190px;
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
     border-radius: 4px;
-    overflow: hidden;
-    margin-top: 40px;
+    padding: 7px 0;
+    z-index: 1000;
   }
   
-  .context-menu-item {
-    padding: 10px;
-    cursor: pointer;
-    display: flex;
+  .context-menu-item-item {
+    display: inline-flex;
     align-items: center;
+    padding: 6px 16px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s;
   }
   
-  .context-menu-item:hover {
+  .context-menu-item-item:hover {
     background-color: #f0f0f0;
   }
   
-  .context-menu-item span.icon {
+  .context-menu-item-item svg {
     margin-right: 8px;
+  }
+  
+  .context-menu-item-item span.icon {
+    margin-right: 8px;
+    display: flex;
   }
   .note-icon {
     margin-left: 5px;
@@ -59,29 +64,29 @@
   }
   
   /* Context Menu */
-  .context-menu {
-    position: absolute;
-    background-color: #ffffff;
-    border: 1px solid #ccc;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
-    z-index: 1000;
-    width: 290px;
-    border-radius: 4px;
-    overflow: hidden;
-    margin-left: -70px;
-  }
+  // .context-menu {
+  //   position: absolute;
+  //   background-color: #ffffff;
+  //   border: 1px solid #ccc;
+  //   box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
+  //   z-index: 1000;
+  //   width: 290px;
+  //   border-radius: 4px;
+  //   overflow: hidden;
+  //   margin-left: -70px;
+  // }
   
-  .context-menu-item {
-    padding: 10px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-  }
+  // .context-menu-item {
+  //   padding: 10px;
+  //   cursor: pointer;
+  //   display: flex;
+  //   align-items: center;
+  // }
   
   
-  .context-menu-item span.icon {
-    margin-right: 8px;
-  }
+  // .context-menu-item span.icon {
+  //   margin-right: 8px;
+  // }
 
   .note-modal-overlay {
     position: fixed;
@@ -93,6 +98,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    
   }
   
   .note-modal {
@@ -102,6 +108,7 @@
     width: 400px;
     max-width: 90%;
     box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    
   }
   
   .note-modal h2 {
@@ -142,4 +149,8 @@
   
   .modal-buttonss button:hover {
     opacity: 0.9;
+  }
+
+  .enternote {
+    margin-right: -110px;
   }

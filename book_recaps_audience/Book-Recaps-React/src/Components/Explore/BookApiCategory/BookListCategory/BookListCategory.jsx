@@ -3,6 +3,40 @@ import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import './BookListCategory.scss'; // Import file SCSS mới
 
+// Function to resolve $ref references in data
+const resolveRefs = (data) => {
+  const refMap = new Map();
+  
+  const createRefMap = (obj) => {
+    if (typeof obj !== "object" || obj === null) return;
+    if (obj.$id) {
+      refMap.set(obj.$id, obj);
+    }
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        createRefMap(obj[key]);
+      }
+    }
+  };
+
+  const resolveRef = (obj) => {
+    if (typeof obj !== "object" || obj === null) return obj;
+    if (obj.$ref) {
+      return refMap.get(obj.$ref);
+    }
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        obj[key] = resolveRef(obj[key]);
+      }
+    }
+    return obj;
+  };
+
+  createRefMap(data);
+  return resolveRef(data);
+};
+
+
 const BookListCategory = () => {
   const { categoryId } = useParams(); // Lấy categoryId từ URL
   const [books, setBooks] = useState([]); // Đặt giá trị khởi tạo là một mảng
@@ -30,17 +64,16 @@ const BookListCategory = () => {
         console.log('Response Data:', response.data); // Debugging: Kiểm tra dữ liệu phản hồi
 
         // Kiểm tra xem dữ liệu trả về có đúng định dạng không
-        if (
-          response.data &&
-          response.data.data &&
-          Array.isArray(response.data.data.$values)
-        ) {
-          // Lọc sách thuộc categoryId đã chọn (nếu API không tự lọc)
-          const filteredBooks = response.data.data.$values.filter(book =>
+        if (response.data && response.data.data && Array.isArray(response.data.data.$values)) {
+          // Resolve references in data
+          const resolvedData = resolveRefs(response.data.data);
+
+          const filteredBooks = resolvedData.$values.filter(book =>
             book.categories &&
             book.categories.$values &&
             book.categories.$values.some(category => category.id === categoryId)
           );
+
 
           setBooks(filteredBooks); // Đặt mảng sách đã lọc vào state
 
@@ -96,8 +129,12 @@ const BookListCategory = () => {
   //   navigate(`/bookdetailbook/${id}`); // Sử dụng id của sách để điều hướng
   // };
 
+  // const handleBookClick = (id) => {
+  //   navigate(`/user-recap-detail/${id}`); // Navigate to UserRecapDetail with the book ID
+  // };
+
   const handleBookClick = (id) => {
-    navigate(`/user-recap-detail/${id}`); // Navigate to UserRecapDetail with the book ID
+    navigate(`/user-recap-detail-item/${id}`); // Navigate to UserRecapDetail with the book ID
   };
   //chạy qua class BookDetailBook qua tiep RecapDetail
 

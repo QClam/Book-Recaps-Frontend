@@ -44,7 +44,7 @@ const AllBookRecap = () => {
 
   return (
     <div className="all-books-container">
-      <h1>All Books</h1>
+      {/* <h1>All Books</h1> */}
       {error && <p className="error-message">{error}</p>}
       <div className="book-list">
         {Array.isArray(books) && books.length > 0 ? (

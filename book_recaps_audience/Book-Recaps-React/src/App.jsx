@@ -1,133 +1,154 @@
 import React, { useEffect, useRef, useState } from "react";
 import { GoogleReCaptchaProvider } from 'react-google-recaptcha-v3'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; // Đừng quên import CSS
+import { BrowserRouter as Router, Route, Routes,Navigate } from 'react-router-dom';
 import './App.css';
-import Onboarding from './Components/Onboarding/Onboarding';
+//import Onboarding from './Components/Onboarding/Onboarding';
 import Explore from './Components/Explore/Explore';
-import Library from './Components/Library/Library';
-import AllBooks from './Components/Library/AllBooks';
-//import Spaces from './Components/Space/Spaces';
-import HighLight from './Components/Highlight/Highlight';
+//import HighLight from './Components/Highlight/Highlight';
 import BookFree from './Components/TodayFreeRead/BookFree';
-import HighlightDetails from './Components/Highlight/HighlightDetails';
+//import HighlightDetails from './Components/Highlight/HighlightDetails';
 import BookDetail from './Components/TodayFreeRead/BookDetail/BookDetai';
 import Settings from './Components/Setting/Settings';
 import MainLayout from './Components/Layout/MainLayout';
-import Help from './Components/Help/Help';
-//import ForYou from './Components/ForYou/ForYou';
-import ListenBook from './Components/TodayFreeRead/ListenBook/ListenBook';
-//import TextToSpeechWithHighlighting from './Components/TodayFreeRead/ListenBook/TextToSpeech';
-//import AudioWithHighlight from './Components/TodayFreeRead/AudioWithHighlight/AudioWithHighlight';
-//import Footer from './Components/Layout/Footer';
-//import BookCarousel from "./Components/ForYou/BookCarousel";
-//import AudioGrid from "./Components/TodayFreeRead/BookListen/AudioGrid";
-import ReadBook from "./Components/TodayFreeRead/ReadBook/ReadBook";
-import ForYouAll from "./Components/ForYou/ForYouAll";
-//import SearchUp from "./Components/Search/SearchUp";
-//import Filter from "./Components/Search/Filter";
+//import ReadBook from "./Components/TodayFreeRead/ReadBook/ReadBook";
 import SearchResults from "./Components/Search/SearchResults/SearchResults";
-import BookTrendingDetail from "./Components/Explore/BookTrending/BookTrendingDetail";
 import Report from "./Components/Help/Report/Report";
 import Application from "./Components/Setting/Application/Application";
-//import Authors from "./Components/Space/Author/Authors";
 import AuthorBy from "./Components/Space/AuthorBy";
-import BooksByCategory from "./Components/Explore/ListCategory/BookByCategory";
 import BookByCategoryDetail from "./Components/Explore/ListCategory/BookByCategoryDetail/BookByCategoryDetail";
-import AuthorDetail from "./Components/Space/AuthorDetail/AuthorDetail";
 import AuthorDetailProfile from "./Components/Space/AuthorDetailProfile/AuthorDetailProfile";
 import AuthorGenersDetail from "./Components/Space/AuthorGenersDetail/AuthorGenersDetail";
 import Billing from "./Components/Setting/Billing/Billing";
 import LibraryBook from "./Components/Library/LibraryBook";
-import CustomCategory from "./Components/Explore/NewCategory/Category";
 import ExploreCategory from "./Components/Explore/ExploreCategory";
-import PopularBookDetail from "./Components/Explore/PopularBook/PopularBookDetail";
-import NoteReadBook from "./Components/TodayFreeRead/NoteReadBook/NoteReadBook";
 import BookApiDetail from "./Components/Explore/BookApi/BookApiDetail";
 import BookDetailItem from "./Components/Explore/BookApi/BookDetailItem";
-import AuthorApi from "./Components/Space/AuthorApi/AuthorApi";
-import RecapDetails from "./Components/ReadListenBook/RecapDetails";
 import Login from "./Components/Auth/Login";
-import BookDetailBook from "./Components/Explore/BookApi/BookDetailBook";
 import AllBookRecap from "./Components/ReadListenBook/AllBookRecap/AllBookRecap";
 import BookListCategory from "./Components/Explore/BookApiCategory/BookListCategory/BookListCategory";
 import AuthorBookApi from "./Components/Space/AuthorApi/AuthorBookApi/AuthorBookApi";
 import UserRecapDetail from "./Components/ReadListenBook/UserRecap/UserRecapDetail";
-import PlaylistBookList from "./Components/Library/PlaylistBook/PlaylistBookList";
-import HighlightAll from "./Components/Highlight/HighlightAll";
 import RecapByContributor from "./Components/ContributorItem/RecapByContributor/RecapByContributor";
 import ConfirmEmail from "./Components/Auth/ConfirmEmail";
+import ForgetPassword from "./Components/Auth/ForgetPassword";
+import ContributorTerm from "./Components/Setting/BecomeContributor/ContributorTerm";
+import ContributorRecaps from "./Components/ContributorItem/ContributorRecaps/ContributorRecaps";
+import Result from "./Components/Setting/Billing/Result/Result";
+import OnboardingStepper from "./Components/Onboarding/OnboardML/Onboarding";
+import BookByList from "./Components/ReadListenBook/UserRecap/BookByList/BookByList";
+import UserRecapNewDetail from "./Components/ReadListenBook/UserRecap/UserRecapNewDetail/UserRecapNewDetail";
+import NewRecapBook from "./Components/ReadListenBook/UserRecap/NewRecapBook/NewRecapBook";
+import RecapVersionNew from "./Components/ReadListenBook/UserRecap/NewRecapBook/RecapVersionNew";
+import UserRecapDetailv2 from "./Components/ReadListenBook/UserRecap/NewRecapBook/UserRecapDetailv2";
+import UsRecapDetail from "./Components/ReadListenBook/UserRecap/UserRecapNewDetail/UsRecapDetail";
+import RecapNewTues from "./Components/ReadListenBook/UserRecap/UserRecapNewDetail/RecapNewTues";
+import History from "./Components/History/History";
+import ForUser from "./Components/Home/ForUser/ForUser";
+import Homepage from "./Components/Home/Homepage";
+import { SubscriptTwoTone } from "@mui/icons-material";
+import SubscriptionHistory from "./Components/Setting/SubcriptionHistory/SubcriptionHistory";
+//import PrivateRoute from "./Components/PrivateRoute";
 
 function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  
+
   useEffect(() => {
+    // Kiểm tra trạng thái đăng nhập, ví dụ như kiểm tra token trong localStorage
+    const token = localStorage.getItem("authToken");
+    setIsAuthenticated(!!token);
     setLoading(false);
   }, []);
-  
+
   if (loading) {
     return <div>Loading...</div>;
   }
+   // Check if the user has completed the onboarding process
+   const isOnboarded = localStorage.getItem("isOnboarded") === 'true';
+
+
 
   return (
-    <>
-      <div id="root">
+     
         <Router>
             {/* <Header /> */}
-          <main>
+          
             
            
               <Routes>
                 {/* Layout cho các trang có sidebar */}
+                 {/* Điều hướng tới trang /login nếu chưa đăng nhập */}
+                 <Route
+          path="/"
+          element={
+            isAuthenticated
+              ? (isOnboarded ? <Navigate to="/explore" /> : <Navigate to="/onboarding" />)
+              : <Navigate to="/login" />
+          }
+        />
+
+                 <Route path="/login" element={<Login />} />
+
                 <Route element={<MainLayout />}>
                 <Route path="/search" element={<SearchResults />} />
 
-                <Route path="/" element={<Explore />} />
-                <Route path="/for-you" element={<Explore />} />
+                {/* <Route path="/" element={<Explore />} /> */}
+                
                 <Route path="/explore" element={<Explore />} />
+                
                 <Route path="/categories" element={<ExploreCategory />} />
-                {/* tu BookApiCategory qua BookListCategory */}
+               
                 <Route path="/category/:categoryId" element={<BookListCategory />} />
-                {/* explore co book trending co book trending detail */}
-                <Route path="/book-trending-detail" element={<BookTrendingDetail />} />
+               
                 <Route path="/playlist" element={<LibraryBook />} />
-                {/* <Route path="/playlist/:id" element={<PlaylistBookList />} /> */}
-                <Route path="/all-books" element={<AllBooks />} />
+                
                 <Route path="/author" element={<AuthorBy />} />
+
                 <Route path="/author-book-api/:id" element={<AuthorBookApi />} />
-                {/* <Route path="/author" element={<AuthorApi />} /> */}
-                {/*trong muc space co Author, Author by r bam vao hien ra list author */}
-                <Route path="/author-detail" element={<AuthorDetail />} />
-                {/* List author r bam vao xem detail author life bio */}
+                
                 <Route path="/author-detail-profile" element={<AuthorDetailProfile />} />
-                {/* trong space co author by genre */}
+                
                 <Route path="/authors/:genre" element={<AuthorGenersDetail />} />
 
                 {/* Contributor Item */}
                 <Route path="/contributor" element={<RecapByContributor />} />
+                {/* <Route path="/contributor-recaps/:userId" element={<ContributorRecaps />} /> */}
 
-                <Route path="/highlights" element={<HighlightAll />} />
-                <Route path="/highlight-details" element={<HighlightDetails />} />
+                
                 <Route path="/books" element={<BookFree />} />
+
+                <Route path="/book-by-list" element={<BookByList />} />
                 {/* trong BookFree co BookRecap, seemore thay AllBookRecap */}
                 <Route path="/all-books-recap" element={<AllBookRecap />} />
-                <Route path="/popular-books-detail" element={<PopularBookDetail />} />
+                
                 <Route path="/book/:id" element={<BookDetail />} />
                 
-                {/* trong Explore co Book list by category */}
-                {/* <Route path="/books" element={<BooksByCategory />} /> */}
-                {/* Book list by category detail */}
+
                 <Route path="/bookbycategory/:id" element={<BookByCategoryDetail />} />
                 
                 <Route path="/book-api-detail" element={<BookApiDetail />} />
-                <Route path="/bookapi/:id" element={<BookDetailItem />} />
 
-                {/* <Route path="/recap/:bookId" element={<RecapDetails />} />  */}
-                {/* api book detail trang Books thuoc BookFree */}
-                {/* <Route path="/bookdetailbook/:id" element={<BookDetailBook />} /> */}
+                <Route path="/bookapi/:id" element={<BookDetailItem />} />
 
                 {/* Recap User Recap Detail */}
                 <Route path="/user-recap-detail/:id" element={<UserRecapDetail />} />
 
+                {/* <Route path="/user-recap-new-detail" element={<UserRecapNewDetail />} /> */}
+                {/* <Route path="/user-recap-new-detail" element={<UserRecapDetail />} /> */}
+
+                {/* MAI LM TIEP */}
+                <Route path="/user-recap-detail-item/:id" element={<UsRecapDetail />} />
+                <Route path="/recap-item-detail/:recapId" element={<RecapNewTues />} />
+
+                {/* TEST NEW RECAP BOOK */}
+                {/* <Route path="/new" element={<NewRecapBook />} /> */}
+                {/* <Route path="/recap-version/:versionId" element={<RecapVersionNew />} /> */}
+                {/* <Route path="/user-recap/:recapId" element={<UserRecapDetailv2 />} /> */}
+               
+                <Route path="/history" element={<History />} />
+                <Route path="/home" element={<Homepage />} />
 
               </Route>
 
@@ -135,32 +156,27 @@ function App() {
                 <Route path="/settings" element={<Settings />} />
                 <Route path="/application" element={<Application />} />
                 <Route path="/billing" element={<Billing />} />
-
+                <Route path="/*" element={<Result />} />
                 <Route path="/help" element={<Report />} />
-                {/* <Route path="/report" element={<Report />} /> */}
-                {/* Khi bam vao button listen trong today free detail la BookDetail */}
-               {/* <Route path="/read" element={<ListenBook />} /> */}
-              {/* <Route path="/listen" element={<TextToSpeechWithHighlighting />} />  */}
+                <Route path="/become-contributor" element={<ContributorTerm />} />
+                <Route path="/subcription-history" element={<SubscriptionHistory />} />
+               {/* <Route path="/read" element={<ReadBook key={new Date().getTime()} />} /> */}               
 
-               {/* <Route path="/read" element={<AudioWithHighlight />} /> */}
-               
-               {/* <Route path="/read" element={<ReadBook />} /> */}
-               {/* <Route path="/read-book" element={<ReadBook />} /> */}
-               <Route path="/read" element={<ReadBook key={new Date().getTime()} />} />
-               {/* <Route path="/read" element={<NoteReadBook />} /> */}
-
-              <Route path="/login" element={<Login />} />
+              {/* <Route path="/login" element={<Login />} /> */}
             
               {/* Confirm mail khi dang ki */}
               <Route path="/auth/confirm-email" element={<ConfirmEmail />} />
-
+              <Route path="/onboarding" element={<OnboardingStepper />} />
+              <Route path="/forget-password" element={ <ForgetPassword /> } />
               </Routes>
+          
+          
+           <ToastContainer />
         
-          </main>
         </Router>
-        {/* <Footer /> */}
-      </div>
-    </>
+       
+      
+   
   );
 }
 

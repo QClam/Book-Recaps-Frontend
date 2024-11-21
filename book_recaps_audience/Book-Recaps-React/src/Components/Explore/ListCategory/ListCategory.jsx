@@ -30,9 +30,8 @@ const ListCategory = () => {
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const query = 'bestsellers';
-                const apiKey = 'AIzaSyDoWf3ws8elORVULfG9eeb0McMql-NugGc';
-                const response = await axios.get(`https://www.googleapis.com/books/v1/volumes?q=${query}&key=${apiKey}`);
+                
+                const response = await axios.get(``);
                 const books = response.data.items;
 
                 // Extract unique categories from the books

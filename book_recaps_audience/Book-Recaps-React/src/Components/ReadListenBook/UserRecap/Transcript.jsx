@@ -99,7 +99,7 @@ const getUserNotesKey = (userId) => `transcriptNotes_${userId}`;
               console.log("Highlighting sentence index:", sentence.sentence_index); // Log câu được highlight
   
               if (sentenceRefs.current[sentence.sentence_index]) {
-                sentenceRefs.current[sentence.sentence_index].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                sentenceRefs.current[sentence.sentence_index];
               }
               found = true;
               break;
@@ -284,21 +284,21 @@ const getUserNotesKey = (userId) => `transcriptNotes_${userId}`;
     }
 
     // Fetch highlights from the server as well
-    // const fetchUserHighlights = async () => {
-    //   try {
-    //     const response = await axios.get(`https://160.25.80.100:7124/api/highlight/gethighlightbyrecapid/${recapVersionId}?userId=${userId}`);
-    //     if (response.data && response.data.data && response.data.data.$values) {
-    //       const apiHighlights = response.data.data.$values.map(item => `sentence-${item.sentenceIndex}`);
-    //       setHighlightedSentences(apiHighlights);
-    //       // Save to localStorage for persistence
-    //       localStorage.setItem(getUserHighlightsKey(userId), JSON.stringify(apiHighlights));
-    //     }
-    //   } catch (error) {
-    //     console.error("Error fetching highlights:", error);
-    //   }
-    // };
+    const fetchUserHighlights = async () => {
+      try {
+        const response = await axios.get(`https://160.25.80.100:7124/api/highlight/gethighlightbyrecapid/${recapVersionId}?userId=${userId}`);
+        if (response.data && response.data.data && response.data.data.$values) {
+          const apiHighlights = response.data.data.$values.map(item => `sentence-${item.sentenceIndex}`);
+          setHighlightedSentences(apiHighlights);
+          // Save to localStorage for persistence
+          localStorage.setItem(getUserHighlightsKey(userId), JSON.stringify(apiHighlights));
+        }
+      } catch (error) {
+        console.error("", error);
+      }
+    };
 
-    // fetchUserHighlights();
+    fetchUserHighlights();
   }, [userId, recapVersionId]); 
 
 
@@ -383,6 +383,9 @@ const getUserNotesKey = (userId) => `transcriptNotes_${userId}`;
       <h4>Transcript:</h4>
       {transcriptContent && transcriptContent.transcriptSections.map((section, sectionIndex) => (
         <div key={sectionIndex} className="transcript-part">
+           {/* Display the title of the section */}
+           {section.title && <h3 className="transcript-title">{section.title}</h3>}
+
           {section.transcriptSentences.map((sentence, sentenceIndex) => {
             const time = sentence.start;
             const sentenceId = `sentence-${sectionIndex}-${sentenceIndex}`;
@@ -415,17 +418,17 @@ const getUserNotesKey = (userId) => `transcriptNotes_${userId}`;
       {/* Context Menu */}
       {contextMenu.visible && (
         <div
-          className="context-menu"
+          className="context-menu-menu"
           style={{ top: contextMenu.y, left: contextMenu.x }}
           ref={contextMenuRef}
         >
-          <div className="context-menu-item" onClick={handleHighlight}>
+          <div className="context-menu-item-item" onClick={handleHighlight}>
             🖍 Highlight
           </div>
-          <div className="context-menu-item" onClick={handleCopy}>
+          <div className="context-menu-item-item" onClick={handleCopy}>
             📋 Copy
           </div>
-          <div className="context-menu-item" onClick={handleTakeNote}>
+          <div className="context-menu-item-item" onClick={handleTakeNote}>
             📝 Take Note
           </div>
         </div>
@@ -446,6 +449,7 @@ const getUserNotesKey = (userId) => `transcriptNotes_${userId}`;
           placeholder="Enter your note here..."
           rows="5"
           cols="50"
+          className="enternote"
         />
         <div className="modal-buttonss">
           <button onClick={saveNote}>Save</button>

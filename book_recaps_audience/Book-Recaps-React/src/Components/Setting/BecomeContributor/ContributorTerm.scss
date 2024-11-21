@@ -1,0 +1,148 @@
+.terms-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    color: #333;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .terms-title {
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+  }
+  
+  .terms-subtitle {
+    font-size: 16px;
+    text-align: center;
+    color: #666;
+    margin-bottom: 10px;
+  }
+  
+  .terms-divider {
+    border: none;
+    border-top: 1px solid #ccc;
+    margin: 0 0 20px 0;
+  }
+  
+  .terms-section {
+    margin-bottom: 20px;
+  
+    h2 {
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+  
+    p {
+      font-size: 16px;
+      line-height: 1.5;
+      color: #555;
+    }
+  }
+  
+  .terms-form {
+    margin-top: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    font-size: 16px;
+    font-weight: bold;
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  .form-group input[type="checkbox"] {
+    margin-right: 10px;
+  }
+  
+  .form-group a {
+    color: #007bff;
+    text-decoration: none;
+  }
+  
+  .form-group a:hover {
+    text-decoration: underline;
+  }
+  
+  .name-fields {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .name-fields input {
+    width: 100%;
+  }
+  
+  .form-group input[type="text"],
+  .form-group input[type="email"] {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+  }
+  
+  .signature-box {
+    width: 100%;
+    height: 100px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #aaa;
+    font-size: 16px;
+  }
+  
+  .submit-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+  }
+  
+  .submit-button:hover {
+    background-color: #218838;
+  }
+  
+  .checkbox-container {
+    display: flex;
+    align-items: center;
+  
+    input[type="checkbox"] {
+      margin-right: 8px;
+      transform: scale(1.3); 
+    }
+  
+    label {
+      font-size: 18px;
+    }
+  
+    a {
+      color: #007bff; /* Màu xanh cho liên kết */
+      text-decoration: none;
+    }
+  
+    a:hover {
+      text-decoration: underline;
+    }
+  }
+  
+  .welcome-message img {
+    width: 150px;
+    height: 150px;
+    margin-left: 260px;
+  }

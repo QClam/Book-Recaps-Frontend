@@ -1,0 +1,59 @@
+.submit-book-form {
+  background-color: #f7f7f7;
+  padding: 30px;
+  max-width: 600px;
+  margin: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  margin-left: 500px;
+}
+.submit-book-form h2 {
+  text-align: center;
+  color: #4a4a4a;
+}
+.submit-book-form form {
+  display: flex;
+  flex-direction: column;
+}
+.submit-book-form form label {
+  margin-top: 15px;
+  color: #333;
+  font-weight: bold;
+}
+.submit-book-form form input[type=text],
+.submit-book-form form input[type=file],
+.submit-book-form form input[type=date],
+.submit-book-form form textarea {
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+.submit-book-form form textarea {
+  height: 100px;
+}
+.submit-book-form form .compliance-check {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+.submit-book-form form .compliance-check input[type=checkbox] {
+  margin-right: 10px;
+}
+.submit-book-form form .compliance-check span {
+  color: #666;
+}
+.submit-book-form form button {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #28a745;
+  color: #fff;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.submit-book-form form button:hover {
+  background-color: #218838;
+}/*# sourceMappingURL=SubmitBookForm.css.map */

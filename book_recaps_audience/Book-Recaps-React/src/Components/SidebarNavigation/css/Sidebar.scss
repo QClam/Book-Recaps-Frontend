@@ -25,7 +25,7 @@
   display: flex;
   align-items: center;
   margin-left: 10px;
-  margin-right: 30px; /* Khoảng cách giữa logo và danh sách */
+  margin-right: 20px; /* Khoảng cách giữa logo và danh sách */
 }
 
 .SidebarLogo img {
@@ -98,7 +98,7 @@
   left: 0;
   width: 100%;
   max-height: 450px; /* Giới hạn chiều cao */
-  overflow-y: auto; /* Cuộn dọc nếu quá dài */
+  overflow-y: hidden; /* Cuộn dọc nếu quá dài */
   margin-top: 5px;
   z-index: 1001; /* Đảm bảo kết quả tìm kiếm nằm trên các thành phần khác */
 }

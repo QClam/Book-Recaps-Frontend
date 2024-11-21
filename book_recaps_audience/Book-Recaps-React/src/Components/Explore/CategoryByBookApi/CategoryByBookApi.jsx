@@ -4,6 +4,36 @@ import './CategoryByBookApi.scss';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import { useParams, useNavigate } from 'react-router-dom';
 
+const resolveRefs = (data) => {
+  const refMap = new Map();
+  const createRefMap = (obj) => {
+    if (typeof obj !== "object" || obj === null) return;
+    if (obj.$id) {
+      refMap.set(obj.$id, obj);
+    }
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        createRefMap(obj[key]);
+      }
+    }
+  };
+  const resolveRef = (obj) => {
+    if (typeof obj !== "object" || obj === null) return obj;
+    if (obj.$ref) {
+      return refMap.get(obj.$ref);
+    }
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        obj[key] = resolveRef(obj[key]);
+      }
+    }
+    return obj;
+  };
+  createRefMap(data);
+  return resolveRef(data);
+};
+
+
 const CategoryByBookApi = () => {
   const [categories, setCategories] = useState([]);
   const [allBooks, setAllBooks] = useState([]);
@@ -37,14 +67,14 @@ const CategoryByBookApi = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('https://160.25.80.100:7124/api/category', {
+        const response = await axios.get('https://160.25.80.100:7124/api/category/getallcategory', {
           headers: {
             'accept': '*/*',
             'Authorization': `Bearer ${accessToken}`,
           }
         });
 
-        const data = response.data;
+        const data = resolveRefs(response.data);
         if (data && data.succeeded) {
           setCategories(data.data.$values);
         } else {
@@ -71,7 +101,7 @@ const CategoryByBookApi = () => {
           }
         });
 
-        const data = response.data;
+        const data = resolveRefs(response.data);
         if (data && data.succeeded) {
           setAllBooks(data.data.$values);
         }
@@ -153,9 +183,14 @@ const CategoryByBookApi = () => {
       );
 
    // Hàm điều hướng khi click vào sách
-   const handleBookClick = (id) => {
-    navigate(`/user-recap-detail/${id}`); // Navigate to UserRecapDetail with the book ID
+  //  const handleBookClick = (id) => {
+  //   navigate(`/user-recap-detail/${id}`); // Navigate to UserRecapDetail with the book ID
+  // };
+
+  const handleBookClick = (id) => {
+    navigate(`/user-recap-detail-item/${id}`); // Navigate to UserRecapDetail with the book ID
   };
+
 
   return (
     <div className="custom-category-wrapper">

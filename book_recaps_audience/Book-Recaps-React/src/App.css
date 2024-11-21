@@ -34,3 +34,6 @@
   min-height: 100vh; /* Đảm bảo sidebar và content bao phủ toàn bộ chiều cao của màn hình */
   overflow: hidden; /* Ngăn cuộn ngoài ý muốn trên toàn trang */
 }
+.grecaptcha-badge { 
+  visibility: hidden !important;
+}

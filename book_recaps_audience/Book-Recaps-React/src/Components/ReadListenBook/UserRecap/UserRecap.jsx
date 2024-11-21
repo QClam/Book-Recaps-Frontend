@@ -64,6 +64,8 @@ const UserRecap = () => {
     navigate(`/user-recap-detail/${book.id}`); // Navigate to UserRecapDetail with the book ID
   };
 
+
+  
   const displayedBooks = showAll ? books : books.slice(0, 12); // Show first 8 books by default
 
   const truncateTitle = (title) => {
@@ -71,7 +73,7 @@ const UserRecap = () => {
   };
   return (
     <div className="recap-wrapper">
-      <h2>User Recap</h2>
+      <h2>Popular </h2>
       {error && <p className="recap-error">{error}</p>}
       <div className="recap-book-grid">
         {Array.isArray(displayedBooks) && displayedBooks.length > 0 ? (

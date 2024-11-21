@@ -3,6 +3,34 @@ import { useNavigate } from 'react-router-dom';
 import ReactPaginate from "react-paginate";
 import axios from "axios";
 import "./BookApi.scss"; // Import CSS cho styling
+const resolveRefs = (data) => {
+  const refMap = new Map();
+  const createRefMap = (obj) => {
+    if (typeof obj !== "object" || obj === null) return;
+    if (obj.$id) {
+      refMap.set(obj.$id, obj);
+    }
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        createRefMap(obj[key]);
+      }
+    }
+  };
+  const resolveRef = (obj) => {
+    if (typeof obj !== "object" || obj === null) return obj;
+    if (obj.$ref) {
+      return refMap.get(obj.$ref);
+    }
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        obj[key] = resolveRef(obj[key]);
+      }
+    }
+    return obj;
+  };
+  createRefMap(data);
+  return resolveRef(data);
+};
 
 const BookApi = () => {
   const [books, setBooks] = useState([]);
@@ -23,6 +51,10 @@ const BookApi = () => {
   const [publicationYears, setPublicationYears] = useState([]);
   const [selectedPublicationYear, setSelectedPublicationYear] = useState("");
 
+  // State for publisher filter
+  const [publishers, setPublishers] = useState([]);
+  const [selectedPublisher, setSelectedPublisher] = useState("");
+
   // Lấy accessToken và refreshToken từ localStorage
   const accessToken = localStorage.getItem("authToken");
   const refreshToken = localStorage.getItem("refreshToken");
@@ -40,7 +72,7 @@ const BookApi = () => {
           }
         );
 
-        const data = response.data;
+        const data = resolveRefs(response.data);
         console.log("Fetched Books Data:", data); // Kiểm tra dữ liệu
         
 
@@ -98,6 +130,7 @@ const BookApi = () => {
     const categorySet = new Set();
     const ageLimitSet = new Set();
     const publicationYearSet = new Set();
+    const publisherSet = new Set();
 
     booksData.forEach((book) => {
       // Categories
@@ -110,11 +143,18 @@ const BookApi = () => {
 
       // Publication Years
       publicationYearSet.add(book.publicationYear);
+
+      if (book.publisher && book.publisher.publisherName) {
+        publisherSet.add(book.publisher.publisherName);
+      }
+
     });
 
     setCategories([...categorySet]);
     setAgeLimits([...ageLimitSet].sort((a, b) => a - b));
     setPublicationYears([...publicationYearSet].sort((a, b) => b - a));
+    setPublishers([...publisherSet]);
+
   };
 
   // Hàm xử lý khi thay đổi Search hoặc Filter
@@ -165,6 +205,13 @@ const BookApi = () => {
       );
     }
 
+    // Apply publisher filter
+    if (selectedPublisher) {
+      tempBooks = tempBooks.filter((book) =>
+        book.publisher?.publisherName === selectedPublisher
+      );
+    }
+
     setFilteredBooks(tempBooks);
     setCurrentPage(0); // Reset về trang đầu khi có thay đổi
   }, [
@@ -174,6 +221,8 @@ const BookApi = () => {
     selectedCategories,
     selectedAgeLimit,
     selectedPublicationYear,
+    selectedPublisher,
+
   ]);
 
   // Tính toán phân trang
@@ -205,11 +254,16 @@ const BookApi = () => {
     setSelectedPublicationYear(e.target.value);
   };
 
+  const handlePublisherChange = (e) => {
+    setSelectedPublisher(e.target.value);
+  };
+
+
   // const handleBookClick = (id) => {
   //   navigate(`/bookdetailbook/${id}`); // Use the book's id for navigation
   // };
   const handleBookClick = (id) => {
-    navigate(`/user-recap-detail/${id}`); // Navigate to UserRecapDetail with the book ID
+    navigate(`/user-recap-detail-item/${id}`); // Navigate to UserRecapDetail with the book ID
   };
 
   return (
@@ -254,6 +308,16 @@ const BookApi = () => {
           </div>
 
           <div className="filter-groupup">
+            <h3>Nhà xuất bản</h3>
+            <select value={selectedPublisher} onChange={handlePublisherChange} className="filter-select">
+              <option value="">Tất cả</option>
+              {publishers.map((publisher) => (
+                <option key={publisher} value={publisher}>{publisher}</option>
+              ))}
+            </select>
+          </div>
+
+          <div className="filter-groupup">
             <h3>Giới hạn tuổi</h3>
             <select
               value={selectedAgeLimit}
@@ -288,10 +352,10 @@ const BookApi = () => {
       </div>
 
       {/* Danh sách sách */}
-      <div className="book-list">
+      <div className="book-list-stst">
         {currentBooks.length > 0 ? (
           currentBooks.map((book) => (
-            <div className="book-item" key={book.id} onClick={() => handleBookClick(book.id)}>
+            <div className="book-item-emem" key={book.id} onClick={() => handleBookClick(book.id)}>
               {book.coverImage && (
                 <img
                   src={book.coverImage}
