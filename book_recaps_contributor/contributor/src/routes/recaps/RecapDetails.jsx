@@ -534,8 +534,9 @@ const RecapVersionStats = () => {
     setStats(data);
     setLoading(false);
   };
+
   const dashboardData = stats ? stats.dailyStats.$values.map((item) => ({
-    date: item.date.split('T')[0],
+    date: new Date(item.date).toLocaleDateString().slice(0, 5),
     views: item.views,
     watchTime: item.watchTime,
     earning: item.earning
@@ -577,7 +578,17 @@ const RecapVersionStats = () => {
           <div className="text-lg font-semibold">
             Quyết toán gần nhất
           </div>
-          <Show when={!loading} fallback={<p>Loading...</p>}>
+          <Show when={!loading} fallback={
+            <p className="flex items-center gap-2">
+              <ProgressSpinner
+                style={{ width: '15px', height: '15px' }}
+                strokeWidth="8"
+                fill="var(--surface-ground)"
+                animationDuration=".5s"
+              />
+              <span>Loading...</span>
+            </p>
+          }>
             <Show when={stats && stats.lastPayout} fallback={<p>Chưa có quyết toán nào.</p>}>
               <p className="text-sm italic text-gray-500">
                 (Từ {new Date(stats?.lastPayout?.fromDate).toLocaleDateString()} đến {new Date(stats?.lastPayout?.toDate).toLocaleDateString()})
@@ -624,7 +635,7 @@ const RecapVersionStats = () => {
           })}
           onClick={() => setActiveTab('views')}
         >
-          <div className="text-2xl font-bold">1000</div>
+          <div className="text-2xl font-bold">{stats?.totalViews || 0}</div>
           <div>Views</div>
         </button>
         <button
@@ -633,7 +644,7 @@ const RecapVersionStats = () => {
           })}
           onClick={() => setActiveTab('watchTime')}
         >
-          <div className="text-2xl font-bold">4000</div>
+          <div className="text-2xl font-bold">{stats?.totalWatchTime || 0}</div>
           <div>Watch time (minutes)</div>
         </button>
         <button
@@ -642,13 +653,13 @@ const RecapVersionStats = () => {
           })}
           onClick={() => setActiveTab('earning')}
         >
-          <div className="text-2xl font-bold">2.000.000</div>
+          <div className="text-2xl font-bold">{stats?.totalEarnings || 0}</div>
           <div>Earning (VNĐ)</div>
         </button>
       </div>
 
-      <div>
-        <ResponsiveContainer width="100%" height={430} aspect={16 / 9}>
+      <div className="max-h-[430px] aspect-video mx-auto">
+        <ResponsiveContainer>
           <AreaChart data={dashboardData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">

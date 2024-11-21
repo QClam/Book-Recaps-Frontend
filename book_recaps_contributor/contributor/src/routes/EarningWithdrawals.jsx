@@ -133,7 +133,17 @@ const EarningWithdrawals = () => {
         <div className="p-4 bg-white rounded-md shadow-sm border border-gray-300 w-fit pr-8">
           <div className="text-lg font-semibold mb-4">Số dư hiện tại:</div>
           <div className="text-2xl text-indigo-600 font-bold mb-2">
-            <Suspense fallback={"Loading..."}>
+            <Suspense fallback={
+              <p className="flex items-center gap-2">
+                <ProgressSpinner
+                  style={{ width: '15px', height: '15px' }}
+                  strokeWidth="8"
+                  fill="var(--surface-ground)"
+                  animationDuration=".5s"
+                />
+                <span>Loading...</span>
+              </p>
+            }>
               <Await resolve={withdrawInfo} errorElement={<>Error occurred</>}>
                 {(resolvedWithdrawInfo) => (
                   <div>
@@ -148,7 +158,17 @@ const EarningWithdrawals = () => {
         <div className="p-4 bg-white rounded-md shadow-sm border border-gray-300 w-fit pr-8">
           <div className="text-lg font-semibold mb-4">Tổng tiền đã rút:</div>
           <div className="text-2xl text-indigo-600 font-bold mb-2">
-            <Suspense fallback={"Loading..."}>
+            <Suspense fallback={
+              <p className="flex items-center gap-2">
+                <ProgressSpinner
+                  style={{ width: '15px', height: '15px' }}
+                  strokeWidth="8"
+                  fill="var(--surface-ground)"
+                  animationDuration=".5s"
+                />
+                <span>Loading...</span>
+              </p>
+            }>
               <Await resolve={withdrawInfo} errorElement={<>Error occurred</>}>
                 {(resolvedWithdrawInfo) => (
                   <div>
@@ -223,8 +243,17 @@ const EarningWithdrawals = () => {
             <Modal.Body className="space-y-4">
               <div className="p-4 bg-white rounded-md shadow-sm border border-gray-300">
                 <div className="text-lg font-semibold">Số dư hiện tại</div>
-
-                <Suspense fallback={"Loading..."}>
+                <Suspense fallback={
+                  <p className="flex items-center gap-2">
+                    <ProgressSpinner
+                      style={{ width: '15px', height: '15px' }}
+                      strokeWidth="8"
+                      fill="var(--surface-ground)"
+                      animationDuration=".5s"
+                    />
+                    <span>Loading...</span>
+                  </p>
+                }>
                   <Await resolve={withdrawInfo} errorElement={<>Error occurred</>}>
                     {(resolvedWithdrawInfo) => (
                       <div className="text-xl text-indigo-600 font-bold">
@@ -234,8 +263,17 @@ const EarningWithdrawals = () => {
                   </Await>
                 </Suspense>
               </div>
-
-              <Suspense fallback={"Loading..."}>
+              <Suspense fallback={
+                <p className="flex items-center gap-2">
+                  <ProgressSpinner
+                    style={{ width: '15px', height: '15px' }}
+                    strokeWidth="8"
+                    fill="var(--surface-ground)"
+                    animationDuration=".5s"
+                  />
+                  <span>Loading...</span>
+                </p>
+              }>
                 <Await resolve={withdrawInfo} errorElement={<>Error occurred</>}>
                   {(resolvedWithdrawInfo) => (
                     <TextInput
@@ -265,8 +303,17 @@ const EarningWithdrawals = () => {
               </div>
             </Modal.Body>
             <Modal.Footer className="justify-end gap-3 text-sm">
-
-              <Suspense fallback={"Loading..."}>
+              <Suspense fallback={
+                <p className="flex items-center gap-2">
+                  <ProgressSpinner
+                    style={{ width: '15px', height: '15px' }}
+                    strokeWidth="8"
+                    fill="var(--surface-ground)"
+                    animationDuration=".5s"
+                  />
+                  <span>Loading...</span>
+                </p>
+              }>
                 <Await resolve={withdrawInfo} errorElement={<>Error occurred</>}>
                   {(resolvedWithdrawInfo) => (
                     <button

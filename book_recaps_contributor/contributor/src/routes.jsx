@@ -18,6 +18,7 @@ import { loginAction } from "./routes/actions/loginAction";
 import { createRecapAction } from "./routes/actions/createRecapAction";
 import EarningWithdrawals, { earningWithdrawalsAction, earningWithdrawalsLoader } from "./routes/EarningWithdrawals";
 import Payouts, { payoutsLoader } from "./routes/Payouts";
+import PayoutDetails, { payoutDetailsLoader } from "./routes/PayoutDetails";
 
 export const routes = {
   dashboard: '/',
@@ -129,8 +130,18 @@ export const router = createBrowserRouter([
               },
               {
                 path: routes.payouts,
-                loader: payoutsLoader,
-                element: <Payouts/>
+                children: [
+                  {
+                    index: true,
+                    loader: payoutsLoader,
+                    element: <Payouts/>,
+                  },
+                  {
+                    path: routes.payoutDetails,
+                    loader: payoutDetailsLoader,
+                    element: <PayoutDetails/>
+                  }
+                ]
               },
               {
                 path: routes.profile,

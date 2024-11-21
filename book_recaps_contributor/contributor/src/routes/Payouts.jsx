@@ -18,7 +18,6 @@ const getPayouts = async (request) => {
     const response = await axiosInstance.get('/api/contributorpayout/getlistpayoutinfobycontributorid/' + user.id, {
       signal: request.signal
     });
-    console.log(response.data.data);
     return response.data.data.$values;
   } catch (error) {
     const err = handleFetchError(error);
@@ -99,27 +98,23 @@ function PayoutsTable() {
             </div>
           </td>
         </tr>
-      }
-    >
+      }>
       {payouts.map((p) => (
         <Table.Row key={p.payoutId}>
           <Table.Cell isFirstCell={true}>
-            {p.fromDate ? new Date(p.fromdate).toLocaleDateString() : 'N/A'}
+            {p.fromdate ? new Date(p.fromdate).toLocaleDateString() : 'N/A'}
           </Table.Cell>
           <Table.Cell>
-            {p.toDate ? new Date(p.todate).toLocaleDateString() : 'N/A'}
+            {p.todate ? new Date(p.todate).toLocaleDateString() : 'N/A'}
           </Table.Cell>
           <Table.Cell>
-            <span className="font-semibold text-indigo-600 text-lg">{p.totalEarnings.toLocaleString('vi-VN')}đ</span>
+            <p className="font-semibold text-indigo-600 text-lg">{p.totalEarnings.toLocaleString('vi-VN')}đ</p>
           </Table.Cell>
           <Table.Cell>
             <Badge
               value={p.status}
-              severity={
-                p.status === "Pending" ? 'warning' :
-                  p.status === "Done" ? 'success' :
-                    'danger'
-              }/>
+              severity={p.status === "Pending" ? 'warning' : p.status === "Done" ? 'success' : 'danger'}
+            />
           </Table.Cell>
           <Table.Cell>
             {p.createAt ? new Date(p.createAt).toLocaleString() : 'N/A'}
@@ -127,7 +122,7 @@ function PayoutsTable() {
           <Table.Cell>
             <Link
               to={generatePath(routes.payoutDetails, { payoutId: p.payoutId })}
-              className="border rounded p-1 hover:bg-indigo-200 disabled:opacity-50 disabled:cursor-progress"
+              className="block w-fit border rounded p-1 hover:bg-indigo-200 disabled:opacity-50 disabled:cursor-progress"
               type="submit"
               title="View details"
               disabled={navigation.state === 'loading'}
