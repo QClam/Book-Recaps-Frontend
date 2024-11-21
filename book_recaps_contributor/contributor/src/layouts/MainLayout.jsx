@@ -12,8 +12,9 @@ const MainLayout = ({ children }) => {
 
   const matchRecapVersionDetails = useMatch(routes.recapVersionDetails);
   const matchRecapDetails = useMatch(routes.recapDetails);
+  const matchCreateRecap = useMatch(routes.createRecap);
 
-  const isOffFooter = matchRecapVersionDetails || matchRecapDetails;
+  const isOffFooter = matchRecapVersionDetails || (matchRecapDetails && !matchCreateRecap);
 
   return (
     <div className="flex flex-row h-screen">

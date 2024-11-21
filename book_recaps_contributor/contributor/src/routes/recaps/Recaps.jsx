@@ -13,29 +13,22 @@ import {
   useSearchParams
 } from "react-router-dom";
 import Select from "../../components/form/Select";
-import { ACCESS_TOKEN, axiosInstance, axiosInstance2 } from "../../utils/axios";
-import { jwtDecode } from "jwt-decode";
+import { axiosInstance, axiosInstance2 } from "../../utils/axios";
 import { handleFetchError } from "../../utils/handleFetchError";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { cn } from "../../utils/cn";
 import { routes } from "../../routes";
 import { useToast } from "../../contexts/Toast";
 import { Image } from "primereact/image";
+import { TbPlus } from "react-icons/tb";
+import { getCurrentUserInfo } from "../../utils/getCurrentUserInfo";
 
 async function getRecaps(published, request) {
   try {
-    const accessToken = localStorage.getItem(ACCESS_TOKEN)
-    if (!accessToken) {
-      return []
-    }
+    const user = getCurrentUserInfo();
+    if (!user) return [];
 
-    const decoded = jwtDecode(accessToken)
-    const id = decoded[import.meta.env.VITE_CLAIMS_IDENTIFIER]
-    if (!id) {
-      return []
-    }
-
-    const response = await axiosInstance2.get('/recaps/by-user/' + id, {
+    const response = await axiosInstance2.get('/recaps/by-user/' + user.id, {
       params: {
         published
       },
@@ -125,7 +118,7 @@ const RecapsPage = () => {
       <CustomBreadCrumb items={[ { label: "Bài viết hiện có" } ]}/>
 
       <div className="p-4">
-        <div className="mb-4 gap-1 flex items-center">
+        <div className="mb-4 gap-1 flex items-center justify-between">
           <Select
             id="published"
             name="published"
@@ -139,6 +132,13 @@ const RecapsPage = () => {
               e.target.value ? setSearchParams({ published: e.target.value }) : setSearchParams({});
             }}
           />
+
+          <Link
+            to={routes.createRecap}
+            className="flex justify-center items-center gap-1 px-5 py-2 font-semibold bg-indigo-600 text-white rounded hover:bg-indigo-800">
+            <TbPlus/>
+            <span>Tạo bài viết mới</span>
+          </Link>
         </div>
         <Suspense
           fallback={

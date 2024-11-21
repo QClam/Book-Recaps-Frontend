@@ -32,6 +32,7 @@ import Modal from "../../components/modal";
 import Table from "../../components/table";
 import BookInfo from "../../components/BookInfo";
 import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import _ from "lodash";
 
 const getRecapInfo = async (recapId, request) => {
   try {
@@ -569,8 +570,8 @@ const RecapVersionStats = () => {
   return (
     <div className="p-4 bg-white rounded-lg shadow-md">
       <div className="flex justify-between mb-4 gap-4">
-        <div className="flex-1 py-4 px-6 rounded-md bg-gray-100 space-y-1 border border-gray-300">
-          <div className="text-lg font-semibold text-gray-700">
+        <div className="flex-1 py-4 px-6 rounded-md shadow-sm space-y-1 border border-gray-300">
+          <div className="text-lg font-semibold">
             Tổng lượt xem
           </div>
           <p className="text-sm italic text-gray-500">
@@ -580,15 +581,15 @@ const RecapVersionStats = () => {
             100.000 views
           </p>
         </div>
-        <div className="flex-1 py-4 px-6 rounded-md bg-gray-100 space-y-1 border border-gray-300">
-          <div className="text-lg font-semibold text-gray-700">
+        <div className="flex-1 py-4 px-6 rounded-md shadow-sm space-y-1 border border-gray-300">
+          <div className="text-lg font-semibold">
             Quyết toán gần nhất
           </div>
           <p className="text-sm italic text-gray-500">
             (Từ 2021-09-01 đến 2021-09-07)
           </p>
           <p className="text-2xl font-bold">
-            100.000 VND
+            100.000 VNĐ
           </p>
         </div>
       </div>
@@ -646,7 +647,7 @@ const RecapVersionStats = () => {
           onClick={() => setActiveTab('earning')}
         >
           <div className="text-2xl font-bold">2.000.000</div>
-          <div>Earning (VND)</div>
+          <div>Earning (VNĐ)</div>
         </button>
       </div>
 
@@ -721,8 +722,7 @@ const RightSidePanel = () => {
   }, [ actionData ]);
 
   useEffect(() => {
-    if (JSON.stringify(recap) === JSON.stringify(recapData)) return;
-    setRecapData(recap);
+    !_.isEqual(recap, recapData) && setRecapData(recap);
   }, [ recap ]);
 
   return (

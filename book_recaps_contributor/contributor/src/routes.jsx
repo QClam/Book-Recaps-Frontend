@@ -16,11 +16,12 @@ import BookDetails, { bookDetailsLoader } from "./routes/BookDetails";
 
 import { loginAction } from "./routes/actions/loginAction";
 import { createRecapAction } from "./routes/actions/createRecapAction";
+import EarningWithdrawals, { earningWithdrawalsAction, earningWithdrawalsLoader } from "./routes/EarningWithdrawals";
 
 export const routes = {
+  dashboard: '/',
   login: '/login',
   logout: '/logout',
-  dashboard: '/',
   recaps: '/recaps',
   recapDetails: '/recaps/:recapId',
   createRecap: '/recaps/create',
@@ -28,11 +29,12 @@ export const routes = {
   keyIdea: '/key-idea',
   books: '/books',
   bookDetails: '/books/:bookId',
+  appeals: '/appeals',
+  reviewAppeals: '/reviews/:reviewId/appeals',
+  earningWithdrawals: '/earning-withdrawals',
   contact: '/contact',
   profile: '/profile',
   billingInvoices: '/billing-invoices',
-  appeals: '/appeals',
-  reviewAppeals: '/reviews/:reviewId/appeals',
 }
 
 export const router = createBrowserRouter([
@@ -116,6 +118,24 @@ export const router = createBrowserRouter([
                     action: createRecapAction
                   }
                 ]
+              },
+              {
+                path: routes.earningWithdrawals,
+                loader: earningWithdrawalsLoader,
+                action: earningWithdrawalsAction,
+                element: <EarningWithdrawals/>
+              },
+              {
+                path: routes.profile,
+                element: <div>Profile</div>
+              },
+              {
+                path: routes.billingInvoices,
+                element: <div>Invoices</div>
+              },
+              {
+                path: routes.contact,
+                element: <div>Contact</div>
               }
             ]
           }

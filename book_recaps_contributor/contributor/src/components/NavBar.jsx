@@ -6,6 +6,7 @@ import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
 import { TbApps, TbArrowBarLeft, TbArrowBarRight, TbBooks, TbMessage, TbNews, TbUser } from "react-icons/tb";
 import { HiOutlineCreditCard } from "react-icons/hi2";
 import { routes } from "../routes";
+import { GrMoney } from "react-icons/gr";
 
 export const NavBar = () => {
   const [ isOpen, setIsOpen ] = useState(true)
@@ -82,8 +83,15 @@ export const NavBar = () => {
 
         <NavbarLink
           href={routes.billingInvoices}
-          text="Billing&nbsp;and&nbsp;invoices"
+          text="Invoices"
           icon={<HiOutlineCreditCard/>}
+          isOpen={isOpen}
+        />
+
+        <NavbarLink
+          href={routes.earningWithdrawals}
+          text="Withdraw&nbsp;earnings"
+          icon={<GrMoney/>}
           isOpen={isOpen}
         />
       </ul>

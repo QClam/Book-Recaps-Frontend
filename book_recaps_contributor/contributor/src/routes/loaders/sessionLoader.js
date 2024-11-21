@@ -19,17 +19,18 @@ export const sessionLoader = async () => {
   }
 
   const decoded = jwtDecode(token)
+  const userId = decoded[import.meta.env.VITE_CLAIMS_IDENTIFIER]
 
   if (
     isValidToken(decoded) &&
     isRoleMatched(decoded, "Contributor") &&
-    responseId === decoded[import.meta.env.VITE_CLAIMS_IDENTIFIER]
+    responseId === userId
   ) {
     return {
       email: decoded.email,
       name: decoded[import.meta.env.VITE_CLAIMS_NAME],
       role: "Contributor",
-      id: decoded[import.meta.env.VITE_CLAIMS_IDENTIFIER]
+      id: userId,
     }
   }
   setSession(null)
