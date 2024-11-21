@@ -1,9 +1,9 @@
 import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
-import dayjs from 'dayjs'
 
 import api from '../Auth/AxiosInterceptors';
+import { Hourglass } from 'react-loader-spinner';
 
 function HistoryContributorPayout() {
 
@@ -31,9 +31,23 @@ function HistoryContributorPayout() {
         return date ? new Date(date).toLocaleDateString() : null;
     }
 
+    if (loading) {
+        return (
+          <div className="loading">
+            <Hourglass
+              visible={true}
+              height="80"
+              width="80"
+              ariaLabel="hourglass-loading"
+              colors={["#306cce", "#72a1ed"]}
+            />
+          </div>
+        );
+      }
+
     return (
         <Box sx={{ width: "80vw" }}>
-            <Typography variant='h5'>Lịch sử quyết toán</Typography>
+            <Typography variant='h5'>Lịch sử quyết toán Contributor</Typography>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
@@ -42,6 +56,7 @@ function HistoryContributorPayout() {
                             <TableCell>Từ ngày</TableCell>
                             <TableCell>Đến ngày</TableCell>
                             <TableCell>Tổng tiền</TableCell>
+                            <TableCell>Ghi chú</TableCell>
                             <TableCell>Trạng thái</TableCell>
                             <TableCell></TableCell>
                         </TableRow>
@@ -53,6 +68,7 @@ function HistoryContributorPayout() {
                                 <TableCell>{formatDate(item.fromDate)}</TableCell>
                                 <TableCell>{formatDate(item.toDate)}</TableCell>
                                 <TableCell>{item.amount}</TableCell>
+                                <TableCell>{item.description}</TableCell>
                                 {item.status === 1 ? (
                                     <TableCell>Hoàn tất</TableCell>
                                 ) : (

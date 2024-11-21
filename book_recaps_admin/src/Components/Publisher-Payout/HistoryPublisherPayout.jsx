@@ -1,69 +1,87 @@
-import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
-import React from 'react'
+import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
+import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
+
+import api from '../Auth/AxiosInterceptors';
+import { Hourglass } from 'react-loader-spinner';
+
 
 function HistoryPublisherPayout() {
 
-    const {historyId} = useParams();
+    const { historyId } = useParams();
 
-    const payoutHistoryData = [
-        {
-            id:'1',
-            name: 'Publisher A',
-            fromDate: '19-09-2024',
-            toDate: new Date().toISOString().slice(0, 10),
-            revenue: '12.000.000 VND',
-            status: 'Hoàn thành',
-        },
-        {
-            id:'2',
-            name: 'Publisher A',
-            fromDate: '19-10-2024',
-            toDate: new Date().toISOString().slice(0, 10),
-            revenue: '8.000.000 VND',
-            status: 'Hoàn thành',
-        },
-        {
-            id:'3',
-            name: 'Publisher A',
-            fromDate: '19-11-2024',
-            toDate: new Date().toISOString().slice(0, 10),
-            revenue: '15.000.000 VND',
-            status: 'Hoàn thành',
-        },
+    const [payouts, setPayouts] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    ];
-    
+    const fetchPayouts = async () => {
+        try {
+            const response = await api.get(`/api/PublisherPayout/getlistpayoutinfobypublisherid/${historyId}`)
+            const payouts = response.data.data.$values;
+            setPayouts(payouts);
+            setLoading(false);
+        } catch (error) {
+            console.error("Error Fetching Contributor Payout History", error);
+        }
+    }
+
+    useEffect(() => {
+        fetchPayouts();
+    }, [])
+
+    const formatDate = (date) => {
+        return date ? new Date(date).toLocaleDateString() : null;
+    }
+
+    if (loading) {
+        return (
+            <div className="loading">
+                <Hourglass
+                    visible={true}
+                    height="80"
+                    width="80"
+                    ariaLabel="hourglass-loading"
+                    colors={["#306cce", "#72a1ed"]}
+                />
+            </div>
+        );
+    }
+
     return (
-        <div className='publisher-payout-container'>           
-                <Typography variant='h5'>Lịch sử quyết toán</Typography>
-                <TableContainer component={Paper}>
-                    <Table>
-                        <TableHead>
-                            <TableRow>
-                                <TableCell>Tên</TableCell>
-                                <TableCell>Từ ngày</TableCell>
-                                <TableCell>Đến ngày</TableCell>
-                                <TableCell>Tổng tiền</TableCell>
-                                <TableCell>Trạng thái</TableCell>
-                                <TableCell></TableCell>
+        <Box sx={{ width: "80vw" }}>
+            <Typography variant='h5'>Lịch sử quyết toán Publisher</Typography>
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell>Tên</TableCell>
+                            <TableCell>Từ ngày</TableCell>
+                            <TableCell>Đến ngày</TableCell>
+                            <TableCell>Tổng tiền</TableCell>
+                            <TableCell>Ghi chú</TableCell>
+                            <TableCell>Trạng thái</TableCell>
+                            <TableCell></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {payouts.map((item) => (
+                            <TableRow key={item.id}>
+                                <TableCell>{item.name}</TableCell>
+                                <TableCell>{formatDate(item.fromDate)}</TableCell>
+                                <TableCell>{formatDate(item.toDate)}</TableCell>
+                                <TableCell>{item.amount}</TableCell>
+                                <TableCell>{item.description}</TableCell>
+                                {item.status === 1 ? (
+                                    <TableCell>Hoàn tất</TableCell>
+                                ) : (
+                                    <TableCell>Unknow</TableCell>
+                                )}
+                                <TableCell><Button href={`/publisher-payout-history/${historyId}/detail/${item.id}`}>Xem chi tiết</Button></TableCell>
                             </TableRow>
-                        </TableHead>
-                        <TableBody>
-                            {payoutHistoryData.map((item, index) => (
-                                <TableRow key={index}>
-                                    <TableCell>{item.name}</TableCell>
-                                    <TableCell>{item.fromDate}</TableCell>
-                                    <TableCell>{item.toDate}</TableCell>
-                                    <TableCell>{item.revenue}</TableCell>
-                                    <TableCell>{item.status}</TableCell>
-                                    <TableCell><Button href={`/publisher-payout-history/${historyId}/detail/${item.id}`}>Xem chi tiết</Button></TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-        </div>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        </Box>
     )
 }
 
