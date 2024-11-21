@@ -441,7 +441,7 @@ function WithdrawRequestsTable() {
       }
     >
       {withdraws.map((wd) => (
-        <Table.Row key={wd.$id}>
+        <Table.Row key={wd.drawalId}>
           <Table.Cell isFirstCell={true}>
             <div className="w-20">
               <Image

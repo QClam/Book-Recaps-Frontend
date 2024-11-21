@@ -123,9 +123,7 @@ function PayoutsTable() {
             <Link
               to={generatePath(routes.payoutDetails, { payoutId: p.payoutId })}
               className="block w-fit border rounded p-1 hover:bg-indigo-200 disabled:opacity-50 disabled:cursor-progress"
-              type="submit"
               title="View details"
-              disabled={navigation.state === 'loading'}
             >
               <span className="text-lg"><TbEye/></span>
             </Link>

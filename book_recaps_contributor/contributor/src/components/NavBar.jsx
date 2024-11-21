@@ -3,7 +3,7 @@ import Show from "./Show";
 import { cn } from "../utils/cn";
 import { Link, NavLink, useMatch } from "react-router-dom";
 import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
-import { TbApps, TbArrowBarLeft, TbArrowBarRight, TbBooks, TbMessage, TbNews, TbUser } from "react-icons/tb";
+import { TbApps, TbArrowBarLeft, TbArrowBarRight, TbBooks, TbNews, TbUser } from "react-icons/tb";
 import { HiOutlineCreditCard } from "react-icons/hi2";
 import { routes } from "../routes";
 import { GrMoney } from "react-icons/gr";
@@ -44,16 +44,17 @@ export const NavBar = () => {
           isOpen={isOpen}
           end
         />
+
+        <NavInfo isOpen={isOpen}>
+          Resources
+        </NavInfo>
+
         <NavbarLink
           href={routes.recaps}
           icon={<TbNews/>}
           text="Recaps"
           isOpen={isOpen}
         />
-
-        <NavInfo isOpen={isOpen}>
-          Resources&nbsp;and&nbsp;help
-        </NavInfo>
 
         <NavbarLink
           href={routes.books}
@@ -63,12 +64,12 @@ export const NavBar = () => {
           end
         />
 
-        <NavbarLink
-          href={routes.contact}
-          text="Contact"
-          icon={<TbMessage/>}
-          isOpen={isOpen}
-        />
+        {/*<NavbarLink*/}
+        {/*  href={routes.supportTickets}*/}
+        {/*  text="Supports"*/}
+        {/*  icon={<TbMessage/>}*/}
+        {/*  isOpen={isOpen}*/}
+        {/*/>*/}
 
         <NavInfo isOpen={isOpen}>
           Account

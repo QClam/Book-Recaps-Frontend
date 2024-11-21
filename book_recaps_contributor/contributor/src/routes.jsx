@@ -20,6 +20,7 @@ import EarningWithdrawals, { earningWithdrawalsAction, earningWithdrawalsLoader 
 import Payouts, { payoutsLoader } from "./routes/Payouts";
 import PayoutDetails, { payoutDetailsLoader } from "./routes/PayoutDetails";
 import Dashboard from "./routes/Dashboard";
+// import Support, { supportTicketsAction, supportTicketsLoader } from "./routes/Support";
 
 export const routes = {
   dashboard: '/',
@@ -35,7 +36,7 @@ export const routes = {
   appeals: '/appeals',
   reviewAppeals: '/reviews/:reviewId/appeals',
   earningWithdrawals: '/earning-withdrawals',
-  contact: '/contact',
+  // supportTickets: '/support-tickets',
   profile: '/profile',
   payouts: '/payouts',
   payoutDetails: '/payouts/:payoutId',
@@ -144,14 +145,16 @@ export const router = createBrowserRouter([
                   }
                 ]
               },
+              // {
+              //   path: routes.supportTickets,
+              //   loader: supportTicketsLoader,
+              //   action: supportTicketsAction,
+              //   element: <Support/>
+              // },
               {
                 path: routes.profile,
                 element: <div>Profile</div>
               },
-              {
-                path: routes.contact,
-                element: <div>Contact</div>
-              }
             ]
           }
         ]
