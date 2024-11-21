@@ -19,6 +19,7 @@ import { createRecapAction } from "./routes/actions/createRecapAction";
 import EarningWithdrawals, { earningWithdrawalsAction, earningWithdrawalsLoader } from "./routes/EarningWithdrawals";
 import Payouts, { payoutsLoader } from "./routes/Payouts";
 import PayoutDetails, { payoutDetailsLoader } from "./routes/PayoutDetails";
+import Dashboard from "./routes/Dashboard";
 
 export const routes = {
   dashboard: '/',
@@ -65,7 +66,7 @@ export const router = createBrowserRouter([
             children: [
               {
                 index: true,
-                element: <div>Dashboard</div>
+                element: <Dashboard/>
               },
               {
                 path: routes.recaps,
