@@ -55,7 +55,7 @@ function CreateContributorPayout() {
     const postPayoutForm = async () => {
 
         const params = {
-            description: description,
+            description: description || "Không có ghi chú",
             toDate: formatDateISO(contributor?.todate),
         }
 

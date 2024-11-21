@@ -99,6 +99,10 @@ function PublisherPayout() {
         setOpenModal(false);
     };
 
+    const historyPayout = (id) => {
+        navigate(`/publisher-payout-history/${id}`);
+    };
+
     // Fetch thông tin payout chuẩn bị tạo
     const inputCreatePayout = async () => {
         try {
@@ -203,7 +207,7 @@ function PublisherPayout() {
                                     <Box>
                                         <Button
                                             color="primary"
-                                            // onClick={() => historyPayout(item.contributorId)}
+                                            onClick={() => historyPayout(item.id)}
                                             sx={{
                                                 '&:hover': { backgroundColor: '#edf5fa' },
                                             }}

@@ -1,41 +1,38 @@
-import { Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
-import React from 'react'
+import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import React, { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom';
+import dayjs from 'dayjs'
+
+import api from '../Auth/AxiosInterceptors';
 
 function HistoryContributorPayout() {
 
-    const {historyId} = useParams();
+    const { historyId } = useParams();
 
-    const payoutHistoryData = [
-        {
-            id: '1',
-            name: 'Contributor A',
-            fromDate: '19-09-2024',
-            toDate: '19-10-2024',
-            revenue: '12.000.000 VND',
-            status: 'Hoàn thành',
-        },
-        {
-            id: '2',
-            name: 'Contributor A',
-            fromDate: '20-10-2024',
-            toDate: '20-11-2024',
-            revenue: '8.000.000 VND',
-            status: 'Chưa đến hạn',
-        },
-        {
-            id: '3',
-            name: 'Contributor A',
-            fromDate: '21-11-2024',
-            toDate: '21-12-2024',
-            revenue: '15.000.000 VND',
-            status: 'Chưa đến hạn',
-        },
+    const [payouts, setPayouts] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    ];
+    const fetchPayouts = async () => {
+        try {
+            const response = await api.get(`/api/contributorpayout/getlistpayoutinfobycontributorid/${historyId}`)
+            const payouts = response.data.data.$values;
+            setPayouts(payouts);
+            setLoading(false);
+        } catch (error) {
+            console.error("Error Fetching Contributor Payout History", error);
+        }
+    }
+
+    useEffect(() => {
+        fetchPayouts();
+    }, [])
+
+    const formatDate = (date) => {
+        return date ? new Date(date).toLocaleDateString() : null;
+    }
 
     return (
-        <div className='publisher-payout-container'>
+        <Box sx={{ width: "80vw" }}>
             <Typography variant='h5'>Lịch sử quyết toán</Typography>
             <TableContainer component={Paper}>
                 <Table>
@@ -50,20 +47,24 @@ function HistoryContributorPayout() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {payoutHistoryData.map((item, index) => (
-                            <TableRow key={index}>
+                        {payouts.map((item) => (
+                            <TableRow key={item.id}>
                                 <TableCell>{item.name}</TableCell>
-                                <TableCell>{item.fromDate}</TableCell>
-                                <TableCell>{item.toDate}</TableCell>
-                                <TableCell>{item.revenue}</TableCell>
-                                <TableCell>{item.status}</TableCell>
+                                <TableCell>{formatDate(item.fromDate)}</TableCell>
+                                <TableCell>{formatDate(item.toDate)}</TableCell>
+                                <TableCell>{item.amount}</TableCell>
+                                {item.status === 1 ? (
+                                    <TableCell>Hoàn tất</TableCell>
+                                ) : (
+                                    <TableCell>Unknow</TableCell>
+                                )}
                                 <TableCell><Button href={`/contributor-payout-history/${historyId}/detail/${item.id}`}>Xem chi tiết</Button></TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </TableContainer>
-        </div>
+        </Box>
     )
 }
 
