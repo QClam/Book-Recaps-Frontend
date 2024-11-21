@@ -102,7 +102,7 @@ function PayoutsTable() {
       }
     >
       {payouts.map((p) => (
-        <Table.Row key={p.$id}>
+        <Table.Row key={p.payoutId}>
           <Table.Cell isFirstCell={true}>
             {p.fromDate ? new Date(p.fromdate).toLocaleDateString() : 'N/A'}
           </Table.Cell>
@@ -122,11 +122,11 @@ function PayoutsTable() {
               }/>
           </Table.Cell>
           <Table.Cell>
-            {p.createdAt ? new Date(p.createdAt).toLocaleString() : 'N/A'}
+            {p.createAt ? new Date(p.createAt).toLocaleString() : 'N/A'}
           </Table.Cell>
           <Table.Cell>
             <Link
-              to={generatePath(routes.payoutDetails, { payoutId: p.id })}
+              to={generatePath(routes.payoutDetails, { payoutId: p.payoutId })}
               className="border rounded p-1 hover:bg-indigo-200 disabled:opacity-50 disabled:cursor-progress"
               type="submit"
               title="View details"
