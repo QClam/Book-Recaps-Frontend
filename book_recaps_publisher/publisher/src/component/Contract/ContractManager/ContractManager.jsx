@@ -108,15 +108,17 @@ const ContractManager = () => {
   const getStatusLabel = (status) => {
     switch (status) {
       case 0:
-        return "Pending";
+        return "Bản nháp";
       case 1:
-        return "NotStarted";
+        return "Đang xử lý";
       case 2:
-        return "Approved";
+        return "Chưa bắt đầu";
       case 3:
-        return "Expired";
+        return "Đang kích hoạt";
       case 4:
-        return "Rejected";
+        return "Hết hạn";
+        case 5:
+          return "Từ chối";
       default:
         return "Unknown";
     }

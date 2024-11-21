@@ -30,13 +30,6 @@ function Settings() {
     const [imageFile, setImageFile] = useState(null); // New state to store selected image file
     const [imageUploadLoading, setImageUploadLoading] = useState(false);
 
-    const handleViewApplication = () => {
-        navigate('/application'); // Navigate to the Application route
-    };
-
-    const handleViewBilling = () => {
-        navigate('/billing'); // Navigate to the Billing route
-    };
      // Handle tab change
      const handleTabChange = (tab) => {
         setCurrentTab(tab);

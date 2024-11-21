@@ -22,6 +22,10 @@ import Dashboard from './component/Dashboard/Dashboard';
 import PayoutDetail from './component/Earning/PayoutDetail/PayoutDetail';
 import PayoutHistory from './component/Earning/PayoutHistory/PayoutHistory';
 import Contract from './component/Contract/Contract/NewContract';
+import FetchPublisherData from './component/Publisher/Publisher';
+import PublisherPayout from './component/Publisher/PublisherPayout';
+import PublisherDashboard from './component/Dashboard/PublisherDashboard';
+import UpdateBook from './component/ListBook/UpdateBook/UpdateBook';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -51,20 +55,25 @@ const App = () => {
            <Route element={<MainLayout />}>
 
             <Route path="/" element={<Overview/>} />
-            <Route path="/contract" element={<ContractViewer />} />
+            {/* <Route path="/contract" element={<ContractViewer />} /> */}
             <Route path="/contractmanager" element={<Contract />} />
             <Route path="/contract-detail/:id" element={<ContractDetail />} />
             {/* <Route path="/bookmanager" element={<ListBook/>} /> */}
             <Route path="/bookmanager" element={<BookList/>} />
             <Route path="/addbook" element={<AddBook/>} />
+            <Route path="/updatebook/:id" element={<UpdateBook />} />
             {/* <Route path="/overview" element={<BookGraph/>} /> */}
             <Route path="/dashboard" element={<Dashboard/>} />
+            {/* <Route path="/dashboard" element={<PublisherDashboard/>} /> */}
             {/* <Route path="/earnings" element={<PayoutHistory/>} /> */}
             <Route path="/earnings" element={<PayoutDetail/>} />
             <Route path="/notifications" element={<Notification/>} />
             {/* <Route path="/feedback" element={<Feedback/>} /> */}
-            <Route path="/help" element={<Report/>} />
+            {/* <Route path="/help" element={<Report/>} /> */}
             <Route path="/settings" element={<Settings/>} />
+            <Route path="/publisher" element={<FetchPublisherData/>} />
+            <Route path="/publisher-payout-detail/:id" element={<PublisherPayout />} /> 
+            
             
             
             </Route>

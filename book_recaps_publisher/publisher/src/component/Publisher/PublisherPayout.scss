@@ -1,0 +1,45 @@
+.thanhtoanv1 {
+    padding: 20px;
+    padding-left: 10cm;  
+}
+
+.payout-info {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.payout-info .left,
+.payout-info .right {
+    width: 45%; /* Each side takes up 45% of the container */
+}
+
+.payout-info .left p,
+.payout-info .right p {
+    margin: 5px 0;
+}
+
+.book-earnings table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.book-earnings th,
+.book-earnings td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.book-earnings th {
+    background-color: #f4f4f4;
+}
+
+.book-earnings tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.book-earnings tr:hover {
+    background-color: #e2e2e2;
+}

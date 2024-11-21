@@ -1,0 +1,49 @@
+.publisherinfo {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    margin-left: 300px;
+}
+
+h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse; /* Làm cho các ô trong bảng không bị khoảng cách */
+    margin-top: 20px;
+}
+
+th, td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd; /* Kẻ ô cho bảng */
+}
+
+th {
+    background-color: #f2f2f2; /* Màu nền cho các tiêu đề */
+    color: #555;
+    font-weight: bold;
+}
+
+td img {
+    width: 50px;
+    height: 50px;
+    object-fit: cover;
+}
+
+tr:nth-child(even) {
+    background-color: #f9f9f9; /* Đổi màu hàng chẵn */
+}
+
+tr:hover {
+    background-color: #f1f1f1; /* Màu khi di chuột qua */
+}
+
+.error {
+    color: red;
+    font-size: 16px;
+}
