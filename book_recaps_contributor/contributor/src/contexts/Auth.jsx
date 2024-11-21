@@ -9,18 +9,19 @@ export function AuthProvider({ children }) {
   const loaderData = useLoaderData()
   const { executeRecaptcha } = useGoogleReCaptcha();
   const [ user, setUser ] = useState(loaderData); // { id, email, name, role }
-  const [ reCaptchaTokens, setReCaptchaTokens ] = useState(null); // { loginToken, signupToken }
+  // const [ reCaptchaTokens, setReCaptchaTokens ] = useState(null); // { loginToken, signupToken }
+  const [ reCaptchaTokens ] = useState({ loginToken: "...", signupToken: "..." });
 
   useEffect(() => {
     const handleReCaptchaVerify = async () => {
-      if (!executeRecaptcha) {
-        console.log('Execute recaptcha not yet available');
-        return;
-      }
-      const loginToken = await executeRecaptcha("login");
-      const signupToken = await executeRecaptcha("signup");
+      // if (!executeRecaptcha) {
+      //   console.log('Execute recaptcha not yet available');
+      //   return;
+      // }
+      // const loginToken = await executeRecaptcha("login");
+      // const signupToken = await executeRecaptcha("signup");
 
-      setReCaptchaTokens({ loginToken, signupToken });
+      // setReCaptchaTokens({ loginToken, signupToken });
     }
 
     handleReCaptchaVerify();
@@ -43,10 +44,10 @@ export function AuthProvider({ children }) {
     setUser(null);
     setSession(null);
 
-    const loginToken = await executeRecaptcha("login");
-    const signupToken = await executeRecaptcha("signup");
+    // const loginToken = await executeRecaptcha("login");
+    // const signupToken = await executeRecaptcha("signup");
 
-    setReCaptchaTokens({ loginToken, signupToken });
+    // setReCaptchaTokens({ loginToken, signupToken });
   };
 
   const reFetchReCaptchaTokens = async (action) => {
@@ -56,19 +57,19 @@ export function AuthProvider({ children }) {
     }
 
     if (action === "login") {
-      const loginToken = await executeRecaptcha("login");
-      setReCaptchaTokens({ ...reCaptchaTokens, loginToken });
+      // const loginToken = await executeRecaptcha("login");
+      // setReCaptchaTokens({ ...reCaptchaTokens, loginToken });
     }
 
     if (action === "signup") {
-      const signupToken = await executeRecaptcha("signup");
-      setReCaptchaTokens({ ...reCaptchaTokens, signupToken });
+      // const signupToken = await executeRecaptcha("signup");
+      // setReCaptchaTokens({ ...reCaptchaTokens, signupToken });
     }
 
     if (!action) {
-      const loginToken = await executeRecaptcha("login");
-      const signupToken = await executeRecaptcha("signup");
-      setReCaptchaTokens({ loginToken, signupToken });
+      // const loginToken = await executeRecaptcha("login");
+      // const signupToken = await executeRecaptcha("signup");
+      // setReCaptchaTokens({ loginToken, signupToken });
     }
   }
 
