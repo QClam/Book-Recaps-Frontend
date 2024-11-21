@@ -1,14 +1,14 @@
 import { json } from "react-router-dom";
 
-import { axiosInstance2 } from "../../utils/axios";
+import { axiosInstance } from "../../utils/axios";
 import { handleFetchError } from "../../utils/handleFetchError";
 
-export const getBookInfoByRecap = async (recapId, request) => {
+export const getBookInfoByRecap = async (bookId, request) => {
   try {
-    const response = await axiosInstance2.get('/books/by-recap/' + recapId, {
+    const response = await axiosInstance.get('/api/book/getbookbyid/' + bookId, {
       signal: request.signal
     });
-    return response.data;
+    return response.data.data;
   } catch (error) {
     const err = handleFetchError(error);
     throw json({ error: err.error }, { status: err.status });

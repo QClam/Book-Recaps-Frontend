@@ -13,7 +13,7 @@ import {
   useSearchParams
 } from "react-router-dom";
 import Select from "../../components/form/Select";
-import { axiosInstance, axiosInstance2 } from "../../utils/axios";
+import { axiosInstance } from "../../utils/axios";
 import { handleFetchError } from "../../utils/handleFetchError";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { cn } from "../../utils/cn";
@@ -28,14 +28,12 @@ async function getRecaps(published, request) {
     const user = getCurrentUserInfo();
     if (!user) return redirect(routes.logout);
 
-    const response = await axiosInstance2.get('/recaps/by-user/' + user.id, {
-      params: {
-        published
-      },
+    const response = await axiosInstance.get('/api/recap/get-all-recapsbycontributorId', {
+      params: { published },
       signal: request.signal
     })
 
-    return response.data
+    return response.data.data.$values;
   } catch (e) {
     const err = handleFetchError(e);
     throw json({ error: err.error }, { status: err.status });

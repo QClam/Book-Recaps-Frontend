@@ -1,9 +1,19 @@
-import { Form, generatePath, json, Navigate, useActionData, useLoaderData } from "react-router-dom";
+import {
+  Await,
+  defer,
+  Form,
+  generatePath,
+  json,
+  Navigate,
+  useActionData,
+  useAsyncValue,
+  useLoaderData
+} from "react-router-dom";
 import { Dialog } from "primereact/dialog";
 import { Image } from 'primereact/image';
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
-import { axiosInstance2 } from "../utils/axios";
+import { axiosInstance } from "../utils/axios";
 import { handleFetchError } from "../utils/handleFetchError";
 import CustomBreadCrumb from "../components/CustomBreadCrumb";
 import { routes } from "../routes";
@@ -12,13 +22,14 @@ import { useAuth } from "../contexts/Auth";
 import TextInput from "../components/form/TextInput";
 import { cn } from "../utils/cn";
 import { useToast } from "../contexts/Toast";
+import { ProgressSpinner } from "primereact/progressspinner";
 
 const getBook = async (bookId, request) => {
   try {
-    const response = await axiosInstance2.get('/books/' + bookId, {
+    const response = await axiosInstance.get('/api/book/getbookbyid/' + bookId, {
       signal: request.signal
     });
-    return response.data;
+    return response.data.data;
   } catch (error) {
     const err = handleFetchError(error);
     throw json({ error: err.error }, { status: err.status });
@@ -26,14 +37,13 @@ const getBook = async (bookId, request) => {
 }
 
 export const bookDetailsLoader = async ({ request, params }) => {
-  const book = await getBook(params.bookId, request);
-  return { book };
+  const book = getBook(params.bookId, request);
+  return defer({ book });
 }
 
 const BookDetails = () => {
   const { book } = useLoaderData();
   const actionData = useActionData();
-  const { user } = useAuth();
   const { showToast } = useToast();
   const [ dialogVisible, setDialogVisible ] = useState(false);
 
@@ -63,6 +73,111 @@ const BookDetails = () => {
   return (
     <>
       <CustomBreadCrumb items={[ { label: "Books", path: routes.books }, { label: "Book details" } ]}/>
+
+      <Suspense
+        fallback={
+          <div className="h-32 flex gap-2 justify-center items-center">
+            <div>
+              <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
+                               fill="var(--surface-ground)" animationDuration=".5s"/>
+            </div>
+            <p>Loading book information...</p>
+          </div>
+        }>
+        <Await resolve={book} errorElement={
+          <div className="h-14 flex gap-2 justify-center items-center italic font-semibold text-gray-400">
+            Error loading book info!
+          </div>
+        }>
+          <BookDetailsImpl dialogVisible={dialogVisible} setDialogVisible={setDialogVisible}/>
+        </Await>
+      </Suspense>
+
+    </>
+  );
+}
+
+export default BookDetails;
+
+const BookDetailsImpl = ({ dialogVisible, setDialogVisible }) => {
+  const book = useAsyncValue();
+  const { user } = useAuth();
+
+  return (
+    <>
+      <div className="p-6 max-w-4xl mx-auto bg-white shadow-md rounded-lg">
+        <div className="flex flex-col lg:flex-row">
+          {/* Book Cover Image */}
+          <div className="w-1/3 mb-0 pr-6">
+            <Image
+              src={book.coverImage || "/empty-image.jpg"}
+              alt={book.title}
+              className="block overflow-hidden rounded-md shadow-md"
+              imageClassName="aspect-[3/4] object-cover w-full bg-white"
+              preview
+            />
+          </div>
+
+          {/* Book Information */}
+          <div className="w-2/3">
+            <h1 className="text-3xl font-bold mb-2">{book.title}</h1>
+            {book.originalTitle && (
+              <h2 className="text-lg text-gray-600 mb-4 italic">
+                Original Title: {book.originalTitle}
+              </h2>
+            )}
+            <p className="text-gray-800 mb-4">{book.description}</p>
+            <div className="text-gray-700 mb-4">
+              <strong>Publication Year:</strong> {book.publicationYear}
+            </div>
+
+            {/* Authors Section */}
+            {book.authors?.$values && book.authors.$values.length > 0 && (
+              <div className="mb-4">
+                <strong>Authors:</strong>
+                <ul className="list-disc ml-5">
+                  {book.authors.$values.map((author) => (
+                    <li key={author.id} className="text-gray-700">
+                      {author.name}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Categories Section */}
+            {book.categories?.$values && book.categories.$values.length > 0 && (
+              <div className="mb-4">
+                <strong>Categories:</strong>
+                <ul className="list-disc ml-5">
+                  {book.categories.$values.map((category) => (
+                    <li key={category.id} className="text-gray-700">
+                      {category.name}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Publisher Section */}
+            {book.publisher && (
+              <div className="mb-4">
+                <strong>Publisher:</strong> <span className="text-gray-700">{book.publisher.publisherName}</span>
+              </div>
+            )}
+
+            <div className="flex justify-start">
+              <button
+                className="bg-indigo-600 text-white rounded py-1.5 px-3 border font-semibold hover:bg-indigo-700"
+                onClick={() => setDialogVisible(true)}
+              >
+                Tạo bài viết tóm tắt
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <Dialog
         visible={dialogVisible}
         onHide={() => {
@@ -112,82 +227,6 @@ const BookDetails = () => {
           </Modal.Wrapper>
         )}
       />
-
-
-      <div className="p-6 max-w-4xl mx-auto bg-white shadow-md rounded-lg">
-        <div className="flex flex-col lg:flex-row">
-          {/* Book Cover Image */}
-          <div className="w-1/3 mb-0 pr-6">
-            <Image
-              src={book.coverImage || "/empty-image.jpg"}
-              alt={book.title}
-              className="block overflow-hidden rounded-md shadow-md"
-              imageClassName="aspect-[3/4] object-cover w-full bg-white"
-              preview
-            />
-          </div>
-
-          {/* Book Information */}
-          <div className="w-2/3">
-            <h1 className="text-3xl font-bold mb-2">{book.title}</h1>
-            {book.originalTitle && (
-              <h2 className="text-lg text-gray-600 mb-4 italic">
-                Original Title: {book.originalTitle}
-              </h2>
-            )}
-            <p className="text-gray-800 mb-4">{book.description}</p>
-            <div className="text-gray-700 mb-4">
-              <strong>Publication Year:</strong> {book.publicationYear}
-            </div>
-
-            {/* Authors Section */}
-            {book.authors && book.authors.length > 0 && (
-              <div className="mb-4">
-                <strong>Authors:</strong>
-                <ul className="list-disc ml-5">
-                  {book.authors.map((author) => (
-                    <li key={author.id} className="text-gray-700">
-                      {author.name}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Categories Section */}
-            {book.categories && book.categories.length > 0 && (
-              <div className="mb-4">
-                <strong>Categories:</strong>
-                <ul className="list-disc ml-5">
-                  {book.categories.map((category) => (
-                    <li key={category.id} className="text-gray-700">
-                      {category.name}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {/* Publisher Section */}
-            {book.publisher && (
-              <div className="mb-4">
-                <strong>Publisher:</strong> <span className="text-gray-700">{book.publisher.name}</span>
-              </div>
-            )}
-
-            <div className="flex justify-start">
-              <button
-                className="bg-indigo-600 text-white rounded py-1.5 px-3 border font-semibold hover:bg-indigo-700"
-                onClick={() => setDialogVisible(true)}
-              >
-                Tạo bài viết tóm tắt
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
     </>
   );
 }
-
-export default BookDetails;

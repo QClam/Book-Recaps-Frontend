@@ -134,7 +134,7 @@ const EarningWithdrawals = () => {
           <div className="text-lg font-semibold mb-4">Số dư hiện tại:</div>
           <div className="text-2xl text-indigo-600 font-bold mb-2">
             <Suspense fallback={
-              <p className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
                 <ProgressSpinner
                   style={{ width: '15px', height: '15px' }}
                   strokeWidth="8"
@@ -142,7 +142,7 @@ const EarningWithdrawals = () => {
                   animationDuration=".5s"
                 />
                 <span>Loading...</span>
-              </p>
+              </div>
             }>
               <Await resolve={withdrawInfo} errorElement={<>Error occurred</>}>
                 {(resolvedWithdrawInfo) => (
@@ -159,7 +159,7 @@ const EarningWithdrawals = () => {
           <div className="text-lg font-semibold mb-4">Tổng tiền đã rút:</div>
           <div className="text-2xl text-indigo-600 font-bold mb-2">
             <Suspense fallback={
-              <p className="flex items-center gap-2">
+              <div className="flex items-center gap-2">
                 <ProgressSpinner
                   style={{ width: '15px', height: '15px' }}
                   strokeWidth="8"
@@ -167,7 +167,7 @@ const EarningWithdrawals = () => {
                   animationDuration=".5s"
                 />
                 <span>Loading...</span>
-              </p>
+              </div>
             }>
               <Await resolve={withdrawInfo} errorElement={<>Error occurred</>}>
                 {(resolvedWithdrawInfo) => (
@@ -244,7 +244,7 @@ const EarningWithdrawals = () => {
               <div className="p-4 bg-white rounded-md shadow-sm border border-gray-300">
                 <div className="text-lg font-semibold">Số dư hiện tại</div>
                 <Suspense fallback={
-                  <p className="flex items-center gap-2">
+                  <div className="flex items-center gap-2">
                     <ProgressSpinner
                       style={{ width: '15px', height: '15px' }}
                       strokeWidth="8"
@@ -252,7 +252,7 @@ const EarningWithdrawals = () => {
                       animationDuration=".5s"
                     />
                     <span>Loading...</span>
-                  </p>
+                  </div>
                 }>
                   <Await resolve={withdrawInfo} errorElement={<>Error occurred</>}>
                     {(resolvedWithdrawInfo) => (
@@ -264,7 +264,7 @@ const EarningWithdrawals = () => {
                 </Suspense>
               </div>
               <Suspense fallback={
-                <p className="flex items-center gap-2">
+                <div className="flex items-center gap-2">
                   <ProgressSpinner
                     style={{ width: '15px', height: '15px' }}
                     strokeWidth="8"
@@ -272,7 +272,7 @@ const EarningWithdrawals = () => {
                     animationDuration=".5s"
                   />
                   <span>Loading...</span>
-                </p>
+                </div>
               }>
                 <Await resolve={withdrawInfo} errorElement={<>Error occurred</>}>
                   {(resolvedWithdrawInfo) => (
@@ -304,7 +304,7 @@ const EarningWithdrawals = () => {
             </Modal.Body>
             <Modal.Footer className="justify-end gap-3 text-sm">
               <Suspense fallback={
-                <p className="flex items-center gap-2">
+                <div className="flex items-center gap-2">
                   <ProgressSpinner
                     style={{ width: '15px', height: '15px' }}
                     strokeWidth="8"
@@ -312,7 +312,7 @@ const EarningWithdrawals = () => {
                     animationDuration=".5s"
                   />
                   <span>Loading...</span>
-                </p>
+                </div>
               }>
                 <Await resolve={withdrawInfo} errorElement={<>Error occurred</>}>
                   {(resolvedWithdrawInfo) => (

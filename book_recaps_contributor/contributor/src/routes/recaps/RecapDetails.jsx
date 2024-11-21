@@ -194,7 +194,7 @@ const deleteVersion = async (request) => {
 export const recapDetailsLoader = async ({ params, request }) => {
   const recap = await getRecapInfo(params.recapId, request);
   const recapVersions = getRecapVersions(params.recapId, request);
-  const bookInfo = getBookInfoByRecap(params.recapId, request);
+  const bookInfo = getBookInfoByRecap(recap.bookId, request);
 
   return defer({
     recapVersions,
@@ -579,7 +579,7 @@ const RecapVersionStats = () => {
             Quyết toán gần nhất
           </div>
           <Show when={!loading} fallback={
-            <p className="flex items-center gap-2">
+            <div className="flex items-center gap-2">
               <ProgressSpinner
                 style={{ width: '15px', height: '15px' }}
                 strokeWidth="8"
@@ -587,7 +587,7 @@ const RecapVersionStats = () => {
                 animationDuration=".5s"
               />
               <span>Loading...</span>
-            </p>
+            </div>
           }>
             <Show when={stats && stats.lastPayout} fallback={<p>Chưa có quyết toán nào.</p>}>
               <p className="text-sm italic text-gray-500">
