@@ -161,7 +161,7 @@ const PlaylistBook = () => {
                 )}
               </div>
               </div>
-            <h4>Books in this playlist:</h4>
+            {/* <h4>Books in this playlist:</h4> */}
             {playlist.playListItems.$values.length === 0 ? (
               <p>No books in this playlist.</p>
             ) : (

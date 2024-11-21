@@ -87,14 +87,16 @@ const History = () => {
       <h1>User Recap History</h1>
       <div className="history-list">
         {recapData.map((recap, index) => (
-          <div key={index} className="history-card">
+          <div key={index} className="history-card"
+          
+         >
            <div className="recap-thumbnail">
-  <img 
-    src={recap.book.coverImage} 
-    alt={recap.book.title} 
-    onClick={() => navigate(`/user-recap-detail-item/${recap.id}`)} 
-    style={{ cursor: 'pointer' }} 
-  />
+           <img 
+      src={recap.book.coverImage} 
+      alt={recap.book.title} 
+      style={{ cursor: 'pointer' }} 
+      onClick={() => navigate(`/user-recap-detail-item/${recap.book.bookId}`)} // Navigate to the detail page
+    />
 </div>
 
             <div className="recap-details">
@@ -104,7 +106,8 @@ const History = () => {
                 {/* <span className="created-at"><strong>Created At:</strong> {new Date(recap.createdAt).toLocaleString()}</span> */}
               </div>
               <div className="recap-meta">
-                <p><strong>Title:</strong> {recap.book.title}</p>
+              {/* <p><strong>Book ID:</strong> {recap.book.bookId} </p> */}
+                <p><strong>Title:</strong> {recap.book.title} </p>
                 <p><strong>Original Title:</strong> {recap.book.originalTitle}</p>
                 <p className="likes-views">
                   <span className="likes"><strong>Likes:</strong> {recap.likesCount}</span>

@@ -99,7 +99,7 @@ const UserRecapDetail = () => {
   return (
     <div className="user-recap-detail-dtdt">
       <h2 className="book-title">{book.title}</h2>
-      <img className="book-cover" src={book.coverImage} alt={book.title} />
+      <img className="book-cover-cover" src={book.coverImage} alt={book.title}  style={{ marginLeft: '330px', alignItems:'center' }} />
       <p className="book-description">{book.description}</p>
       <p className="publication-year">Publication Year: {book.publicationYear}</p>
       <p className="author">
@@ -119,7 +119,7 @@ const UserRecapDetail = () => {
       </p>
 
       <div className="recaps">
-        <h3 className="recaps-title">Recaps</h3>
+        <h2 className="recaps-title">Recaps</h2>
         {book.recaps && book.recaps.$values.length > 0 ? (
           book.recaps.$values
             .filter((recap) => recap.isPublished)
@@ -133,13 +133,15 @@ const UserRecapDetail = () => {
                   key={recap.id}
                   onClick={() => handleRecapClick(recap.id)}
                 >
-                  <h4 className="recap-name">{recap.name}</h4>
-                  <p className="recap-published">
+                  <h2 className="recap-name">{recap.name}</h2>
+                  {/* <p className="recap-published">
                     Published: {recap.isPublished ? "Yes" : "No"}
-                  </p>
-                  <p className="recap-premium">
-                    Premium: {recap.isPremium ? "Yes" : "No"}
-                  </p>
+                  </p> */}
+                  {recap.isPremium && (
+                    <p className="recap-premium" style={{ color: 'orange', fontWeight: 'bold', fontSize: '17px' }}>
+                      Premium
+                    </p>
+                  )}
 
                   {contributorData && contributorData.contributor && (
                     <div className="contributor">

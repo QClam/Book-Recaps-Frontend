@@ -294,7 +294,7 @@ const getUserNotesKey = (userId) => `transcriptNotes_${userId}`;
           localStorage.setItem(getUserHighlightsKey(userId), JSON.stringify(apiHighlights));
         }
       } catch (error) {
-        console.error("Error fetching highlights:", error);
+        console.error("", error);
       }
     };
 

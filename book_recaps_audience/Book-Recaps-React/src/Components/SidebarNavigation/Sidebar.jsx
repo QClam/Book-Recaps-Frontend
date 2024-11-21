@@ -33,7 +33,7 @@ function Sidebar() {
 
   const handleBookClick = (id) => {
     // Navigate to the book detail page
-    navigate(`/user-recap-detail/${id}`);
+    navigate(`/user-recap-detail-item/${id}`);
     setSearchTerm(''); // Clear search term
     setFilteredBooks([]); // Clear filtered results
   };

@@ -11,16 +11,22 @@
       font-size: 24px;
       color: #333;
       margin-bottom: 10px;
+      text-align: center;
     }
   
-    .book-cover {
+    .book-cover-cover {
       width: 100%;
       max-width: 250px;
-      height: auto;
+      height: 380px;
       border-radius: 8px;
       margin-bottom: 20px;
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      align-items: center;
+      justify-content: center;
+      display: flex;
+      //height: 400px;
     }
+
   
     .book-description,
     .publication-year,
@@ -41,7 +47,7 @@
       }
   
       .recap-item-it {
-        border: 1px solid #eaeaea;
+        border: 3px solid #dad3d3;
         border-radius: 8px;
         padding: 15px;
         margin-bottom: 15px;
@@ -49,7 +55,7 @@
         transition: box-shadow 0.3s ease;
   
         &:hover {
-          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 10px 10px rgba(0, 0, 0, 0.15);
         }
   
         .recap-name {

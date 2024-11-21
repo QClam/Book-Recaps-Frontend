@@ -41,6 +41,19 @@ const Transcriptv2 = ({
   // Function to get the storage key for the user's notes
   const getUserNotesKey = (userId) => `transcriptNotes_${userId}`;
   
+    // Tải ghi chú từ localStorage khi component mount
+    useEffect(() => {
+      try {
+        const storedNotes = JSON.parse(localStorage.getItem(getUserNotesKey(userId)));
+        setNotes(storedNotes && typeof storedNotes === 'object' ? storedNotes : {});
+      } catch (error) {
+        console.error('Error parsing transcriptNotes from localStorage:', error);
+        setNotes({});
+        // Optionally, you can remove the invalid entry from localStorage
+        localStorage.removeItem(getUserNotesKey(userId));
+      }
+    }, [userId]);
+
   useEffect(() => {
     const fetchTranscript = async () => {
       try {
@@ -256,7 +269,7 @@ const Transcriptv2 = ({
       return updatedNotes;
     });
     setIsModalOpen(false);
-  };;
+  };
 
   // Load saved highlights and notes
   useEffect(() => {

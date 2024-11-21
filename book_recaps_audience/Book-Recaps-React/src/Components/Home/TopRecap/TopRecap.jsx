@@ -58,13 +58,14 @@ const TopRecap = () => {
               src={recap.book.coverImage} 
               alt={recap.book.title} 
               style={{ width: '250px', height: '300px', objectFit: 'cover' }}
-              onClick={() => navigate(`/user-recap-detail-item/${recap.book.id}`)} // Thêm sự kiện onClick
+              onClick={() => navigate(`/recap-item-detail/${recap.id}`)}
+ // Thêm sự kiện onClick
             />
-        <div>
-          <h3>{recap.book.title}</h3>
+        <div className="recommendations-recap">
+          <h4>{recap.book.title}</h4>
           <p><strong>Published:</strong> {recap.book.publicationYear}</p>
-          <p><strong>Name:</strong> {recap.name}</p>
-          {recap.isPremium && <span style={{ color: 'gold' }}>Premium</span>}
+          <p><strong>Recap Name:</strong> {recap.name}</p>
+          {recap.isPremium && <span style={{ color: 'orange', fontWeight: 'bold' }}>Premium</span>}
         </div>
       </div>
     ))}

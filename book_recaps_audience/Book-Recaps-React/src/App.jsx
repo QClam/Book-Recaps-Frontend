@@ -47,6 +47,8 @@ import RecapNewTues from "./Components/ReadListenBook/UserRecap/UserRecapNewDeta
 import History from "./Components/History/History";
 import ForUser from "./Components/Home/ForUser/ForUser";
 import Homepage from "./Components/Home/Homepage";
+import { SubscriptTwoTone } from "@mui/icons-material";
+import SubscriptionHistory from "./Components/Setting/SubcriptionHistory/SubcriptionHistory";
 //import PrivateRoute from "./Components/PrivateRoute";
 
 function App() {
@@ -157,7 +159,7 @@ function App() {
                 <Route path="/*" element={<Result />} />
                 <Route path="/help" element={<Report />} />
                 <Route path="/become-contributor" element={<ContributorTerm />} />
-              
+                <Route path="/subcription-history" element={<SubscriptionHistory />} />
                {/* <Route path="/read" element={<ReadBook key={new Date().getTime()} />} /> */}               
 
               {/* <Route path="/login" element={<Login />} /> */}

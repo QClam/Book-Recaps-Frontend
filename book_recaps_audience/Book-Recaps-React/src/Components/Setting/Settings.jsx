@@ -47,6 +47,11 @@ function Settings() {
         setCurrentTab(tab);
     };
 
+    const handleViewSubcriptionHistory = () => {
+        navigate('/subcription-history');
+    };
+
+    
     // Fetch user profile data
     useEffect(() => {
         const fetchProfile = async () => {
@@ -356,6 +361,9 @@ function Settings() {
                     
                     <li>
                         <p onClick={handleViewBilling}>Billing</p>
+                    </li>
+                    <li>
+                        <p onClick={handleViewSubcriptionHistory}>Subcription History</p>
                     </li>
                     <li>
                         <p onClick={handleViewApplication}>View Application</p>
