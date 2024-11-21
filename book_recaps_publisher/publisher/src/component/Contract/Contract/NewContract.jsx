@@ -2,35 +2,36 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 //import './Contract.scss';
 import { useNavigate } from 'react-router-dom';
+import "../ContractManager/ContractManager.scss";
 
 const resolveRefs = (data) => {
-    const refMap = new Map();
-    const createRefMap = (obj) => {
-      if (typeof obj !== "object" || obj === null) return;
-      if (obj.$id) {
-        refMap.set(obj.$id, obj);
+  const refMap = new Map();
+  const createRefMap = (obj) => {
+    if (typeof obj !== "object" || obj === null) return;
+    if (obj.$id) {
+      refMap.set(obj.$id, obj);
+    }
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        createRefMap(obj[key]);
       }
-      for (const key in obj) {
-        if (obj.hasOwnProperty(key)) {
-          createRefMap(obj[key]);
-        }
-      }
-    };
-    const resolveRef = (obj) => {
-      if (typeof obj !== "object" || obj === null) return obj;
-      if (obj.$ref) {
-        return refMap.get(obj.$ref);
-      }
-      for (const key in obj) {
-        if (obj.hasOwnProperty(key)) {
-          obj[key] = resolveRef(obj[key]);
-        }
-      }
-      return obj;
-    };
-    createRefMap(data);
-    return resolveRef(data);
+    }
   };
+  const resolveRef = (obj) => {
+    if (typeof obj !== "object" || obj === null) return obj;
+    if (obj.$ref) {
+      return refMap.get(obj.$ref);
+    }
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        obj[key] = resolveRef(obj[key]);
+      }
+    }
+    return obj;
+  };
+  createRefMap(data);
+  return resolveRef(data);
+};
   
 const Contract = () => {
   const [contracts, setContracts] = useState([]); 
@@ -40,9 +41,38 @@ const Contract = () => {
   const navigate = useNavigate();
   const accessToken = localStorage.getItem("authToken");
   const [statusFilter, setStatusFilter] = useState('All');
+  const [userId, setUserId] = useState(null);
+
+  useEffect(() => {
+    const fetchProfileData = async () => {
+      try {
+        const profileResponse = await fetch('https://160.25.80.100:7124/api/personal/profile', {
+          method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!profileResponse.ok) {
+          throw new Error("Failed to fetch profile data");
+        }
+
+        const profileData = await profileResponse.json();
+        setUserId(profileData?.id);
+      } catch (error) {
+        setError(error.message);
+        setLoading(false);
+      }
+    };
+
+    fetchProfileData();
+  }, [accessToken]);
 
   useEffect(() => {
     const fetchContracts = async () => {
+      if (!userId) return;
+
       try {
         const response = await axios.get(
           `https://160.25.80.100:7124/api/Contract/getallcontract`,
@@ -54,8 +84,11 @@ const Contract = () => {
             },
           }
         );
+        
         const result = resolveRefs(response.data);
-        setContracts(result.data.$values); 
+        // Filter contracts based on the userId
+        const userContracts = result.data.$values.filter(contract => contract.publisher.userId === userId);
+        setContracts(userContracts);
         setLoading(false);
       } catch (error) {
         setError(error.message);
@@ -64,7 +97,8 @@ const Contract = () => {
     };
 
     fetchContracts();
-  }, [accessToken]);
+  }, [userId, accessToken]);
+
 
   // Fetch attachments for each contract
   useEffect(() => {
@@ -106,11 +140,12 @@ const Contract = () => {
     
   const getStatusLabel = (status) => {
     switch (status) {
-      case 0: return "Pending";
-      case 1: return "NotStarted";
-      case 2: return "Approved";
-      case 3: return "Expired";
-      case 4: return "Rejected";
+      case 0: return "Bản nháp";
+      case 1: return "Đang xử lý";
+      case 2: return "Chưa bắt đầu";
+      case 3: return "Đang kích hoạt";
+      case 4: return "Hết hạn";
+      case 5: return "Từ chối";
       default: return "Unknown";
     }
   };
@@ -139,11 +174,13 @@ const Contract = () => {
                     onChange={(e) => setStatusFilter(e.target.value)}
                 >
                     <option value="All">All</option>
-                    <option value="Pending">Pending</option>
-                    <option value="NotStarted">Not Started</option>
-                    <option value="Approved">Approved</option>
-                    <option value="Expired">Expired</option>
-                    <option value="Rejected">Rejected</option>
+                    <option value="Bản nháp">Bản nháp</option>
+                    <option value="Đang xử lý">Đang xử lý</option>
+                    <option value="Chưa bắt đầu">Chưa bắt đầu</option>
+                    <option value="Đang kích hoạt">Đang kích hoạt</option>
+                    <option value="Hết hạn">Hết hạn</option>
+                    <option value="Từ chối">Từ chối</option>
+
                 </select>
             </div>
 

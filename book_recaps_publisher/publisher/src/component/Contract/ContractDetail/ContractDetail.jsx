@@ -5,6 +5,36 @@ import "../ContractDetail/ContractDetail.scss"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPaperclip } from '@fortawesome/free-solid-svg-icons';
 
+const resolveRefs = (data) => {
+  const refMap = new Map();
+  const createRefMap = (obj) => {
+    if (typeof obj !== "object" || obj === null) return;
+    if (obj.$id) {
+      refMap.set(obj.$id, obj);
+    }
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        createRefMap(obj[key]);
+      }
+    }
+  };
+  const resolveRef = (obj) => {
+    if (typeof obj !== "object" || obj === null) return obj;
+    if (obj.$ref) {
+      return refMap.get(obj.$ref);
+    }
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        obj[key] = resolveRef(obj[key]);
+      }
+    }
+    return obj;
+  };
+  createRefMap(data);
+  return resolveRef(data);
+};
+
+
 const ContractDetail = () => {
   const { id } = useParams(); // Lấy ID từ URL
   const [contract, setContract] = useState(null);
@@ -12,7 +42,7 @@ const ContractDetail = () => {
   const [error, setError] = useState(null);
   const [isApproved, setIsApproved] = useState(false); // Track if approved
   const [showConfirmModal, setShowConfirmModal] = useState(false); // Modal visibility state
-
+  const [books, setBooks] = useState([]); // State for books
 
   const accessToken = localStorage.getItem("authToken");
 
@@ -28,8 +58,18 @@ const ContractDetail = () => {
             },
           }
         );
+        const contractDetail = resolveRefs(response.data.data);
+        // resolveRefs(setContract(response.data.data)); // Lưu thông tin hợp đồng vào state
+        // resolveRefs( setBooks(response.data.data.books?.$values || [])); // Set book data
+        // console.log(response.data.data.books?.$values || [])
+        // console.log(response.data.data)
+        setContract(contractDetail);
+       console.log(contractDetail);
 
-        setContract(response.data.data); // Lưu thông tin hợp đồng vào state
+       const bookContract = contractDetail.books?.$values || [];
+       console.log(bookContract);
+       setBooks(bookContract);
+
         setLoading(false);
       } catch (error) {
         setError(error.message);
@@ -61,7 +101,7 @@ const ContractDetail = () => {
       }));
       if (newStatus === 2) {
         setIsApproved(true);
-      } else if (newStatus === 4) {
+      } else if (newStatus === 5) {
         setIsApproved(false);
       }
     } catch (error) {
@@ -84,6 +124,7 @@ const ContractDetail = () => {
       <h2>Contract Detail</h2>
       <div className="info-box">
         <p><strong>Publisher:</strong> {contract.publisherId}</p>
+         <p>{contract.publisher.publisherName || ""}</p> 
         <p><strong>Phần trăm chia sẻ doanh thu:</strong> <span>{contract.revenueSharePercentage}%</span></p>
         <p><strong>Ngày tạo:</strong> {new Date(contract.startDate).toLocaleDateString()}</p>
         <p><strong>Ngày bắt đầu:</strong> {new Date(contract.startDate).toLocaleDateString()}</p>
@@ -124,8 +165,40 @@ const ContractDetail = () => {
             </div>
           ))}
         </div>
+
+
+      </div>
+          {/* Books Table */}
+      <div className="books-section">
+        <h3>Danh sách sách</h3>
+        <table className="books-table">
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Original Title</th>
+              <th>Description</th>
+              <th>Publication Year</th>
+              <th>Cover Image</th>
+            </tr>
+          </thead>
+          <tbody>
+            {books.map((book, index) => (
+              <tr key={index}>
+                <td>{book.title}</td>
+                <td>{book.originalTitle}</td>
+                <td>{book.description}</td>
+                <td>{book.publicationYear}</td>
+                <td>
+                  <img src={book.coverImage} alt={book.title} width="50" height="75" />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
+
+          
        {/* Confirmation Modal */}
        {showConfirmModal && (
         <div className="modal-overlay">
@@ -152,18 +225,13 @@ const ContractDetail = () => {
 // Hàm để ánh xạ status thành tên
 const getStatusLabel = (status) => {
   switch (status) {
-    case 0:
-      return "Pending";
-    case 1:
-      return "NotStarted";
-    case 2:
-      return "Approved";
-    case 3:
-      return "Expired";
-    case 4:
-      return "Rejected";
-    default:
-      return "Unknown";
+    case 0: return "Bản nháp";
+    case 1: return "Đang xử lý";
+    case 2: return "Chưa bắt đầu";
+    case 3: return "Đang kích hoạt";
+    case 4: return "Hết hạn";
+    case 5: return "Từ chối";
+    default: return "Unknown";
   }
 };
 

@@ -43,6 +43,45 @@ const BookList = () => {
   const refreshToken = localStorage.getItem("refreshToken");
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
+  const [openMenuIndex, setOpenMenuIndex] = useState(null);
+  const [showPopup, setShowPopup] = useState(false);
+  const [selectedBook, setSelectedBook] = useState(null);
+  const [bookToDelete, setBookToDelete] = useState(null);
+
+const toggleMenu = (index) => {
+  setOpenMenuIndex(openMenuIndex === index ? null : index);
+};
+
+
+const handleDelete = (book) => {
+  setBookToDelete(book); // Lưu thông tin cuốn sách cần xóa
+  setShowPopup(true);    // Hiển thị popup
+};
+
+const confirmDelete = async () => {
+  if (bookToDelete) {
+    try {
+      await axios.delete(`https://160.25.80.100:7124/api/book/deletebook/${bookToDelete.id}`, {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      setBooks(books.filter((b) => b.id !== bookToDelete.id)); // Cập nhật danh sách sách
+      setShowPopup(false); // Đóng popup
+      setBookToDelete(null); // Xóa thông tin cuốn sách đã chọn
+    } catch (error) {
+      console.error("Error deleting book:", error);
+    }
+  }
+};
+
+const cancelDelete = () => {
+  setShowPopup(false); // Đóng popup
+  setBookToDelete(null); // Xóa thông tin cuốn sách đã chọn
+};
+
+
   useEffect(() => {
     const fetchBooks = async () => {
       try {
@@ -113,24 +152,15 @@ const BookList = () => {
     setCurrentPage(page);
   };
 
-  // Function to get status color
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "negotiation":
-        return "blue";
-      case "approval":
-        return "green";
-      case "disapproval":
-        return "red";
-      default:
-        return "gray";
-    }
-  };
 
   const handleAddBook = () => {
     navigate('/addbook');
   };
 
+  const handleUpdate = (book) => {
+    navigate(`/updatebook/${book.id}`);
+  };
+  
   return (
     <div className="list-book-container-container">
     <div className="header">
@@ -155,21 +185,19 @@ const BookList = () => {
         <thead>
           <tr>
             <th>STT</th>
-            <th>Approval</th>
             <th>Genre</th>
             <th>Title</th>
             <th>Author</th>
             <th>PublicationYear</th>
-            {/* <th>Status</th> 
-            <th>Guidelines</th> */}
+            <th>Action</th>
+           
           </tr>
         </thead>
         <tbody>
         {currentBooks.map((book, index) => (
             <tr key={index}>
               <td>{(currentPage - 1) * booksPerPage + index + 1}</td>
-
-      <td><input type="checkbox" /></td>
+      
       <td>
         <span className={`tag ${book.categories?.$values[0]?.name?.toLowerCase() || 'unknown'}`}>
           {book.categories?.$values[0]?.name || 'Unknown'}
@@ -180,15 +208,35 @@ const BookList = () => {
         {book.authors?.$values.map(author => author.name).join(', ') || 'Unknown Author'}
       </td>
       <td>{book.publicationYear || 'N/A'}</td> {/* Display publication year */}
-      {/* <td>
-                <span style={{ color: getStatusColor(book.status) }}>
-                  {book.status || 'Unknown Status'}
-                </span>
-              </td> */}
+      <td>
+        <div className="action-menu">
+          <button
+            className="action-button"
+            onClick={() => toggleMenu(index)}
+          >
+            ⋮
+          </button>
+          {openMenuIndex === index && (
+            <div className="dropdown-menu">
+              <button onClick={() => handleUpdate(book)}>Update</button>
 
-      {/* <td>
-        <a href="#" className="guidelines-link">View Guidelines</a>
-      </td> */}
+              <button onClick={() => handleDelete(book)}>Delete</button>
+            </div>
+          )}
+
+              {showPopup && bookToDelete && (
+                <div className="popup-overlay">
+                  <div className="popup-content">
+                    <p>Are you sure you want to delete this book: <strong>{bookToDelete.title}</strong>?</p>
+                    <button onClick={confirmDelete} className="confirm-button">Yes</button>
+                    <button onClick={cancelDelete} className="cancel-button">No</button>
+                  </div>
+                </div>
+              )}
+
+
+        </div>
+      </td>
     </tr>
   ))}
 </tbody>
@@ -225,10 +273,6 @@ const BookList = () => {
 
 <span>Showing {((currentPage - 1) * booksPerPage) + 1} to {Math.min(currentPage * booksPerPage, filteredBooks.length)} of {filteredBooks.length} entries</span>
 
-      </div>
-
-      <div className="submit-approve-container">
-        {/* <button className="submit-approve-btn">Submit Approve</button> */}
       </div>
     </div>
   );

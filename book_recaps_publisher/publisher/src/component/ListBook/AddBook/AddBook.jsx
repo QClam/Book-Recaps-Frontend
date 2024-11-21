@@ -21,6 +21,7 @@ const AddBook = () => {
     coverImageFile: null,
     authorImageFile: null,
   });
+  const [notification, setNotification] = useState('');
 
   const accessToken = localStorage.getItem("authToken");
   const refreshToken = localStorage.getItem("refreshToken");
@@ -96,10 +97,12 @@ const AddBook = () => {
                 'Content-Type': 'multipart/form-data',
             },
         });
-        console.log('Book created successfully:', response.data);
+        alert(`Book created successfully!`); 
+        // console.log('Book created successfully:', response.data);
     } catch (error) {
         console.error('Error response:', error.response.data);
-      alert(`Error creating book: ${JSON.stringify(error.response.data)}`);
+      alert(`Error creating book`);
+      // alert(`Error creating book: ${JSON.stringify(error.response.data)}`);
         if (error.response && error.response.status === 401) {
             await handleTokenRefresh();
             handleSubmit(e);
@@ -193,9 +196,16 @@ const AddBook = () => {
       </div>
       <div className="button-group">
         <button type="submit" className="save">Save</button>
-        <button type="button" className="save-add">Save & Add Another</button>
+       
         <button type="button" className="cancel">Cancel</button>
       </div>
+      
+          {notification && (
+      <div className="notification">
+        {notification}
+      </div>
+)}
+
     </form>
   );
 };

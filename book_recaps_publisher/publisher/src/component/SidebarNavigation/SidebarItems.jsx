@@ -30,11 +30,17 @@ export const SidebarItems = [
        
         link: "/contractmanager",
     },
-    {
-        title: "Earnings ",
+    // {
+    //     title: "Earnings ",
        
-        link: "/earnings",
+    //     link: "/earnings",
+    // },
+    {
+        title: "Earning ",
+       
+        link: "/publisher",
     },
+
     // {
     //     title: "Notifications ",
        
@@ -50,11 +56,11 @@ export const SidebarItems = [
       
         link: "/settings",
     },
-    {
-        title: "Help & support",
+    // {
+    //     title: "Help & support",
        
-        link: "/help",
-    },
+    //     link: "/help",
+    // },
     
 
     
