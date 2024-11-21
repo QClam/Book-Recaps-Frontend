@@ -31,7 +31,7 @@ import { cn } from "../utils/cn";
 const getWithdrawlsInfo = async (recapId, request) => {
   try {
     const user = getCurrentUserInfo();
-    if (!user) return null;
+    if (!user) return redirect(routes.logout);
 
     const response = await axiosInstance.get('/api/contributorwithdrawal/getlistdrawalbycontributorid/' + user.id, {
       signal: request.signal

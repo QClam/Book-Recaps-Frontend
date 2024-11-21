@@ -82,7 +82,7 @@ export const NavBar = () => {
         />
 
         <NavbarLink
-          href={routes.billingInvoices}
+          href={routes.payouts}
           text="Invoices"
           icon={<HiOutlineCreditCard/>}
           isOpen={isOpen}

@@ -17,6 +17,7 @@ import BookDetails, { bookDetailsLoader } from "./routes/BookDetails";
 import { loginAction } from "./routes/actions/loginAction";
 import { createRecapAction } from "./routes/actions/createRecapAction";
 import EarningWithdrawals, { earningWithdrawalsAction, earningWithdrawalsLoader } from "./routes/EarningWithdrawals";
+import Payouts, { payoutsLoader } from "./routes/Payouts";
 
 export const routes = {
   dashboard: '/',
@@ -34,7 +35,8 @@ export const routes = {
   earningWithdrawals: '/earning-withdrawals',
   contact: '/contact',
   profile: '/profile',
-  billingInvoices: '/billing-invoices',
+  payouts: '/payouts',
+  payoutDetails: '/payouts/:payoutId',
 }
 
 export const router = createBrowserRouter([
@@ -126,12 +128,13 @@ export const router = createBrowserRouter([
                 element: <EarningWithdrawals/>
               },
               {
-                path: routes.profile,
-                element: <div>Profile</div>
+                path: routes.payouts,
+                loader: payoutsLoader,
+                element: <Payouts/>
               },
               {
-                path: routes.billingInvoices,
-                element: <div>Invoices</div>
+                path: routes.profile,
+                element: <div>Profile</div>
               },
               {
                 path: routes.contact,

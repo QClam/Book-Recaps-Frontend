@@ -26,7 +26,7 @@ import { getCurrentUserInfo } from "../../utils/getCurrentUserInfo";
 async function getRecaps(published, request) {
   try {
     const user = getCurrentUserInfo();
-    if (!user) return [];
+    if (!user) return redirect(routes.logout);
 
     const response = await axiosInstance2.get('/recaps/by-user/' + user.id, {
       params: {
