@@ -1,7 +1,10 @@
 import { Image } from "primereact/image";
 
 const BookInfo = ({ book }) => {
-  console.log("book", book);
+
+  const authors = book.authors?.$values ? book.authors.$values : book.authors;
+  const categories = book.categories?.$values ? book.categories.$values : book.categories
+
   return (
     <div className="mt-3 border-b pb-4 border-gray-300">
       <div className="flex flex-row">
@@ -27,21 +30,21 @@ const BookInfo = ({ book }) => {
           </div>
 
           {/* Authors Section */}
-          {book.authors?.$values && book.authors.$values.length > 0 && (
+          {authors.length > 0 && (
             <div className="flex items-center gap-5">
               <strong>Authors:</strong>
               <p className="text-gray-700 line-clamp-1">
-                {book.authors.$values.map((author) => author.name).join(", ")}
+                {authors.map((author) => author.name).join(", ")}
               </p>
             </div>
           )}
 
           {/* Categories Section */}
-          {book.categories?.$values && book.categories.$values.length > 0 && (
+          {categories.length > 0 && (
             <div className="flex items-center gap-5">
               <strong>Categories:</strong>
               <p className="text-gray-700 line-clamp-1">
-                {book.categories.$values.map((cate) => cate.name).join(", ")}
+                {categories.map((cate) => cate.name).join(", ")}
               </p>
             </div>
           )}

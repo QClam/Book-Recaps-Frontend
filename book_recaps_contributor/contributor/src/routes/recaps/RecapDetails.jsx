@@ -15,7 +15,7 @@ import {
   useNavigation,
   useSubmit
 } from "react-router-dom";
-import { getBookInfoByRecap } from "../fetch";
+import { getBookInfoById } from "../fetch";
 import { axiosInstance, axiosInstance2 } from "../../utils/axios";
 import { handleFetchError } from "../../utils/handleFetchError";
 import { routes } from "../../routes";
@@ -194,7 +194,7 @@ const deleteVersion = async (request) => {
 export const recapDetailsLoader = async ({ params, request }) => {
   const recap = await getRecapInfo(params.recapId, request);
   const recapVersions = getRecapVersions(params.recapId, request);
-  const bookInfo = getBookInfoByRecap(recap.bookId, request);
+  const bookInfo = getBookInfoById(recap.bookId, request);
 
   return defer({
     recapVersions,
