@@ -11,7 +11,6 @@ function BookList() {
 
   const [books, setBooks] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [isDarkMode, setIsDarkMode] = useState(true); // State to toggle dark mode
   const [modalIsOpen, setModalIsOpen] = useState(false); // Modal visibility state
   const [error, setError] = useState(null); // Error state
   const [addBookForm, setAddBookForm] = useState({
@@ -150,22 +149,6 @@ function BookList() {
         color="primary" // Styling options
         showFirstButton
         showLastButton
-        sx={{
-          "& .MuiPaginationItem-root": {
-            color: isDarkMode ? "#fff" : "#000", // Change text color based on theme
-            backgroundColor: isDarkMode ? "#555" : "#f0f0f0", // Button background color based on theme
-          },
-          "& .MuiPaginationItem-root.Mui-selected": {
-            backgroundColor: isDarkMode ? "#306cce" : "#72a1ed", // Change color of selected page button
-            color: "#fff", // Ensure selected text is white for contrast
-          },
-          "& .MuiPaginationItem-root.Mui-selected:hover": {
-            backgroundColor: isDarkMode ? "#2057a4" : "#5698d3", // Color on hover for selected button
-          },
-          "& .MuiPaginationItem-root:hover": {
-            backgroundColor: isDarkMode ? "#666" : "#e0e0e0", // Color on hover for non-selected buttons
-          },
-        }}
       />
     </div>
   )

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import { Box, Button, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
 import { Hourglass } from 'react-loader-spinner';
 import { useNavigate } from "react-router-dom";
 
@@ -39,6 +39,7 @@ function ContractsList() {
 
     const [contracts, setContracts] = useState([]);
     const [publishers, setPublishers] = useState([]);
+    const [currentPage, setCurrentPage] = useState(1);
     const [loading, setLoading] = useState(true);
 
     const [contractForm, setContractForm] = useState({
@@ -46,6 +47,16 @@ function ContractsList() {
     })
 
     const navigate = useNavigate();
+
+    const contractsPerPage = 5;
+
+    const displayContracts= contracts.slice(
+        (currentPage - 1) * contractsPerPage,
+        currentPage * contractsPerPage
+    ); // Adjust slicing for 1-based page indexing
+    const handlePageChange = (event, value) => {
+        setCurrentPage(value);
+    };
 
     const fetchContracts = async () => {
         try {
@@ -117,7 +128,7 @@ function ContractsList() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {contracts.map((item) => (
+                            {displayContracts.map((item) => (
                                 <TableRow key={item.id}>
                                     <TableCell>{item.publisher?.publisherName}</TableCell>
                                     <TableCell>{item.revenueSharePercentage}%</TableCell>
@@ -149,6 +160,17 @@ function ContractsList() {
                         </TableBody>
                     </Table>
                 </TableContainer>
+
+                <Pagination
+                className="center"
+                count={Math.ceil(contracts.length / contractsPerPage)} // Total number of pages
+                page={currentPage} // Current page
+                onChange={handlePageChange} // Handle page change
+                color="primary" // Styling options
+                showFirstButton
+                showLastButton
+                sx={{marginTop: 2}}
+            />
             </Box>
         </div>
     )
