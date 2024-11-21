@@ -58,6 +58,20 @@ const getRecapVersions = async (recapId, request) => {
   }
 }
 
+const getRecapStats = async (recapId, fromDate, toDate, request) => {
+  try {
+    const response = await axiosInstance.get('/api/recap/getrecapdetail/' + recapId, {
+      params: { fromDate, toDate },
+      signal: request.signal
+    });
+    return response.data.data;
+  } catch (error) {
+    const err = handleFetchError(error);
+    console.log("err", err);
+    return null;
+  }
+}
+
 const updateRecap = async (recapId, request) => {
   const formData = await request.formData();
 
@@ -185,7 +199,7 @@ export const recapDetailsLoader = async ({ params, request }) => {
   return defer({
     recapVersions,
     recap,
-    bookInfo
+    bookInfo,
   });
 }
 
@@ -492,62 +506,40 @@ const oneWeekAgo = new Date();
 oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
 const RecapVersionStats = () => {
+  const { recap } = useLoaderData();
   const [ fromDate, setFromDate ] = useState(oneWeekAgo.toISOString().split('T')[0]);
   const [ toDate, setToDate ] = useState(new Date().toISOString().split('T')[0]);
+  const [ stats, setStats ] = useState(null);
+  const [ loading, setLoading ] = useState(true);
   const [ activeTab, setActiveTab ] = useState('views');
+  const [ controller, setController ] = useState(null);
 
-  const dashboardData = [
-    {
-      date: "2021-09-01",
-      views: 100,
-      watchTime: 200,
-      earning: 1000
-    },
-    {
-      date: "2021-09-02",
-      views: 200,
-      watchTime: 400,
-      earning: 2000
-    },
-    {
-      date: "2021-09-03",
-      views: 300,
-      watchTime: 600,
-      earning: 3000
-    },
-    {
-      date: "2021-09-04",
-      views: 400,
-      watchTime: 800,
-      earning: 4000
-    },
-    {
-      date: "2021-09-05",
-      views: 500,
-      watchTime: 1000,
-      earning: 5000
-    },
-    {
-      date: "2021-09-06",
-      views: 600,
-      watchTime: 1200,
-      earning: 6000
-    },
-    {
-      date: "2021-09-07",
-      views: 700,
-      watchTime: 1400,
-      earning: 7000
-    },
-  ]
+  useEffect(() => {
+    return () => controller?.abort();
+  }, [ controller ]);
 
-  const applyDateFilter = () => {
+  useEffect(() => {
+    applyDateFilter()
+  }, []);
+
+  const applyDateFilter = async () => {
     // Convert dates to UTC format before sending to the backend
-    const fromDateUTC = new Date(fromDate).toISOString();
-    const toDateUTC = new Date(toDate).toISOString();
+    const newController = new AbortController();
 
-    console.log(`Filtering from ${fromDateUTC} to ${toDateUTC}`);
+    setLoading(true);
+    setController(newController);
+
+    const data = await getRecapStats(recap.id, fromDate, toDate, newController);
+
+    setStats(data);
+    setLoading(false);
   };
+  const dashboardData = stats ? stats.dailyStats.$values.map((item) => ({
+    date: item.date.split('T')[0],
+    views: item.views,
+    watchTime: item.watchTime,
+    earning: item.earning
+  })) : [];
 
   const color = {
     stroke: {
@@ -568,7 +560,7 @@ const RecapVersionStats = () => {
   }
 
   return (
-    <div className="p-4 bg-white rounded-lg shadow-md">
+    <div className={cn("p-4 bg-white rounded-lg shadow-md", { "cursor-progress": loading })}>
       <div className="flex justify-between mb-4 gap-4">
         <div className="flex-1 py-4 px-6 rounded-md shadow-sm space-y-1 border border-gray-300">
           <div className="text-lg font-semibold">
@@ -577,20 +569,24 @@ const RecapVersionStats = () => {
           <p className="text-sm italic text-gray-500">
             (All time)
           </p>
-          <p className="text-2xl font-bold">
-            100.000 views
+          <p className="text-2xl font-bold text-indigo-600">
+            {recap.viewsCount || 0} views
           </p>
         </div>
         <div className="flex-1 py-4 px-6 rounded-md shadow-sm space-y-1 border border-gray-300">
           <div className="text-lg font-semibold">
             Quyết toán gần nhất
           </div>
-          <p className="text-sm italic text-gray-500">
-            (Từ 2021-09-01 đến 2021-09-07)
-          </p>
-          <p className="text-2xl font-bold">
-            100.000 VNĐ
-          </p>
+          <Show when={!loading} fallback={<p>Loading...</p>}>
+            <Show when={stats && stats.lastPayout} fallback={<p>Chưa có quyết toán nào.</p>}>
+              <p className="text-sm italic text-gray-500">
+                (Từ {new Date(stats?.lastPayout?.fromDate).toLocaleDateString()} đến {new Date(stats?.lastPayout?.toDate).toLocaleDateString()})
+              </p>
+              <p className="text-2xl font-bold text-indigo-600">
+                {stats?.lastPayout?.amount.toLocaleString("vi-VN")} VNĐ
+              </p>
+            </Show>
+          </Show>
         </div>
       </div>
 

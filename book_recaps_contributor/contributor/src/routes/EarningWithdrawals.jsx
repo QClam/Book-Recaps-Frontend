@@ -109,6 +109,7 @@ const EarningWithdrawals = () => {
   }, [ actionData ]);
 
   const openWithdrawDialog = () => {
+    setWithdrawAmount("");
     setWithdrawDialog(true);
   };
 
@@ -316,12 +317,21 @@ const EarningWithdrawals = () => {
                   <p>Tổng tiền</p>
                   <p className="font-semibold">{withdrawAmount.toLocaleString('vi-VN')} VNĐ</p>
                 </div>
-                <button
-                  onClick={completeWithdrawal}
-                  className="text-white bg-indigo-600 rounded py-1.5 px-3 border font-semibold hover:bg-indigo-700 w-full"
-                >
-                  Rút tiền
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    className="bg-gray-200 rounded py-1.5 px-3 border font-semibold hover:bg-gray-300 flex-1"
+                    type="button"
+                    onClick={hide}
+                  >
+                    Đóng
+                  </button>
+                  <button
+                    onClick={completeWithdrawal}
+                    className="text-white bg-indigo-600 rounded py-1.5 px-3 border font-semibold hover:bg-indigo-700 flex-1"
+                  >
+                    Rút tiền
+                  </button>
+                </div>
               </div>
             </Modal.Footer>
           </Modal.Wrapper>
@@ -343,7 +353,10 @@ const EarningWithdrawals = () => {
                 </div>
                 <p className="font-semibold text-indigo-600">{withdrawAmount.toLocaleString('vi-VN')} VNĐ</p>
                 <Divider/>
-                <p>Vui lòng đến chi nhánh gần nhất để hoàn tất thủ tục rút tiền.</p>
+                <p>
+                  Vui lòng đến chi nhánh gần nhất để hoàn tất thủ tục rút tiền. <strong>Yêu cầu sẽ bị hủy sau 24
+                  tiếng.</strong>
+                </p>
               </div>
             </Modal.Body>
             <Modal.Footer className="justify-end gap-3 text-sm">
