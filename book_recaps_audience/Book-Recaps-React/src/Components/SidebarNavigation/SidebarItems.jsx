@@ -1,19 +1,22 @@
 import React from 'react';
 
-import { Home, Search, LibraryBooks, Person, BorderColor, MenuBook, Settings, HelpOutline, Logout, Category, AutoAwesome  } from '@mui/icons-material';
+import { Home, Search, LibraryBooks, Person, BorderColor, MenuBook, Settings, HelpOutline, Logout, Category, AutoAwesome, History   } from '@mui/icons-material';
 
 export const SidebarItems = [
-    {
-        title: "Home",
-        icon: <Home />,
-        link: "/home",
-    },
 
     {
         title: "Explore",
         icon: <Search />,
         link: "/explore",
     },
+
+    {
+        title: "Home",
+        icon: <Home />,
+        link: "/home",
+    },
+
+
     {
         title: "Books",
         icon: <MenuBook />,  // Icon cho Books
@@ -45,7 +48,7 @@ export const SidebarItems = [
     
     {
         title: "History",
-        icon: <BorderColor />,
+        icon: <History  />,
         link: "/history",
     },
     
