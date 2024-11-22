@@ -84,6 +84,10 @@ function ContributorPayout() {
         navigate(`/contributor-payout-history/${id}`);
     };
 
+    const detailPayout = (id) => {
+        navigate(`/contributor-payout-detail/${id}`);
+    };
+
     const handleOpenModal = () => {
         setOpenModal(true);
     };
@@ -149,21 +153,21 @@ function ContributorPayout() {
 
     if (loading) {
         return (
-          <div className="loading">
-            <Hourglass
-              visible={true}
-              height="80"
-              width="80"
-              ariaLabel="hourglass-loading"
-              colors={["#306cce", "#72a1ed"]}
-            />
-          </div>
+            <div className="loading">
+                <Hourglass
+                    visible={true}
+                    height="80"
+                    width="80"
+                    ariaLabel="hourglass-loading"
+                    colors={["#306cce", "#72a1ed"]}
+                />
+            </div>
         );
-      }
+    }
 
     return (
         <Box sx={{ padding: '24px', width: '80vw' }}>
-            <Typography variant="h5">Quyết toán thu nhập cho Contributor</Typography>
+            <Typography variant="h5">Quyết toán thu nhập cho Người đóng góp</Typography>
             <Box display="flex" justifyContent="flex-end" mt={2} padding={2}>
                 <Button variant="contained" color="primary" onClick={handleOpenModal}>
                     Tạo mới
@@ -186,7 +190,13 @@ function ContributorPayout() {
                                 <TableCell>{item.contributorName}</TableCell>
                                 <TableCell> {dayjs(item.fromdate).format('DD/MM/YYYY')} - {dayjs(item.todate).format('DD/MM/YYYY')}</TableCell>
                                 <TableCell>{item.totalEarnings}</TableCell>
-                                <TableCell>{item.status}</TableCell>
+                                {item.status === "Done" ? (
+                                    <TableCell>Hoàn thành</TableCell>
+
+                                ) : (
+                                    <TableCell>Lỗi</TableCell>
+
+                                )}
                                 <TableCell>
                                     <Box>
                                         <Button
@@ -200,7 +210,7 @@ function ContributorPayout() {
                                         </Button>
                                         <Button
                                             color="primary"
-                                            // onClick={() => createPayout(item.id)}
+                                            onClick={() => detailPayout(item.payoutId)}
                                             sx={{
                                                 '&:hover': { backgroundColor: '#edf5fa' },
                                             }}

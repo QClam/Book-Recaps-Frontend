@@ -1,14 +1,16 @@
 import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import api from '../Auth/AxiosInterceptors';
 import { Hourglass } from 'react-loader-spinner';
+import { Visibility } from '@mui/icons-material';
 
 
 function HistoryPublisherPayout() {
 
     const { historyId } = useParams();
+    const navigate = useNavigate();
 
     const [payouts, setPayouts] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -32,6 +34,10 @@ function HistoryPublisherPayout() {
         return date ? new Date(date).toLocaleDateString() : null;
     }
 
+    const detailPayout = (id) => {
+        navigate(`/publisher-payout-detail/${id}`)
+    } 
+
     if (loading) {
         return (
             <div className="loading">
@@ -48,7 +54,7 @@ function HistoryPublisherPayout() {
 
     return (
         <Box sx={{ width: "80vw" }}>
-            <Typography variant='h5'>Lịch sử quyết toán Publisher</Typography>
+            <Typography variant='h5' sx={{margin: 2}}>Lịch sử quyết toán Publisher</Typography>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
@@ -64,18 +70,18 @@ function HistoryPublisherPayout() {
                     </TableHead>
                     <TableBody>
                         {payouts.map((item) => (
-                            <TableRow key={item.id}>
-                                <TableCell>{item.name}</TableCell>
+                            <TableRow key={item.payoutId}>
+                                <TableCell>{item.publisherName}</TableCell>
                                 <TableCell>{formatDate(item.fromDate)}</TableCell>
                                 <TableCell>{formatDate(item.toDate)}</TableCell>
-                                <TableCell>{item.amount}</TableCell>
+                                <TableCell>{item.totalEarnings}</TableCell>
                                 <TableCell>{item.description}</TableCell>
-                                {item.status === 1 ? (
-                                    <TableCell>Hoàn tất</TableCell>
+                                {item.status === "Done" ? (
+                                    <TableCell>Hoàn thành</TableCell>
                                 ) : (
-                                    <TableCell>Unknow</TableCell>
+                                    <TableCell>Lỗi</TableCell>
                                 )}
-                                <TableCell><Button href={`/publisher-payout-history/${historyId}/detail/${item.id}`}>Xem chi tiết</Button></TableCell>
+                                <TableCell><Button onClick={() => detailPayout(item.payoutId)}><Visibility /> </Button></TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

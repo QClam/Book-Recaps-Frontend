@@ -103,6 +103,9 @@ function PublisherPayout() {
         navigate(`/publisher-payout-history/${id}`);
     };
 
+    const detailPayout = (id) => {
+        navigate(`/publisher-payout-detail/${id}`)
+    }
     // Fetch thông tin payout chuẩn bị tạo
     const inputCreatePayout = async () => {
         try {
@@ -202,7 +205,7 @@ function PublisherPayout() {
                                 <TableCell>{item.publisherName}</TableCell>
                                 <TableCell>{dayjs(item.fromdate).format('DD/MM/YYYY')} - {dayjs(item.todate).format('DD/MM/YYYY')}</TableCell>
                                 <TableCell>{item.totalEarnings}</TableCell>
-                                <TableCell>{item.status}</TableCell>
+                                <TableCell>Hoàn thành</TableCell>
                                 <TableCell align="center">
                                     <Box>
                                         <Button
@@ -216,7 +219,7 @@ function PublisherPayout() {
                                         </Button>
                                         <Button
                                             color="primary"
-                                            // onClick={() => createPayout(item.id)}
+                                            onClick={() => detailPayout(item.payoutId)}
                                             sx={{
                                                 '&:hover': { backgroundColor: '#edf5fa' },
                                             }}

@@ -28,46 +28,46 @@ import CreateContract from './Components/Contracts/CreateContract';
 
 function App() {
 
-  const location = useLocation();
-  const isLoginPage = location.pathname === "/auth" || location.pathname === "/auth/confirm-email";
+    const location = useLocation();
+    const isLoginPage = location.pathname === "/auth" || location.pathname === "/auth/confirm-email";
 
-  return (
-    <main>
-      {!isLoginPage && <Sidebar />}
-      <Routes>
-        <Route path="/" element={<PrivateRoute> <UsersList /> </PrivateRoute>} />
-        <Route path="/users" element={<PrivateRoute> <UsersList /> </PrivateRoute>} />
-        <Route path="/dashboard" element={ <Dashboard />} />
-        <Route path="/publisher-payout" element={ <PublisherPayout />} />
-        <Route path="/publisher-payout-create/:id" element={ <CreatePublisherPayout />} />
-        <Route path="/publisher-payout-history/:historyId" element={ <HistoryPublisherPayout />} />
-        <Route path="/publisher-payout-history/:historyId/detail/:id" element={ <DetailPublihserPayout />} />
-        <Route path="/contributor-payout" element={ <ContributorPayout />} />
-        <Route path="/contributor-payout-create/:id" element={ <CreateContributorPayout />} />
-        <Route path="/contributor-payout-history/:historyId" element={ <HistoryContributorPayout />} />
-        <Route path="/contributor-payout-history/:historyId/detail/:id" element={ <DetailContributorPayout />} />
-        <Route path="/books" element={<PrivateRoute> <BookList /> </PrivateRoute>} />
-        <Route path="/book/:id" element={<PrivateRoute> <BookDetail /> </PrivateRoute>} />
-        <Route path="/publishsers" element={<PrivateRoute> <PublisherList /> </PrivateRoute>} />
-        <Route path="/contracts" element={<PrivateRoute> <ContractsList /> </PrivateRoute>} />
-        <Route path="/contract/create" element={<PrivateRoute> <CreateContract /> </PrivateRoute>} />
-        <Route path="/contract/:contractId" element={<PrivateRoute> <ContractDetail /> </PrivateRoute>} />
-        <Route path="/auth" element={<Login />} />
-        <Route path="/auth/confirm-email" element={<ConfirmEmail />} />
-      </Routes>
-    </main>
-  )
+    return (
+        <main>
+            {!isLoginPage && <Sidebar />}
+            <Routes>
+                <Route path="/" element={<PrivateRoute> <UsersList /> </PrivateRoute>} />
+                <Route path="/users" element={<PrivateRoute> <UsersList /> </PrivateRoute>} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/publisher-payout" element={<PublisherPayout />} />
+                <Route path="/publisher-payout-detail/:id" element={<DetailPublihserPayout />} />
+                <Route path="/publisher-payout-create/:id" element={<CreatePublisherPayout />} />
+                <Route path="/publisher-payout-history/:historyId" element={<HistoryPublisherPayout />} />
+                <Route path="/contributor-payout" element={<ContributorPayout />} />
+                <Route path="/contributor-payout-detail/:id" element={<DetailContributorPayout />} />
+                <Route path="/contributor-payout-create/:id" element={<CreateContributorPayout />} />
+                <Route path="/contributor-payout-history/:historyId" element={<HistoryContributorPayout />} />
+                <Route path="/books" element={<PrivateRoute> <BookList /> </PrivateRoute>} />
+                <Route path="/book/:id" element={<PrivateRoute> <BookDetail /> </PrivateRoute>} />
+                <Route path="/publishsers" element={<PrivateRoute> <PublisherList /> </PrivateRoute>} />
+                <Route path="/contracts" element={<PrivateRoute> <ContractsList /> </PrivateRoute>} />
+                <Route path="/contract/create" element={<PrivateRoute> <CreateContract /> </PrivateRoute>} />
+                <Route path="/contract/:contractId" element={<PrivateRoute> <ContractDetail /> </PrivateRoute>} />
+                <Route path="/auth" element={<Login />} />
+                <Route path="/auth/confirm-email" element={<ConfirmEmail />} />
+            </Routes>
+        </main>
+    )
 }
 
 function AppWrapper() {
-  const recaptchaKey = import.meta.env.VITE_RECAPTCHA_KEY;
-  return (
-    <GoogleReCaptchaProvider reCaptchaKey={recaptchaKey}>
-      <Router>
-        <App />
-      </Router>
-    </GoogleReCaptchaProvider>
-  )
+    const recaptchaKey = import.meta.env.VITE_RECAPTCHA_KEY;
+    return (
+        <GoogleReCaptchaProvider reCaptchaKey={recaptchaKey}>
+            <Router>
+                <App />
+            </Router>
+        </GoogleReCaptchaProvider>
+    )
 }
 
 export default AppWrapper
