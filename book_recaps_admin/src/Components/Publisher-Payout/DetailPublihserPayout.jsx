@@ -20,7 +20,7 @@ function DetailPublihserPayout() {
         try {
             const response = await api.get(`/api/PublisherPayout/getpayoutinfobyid/${id}`);
             const payout = response.data.data;
-            const bookEarnings = payout.bookEarnings.$values;
+            const bookEarnings = Array.isArray(payout.bookDetails?.$values) ? payout.bookDetails.$values : [];
             setPayoutData(payout);
             setBookEarnings(bookEarnings)
             console.log("Payout Detail: ", payout);
@@ -35,13 +35,19 @@ function DetailPublihserPayout() {
     }, [])
 
     const handleExportExcel = () => {
-        // Chuyển đổi dữ liệu thành định dạng của sheet Excel
-        const worksheet = XLSX.utils.json_to_sheet(payoutData);
+        const bookData = bookEarnings.map(item => ({
+            bookTitle: item.bookTitle,
+            fromDate: dayjs(payoutData.fromdate).format('DD/MM/YYYY'),
+            toDate: dayjs(payoutData.todate).format('DD/MM/YYYY'),
+            bookEarnings: item.bookEarnings.toLocaleString()
+        }));
+
+        const worksheet = XLSX.utils.json_to_sheet(bookData);
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, 'Books');
 
         // Xuất workbook ra file Excel
-        XLSX.writeFile(workbook, "PayoutData.xlsx");
+        XLSX.writeFile(workbook, "BookData.xlsx");
     }
 
     return (
@@ -66,19 +72,19 @@ function DetailPublihserPayout() {
                                         <Typography variant="body1" fontWeight="bold">
                                             Nhà xuất bản:
                                         </Typography>
-                                        <Typography variant="body1">{payoutData.publisher?.publisherName}</Typography>
+                                        <Typography variant="body1">{payoutData.publisherName}</Typography>
                                     </Box>
                                     <Box display="flex" justifyContent="space-between" mb={1}>
                                         <Typography variant="body1" fontWeight="bold">
                                             Tài khoản ngân hàng:
                                         </Typography>
-                                        <Typography variant="body1">{payoutData.publisher?.bankAccount}</Typography>
+                                        <Typography variant="body1">{payoutData.bankAccount}</Typography>
                                     </Box>
                                     <Box display="flex" justifyContent="space-between">
                                         <Typography variant="body1" fontWeight="bold">
                                             Thông tin liên hệ:
                                         </Typography>
-                                        <Typography variant="body1">{payoutData.publisher?.contactInfo}</Typography>
+                                        <Typography variant="body1">{payoutData.contactInfo}</Typography>
                                     </Box>
                                 </Paper>
                             </Grid>
@@ -103,7 +109,7 @@ function DetailPublihserPayout() {
                                         <Typography variant="body1" fontWeight="bold">
                                             Tổng chi:
                                         </Typography>
-                                        <Typography variant="body1">{payoutData.amount} VND</Typography>
+                                        <Typography variant="body1">{payoutData.totalEarnings} VND</Typography>
                                     </Box>
                                     <Box display="flex" justifyContent="space-between">
                                         <Link href={payoutData.imageURL} underline="hover" target="_blank">Hình ảnh</Link>
@@ -147,7 +153,7 @@ function DetailPublihserPayout() {
                             Xuất Excel
                         </Button>
                     </Box>
-                    <TableContainer component={Paper} sx={{margin: 1}}>
+                    <TableContainer component={Paper} sx={{ margin: 1 }}>
                         <Table>
                             <TableHead>
                                 <TableRow>
@@ -158,14 +164,20 @@ function DetailPublihserPayout() {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {bookEarnings.map((item) => (
-                                    <TableRow key={item.id}>
-                                        <TableCell>Thêm title book ở đây</TableCell>
-                                        <TableCell>{dayjs(item.fromDate).format('DD/MM/YYYY')}</TableCell>
-                                        <TableCell>{dayjs(item.toDate).format('DD/MM/YYYY')}</TableCell>
-                                        <TableCell>{item.earningAmount} VND</TableCell>
+                                {bookEarnings.length > 0 ? (
+                                    bookEarnings.map((item) => (
+                                        <TableRow key={item.bookId}>
+                                            <TableCell>{item.bookTitle}</TableCell>
+                                            <TableCell>{dayjs(payoutData.fromDate).format('DD/MM/YYYY')}</TableCell>
+                                            <TableCell>{dayjs(payoutData.toDate).format('DD/MM/YYYY')}</TableCell>
+                                            <TableCell>{item.bookEarnings} VND</TableCell>
+                                        </TableRow>
+                                    )
+                                    )) : (
+                                    <TableRow>
+                                        <TableCell colSpan={5} align="center">Không có dữ liệu</TableCell>
                                     </TableRow>
-                                ))}
+                                )}
                             </TableBody>
                         </Table>
                     </TableContainer>
