@@ -2,19 +2,19 @@ import { FlatList, SafeAreaView, StyleSheet, Text, View, useWindowDimensions } f
 import React, { useState } from "react";
 
 import { TabView, SceneMap, TabBar } from "react-native-tab-view";
-import LoginScreen from "./Login";
-import RegisterScreen from "./Register";
+import Login from "../components/Auth/Login";
+import Register from "../components/Auth/Register";
 
-const loginRoute = () => <LoginScreen />
-const registerRoute = () => <RegisterScreen />
+const loginRoute = () => <Login />
+const registerRoute = () => <Register />
 
-const LoginNRegister = () => {
+const LoginScreen = () => {
 
     const layout = useWindowDimensions();
     const [index, setIndex] = useState(0);
     const [routes] = useState([
-        {key: 'login', title: 'Login'},
-        {key: 'register', title: 'Register'}
+        {key: 'login', title: 'Đăng nhập'},
+        {key: 'register', title: 'Đăng ký'}
     ])
 
     const renderScene = SceneMap({
@@ -47,7 +47,7 @@ const LoginNRegister = () => {
   );
 };
 
-export default LoginNRegister;
+export default LoginScreen;
 
 const styles = StyleSheet.create({
     container: {

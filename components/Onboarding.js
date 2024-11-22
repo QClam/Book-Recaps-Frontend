@@ -28,7 +28,7 @@ const Onboarding = () => {
       try {
         await AsyncStorage.setItem("@viewedOnboarding", "true");
         // navigation.navigate("Home"); // Navigate to Home screen after the last slide
-        navigation.navigate("LoginNRegister"); // Navigate to after the last slide
+        navigation.navigate("Login"); // Navigate to after the last slide
       } catch (error) {
         console.log("Error @setItem", error);
       }
