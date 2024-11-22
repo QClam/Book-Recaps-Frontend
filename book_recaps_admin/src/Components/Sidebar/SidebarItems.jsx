@@ -22,7 +22,7 @@ export const SidebarItems = [
         link: "/publisher-payout",
     },
     {
-        title: "Quyết toán cho Contributor",
+        title: "Quyết toán cho Người đóng góp",
         icon: <CurrencyExchange />,
         link: "/contributor-payout",
     },

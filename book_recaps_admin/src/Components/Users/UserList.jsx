@@ -487,19 +487,19 @@ function UsersList() {
                                         </button>
                                     ) : user.roleType === 1 ? (
                                         <button className="role-container" style={{ backgroundColor: "#007bff" }}>
-                                            Staff
+                                            Nhân viên
                                         </button>
                                     ) : user.roleType === 2 ? (
                                         <button className="role-container" style={{ backgroundColor: "#1d96c6" }}>
-                                            Contributor
+                                            Người đóng góp
                                         </button>
                                     ) : user.roleType === 3 ? (
                                         <button className="role-container" style={{ backgroundColor: "#268a3a" }}>
-                                            Publisher
+                                            Nhà xuất bản
                                         </button>
                                     ) : user.roleType === 4 ? (
                                         <button className="role-container" style={{ backgroundColor: "#a74f19" }}>
-                                            Customer
+                                            Thính giả
                                         </button>
                                     ) : (
                                         <button className="role-container" style={{ backgroundColor: "#5e6061" }}>

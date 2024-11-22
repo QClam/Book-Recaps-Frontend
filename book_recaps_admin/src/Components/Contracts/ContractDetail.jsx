@@ -325,9 +325,9 @@ function ContractDetail() {
                     </Card>
                 </Box>
 
-                <AddContractAttachment contractId={contractId} />
+                <AddContractAttachment contractId={contractId} disableUpdate={disableUpdate}/>
 
-                <AddContractBooks contractId={contractId} />
+                <AddContractBooks contractId={contractId} disableUpdate={disableUpdate}/>
 
             </Box>
         </div>
