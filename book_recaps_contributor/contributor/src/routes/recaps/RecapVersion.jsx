@@ -271,7 +271,7 @@ const RightSidePanel = () => {
 }
 
 const RecapVersionDetails = () => {
-  const { recapVersion, setRecapVersion } = useRecapVersion();
+  const { recapVersion, setRecapVersion, isKeyIdeasEmpty } = useRecapVersion();
   const navigate = useNavigate();
   const { showToast } = useToast();
 
@@ -351,6 +351,15 @@ const RecapVersionDetails = () => {
 
   const handleGenerateAudio = async () => {
     if (uploadingAudio) return;
+
+    if (isKeyIdeasEmpty) {
+      showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Key ideas cannot be empty',
+      });
+      return;
+    }
 
     try {
       setUploadingAudio(true);
@@ -514,7 +523,7 @@ const RecapVersionDetails = () => {
           <input
             type="text"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none read-only:bg-gray-100"
-            defaultValue={recapVersion.audioURL}
+            value={recapVersion.audioURL}
             placeholder="Audio URL"
             readOnly
           />
@@ -528,7 +537,7 @@ const RecapVersionDetails = () => {
             <input
               type="text"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none read-only:bg-gray-100"
-              defaultValue={recapVersion.transcriptUrl}
+              value={recapVersion.transcriptUrl}
               placeholder="Audio transcript URL"
               readOnly
             />
@@ -587,7 +596,7 @@ const RecapVersionDetails = () => {
           <div className="mb-4">
             <button
               type="button"
-              disabled={loading}
+              disabled={loading || isKeyIdeasEmpty}
               onClick={handleGenerateAudio}
               className="w-full px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300 disabled:opacity-50">
               Generate audio

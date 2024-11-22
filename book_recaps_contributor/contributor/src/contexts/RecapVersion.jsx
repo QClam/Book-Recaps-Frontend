@@ -24,12 +24,16 @@ export const RecapVersionProvider = ({ children, initialRecapVersion, deferredKe
     });
   }, [ deferredKeyIdeas ]);
 
+  // Key ideas bodies are empty
+  const isKeyIdeasEmpty = keyIdeas && keyIdeas.every(idea => !idea.body);
+
   return (
     <RecapVersionContext.Provider value={{
       activeIndex, setActiveIndex,
       recapVersion, setRecapVersion,
       keyIdeas, setKeyIdeas,
-      plagiarismResults, setPlagiarismResults
+      plagiarismResults, setPlagiarismResults,
+      isKeyIdeasEmpty
     }}>
       {children}
     </RecapVersionContext.Provider>
