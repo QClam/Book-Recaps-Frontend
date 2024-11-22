@@ -47,7 +47,6 @@ function ReportList() {
     const [responseText, setResponseText] = useState("");
     const [filterStatus, setFilterStatus] = useState("");
     const [currentPage, setCurrentPage] = useState(1); // MUI Pagination uses 1-based indexing
-    const [isDarkMode, setIsDarkMode] = useState(true);
 
     const reportsPerPage = 5;
 
@@ -162,7 +161,7 @@ function ReportList() {
     }
 
     return (
-        <div>
+        <div style={{width: "80vw"}}>
             <div className="content-list">
                 <h2>Danh sách Report của Audience</h2>
                 <FormControl variant="outlined" style={{ minWidth: 200, marginBottom: 20 }} className="form-control">
@@ -205,7 +204,7 @@ function ReportList() {
                                     <td>{new Date(val.createdAt).toLocaleDateString()}</td>
                                     <td><button onClick={() => openDialog(val)}
                                         disabled={val.status === 2}
-                                        style={{ width: "150px", backgroundColor: "green" }}
+                                        style={{ width: "150px", backgroundColor: "green", color: "#fff" }}
                                     >
                                         Phản hồi</button></td>
                                     <td>{val.status === 1 ? (
@@ -259,22 +258,6 @@ function ReportList() {
                 color="primary"
                 showFirstButton
                 showLastButton
-                sx={{
-                    "& .MuiPaginationItem-root": {
-                        color: isDarkMode ? "#fff" : "#000",
-                        backgroundColor: isDarkMode ? "#555" : "#f0f0f0",
-                    },
-                    "& .MuiPaginationItem-root.Mui-selected": {
-                        backgroundColor: isDarkMode ? "#306cce" : "#72a1ed",
-                        color: "#fff",
-                    },
-                    "& .MuiPaginationItem-root.Mui-selected:hover": {
-                        backgroundColor: isDarkMode ? "#2057a4" : "#5698d3",
-                    },
-                    "& .MuiPaginationItem-root:hover": {
-                        backgroundColor: isDarkMode ? "#666" : "#e0e0e0",
-                    },
-                }}
             />
         </div>
     )

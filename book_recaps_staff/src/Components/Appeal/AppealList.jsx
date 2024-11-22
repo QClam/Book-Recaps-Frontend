@@ -198,7 +198,7 @@ function AppealList() {
                                     <td>{val.response || "Chưa có phản hồi từ Staff"}</td>
                                     <td>{new Date(val.createdAt).toLocaleDateString()}</td>
                                     <td>
-                                        <button style={{ width: "150px" }}
+                                        <button style={{ width: "150px", backgroundColor: "#007bff", color: "#fff" }}
                                             onClick={() =>
                                                 navigate(`/review/content_version/${val.reviewId}`)
                                             }
@@ -209,7 +209,7 @@ function AppealList() {
                                     <td>
                                         <button onClick={() => openDialog(val)}
                                             disabled={val.appealStatus === 2}
-                                            style={{ width: "150px" }}
+                                            style={{ width: "150px", backgroundColor: "red", color: "#f0f0f0" }}
                                         >
                                             Phản hồi</button>
                                     </td>
@@ -269,22 +269,6 @@ function AppealList() {
                 color="primary"
                 showFirstButton
                 showLastButton
-                sx={{
-                    "& .MuiPaginationItem-root": {
-                        color: isDarkMode ? "#fff" : "#000",
-                        backgroundColor: isDarkMode ? "#555" : "#f0f0f0",
-                    },
-                    "& .MuiPaginationItem-root.Mui-selected": {
-                        backgroundColor: isDarkMode ? "#306cce" : "#72a1ed",
-                        color: "#fff",
-                    },
-                    "& .MuiPaginationItem-root.Mui-selected:hover": {
-                        backgroundColor: isDarkMode ? "#2057a4" : "#5698d3",
-                    },
-                    "& .MuiPaginationItem-root:hover": {
-                        backgroundColor: isDarkMode ? "#666" : "#e0e0e0",
-                    },
-                }}
             />
         </div>
     );

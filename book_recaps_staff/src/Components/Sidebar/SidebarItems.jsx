@@ -2,18 +2,11 @@ import React from "react";
 
 import {
   OutlinedFlag,
-  Bookmark,
   SpaceDashboard,
-  BorderColor,
-  AutoAwesome,
-  Settings,
-  HelpOutline,
-  Logout,
-  GifBox,
   LibraryBooks,
-  Widgets,
   Gavel,
-  Groups
+  Groups,
+  CurrencyExchange
 } from "@mui/icons-material";
 
 export const SidebarItems = [
@@ -43,13 +36,13 @@ export const SidebarItems = [
     link: "/appeals",
   },
   {
-    title: "Report",
+    title: "Phản hồi",
     icon: <OutlinedFlag />,
     link: "/reports",
   },
   {
-    title: "Cài đặt",
-    icon: <Settings />,
-    link: "/settings",
+    title: "Quản lý rút tiền",
+    icon: <CurrencyExchange />,
+    link: "/withdrawl",
   },
 ];

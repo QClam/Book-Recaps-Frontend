@@ -8,11 +8,11 @@ import UsersList from "./Components/Users/UsersList";
 import ConfirmEmail from "./Components/Auth/ConfirmEmail";
 import PrivateRoute from "./Components/Auth/PrivateRoute";
 import RecapsList from "./Components/Recaps/RecapsList";
-import UserProfile from "./Components/Auth/UserProfile";
 import ForgetPassword from "./Components/Auth/ForgetPassword";
 import Dashboard from "./Components/Dashboard/Dashboard";
 import AppealList from "./Components/Appeal/AppealList";
 import ReportList from "./Components/Report/ReportList";
+import WithdrawalList from "./Components/WithDrawal/WithDrawalList";
 
 import "./App.css";
 function App() {
@@ -30,7 +30,7 @@ function App() {
         <Route path="/" element={<PrivateRoute> <RecapsList /> </PrivateRoute>} />
         <Route path="/recaps" element={<PrivateRoute> <RecapsList /> </PrivateRoute>} />
         <Route path="/users" element={<PrivateRoute> <UsersList /> </PrivateRoute>} />
-        <Route path="/settings" element={<PrivateRoute> <UserProfile /> </PrivateRoute>} />
+        <Route path="/withdrawl" element={<PrivateRoute> <WithdrawalList /> </PrivateRoute>} />
         <Route path="/dashboard" element={<Dashboard /> } />
         <Route path="/appeals" element={<PrivateRoute> <AppealList /> </PrivateRoute> } />
         <Route path="/reports" element={<PrivateRoute> <ReportList /> </PrivateRoute> } />
