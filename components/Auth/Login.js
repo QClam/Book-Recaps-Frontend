@@ -37,7 +37,7 @@ const Login = () => {
             await AsyncStorage.setItem("access_token", accessToken);
             await AsyncStorage.setItem("refresh_token", refreshToken);
 
-            console.log("Access_Token: ", accessToken);
+            // console.log("Access_Token: ", accessToken);
             
 
             navigation.replace("Tabs");
