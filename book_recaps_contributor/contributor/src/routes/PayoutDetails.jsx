@@ -79,9 +79,9 @@ const PayoutDetailsImpl = () => {
   const handleExportExcel = () => {
     const earnings = recapEarnings.map((recap) => ({
       'Tiêu đề': recap.recapId,
-      'Từ ngày': payoutDetails.fromdate ? new Date(payoutDetails.fromdate).toLocaleDateString() : 'N/A',
-      'Tới ngày': payoutDetails.todate ? new Date(payoutDetails.todate).toLocaleDateString() : 'N/A',
-      'Tổng thu nhập': recap.recapEarnings.toLocaleString('vi-VN') + 'đ'
+      'Từ ngày': recap.fromDate ? new Date(recap.fromDate).toLocaleDateString() : 'N/A',
+      'Tới ngày': recap.toDate ? new Date(recap.toDate).toLocaleDateString() : 'N/A',
+      'Tổng thu nhập': recap.earningAmount.toLocaleString('vi-VN') + 'đ'
     }));
     const worksheet = XLSX.utils.json_to_sheet(earnings);
     const workbook = XLSX.utils.book_new();
@@ -100,15 +100,15 @@ const PayoutDetailsImpl = () => {
         <div className="flex-1 p-4 bg-white rounded-md shadow-sm border border-gray-300 space-y-4">
           <div className="flex justify-between items-start gap-9">
             <p>Họ tên:</p>
-            <p className="font-semibold">{payoutDetails.contributorName}</p>
+            <p className="font-semibold">{payoutDetails.contributor.fullName}</p>
           </div>
           <div className="flex justify-between items-start gap-9">
             <p>Email:</p>
-            <p className="font-semibold">{payoutDetails.email}</p>
+            <p className="font-semibold">{payoutDetails.contributor.email}</p>
           </div>
           <div className="flex justify-between items-start gap-9">
-            <p>Số điện thoại:</p>
-            <p className="font-semibold">{payoutDetails.username}</p>
+            <p>Tên tài khoản:</p>
+            <p className="font-semibold">{payoutDetails.contributor.userName}</p>
           </div>
         </div>
 
@@ -116,12 +116,12 @@ const PayoutDetailsImpl = () => {
           <div className="flex justify-between gap-9">
             <p>Thời gian:</p>
             <p className="font-semibold">
-              {new Date(payoutDetails.fromdate).toLocaleDateString()} tới {new Date(payoutDetails.todate).toLocaleDateString()}
+              {new Date(payoutDetails.fromDate).toLocaleDateString()} tới {new Date(payoutDetails.toDate).toLocaleDateString()}
             </p>
           </div>
           <div className="flex justify-between gap-9">
             <p>Tổng tiền:</p>
-            <p className="font-semibold">{payoutDetails.totalEarnings.toLocaleString('vi-VN')} VNĐ</p>
+            <p className="font-semibold text-indigo-600">{payoutDetails.amount.toLocaleString('vi-VN')} VNĐ</p>
           </div>
           <div className="flex justify-between gap-9">
             <p>Trạng thái:</p>
@@ -139,7 +139,7 @@ const PayoutDetailsImpl = () => {
           <div className="flex flex-col h-full">
             <p className="font-semibold">Ghi chú:</p>
             <div className="flex-1 overflow-auto">
-              <p>{payoutDetails.description || "(Không có)"}</p>
+              <p>{payoutDetails.description || <span className="italic">(Không có)</span>}</p>
             </div>
           </div>
         </div>
@@ -184,7 +184,7 @@ const PayoutDetailsImpl = () => {
                   to={generatePath(routes.recapDetails, { recapId: recap.recapId })}
                   className="font-semibold text-indigo-600 hover:underline"
                 >
-                  {recap.recapId}
+                  {recap.recap.name}
                 </Link>
               </Table.Cell>
               <Table.Cell>
