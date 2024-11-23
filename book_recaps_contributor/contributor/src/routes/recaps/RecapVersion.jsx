@@ -560,7 +560,6 @@ const RecapVersionDetails = () => {
         </div>
       </Show>
 
-      {/*TODO: Preview audio and transcript*/}
       <Show when={recapVersion.transcriptUrl && recapVersion.audioURL && recapVersion.transcriptStatus === 2}>
         <>
           <div className="mb-4">
@@ -1470,7 +1469,7 @@ const AudioTranscriptPreview = ({ hide, isOpen, audioUrl, transcriptUrl }) => {
         <audio controls onCanPlayThrough={handleAudioLoaded} className={cn("w-full", {
           "opacity-50 cursor-progress": !audioLoaded
         })}>
-          <source src={audioUrl} type="audio/wav"/>
+          <source src={audioUrl} type={audioUrl.endsWith(".wav") ? "audio/wav" : "audio/mp4"}/>
           Your browser does not support the audio element.
         </audio>
       </Modal.Body>

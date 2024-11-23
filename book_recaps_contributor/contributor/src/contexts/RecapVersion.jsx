@@ -7,6 +7,7 @@ export const RecapVersionProvider = ({ children, initialRecapVersion, deferredKe
   const [ recapVersion, setRecapVersion ] = useState(initialRecapVersion);
   const [ keyIdeas, setKeyIdeas ] = useState(null); // Initial loading state
   const [ plagiarismResults, setPlagiarismResults ] = useState(null);
+  const [ isKeyIdeasLocked, setIsKeyIdeasLocked ] = useState(false);
 
   // Effect to set keyIdeas when deferred data is ready
   useEffect(() => {
@@ -33,6 +34,7 @@ export const RecapVersionProvider = ({ children, initialRecapVersion, deferredKe
       recapVersion, setRecapVersion,
       keyIdeas, setKeyIdeas,
       plagiarismResults, setPlagiarismResults,
+      isKeyIdeasLocked, setIsKeyIdeasLocked,
       isKeyIdeasEmpty
     }}>
       {children}
