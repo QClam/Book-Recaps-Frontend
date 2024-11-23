@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+import { createContext, useContext, useState } from "react";
+// import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { setSession } from "../utils/axios";
 import { useLoaderData } from "react-router-dom";
 
@@ -7,25 +7,25 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const loaderData = useLoaderData()
-  const { executeRecaptcha } = useGoogleReCaptcha();
+  // const { executeRecaptcha } = useGoogleReCaptcha();
   const [ user, setUser ] = useState(loaderData); // { id, email, name, role }
   // const [ reCaptchaTokens, setReCaptchaTokens ] = useState(null); // { loginToken, signupToken }
   const [ reCaptchaTokens ] = useState({ loginToken: "...", signupToken: "..." });
 
-  useEffect(() => {
-    const handleReCaptchaVerify = async () => {
-      // if (!executeRecaptcha) {
-      //   console.log('Execute recaptcha not yet available');
-      //   return;
-      // }
-      // const loginToken = await executeRecaptcha("login");
-      // const signupToken = await executeRecaptcha("signup");
-
-      // setReCaptchaTokens({ loginToken, signupToken });
-    }
-
-    handleReCaptchaVerify();
-  }, [ executeRecaptcha ]);
+  // useEffect(() => {
+  //   const handleReCaptchaVerify = async () => {
+  //     if (!executeRecaptcha) {
+  //       console.log('Execute recaptcha not yet available');
+  //       return;
+  //     }
+  //     const loginToken = await executeRecaptcha("login");
+  //     const signupToken = await executeRecaptcha("signup");
+  //
+  //     setReCaptchaTokens({ loginToken, signupToken });
+  //   }
+  //
+  //   handleReCaptchaVerify();
+  // }, [ executeRecaptcha ]);
 
   /**
    * @param {object} userData
@@ -51,10 +51,10 @@ export function AuthProvider({ children }) {
   };
 
   const reFetchReCaptchaTokens = async (action) => {
-    if (!executeRecaptcha) {
-      console.log('Execute recaptcha not yet available');
-      return;
-    }
+    // if (!executeRecaptcha) {
+    //   console.log('Execute recaptcha not yet available');
+    //   return;
+    // }
 
     if (action === "login") {
       // const loginToken = await executeRecaptcha("login");

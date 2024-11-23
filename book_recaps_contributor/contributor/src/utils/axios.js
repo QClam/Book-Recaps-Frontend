@@ -58,5 +58,8 @@ export const getSession = () => {
     return accessToken
   }
 
+  localStorage.removeItem(ACCESS_TOKEN)
+  delete axiosInstance.defaults.headers.common.Authorization
+  delete axiosInstance2.defaults.headers.common.Authorization
   return null
 }
