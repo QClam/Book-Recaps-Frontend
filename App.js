@@ -18,7 +18,9 @@ import LoginScreen from "./screens/LoginScreen";
 
 import { Ionicons } from '@expo/vector-icons'
 import FavoriteScreen from "./screens/FavoriteScreen";
-import RecapsScreen from "./screens/RecapsScreen";
+import RecapDetail from "./components/Books/RecapDetail";
+import RecapItemDetail from "./components/Books/RecapItemDetail";
+import RecapScreen from "./screens/RecapScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -35,7 +37,7 @@ const TabNavigator = () => {
                         iconName = focused ? "home" : "home-outline";
                     } else if (route.name === "Playlist") {
                         iconName = focused ? "list" : "list-outline";
-                    } else if (route.name === "Recaps") {
+                    } else if (route.name === "Recap") {
                         iconName = focused ? "albums" : "albums-outline";
                     }
 
@@ -56,9 +58,9 @@ const TabNavigator = () => {
                 options={{ title: "Playlist" }}
             />
             <Tab.Screen
-                name="Recaps"
-                component={RecapsScreen}
-                options={{ title: "Recaps" }}
+                name="Recap"
+                component={RecapScreen}
+                options={{ title: "Recap" }}
             />
         </Tab.Navigator>
     );
@@ -87,10 +89,13 @@ export default function App() {
     }, []);
 
     if (loading) {
-        <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-            <ActivityIndicator size="large" color="#007AFF" />
-        </View>
+        return (
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                <ActivityIndicator size="large" color="#007AFF" />
+            </View>
+        );
     }
+
 
     return (
         <NavigationContainer>
@@ -113,6 +118,17 @@ export default function App() {
                         component={TabNavigator}
                         options={{ headerShown: false }}
                     />
+
+                        <Stack.Screen
+                            name="RecapDetail"
+                            component={RecapDetail}
+                            options={{ title: "Detail" }}
+                        />
+                        <Stack.Screen
+                            name="RecapItemDetail"
+                            component={RecapItemDetail}
+                            options={{ title: "Detail Recap" }}
+                        />
                 </Stack.Navigator>
                 <StatusBar style="auto" />
             </SafeAreaView>
