@@ -7,11 +7,35 @@ import { Hourglass } from 'react-loader-spinner';
 
 import api from '../Auth/AxiosInterceptors'
 import { Edit, Visibility } from '@mui/icons-material';
+import WithdrawalInfo from './WithdrawalInfo';
+import WithdrawalRequest from './WithdrawalRequest';
 function WithdrawalList() {
 
     const [withdrawals, setWithdrawals] = useState([]);
     const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedDrawalId, setSelectedDrawalId] = useState(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [dialogType, setDialogType] = useState(null); // State để xác định mở dialog Info hay Request
+
+    const handleInfoView = (drawalId) => {
+        setSelectedDrawalId(drawalId);
+        setDialogType('info');
+        setIsDialogOpen(true);
+    };
+
+    const handleRequestView = (drawalId) => {
+        setSelectedDrawalId(drawalId);
+        setDialogType('request');
+        setIsDialogOpen(true);
+    };
+
+    const handleCloseDialog = () => {
+        setIsDialogOpen(false);
+        setSelectedDrawalId(null);
+        setDialogType(null);
+    };
+
 
     const withdrawalsPerPage = 7;
 
@@ -72,8 +96,8 @@ function WithdrawalList() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {displaywithdrawals.map((item, index) => (
-                            <TableRow key={index}>
+                        {displaywithdrawals.map((item) => (
+                            <TableRow key={item.drawalId}>
                                 <TableCell>{item.contributorName}</TableCell>
                                 <TableCell>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.totalEarnings || 0)}</TableCell>
                                 <TableCell>{item.description || "Không có ghi chú"}</TableCell>
@@ -90,7 +114,7 @@ function WithdrawalList() {
 
                                         <Button
                                             color="primary"
-                                            // onClick={() => historyPayout(item.contributorId)}
+                                            onClick={() => handleRequestView(item.drawalId)}
                                             sx={{
                                                 '&:hover': { backgroundColor: '#edf5fa' },
                                             }}
@@ -101,7 +125,7 @@ function WithdrawalList() {
 
                                         <Button
                                             color="primary"
-                                            // onClick={() => detailPayout(item.payoutId)}
+                                            onClick={() => handleInfoView(item.drawalId)}
                                             sx={{
                                                 '&:hover': { backgroundColor: '#edf5fa' },
                                             }}
@@ -118,6 +142,13 @@ function WithdrawalList() {
                 </Table>
             </TableContainer>
 
+            {dialogType === 'info' && (
+                <WithdrawalInfo open={isDialogOpen} onClose={handleCloseDialog} drawalId={selectedDrawalId} />
+            )}
+            {dialogType === 'request' && (
+                <WithdrawalRequest open={isDialogOpen} onClose={handleCloseDialog} drawalId={selectedDrawalId} />
+            )}
+
             <Pagination
                 className="center"
                 count={Math.ceil(withdrawals.length / withdrawalsPerPage)}
@@ -126,7 +157,7 @@ function WithdrawalList() {
                 color="primary"
                 showFirstButton
                 showLastButton
-                sx={{margin: 1}}
+                sx={{ margin: 1 }}
             />
         </Box>
     )
