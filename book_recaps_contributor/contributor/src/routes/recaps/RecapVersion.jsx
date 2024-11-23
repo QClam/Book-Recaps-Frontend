@@ -519,11 +519,11 @@ const RecapVersionDetails = () => {
       {/* Audio Upload */}
       <div className="mb-4">
         <label className="block text-sm font-medium text-gray-700 mb-1">Audio:</label>
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2" key={recapVersion.audioURL}>
           <input
             type="text"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none read-only:bg-gray-100"
-            value={recapVersion.audioURL}
+            defaultValue={recapVersion.audioURL}
             placeholder="Audio URL"
             readOnly
           />
@@ -533,11 +533,11 @@ const RecapVersionDetails = () => {
       <Show when={recapVersion.audioURL}>
         <div className="mb-4">
           <label className="block text-sm font-medium text-gray-700 mb-1">Audio transcript:</label>
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center space-x-2" key={recapVersion.transcriptUrl}>
             <input
               type="text"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none read-only:bg-gray-100"
-              value={recapVersion.transcriptUrl}
+              defaultValue={recapVersion.transcriptUrl}
               placeholder="Audio transcript URL"
               readOnly
             />
