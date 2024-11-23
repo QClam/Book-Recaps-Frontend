@@ -141,12 +141,12 @@ const FetchPublisherData = () => {
                                         />
                                     </td>
                                     <td>{payout.description}</td>
-                                    <td>{payout.amount}</td>
-                                    <td>{payout.status === 1 ? 'Paid' : 'Pending'}</td>
+                                    <td>{payout.totalEarnings}</td>
+                                    <td>{payout.status}</td>
                                     <td>{new Date(payout.fromDate).toLocaleDateString()}</td>
                                     <td>{new Date(payout.toDate).toLocaleDateString()}</td>
                                     <td>
-                                        <button onClick={() => handleDetailClick(payout.id)}>Detail</button>
+                                        <button onClick={() => handleDetailClick(payout.payoutId)}>Detail</button>
                                     </td>
 
 
