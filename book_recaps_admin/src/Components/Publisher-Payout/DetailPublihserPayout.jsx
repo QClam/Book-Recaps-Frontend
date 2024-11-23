@@ -20,7 +20,7 @@ function DetailPublihserPayout() {
         try {
             const response = await api.get(`/api/PublisherPayout/getpayoutinfobyid/${id}`);
             const payout = response.data.data;
-            const bookEarnings = Array.isArray(payout.bookDetails?.$values) ? payout.bookDetails.$values : [];
+            const bookEarnings = Array.isArray(payout.bookEarnings?.$values) ? payout.bookEarnings.$values : [];
             setPayoutData(payout);
             setBookEarnings(bookEarnings)
             console.log("Payout Detail: ", payout);
@@ -36,10 +36,10 @@ function DetailPublihserPayout() {
 
     const handleExportExcel = () => {
         const bookData = bookEarnings.map(item => ({
-            bookTitle: item.bookTitle,
+            bookTitle: item.book?.title,
             fromDate: dayjs(payoutData.fromdate).format('DD/MM/YYYY'),
             toDate: dayjs(payoutData.todate).format('DD/MM/YYYY'),
-            bookEarnings: item.bookEarnings.toLocaleString()
+            bookEarnings: item.earningAmount,
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(bookData);
@@ -72,19 +72,19 @@ function DetailPublihserPayout() {
                                         <Typography variant="body1" fontWeight="bold">
                                             Nhà xuất bản:
                                         </Typography>
-                                        <Typography variant="body1">{payoutData.publisherName}</Typography>
+                                        <Typography variant="body1">{payoutData.publisher?.publisherName}</Typography>
                                     </Box>
                                     <Box display="flex" justifyContent="space-between" mb={1}>
                                         <Typography variant="body1" fontWeight="bold">
                                             Tài khoản ngân hàng:
                                         </Typography>
-                                        <Typography variant="body1">{payoutData.bankAccount}</Typography>
+                                        <Typography variant="body1">{payoutData.publisher?.bankAccount}</Typography>
                                     </Box>
                                     <Box display="flex" justifyContent="space-between">
                                         <Typography variant="body1" fontWeight="bold">
                                             Thông tin liên hệ:
                                         </Typography>
-                                        <Typography variant="body1">{payoutData.contactInfo}</Typography>
+                                        <Typography variant="body1">{payoutData.publisher?.contactInfo}</Typography>
                                     </Box>
                                 </Paper>
                             </Grid>
@@ -109,7 +109,7 @@ function DetailPublihserPayout() {
                                         <Typography variant="body1" fontWeight="bold">
                                             Tổng chi:
                                         </Typography>
-                                        <Typography variant="body1">{payoutData.totalEarnings} VND</Typography>
+                                        <Typography variant="body1">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(payoutData.amount)}</Typography>
                                     </Box>
                                     <Box display="flex" justifyContent="space-between">
                                         <Link href={payoutData.imageURL} underline="hover" target="_blank">Hình ảnh</Link>
@@ -167,10 +167,10 @@ function DetailPublihserPayout() {
                                 {bookEarnings.length > 0 ? (
                                     bookEarnings.map((item) => (
                                         <TableRow key={item.bookId}>
-                                            <TableCell>{item.bookTitle}</TableCell>
+                                            <TableCell>{item.book?.title}</TableCell>
                                             <TableCell>{dayjs(payoutData.fromDate).format('DD/MM/YYYY')}</TableCell>
                                             <TableCell>{dayjs(payoutData.toDate).format('DD/MM/YYYY')}</TableCell>
-                                            <TableCell>{item.bookEarnings} VND</TableCell>
+                                            <TableCell>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.earningAmount)}</TableCell>
                                         </TableRow>
                                     )
                                     )) : (

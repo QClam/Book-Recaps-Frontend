@@ -74,7 +74,7 @@ function HistoryPublisherPayout() {
                                 <TableCell>{item.publisherName}</TableCell>
                                 <TableCell>{formatDate(item.fromDate)}</TableCell>
                                 <TableCell>{formatDate(item.toDate)}</TableCell>
-                                <TableCell>{item.totalEarnings}</TableCell>
+                                <TableCell>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.totalEarnings)}</TableCell>
                                 <TableCell>{item.description}</TableCell>
                                 {item.status === "Done" ? (
                                     <TableCell>Hoàn thành</TableCell>

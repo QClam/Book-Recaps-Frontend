@@ -204,7 +204,7 @@ function PublisherPayout() {
                             <TableRow key={item.id}>
                                 <TableCell>{item.publisherName}</TableCell>
                                 <TableCell>{dayjs(item.fromdate).format('DD/MM/YYYY')} - {dayjs(item.todate).format('DD/MM/YYYY')}</TableCell>
-                                <TableCell>{item.totalEarnings}</TableCell>
+                                <TableCell>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.totalEarnings)}</TableCell>
                                 <TableCell>Hoàn thành</TableCell>
                                 <TableCell align="center">
                                     <Box>

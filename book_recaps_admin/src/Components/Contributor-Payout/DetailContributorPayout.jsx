@@ -21,11 +21,11 @@ function DetailContributorPayout() {
         try {
             const response = await api.get(`/api/contributorpayout/getpayoutinfobyid/${id}`);
             const payout = response.data.data;
-            const recapEarnings = Array.isArray(payout.recapDetails?.$values) ? payout.recapDetails.$values : [];
+            const recapEarnings = Array.isArray(payout.recapEarnings?.$values) ? payout.recapEarnings.$values : [];
             setPayoutData(payout);
             setRecapEarnings(recapEarnings)
             console.log("Payout Detail: ", payout);
-            console.log("bookEarnings: ", recapEarnings);
+            console.log("recapEarnings: ", recapEarnings);
         } catch (error) {
             console.error("Error Fetching Payout Detail", error);
         }
@@ -37,11 +37,10 @@ function DetailContributorPayout() {
 
     const handleExportExcel = () => {
         const recapData = recapEarnings.map(item => ({
-            recapName: item.recapName,
-            fromDate: dayjs(payoutData.fromdate).format('DD/MM/YYYY'),
-            toDate: dayjs(payoutData.todate).format('DD/MM/YYYY'),
-            viewCount: item.viewCount || 0,
-            recapEarnings: item.recapEarnings.toLocaleString()
+            recapName: item.recap?.name,
+            fromDate: dayjs(payoutData.fromDate).format('DD/MM/YYYY'),
+            toDate: dayjs(payoutData.toDate).format('DD/MM/YYYY'),
+            recapEarnings: item.earningAmount
         }));
 
         const worksheet = XLSX.utils.json_to_sheet(recapData);
@@ -75,19 +74,13 @@ function DetailContributorPayout() {
                                         <Typography variant="body1" fontWeight="bold">
                                             Người đóng góp:
                                         </Typography>
-                                        <Typography variant="body1">{payoutData.contributorName}</Typography>
-                                    </Box>
-                                    <Box display="flex" justifyContent="space-between" mb={1}>
-                                        <Typography variant="body1" fontWeight="bold">
-                                            Tài khoản ngân hàng:
-                                        </Typography>
-                                        <Typography variant="body1">{payoutData.publisher?.bankAccount}</Typography>
+                                        <Typography variant="body1">{payoutData.contributor?.fullName}</Typography>
                                     </Box>
                                     <Box display="flex" justifyContent="space-between">
                                         <Typography variant="body1" fontWeight="bold">
                                             Thông tin liên hệ:
                                         </Typography>
-                                        <Typography variant="body1">{payoutData.email}</Typography>
+                                        <Typography variant="body1">{payoutData.contributor?.email}</Typography>
                                     </Box>
                                     {/* <Box display="flex" justifyContent="space-between">
                                         <Typography variant="body1" fontWeight="bold">
@@ -118,7 +111,7 @@ function DetailContributorPayout() {
                                         <Typography variant="body1" fontWeight="bold">
                                             Tổng chi:
                                         </Typography>
-                                        <Typography variant="body1">{payoutData.totalEarnings} VND</Typography>
+                                        <Typography variant="body1">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(payoutData.amount)}</Typography>
                                     </Box>
                                     <Box display="flex" justifyContent="space-between">
                                         <Link href={payoutData.imageURL} underline="hover" target="_blank">Hình ảnh</Link>
@@ -169,7 +162,7 @@ function DetailContributorPayout() {
                                     <TableCell>Tiêu đề</TableCell>
                                     <TableCell>Từ ngày</TableCell>
                                     <TableCell>Tới ngày</TableCell>
-                                    <TableCell>Lượt xem</TableCell>
+                                    {/* <TableCell>Lượt xem</TableCell> */}
                                     <TableCell>Doanh thu (VND)</TableCell>
                                 </TableRow>
                             </TableHead>
@@ -177,11 +170,11 @@ function DetailContributorPayout() {
                                 {recapEarnings.length > 0 ? (
                                     recapEarnings.map((item) => (
                                         <TableRow key={item.recapId}>
-                                            <TableCell>{item.recapName}</TableCell>
-                                            <TableCell>{dayjs(payoutData.fromdate).format('DD/MM/YYYY')}</TableCell>
-                                            <TableCell>{dayjs(payoutData.todate).format('DD/MM/YYYY')}</TableCell>
-                                            <TableCell>{item.viewCount || 0} Lượt</TableCell>
-                                            <TableCell>{item.recapEarnings.toLocaleString()} VND</TableCell>
+                                            <TableCell>{item.recap?.name}</TableCell>
+                                            <TableCell>{dayjs(payoutData.fromDate).format('DD/MM/YYYY')}</TableCell>
+                                            <TableCell>{dayjs(payoutData.toDate).format('DD/MM/YYYY')}</TableCell>
+                                            {/* <TableCell>{item.recap?.viewCount || 0} Lượt</TableCell> */}
+                                            <TableCell>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.earningAmount)}</TableCell>
                                         </TableRow>
                                     ))
                                 ) : (
