@@ -25,6 +25,7 @@ import CreateContributorPayout from './Components/Contributor-Payout/CreateContr
 import ContractsList from './Components/Contracts/ContractsList';
 import ContractDetail from './Components/Contracts/ContractDetail';
 import CreateContract from './Components/Contracts/CreateContract';
+import Users from './Components/Users/Users';
 
 function App() {
 
@@ -37,6 +38,7 @@ function App() {
             <Routes>
                 <Route path="/" element={<PrivateRoute> <UsersList /> </PrivateRoute>} />
                 <Route path="/users" element={<PrivateRoute> <UsersList /> </PrivateRoute>} />
+                <Route path="/userss" element={<PrivateRoute> <Users /> </PrivateRoute>} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/publisher-payout" element={<PublisherPayout />} />
                 <Route path="/publisher-payout-detail/:id" element={<DetailPublihserPayout />} />

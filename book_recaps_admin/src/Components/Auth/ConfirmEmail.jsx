@@ -73,17 +73,17 @@ function ConfirmEmail() {
     setTimeout(() => {
       Swal.fire({
         title: "Email Confirmation",
-        text: "Email đã xác nhận thành công. Bạn sẽ được chuyển hướng đến trang đăng nhập.",
+        text: "Email đã xác nhận thành công. Bạn sẽ được chuyển hướng về trang Quản lý người dùng.",
         icon: "success",
         confirmButtonText: "OK",
       }).then(() => {
-        navigate("/login"); // Redirect after SweetAlert is confirmed
+        navigate("/userss"); // Redirect after SweetAlert is confirmed
       });
     }, 3000);
   };
 
   return (
-    <div style={{marginLeft: "10vw"}}>
+    <div style={{width: "70vw"}}>
       {loading ? (
         <div>
           <div className="center">
@@ -95,7 +95,7 @@ function ConfirmEmail() {
             />
           </div>
           <div>
-            <p>
+            <p style={{textAlign: "center"}}>
               Chúng tôi đang xác nhận Email {email}, vui lòng chờ trong giây
               lát...
             </p>
