@@ -91,7 +91,7 @@ function WithdrawalList() {
                             <TableCell><strong>Số tiền</strong></TableCell>
                             <TableCell><strong>Ghi chú</strong></TableCell>
                             <TableCell><strong>Trạng thái</strong></TableCell>
-                            <TableCell><strong>Ngày tạo</strong></TableCell>
+                            <TableCell><strong>Ngày tạo</strong></TableCell>`
                             <TableCell></TableCell>
                         </TableRow>
                     </TableHead>
@@ -102,13 +102,16 @@ function WithdrawalList() {
                                 <TableCell>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.totalEarnings || 0)}</TableCell>
                                 <TableCell>{item.description || "Không có ghi chú"}</TableCell>
                                 {item.status === "Pending" ? (
-                                    <TableCell>Đang mở</TableCell>
+                                    <TableCell sx={{color: "#edf5fa"}}>Đang mở</TableCell>
 
                                 ) : item.status === "Accepted" ? (
-                                    <TableCell>Hoàn tất</TableCell>
+                                    <TableCell sx={{color: "green"}}>Hoàn tất</TableCell>
+                                ) : item.status === "Rejected" ? (
+                                    <TableCell sx={{color: "red"}}>Hủy</TableCell>
                                 ) : (
                                     <TableCell>Lỗi</TableCell>
                                 )}
+                                <TableCell>{new Date(withdrawals.createAt).toLocaleDateString()}</TableCell>
                                 <TableCell>
                                     {item.status === "Pending" ? (
 
@@ -133,7 +136,15 @@ function WithdrawalList() {
                                             <Visibility />
                                         </Button>
                                     ) : (
-                                        <TableCell>Bị hủy</TableCell>
+                                        <Button
+                                            color="error"
+                                            variant='outlined'
+                                            sx={{
+                                                '&:hover': { backgroundColor: '#edf5fa' },
+                                            }}
+                                        >
+                                            Bị hủy
+                                        </Button>
                                     )}
                                 </TableCell>
                             </TableRow>
@@ -143,10 +154,17 @@ function WithdrawalList() {
             </TableContainer>
 
             {dialogType === 'info' && (
-                <WithdrawalInfo open={isDialogOpen} onClose={handleCloseDialog} drawalId={selectedDrawalId} />
+                <WithdrawalInfo
+                    open={isDialogOpen}
+                    onClose={handleCloseDialog}
+                    drawalId={selectedDrawalId} />
             )}
             {dialogType === 'request' && (
-                <WithdrawalRequest open={isDialogOpen} onClose={handleCloseDialog} drawalId={selectedDrawalId} />
+                <WithdrawalRequest
+                    open={isDialogOpen}
+                    onClose={handleCloseDialog}
+                    drawalId={selectedDrawalId}
+                    onUpdate={fetchWithdrawals} />
             )}
 
             <Pagination

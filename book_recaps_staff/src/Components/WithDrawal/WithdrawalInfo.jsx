@@ -101,8 +101,8 @@ function WithdrawalInfo({ open, onClose, drawalId }) {
                         </Typography>
                         <Box
                             sx={{
-                                width: 200,
-                                height: 210,
+                                width: '300px',
+                                height: 'auto',
                                 border: '1px solid #ddd',
                                 display: 'flex',
                                 alignItems: 'center',

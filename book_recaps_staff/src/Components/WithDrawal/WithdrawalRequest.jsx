@@ -2,7 +2,7 @@ import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuIte
 import React, { useEffect, useState } from 'react'
 import api from '../Auth/AxiosInterceptors';
 
-function WithdrawalRequest({ open, onClose, drawalId }) {
+function WithdrawalRequest({ open, onClose, drawalId, onUpdate }) {
 
     const [withdrawalDetails, setWithdrawalDetails] = useState(null);
     const [previewImage, setPreviewImage] = useState(null); // URL preview ảnh
@@ -62,7 +62,7 @@ function WithdrawalRequest({ open, onClose, drawalId }) {
         formData.append('Status', withdrawalStatus);
 
         try {
-            const response = await api.put(`/api/contributorwithdrawal/processwithdrawal/${drawalId}`, formData,
+            const response = await api.put(`/api/contributorwithdrawal/processwithdrawal?withdrawalId=${drawalId}`, formData,
                 {
                     headers: {
                         "Content-Type": "multipart/form-data"
@@ -71,6 +71,7 @@ function WithdrawalRequest({ open, onClose, drawalId }) {
             )
             alert("Cập nhật thành công!");
             onClose();
+            if (onUpdate) onUpdate(); // Gọi lại để cập nhật danh sách
         } catch (error) {
             console.error("Error updating withdrawal request:", error);
             alert("Đã xảy ra lỗi khi cập nhật!");
@@ -202,7 +203,7 @@ function WithdrawalRequest({ open, onClose, drawalId }) {
                                 value={withdrawalStatus}
                                 onChange={handleStatusChange}
                                 displayEmpty
-                                renderValue={(selected) => selected ? `Trạng thái: ${selected === 1 ? "Hoàn tất" : "Hủy"}` : "Đang mở"} // Hiển thị text khi chưa chọn
+                                renderValue={(selected) => selected ? `${selected === 1 ? "Hoàn tất" : "Hủy"}` : "Đang mở"}
                             >
                                 <MenuItem value={1}>Hoàn tất</MenuItem>
                                 <MenuItem value={2}>Hủy</MenuItem>
