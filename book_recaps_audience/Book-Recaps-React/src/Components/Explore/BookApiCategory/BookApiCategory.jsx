@@ -21,7 +21,7 @@ const BookApiCategory = () => {
     const fetchCategories = async () => {
       try {
         const response = await axios.get(
-          "https://160.25.80.100:7124/api/category/getallcategory",
+          "https://bookrecaps.cloud/api/category/getallcategory",
           {
             headers: {
               'accept': '*/*',
@@ -54,7 +54,7 @@ const BookApiCategory = () => {
   // Token refresh function
   const handleTokenRefresh = async () => {
     try {
-      const response = await axios.post("https://160.25.80.100:7124/api/tokens/refresh", {
+      const response = await axios.post("https://bookrecaps.cloud/api/tokens/refresh", {
         refreshToken,
       });
 

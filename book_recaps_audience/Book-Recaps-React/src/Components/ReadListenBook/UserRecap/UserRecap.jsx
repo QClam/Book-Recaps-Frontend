@@ -15,7 +15,7 @@ const UserRecap = () => {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await axios.get('https://160.25.80.100:7124/api/book/getallbooks', {
+        const response = await axios.get('https://bookrecaps.cloud/api/book/getallbooks', {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
@@ -44,7 +44,7 @@ const UserRecap = () => {
 
   const handleTokenRefresh = async () => {
     try {
-      const response = await axios.post("https://160.25.80.100:7124/api/tokens/refresh", {
+      const response = await axios.post("https://bookrecaps.cloud/api/tokens/refresh", {
         refreshToken,
       });
 

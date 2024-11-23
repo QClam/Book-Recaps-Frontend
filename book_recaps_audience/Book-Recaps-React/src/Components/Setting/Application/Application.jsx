@@ -16,7 +16,7 @@ const Application = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.get('https://160.25.80.100:7124/api/personal/profile', {
+        const response = await axios.get('https://bookrecaps.cloud/api/personal/profile', {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
@@ -41,7 +41,7 @@ const Application = () => {
     if (userId) {
       const fetchSupportTickets = async () => {
         try {
-          const response = await axios.get(`https://160.25.80.100:7124/api/supportticket/getsupportticketbyuser/${userId}`, {
+          const response = await axios.get(`https://bookrecaps.cloud/api/supportticket/getsupportticketbyuser/${userId}`, {
             headers: {
               'Authorization': `Bearer ${accessToken}`,
               'Content-Type': 'application/json',
@@ -57,7 +57,7 @@ const Application = () => {
               const recapId = ticket.recapId;
               if (recapId) {
                 try {
-                  const bookResponse = await axios.get(`https://160.25.80.100:7124/getrecapbyId/${recapId}`, {
+                  const bookResponse = await axios.get(`https://bookrecaps.cloud/getrecapbyId/${recapId}`, {
                     headers: {
                       'Authorization': `Bearer ${accessToken}`,
                       'Content-Type': 'application/json',

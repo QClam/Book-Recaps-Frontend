@@ -63,7 +63,7 @@ const Onboarding = ({ onComplete = () => {} }) => {
 
   const fetchData = async () => {
     try {
-      const response = await axios.get('https://160.25.80.100:7124/api/book/getallbooks', {
+      const response = await axios.get('https://bookrecaps.cloud/api/book/getallbooks', {
         headers: {
           // 'Authorization': `Bearer ${localStorage.getItem("authToken")}`,
           'Content-Type': 'application/json',
@@ -81,7 +81,7 @@ const Onboarding = ({ onComplete = () => {} }) => {
 
   const fetchAuthors = async () => {
     try {
-      const response = await axios.get('https://160.25.80.100:7124/api/authors/getallauthors', {
+      const response = await axios.get('https://bookrecaps.cloud/api/authors/getallauthors', {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',

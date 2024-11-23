@@ -52,7 +52,7 @@ const BookListCategory = () => {
     const fetchBooks = async () => {
       try {
         const response = await axios.get(
-          `https://160.25.80.100:7124/api/book/getallbooks?categoryId=${categoryId}`,
+          `https://bookrecaps.cloud/api/book/getallbooks?categoryId=${categoryId}`,
           {
             headers: {
               'Authorization': `Bearer ${accessToken}`, // Sử dụng access token
@@ -107,7 +107,7 @@ const BookListCategory = () => {
   // Hàm làm mới token
   const handleTokenRefresh = async () => {
     try {
-      const response = await axios.post("https://160.25.80.100:7124/api/tokens/refresh", {
+      const response = await axios.post("https://bookrecaps.cloud/api/tokens/refresh", {
         refreshToken,
       });
 

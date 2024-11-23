@@ -53,7 +53,7 @@ function Sidebar() {
     const fetchUserProfile = async () => {
       const accessToken = localStorage.getItem('authToken');
       try {
-        const response = await fetch('https://160.25.80.100:7124/api/personal/profile', {
+        const response = await fetch('https://bookrecaps.cloud/api/personal/profile', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${accessToken}`,
@@ -84,7 +84,7 @@ function Sidebar() {
     const fetchBooks = async () => {
       const accessToken = localStorage.getItem('authToken');
       try {
-        const response = await fetch('https://160.25.80.100:7124/api/book/getallbooks', {
+        const response = await fetch('https://bookrecaps.cloud/api/book/getallbooks', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${accessToken}`,

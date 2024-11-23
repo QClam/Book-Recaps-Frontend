@@ -32,7 +32,7 @@ function ConfirmEmail() {
 
   //       try {
   //         // Gửi yêu cầu xác nhận email tới API bằng phương thức GET
-  //         const response = await axios.get('https://160.25.80.100:7124/api/confirm-email', {
+  //         const response = await axios.get('https://bookrecaps.cloud/api/confirm-email', {
   //           params: {
   //             userId, // Truyền userId từ URL
   //             token,  // Truyền token từ URL

@@ -16,7 +16,7 @@ const ForUser = () => {
   // Fetch user data to get the user ID
   const fetchUserId = async () => {
     try {
-      const response = await axios.get('https://160.25.80.100:7124/api/personal/profile', {
+      const response = await axios.get('https://bookrecaps.cloud/api/personal/profile', {
         headers: {
           'accept': '*/*',
           'Authorization': `Bearer ${accessToken}`,

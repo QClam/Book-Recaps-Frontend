@@ -47,7 +47,7 @@ const CategoryByBookApi = () => {
   // Function to refresh token
   const handleTokenRefresh = async () => {
     try {
-      const response = await axios.post("https://160.25.80.100:7124/api/tokens/refresh", {
+      const response = await axios.post("https://bookrecaps.cloud/api/tokens/refresh", {
         refreshToken,
       });
 
@@ -67,7 +67,7 @@ const CategoryByBookApi = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('https://160.25.80.100:7124/api/category/getallcategory', {
+        const response = await axios.get('https://bookrecaps.cloud/api/category/getallcategory', {
           headers: {
             'accept': '*/*',
             'Authorization': `Bearer ${accessToken}`,
@@ -94,7 +94,7 @@ const CategoryByBookApi = () => {
 
     const fetchBooks = async () => {
       try {
-        const response = await axios.get('https://160.25.80.100:7124/api/book/getallbooks', {
+        const response = await axios.get('https://bookrecaps.cloud/api/book/getallbooks', {
           headers: {
             'accept': '*/*',
             'Authorization': `Bearer ${accessToken}`,

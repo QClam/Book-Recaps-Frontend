@@ -96,12 +96,12 @@ function Login() {
       };
 
       const response = await axios.post(
-        "https://160.25.80.100:7124/api/register",
+        "https://bookrecaps.cloud/api/register",
         newUser
       );
       console.log("Register Successfully", newUser);
       console.log("Link: ", response.data.message);
-      navigate("/auth/confirm-email", {
+      navigate("/confirm-email", {
         state: {
           email: registerForm.email,
           message: response.data.message,
@@ -135,7 +135,7 @@ function Login() {
       const capcha = await executeRecaptcha("login");
   
       // Login request
-      const response = await axios.post("https://160.25.80.100:7124/api/tokens", {
+      const response = await axios.post("https://bookrecaps.cloud/api/tokens", {
         email,
         password,
         captchaToken: capcha,
@@ -149,7 +149,7 @@ function Login() {
         localStorage.setItem("refreshToken", refreshToken);
        
         // Fetch the user's profile to check if they have completed onboarding
-      const profileResponse = await axios.get("https://160.25.80.100:7124/api/personal/profile", {
+      const profileResponse = await axios.get("https://bookrecaps.cloud/api/personal/profile", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },

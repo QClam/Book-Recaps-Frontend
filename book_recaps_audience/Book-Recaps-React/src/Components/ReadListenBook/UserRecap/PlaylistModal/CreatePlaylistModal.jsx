@@ -14,7 +14,7 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId }) => {
   useEffect(() => {
     const fetchPlaylists = async () => {
       try {
-        const response = await axios.get('https://160.25.80.100:7124/api/playlists/my-playlists', {
+        const response = await axios.get('https://bookrecaps.cloud/api/playlists/my-playlists', {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
@@ -33,7 +33,7 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId }) => {
   // Helper function to refresh the access token
   const refreshAccessToken = async () => {
     try {
-      const response = await axios.post('https://160.25.80.100:7124/api/auth/refresh', {
+      const response = await axios.post('https://bookrecaps.cloud/api/auth/refresh', {
         refreshToken,
       });
       const newAccessToken = response.data.accessToken;
@@ -58,7 +58,7 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId }) => {
       let currentAccessToken = accessToken;
 
       const createPlaylistResponse = await axios.post(
-        'https://160.25.80.100:7124/api/playlists/createPlaylist',
+        'https://bookrecaps.cloud/api/playlists/createPlaylist',
         {
           userId,
           playListName: playlistName,
@@ -73,7 +73,7 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId }) => {
       const { id: playlistId } = createPlaylistResponse.data.data;
 
       await axios.post(
-        `https://160.25.80.100:7124/api/playlists/${playlistId}/add-recap/${recapId}`,
+        `https://bookrecaps.cloud/api/playlists/${playlistId}/add-recap/${recapId}`,
         {},
         {
           headers: {
@@ -108,7 +108,7 @@ const handleSaveInSelectedPlaylists = async () => {
     for (const playlistId of selectedPlaylists) {
       // API call to add recap to each playlist
       await axios.post(
-        `https://160.25.80.100:7124/api/playlists/${playlistId}/add-recap/${recapId}`,
+        `https://bookrecaps.cloud/api/playlists/${playlistId}/add-recap/${recapId}`,
         {},
         {
           headers: {

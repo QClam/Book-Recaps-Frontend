@@ -19,7 +19,7 @@ const Billing = () => {
     const status = params.get('status');
 
     if (code && status) {
-      navigate('/', { state: { code, status } }); // Điều hướng tới /result với trạng thái thanh toán
+      navigate('/result', { state: { code, status } }); // Điều hướng tới /result với trạng thái thanh toán
     }
   }, [location, navigate]);
 
@@ -27,7 +27,7 @@ const Billing = () => {
     const fetchAllSubscriptionPackages = async () => {
       try {
         const response = await axios.get(
-          'https://160.25.80.100:7124/api/subscriptionpackages/getallpackages',
+          'https://bookrecaps.cloud/api/subscriptionpackages/getallpackages',
           {
             headers: {
               'Authorization': `Bearer ${accessToken}`,
@@ -55,7 +55,7 @@ const Billing = () => {
 
     const handleTokenRefresh = async () => {
       try {
-        const response = await axios.post("https://160.25.80.100:7124/api/tokens/refresh", {
+        const response = await axios.post("https://bookrecaps.cloud/api/tokens/refresh", {
           refreshToken,
         });
 
@@ -75,7 +75,7 @@ const Billing = () => {
   const handlePayment = async (subscriptionPackageId) => {
     try {
       const response = await axios.post(
-        `https://160.25.80.100:7124/api/transaction/create-transaction/${subscriptionPackageId}`,
+        `https://bookrecaps.cloud/api/transaction/create-transaction/${subscriptionPackageId}`,
         {},
         {
           headers: {

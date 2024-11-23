@@ -17,7 +17,7 @@ const History = () => {
   // Function to fetch user ID
   const fetchUserId = async () => {
     try {
-      const response = await axios.get('https://160.25.80.100:7124/api/personal/profile', {
+      const response = await axios.get('https://bookrecaps.cloud/api/personal/profile', {
         headers: {
           'accept': '*/*',
           'Authorization': `Bearer ${accessToken}`, // Use the access token
@@ -37,7 +37,7 @@ const History = () => {
   const fetchRecapData = async (id) => {
     try {
       const response = await axios.get(
-        `https://160.25.80.100:7124/api/viewtracking/getviewtrackingbyuserid/${id}?pageNumber=1&pageSize=10`,
+        `https://bookrecaps.cloud/api/viewtracking/getviewtrackingbyuserid/${id}?pageNumber=1&pageSize=10`,
         {
           headers: {
             'accept': '*/*',

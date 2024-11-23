@@ -29,7 +29,7 @@ const ContributorTerm = () => {
 
   const handleTokenRefresh = async () => {
     try {
-      const response = await axios.post("https://160.25.80.100:7124/api/tokens/refresh", {
+      const response = await axios.post("https://bookrecaps.cloud/api/tokens/refresh", {
         refreshToken,
       });
       const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data.message.token;
@@ -51,7 +51,7 @@ const ContributorTerm = () => {
 
     try {
       let token = accessToken;
-      const response = await axios.put('https://160.25.80.100:7124/api/self-update-role', 
+      const response = await axios.put('https://bookrecaps.cloud/api/self-update-role', 
         { role: 'contributor' }, 
         {
           headers: {
@@ -68,7 +68,7 @@ const ContributorTerm = () => {
         if (newToken) {
           // Retry the request with the new access token
           try {
-            const retryResponse = await axios.put('https://160.25.80.100:7124/api/self-update-role', 
+            const retryResponse = await axios.put('https://bookrecaps.cloud/api/self-update-role', 
               { role: 'contributor' }, 
               {
                 headers: {

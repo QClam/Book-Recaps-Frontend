@@ -38,7 +38,7 @@ const RecapDetails = () => {
   const handleTokenRefresh = async () => {
     try {
       const response = await axios.post(
-        "https://160.25.80.100:7124/api/tokens/refresh",
+        "https://bookrecaps.cloud/api/tokens/refresh",
         {
           refreshToken,
         }
@@ -61,7 +61,7 @@ const RecapDetails = () => {
   const fetchRecaps = async () => {
     try {
       const response = await axios.get(
-        "https://160.25.80.100:7124/api/recap/get-all-recapsbycontributorId",
+        "https://bookrecaps.cloud/api/recap/get-all-recapsbycontributorId",
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -339,7 +339,7 @@ const sendHighlightRequest = async (highlightData) => {
 
   try {
       const response = await axios.post(
-          "https://160.25.80.100:7124/api/highlight/createhighlight",
+          "https://bookrecaps.cloud/api/highlight/createhighlight",
           highlightData,
           {
               headers: {

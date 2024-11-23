@@ -12,7 +12,7 @@ const SubscriptionHistory = () => {
 
   const fetchUserId = async () => {
     try {
-      const response = await axios.get("https://160.25.80.100:7124/api/personal/profile", {
+      const response = await axios.get("https://bookrecaps.cloud/api/personal/profile", {
         headers: {
           accept: "*/*",
           Authorization: `Bearer ${accessToken}`,
@@ -31,7 +31,7 @@ const SubscriptionHistory = () => {
   const fetchSubscriptionHistory = async (id) => {
     try {
       const response = await axios.get(
-        `https://160.25.80.100:7124/api/subscription/gethistorysubscription/${id}`,
+        `https://bookrecaps.cloud/api/subscription/gethistorysubscription/${id}`,
         {
           headers: {
             accept: "*/*",

@@ -44,7 +44,7 @@ const UserRecapDetail = () => {
     const fetchBookDetail = async () => {
       try {
         const response = await axios.get(
-          `https://160.25.80.100:7124/api/book/getbookbyid/${id}`,
+          `https://bookrecaps.cloud/api/book/getbookbyid/${id}`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`,
@@ -60,7 +60,7 @@ const UserRecapDetail = () => {
             bookRecapNew.recaps.$values.map(async (recap) => {
               if (recap.userId) {
                 const userResponse = await axios.get(
-                  `https://160.25.80.100:7124/api/users/get-user-account-byID?userId=${recap.userId}`,
+                  `https://bookrecaps.cloud/api/users/get-user-account-byID?userId=${recap.userId}`,
                   {
                     headers: {
                       Authorization: `Bearer ${accessToken}`,
@@ -147,7 +147,7 @@ const UserRecapDetail = () => {
                     <div className="contributor">
                       <img
                         className="contributor-image"
-                        src={`https://160.25.80.100:7124/${contributorData.contributor.imageUrl}`}
+                        src={`https://bookrecaps.cloud/${contributorData.contributor.imageUrl}`}
                         alt={contributorData.contributor.fullName}
                       />
                       <div>

@@ -168,7 +168,7 @@ const Transcriptv2 = ({
           console.log('Request Body:', requestBody);
           
   
-        const response = await axios.post('https://160.25.80.100:7124/api/highlight/createhighlight', requestBody, {
+        const response = await axios.post('https://bookrecaps.cloud/api/highlight/createhighlight', requestBody, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
 
@@ -216,7 +216,12 @@ const Transcriptv2 = ({
     }
     const fetchUserHighlights = async () => {
         try {
-          const response = await axios.get(`https://160.25.80.100:7124/api/highlight/gethighlightbyrecapid/${recapVersionId}?userId=${userId}`);
+          const response = await axios.get(`https://bookrecaps.cloud/api/highlight/gethighlightbyrecapid/${recapVersionId}?userId=${userId}`, {
+            headers: {
+              'Authorization': `Bearer ${accessToken}`,
+              'Content-Type': 'application/json',
+            },
+          });
           if (response.data && response.data.data && response.data.data.$values) {
             const apiHighlights = response.data.data.$values.map(item => `sentence-${item.sentenceIndex}`);
             setHighlightedSentences(apiHighlights);
@@ -285,7 +290,7 @@ const Transcriptv2 = ({
 
     // const fetchUserHighlights = async () => {
     //   try {
-    //     const response = await axios.get(`https://160.25.80.100:7124/api/highlight/gethighlightbyrecapid/${recapVersionId}?userId=${userId}`);
+    //     const response = await axios.get(`https://bookrecaps.cloud/api/highlight/gethighlightbyrecapid/${recapVersionId}?userId=${userId}`);
     //     if (response.data && response.data.data && response.data.data.$values) {
     //       const apiHighlights = response.data.data.$values.map(item => `sentence-${item.sentenceIndex}`);
     //       setHighlightedSentences(apiHighlights);

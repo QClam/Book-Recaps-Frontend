@@ -11,7 +11,7 @@ const UserRecapDetailv2 = () => {
   useEffect(() => {
     const fetchRecapDetails = async () => {
       try {
-        const response = await axios.get(`https://160.25.80.100:7124/getrecapbyId/${recapId}`);
+        const response = await axios.get(`https://bookrecaps.cloud/getrecapbyId/${recapId}`);
         setRecapDetails(response.data); // Assuming this returns the recap details
         setLoading(false);
       } catch (error) {

@@ -65,7 +65,7 @@ function ForgetPassword() {
     try {
       const captchaToken = await executeRecaptcha("reset_password");
       const params = { email: email, captchaToken: captchaToken };
-      const response = await axios.post("https://160.25.80.100:7124/api/forget-password", null, { params });
+      const response = await axios.post("https://bookrecaps.cloud/api/forget-password", null, { params });
 
       const resetToken = response.data.message;
       localStorage.setItem("reset_token", resetToken);
@@ -105,7 +105,7 @@ function ForgetPassword() {
         captchaToken: captchaToken 
       };
 
-      await axios.post("https://160.25.80.100:7124/api/reset-password", null, { params });
+      await axios.post("https://bookrecaps.cloud/api/reset-password", null, { params });
       navigate("/login");
       setRegisterForm({ email: "", NewPassword: "", ConfirmPassword: "" });
       setError(null);

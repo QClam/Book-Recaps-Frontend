@@ -16,7 +16,7 @@ const PlaylistBook = () => {
   useEffect(() => {
     const fetchPlaylists = async () => {
       try {
-        const response = await axios.get('https://160.25.80.100:7124/api/playlists/my-playlists', {
+        const response = await axios.get('https://bookrecaps.cloud/api/playlists/my-playlists', {
           headers: {
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
@@ -49,7 +49,7 @@ const PlaylistBook = () => {
 
   const fetchBooks = async () => {
     try {
-      const response = await axios.get('https://160.25.80.100:7124/api/book/getallbooks', {
+      const response = await axios.get('https://bookrecaps.cloud/api/book/getallbooks', {
         headers: {
           Authorization: `Bearer ${accessToken}`, // Add token for book fetching
         },
@@ -63,7 +63,7 @@ const PlaylistBook = () => {
 
   const handleTokenRefresh = async () => {
     try {
-      const response = await axios.post("https://160.25.80.100:7124/api/tokens/refresh", {
+      const response = await axios.post("https://bookrecaps.cloud/api/tokens/refresh", {
         refreshToken,
       });
 
@@ -81,7 +81,7 @@ const PlaylistBook = () => {
 
   const handleDeletePlaylist = async (playlistId) => {
     try {
-      await axios.delete(`https://160.25.80.100:7124/api/playlists/deleteplaylist/${playlistId}`, {
+      await axios.delete(`https://bookrecaps.cloud/api/playlists/deleteplaylist/${playlistId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
@@ -97,7 +97,7 @@ const PlaylistBook = () => {
   const handleDelete = async (playlistItemId) => {
     
     try {
-      await axios.delete(`https://160.25.80.100:7124/api/playlists/deleteplaylistitem/${playlistItemId}`, {
+      await axios.delete(`https://bookrecaps.cloud/api/playlists/deleteplaylistitem/${playlistItemId}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },

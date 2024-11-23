@@ -1,6 +1,5 @@
-import React from 'react';
-
 import { Home, Search, LibraryBooks, Person, BorderColor, MenuBook, Settings, HelpOutline, Logout, Category, AutoAwesome, History   } from '@mui/icons-material';
+import { routes } from "../../routes";
 
 export const SidebarItems = [
 
@@ -13,7 +12,7 @@ export const SidebarItems = [
     {
         title: "Home",
         icon: <Home />,
-        link: "/home",
+        link: routes.index,
     },
 
 

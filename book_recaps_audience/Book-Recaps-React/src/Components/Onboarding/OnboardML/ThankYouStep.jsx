@@ -34,7 +34,7 @@ const markOnboardingComplete = async () => {
 
   const handleTokenRefresh = async () => {
     try {
-      const response = await axiosInstance.post("https://160.25.80.100:7124/api/tokens/refresh", {
+      const response = await axiosInstance.post("https://bookrecaps.cloud/api/tokens/refresh", {
         refreshToken,
       });
       const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data.message.token;
@@ -48,7 +48,7 @@ const markOnboardingComplete = async () => {
   };
 
   try {
-    const response = await axiosInstance.put('https://160.25.80.100:7124/api/personal/changeisOnboard', null, {
+    const response = await axiosInstance.put('https://bookrecaps.cloud/api/personal/changeisOnboard', null, {
       headers: {
         Authorization: `Bearer ${accessToken}`
       }

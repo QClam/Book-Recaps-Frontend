@@ -48,7 +48,7 @@ function Settings() {
     };
 
     const handleViewSubcriptionHistory = () => {
-        navigate('/subcription-history');
+        navigate('/subscription-history');
     };
 
     
@@ -57,7 +57,7 @@ function Settings() {
         const fetchProfile = async () => {
             const accessToken = localStorage.getItem('authToken');
             try {
-                const response = await fetch('https://160.25.80.100:7124/api/personal/profile', {
+                const response = await fetch('https://bookrecaps.cloud/api/personal/profile', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${accessToken}`,
@@ -112,7 +112,7 @@ function Settings() {
    const fetchSubscriptionPackage = async (subscriptionPackageId) => {
     const accessToken = localStorage.getItem('authToken');
     try {
-        const response = await fetch(`https://160.25.80.100:7124/api/subscriptionpackages/getpackagebyid/${subscriptionPackageId}`, {
+        const response = await fetch(`https://bookrecaps.cloud/api/subscriptionpackages/getpackagebyid/${subscriptionPackageId}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
@@ -142,7 +142,7 @@ function Settings() {
         console.log('Updated profile data:', updatedProfile);
     
         try {
-            const response = await fetch('https://160.25.80.100:7124/api/personal/profile', {
+            const response = await fetch('https://bookrecaps.cloud/api/personal/profile', {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
@@ -184,7 +184,7 @@ function Settings() {
         const accessToken = localStorage.getItem('authToken');
         
         try {
-            const response = await fetch('https://160.25.80.100:7124/api/personal/update-phone', {
+            const response = await fetch('https://bookrecaps.cloud/api/personal/update-phone', {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
@@ -219,7 +219,7 @@ function Settings() {
     const fetchProfile = async () => {
         const accessToken = localStorage.getItem('authToken');
         try {
-            const response = await fetch('https://160.25.80.100:7124/api/personal/profile', {
+            const response = await fetch('https://bookrecaps.cloud/api/personal/profile', {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
@@ -261,7 +261,7 @@ function Settings() {
     const handleUpdatePassword = async () => {   
         const accessToken = localStorage.getItem('authToken');
         try {
-            const response = await fetch('https://160.25.80.100:7124/api/personal/update-password', {
+            const response = await fetch('https://bookrecaps.cloud/api/personal/update-password', {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
@@ -287,7 +287,7 @@ function Settings() {
             navigate('/login');
     
             // Đăng xuất khỏi các phiên làm việc cũ, nếu có
-            await fetch('https://160.25.80.100:7124/api/personal/logout', {
+            await fetch('https://bookrecaps.cloud/api/personal/logout', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
@@ -323,7 +323,7 @@ function Settings() {
 
         try {
             setImageUploadLoading(true);
-            const response = await fetch('https://160.25.80.100:7124/api/personal/update-avatar', {
+            const response = await fetch('https://bookrecaps.cloud/api/personal/update-avatar', {
                 method: 'PUT',
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
