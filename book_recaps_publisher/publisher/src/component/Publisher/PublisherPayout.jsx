@@ -6,6 +6,7 @@ const PublisherPayout = () => {
     const { id } = useParams(); // Get the payout ID from the URL
     const [payoutDetail, setPayoutDetail] = useState(null);
     const [error, setError] = useState(null);
+    const [detailedBooks, setDetailedBooks] = useState([]);
 
     useEffect(() => {
         const fetchPayoutDetail = async () => {
@@ -25,6 +26,26 @@ const PublisherPayout = () => {
 
                 const data = await response.json();
                 setPayoutDetail(data);
+
+                // Fetch detailed book information for each book ID in the payout details
+                const detailedBooksPromises = data?.data?.bookEarnings?.$values?.map(async (earning) => {
+                    const bookResponse = await fetch(
+                        `https://160.25.80.100:7124/api/book/getbookbyid/${earning.bookId}`,
+                        {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': `Bearer ${accessToken}`,
+                                'Content-Type': 'application/json',
+                            },
+                        }
+                    );
+                    if (!bookResponse.ok) throw new Error(`Failed to fetch book details for ID: ${earning.bookId}`);
+                    const bookData = await bookResponse.json();
+                    return { ...earning, ...bookData.data }; // Combine book data with earnings info
+                });
+
+                const detailedBooks = await Promise.all(detailedBooksPromises);
+                setDetailedBooks(detailedBooks);
             } catch (err) {
                 setError(err.message);
             }
@@ -61,21 +82,28 @@ const PublisherPayout = () => {
                         <table>
                             <thead>
                                 <tr>
-                                    <th>Book ID</th>
+                                    {/* <th>Book ID</th> */}
+                                    <th>Book Title</th>
+                                    <th>Cover Image</th>
+
                                     <th>Earning Amount</th>
                                     <th>From Date</th>
                                     <th>To Date</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {payoutDetail?.data?.bookEarnings?.$values?.map((earning, index) => (
+                            {detailedBooks?.map((book, index) => (
                                     <tr key={index}>
-                                        <td>{earning.bookId}</td>
-                                        <td>{earning.earningAmount}</td>
-                                        <td>{new Date(earning.fromDate).toLocaleDateString()}</td>
-                                        <td>{new Date(earning.toDate).toLocaleDateString()}</td>
+                                        <td>{book.title}</td>
+                                        <td>
+                                            <img src={book.coverImage} alt={book.title} width="50" />
+                                        </td>
+                                        <td>{book.earningAmount}</td>
+                                        <td>{new Date(book.fromDate).toLocaleDateString()}</td>
+                                        <td>{new Date(book.toDate).toLocaleDateString()}</td>
                                     </tr>
                                 ))}
+
                             </tbody>
                         </table>
                     </div>
