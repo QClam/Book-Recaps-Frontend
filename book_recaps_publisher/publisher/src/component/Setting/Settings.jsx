@@ -29,6 +29,7 @@ function Settings() {
     const [imageUpdateModalOpen, setImageUpdateModalOpen] = useState(false)
     const [imageFile, setImageFile] = useState(null); // New state to store selected image file
     const [imageUploadLoading, setImageUploadLoading] = useState(false);
+    const [publisher, setPublisher] = useState(null);
 
      // Handle tab change
      const handleTabChange = (tab) => {
@@ -129,7 +130,53 @@ function Settings() {
             [name]: value,
         }));
     };
-    
+    useEffect(() => {
+        const fetchData = async () => {
+            const accessToken = localStorage.getItem('authToken');
+
+            try {
+                // Fetch profile data
+                const profileResponse = await fetch('https://160.25.80.100:7124/api/personal/profile', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                if (!profileResponse.ok) {
+                    throw new Error("Failed to fetch profile data");
+                }
+
+                const profileData = await profileResponse.json();
+                setProfile(profileData);
+
+                // Fetch publisher data using the profile ID
+                const publisherResponse = await fetch(
+                    `https://160.25.80.100:7124/api/publisher/getbypublisheruser/${profileData.id}`,
+                    {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': `Bearer ${accessToken}`,
+                            'Content-Type': 'application/json',
+                        },
+                    }
+                );
+
+                if (!publisherResponse.ok) {
+                    throw new Error("Failed to fetch publisher data");
+                }
+
+                const publisherData = await publisherResponse.json();
+                setPublisher(publisherData);
+            } catch (error) {
+                console.error("Error fetching data:", error);
+            }
+        };
+
+        fetchData();
+    }, []);
+
     // Handle phone update
     const handleUpdatePhone = async () => {
         const accessToken = localStorage.getItem('authToken');
@@ -316,6 +363,24 @@ function Settings() {
             {currentTab === 'profile' && (
                 <div>
                 <h2>Basic Info</h2>
+                {publisher ? (
+                    <div className="info-group">
+                        <div className="info-item">
+                            <label>Publisher Name</label>
+                            <span>{publisher.publisherName || "N/A"}</span>
+                        </div>
+                        <div className="info-item">
+                            <label>Contact Info</label>
+                            <span>{publisher.contactInfo || "N/A"}</span>
+                        </div>
+                        <div className="info-item">
+                            <label>Bank Account</label>
+                            <span>{publisher.bankAccount || "N/A"}</span>
+                        </div>
+                    </div>
+                ) : (
+                    <p>Loading publisher info...</p>
+                )}
                 {profile ? (
                     <div className="info-group">
                         <div className="info-item">
@@ -374,6 +439,9 @@ function Settings() {
                 ) : (
                     <p>Loading profile...</p>
                 )}
+                
+
+
                  <button className="update-button" onClick={() => setModalOpen(true)}>
                     Update Account Settings
                 </button>
