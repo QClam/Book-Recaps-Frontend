@@ -1,16 +1,11 @@
 .date-picker-container {
-    display: flex;
-    
-    .date-picker {
-        width: 70vw;
-        display: flex;
-        justify-content: center;
-    }
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .dashboard-body {
-
-    .overview {
-        
-    }
+  .overview {
+  }
 }
