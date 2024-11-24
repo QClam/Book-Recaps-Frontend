@@ -9,6 +9,8 @@ const PublisherDashboard = () => {
     const [detailedBooks, setDetailedBooks] = useState([]);
     const [latestPayout, setLatestPayout] = useState(null);
     const [error, setError] = useState(null);
+    const [viewCount, setViewCount] = useState(0);
+    const [uniqueRecapCount, setUniqueRecapCount] = useState(0); // New state for unique RecapId count
 
     useEffect(() => {
         const fetchData = async () => {
@@ -70,7 +72,7 @@ const PublisherDashboard = () => {
                 // Fetch detailed payout info for books
                 const bookDetailsPromises = payouts.map(async (payout) => {
                     const payoutDetailResponse = await fetch(
-                        `https://160.25.80.100:7124/api/PublisherPayout/getpayoutinfobyid/${payout.id}`,
+                        `https://160.25.80.100:7124/api/PublisherPayout/getpayoutinfobyid/${payout.payoutId}`,
                         {
                             method: 'GET',
                             headers: {
@@ -107,12 +109,32 @@ const PublisherDashboard = () => {
                 });
 
                 const detailedBooks = await Promise.all(detailedBooksPromises);
+                
+                const viewResponse = await fetch('https://160.25.80.100:7124/api/viewtracking/getallviewtracking', {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${accessToken}`,
+                        'Content-Type': 'application/json',
+                    },
+                });
+                if (!viewResponse.ok) throw new Error("Failed to fetch view tracking data");
+
+                const viewData = await viewResponse.json();
+                const viewsArray = viewData?.data?.$values || [];
+                const totalViewsCount = viewsArray.length; // Count the total views
+                
+                // Calculate unique RecapId count
+                const uniqueRecapIds = new Set(viewsArray.map(view => view.recapId));
+                const uniqueRecapCount = uniqueRecapIds.size;
+
 
                 setProfile(profileData);
                 setPublisherData(publisherData);
                 setPayoutData(sortedPayouts);
                 setLatestPayout(latestPayout);
                 setDetailedBooks(detailedBooks);
+                setViewCount(totalViewsCount);
+                setUniqueRecapCount(uniqueRecapCount);
             } catch (err) {
                 console.error('Error:', err);
                 setError(err.message);
@@ -127,14 +149,42 @@ const PublisherDashboard = () => {
             <h2>Publisher Dashboard</h2>
             {error && <p style={{ color: 'red' }}>Error: {error}</p>}
 
-            {latestPayout && (
-                <div className="latest-payout">
-                    <h3>Latest Payout</h3>
-                    <p><strong>Amount:</strong> {latestPayout.amount}</p>
-                    <p><strong>Status:</strong> {latestPayout.status === 1 ? 'Paid' : 'Pending'}</p>
-                    <p><strong>To Date:</strong> {new Date(latestPayout.toDate).toLocaleDateString()}</p>
+            <div className="dashboard-cards">
+    {latestPayout && (
+        <div className="dashboard-card">
+            <div className="card-content">
+                <h4>Thu nhập</h4>
+                <p className="amount">{latestPayout.totalEarnings} VND</p>
+                <p className="date">Tháng trước</p>
+                <div className="icon">
+                    <i className="fa fa-bar-chart"></i> {/* Icon for payout */}
                 </div>
-            )}
+            </div>
+        </div>
+    )}
+
+    <div className="dashboard-card">
+        <div className="card-content">
+            <h4>Số bài viết mới</h4>
+            <p className="amount">{uniqueRecapCount}</p>
+            <p className="date">Tháng trước</p>
+            <div className="icon">
+                <i className="fa fa-file-text"></i> {/* Icon for articles */}
+            </div>
+        </div>
+    </div>
+
+    <div className="dashboard-card">
+        <div className="card-content">
+            <h4>Lượt xem</h4>
+            <p className="amount">{viewCount}</p>
+            <p className="date">Tháng trước</p>
+            <div className="icon">
+                <i className="fa fa-eye"></i> {/* Icon for views */}
+            </div>
+        </div>
+    </div>
+</div>
 
             {detailedBooks.length > 0 && (
                 <div className="book-details">
@@ -142,7 +192,7 @@ const PublisherDashboard = () => {
                     <table>
                         <thead>
                             <tr>
-                                <th>Book ID</th>
+                                {/* <th>Book ID</th> */}
                                 <th>Title</th>
                                 <th>Cover Image</th>
                                 <th>Earning Amount</th>
@@ -153,7 +203,7 @@ const PublisherDashboard = () => {
                         <tbody>
                             {detailedBooks.map((book, index) => (
                                 <tr key={index}>
-                                    <td>{book.bookId}</td>
+                                    {/* <td>{book.bookId}</td> */}
                                     <td>{book.title}</td>
                                     <td>
                                         <img

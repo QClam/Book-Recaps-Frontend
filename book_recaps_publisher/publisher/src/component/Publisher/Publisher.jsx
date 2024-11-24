@@ -106,6 +106,8 @@ const FetchPublisherData = () => {
                 <div>
                     <p><strong>Publisher Name:</strong> {publisherData.publisherName}</p>
                     <p><strong>Revenue Share Percentage:</strong> {publisherData.revenueSharePercentage}%</p>
+                    <p><strong>Contact Info:</strong> {publisherData.contactInfo}</p>
+                    <p><strong>Bank Account:</strong> {publisherData.bankAccount}</p>
                 </div>
             ) : (
                 <p>Loading publisher data...</p>

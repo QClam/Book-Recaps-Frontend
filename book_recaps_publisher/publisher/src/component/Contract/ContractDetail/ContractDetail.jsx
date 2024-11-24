@@ -125,6 +125,8 @@ const ContractDetail = () => {
       <div className="info-box">
         <p><strong>Publisher:</strong> {contract.publisherId}</p>
          <p>{contract.publisher.publisherName || ""}</p> 
+         <p><strong>Contact Info:</strong> {contract.publisher.contactInfo || "N/A"}</p>
+        <p><strong>Bank Account:</strong> {contract.publisher.bankAccount || "N/A"}</p>
         <p><strong>Phần trăm chia sẻ doanh thu:</strong> <span>{contract.revenueSharePercentage}%</span></p>
         <p><strong>Ngày tạo:</strong> {new Date(contract.startDate).toLocaleDateString()}</p>
         <p><strong>Ngày bắt đầu:</strong> {new Date(contract.startDate).toLocaleDateString()}</p>
@@ -204,13 +206,13 @@ const ContractDetail = () => {
         <div className="modal-overlay">
           <div className="modal-content">
             <h3>Bạn chắc chắn?</h3>
-            <p>Tôi đã đọc lại văn bản cam kết này và đồng ý toàn bộ nội dung trên, đồng thời ký, điểm chỉ vào văn bản cam kết này.</p>
+            <p>Tôi đã đọc lại văn bản cam kết ở trong tệp đính kèm và đồng ý toàn bộ nội dung trên, đồng thời ký, điểm chỉ vào văn bản cam kết này.</p>
             <div className="modal-buttons">
               <button className="cancel-btn" onClick={() => setShowConfirmModal(false)}>
-                Cancel
+                Hủy bỏ
               </button>
               <button className="confirm-btn" onClick={confirmApprove}>
-                Confirm
+                Đồng ý
               </button>
             </div>
           </div>
