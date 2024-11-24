@@ -62,7 +62,7 @@ function RecapsList() {
     const token = localStorage.getItem("access_token");
     const navigate = useNavigate();
 
-    const recapsPerPage = 5;
+    const recapsPerPage = 4;
     const maxLength = 150;
 
     const fetchRecaps = async () => {
@@ -264,7 +264,7 @@ function RecapsList() {
             <div>
                 <h2>Nội dung của Contributor</h2>
             </div>
-            <div className="search-filter-container">
+            {/* <div className="search-filter-container">
                 <input
                     type="text"
                     placeholder="Tìm theo cuốn sách..."
@@ -280,7 +280,7 @@ function RecapsList() {
                     <option value="2">Chấp thuận</option>
                     <option value="3">Từ chối</option>
                 </select>
-            </div>
+            </div> */}
             <div className="content-list">
                 <table className="content-table">
                     <thead>
@@ -296,7 +296,7 @@ function RecapsList() {
                         </tr>
                     </thead>
                     <tbody>
-                        {displayRecaps.filter((val) => val.currentVersionStatus !== 0).map((val) => (
+                        {displayRecaps.map((val) => (
                             <tr key={val.id}>
                                 <td>{val.name}</td>
                                 <td>{val.book?.title}</td>
@@ -355,6 +355,13 @@ function RecapsList() {
                                             style={{ backgroundColor: "red", color: "#f0f0f0", width: "140px" }}
                                         >
                                             Từ chối
+                                        </button>
+                                    ) : val.currentVersionStatus === 0 ? (
+                                        <button
+                                            className="role-container"
+                                            style={{ backgroundColor: "#CDB38B", color: "#f0f0f0" }}
+                                        >
+                                            Bản nháp
                                         </button>
                                     ) : (
                                         <button
