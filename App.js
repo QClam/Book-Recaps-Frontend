@@ -17,10 +17,10 @@ import HomeScreen from "./screens/HomeScreen";
 import LoginScreen from "./screens/LoginScreen";
 
 import { Ionicons } from '@expo/vector-icons'
-import FavoriteScreen from "./screens/FavoriteScreen";
 import RecapDetail from "./components/Books/RecapDetail";
 import RecapItemDetail from "./components/Books/RecapItemDetail";
 import RecapScreen from "./screens/RecapScreen";
+import PlaylistScreen from "./screens/PlaylistScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -54,7 +54,7 @@ const TabNavigator = () => {
             />
             <Tab.Screen
                 name="Playlist"
-                component={FavoriteScreen}
+                component={PlaylistScreen}
                 options={{ title: "Playlist" }}
             />
             <Tab.Screen
