@@ -1,37 +1,35 @@
 import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import React from 'react';
 import { useNavigation } from '@react-navigation/native';
-import { Entypo } from '@expo/vector-icons';
 
-import defaultImage from '../../assets/empty-image.png'
+import defaultImage from '../../assets/empty-image.png';
 
-const BookCard = React.memo(({ item }) => {
+const RecapCard = React.memo(({ item }) => {
     const navigation = useNavigation();
 
-    const authors = item.authors?.$values?.map(author => author.name).join(', ') || 'Không rõ';
-    const categories = item.categories?.$values?.map(category => category.name).join(', ') || 'Không rõ';
+    const contributor = item.contributor || 'Không rõ';
+    const likesCount = item.likesCount ? item.likesCount.toString() : '0';
+    const bookTitle = item.book?.title || 'Không rõ';
+    const coverImage = item.book?.coverImage;
 
     return (
-        <TouchableOpacity onPress={() => navigation.navigate("RecapDetail", { bookId: item.id })}>
+        <TouchableOpacity onPress={() => navigation.navigate("RecapItemDetail", { recapId: item.id })}>
             <View style={styles.card}>
-                <Image source={item.coverImage ? {uri: item.coverImage} : defaultImage} style={styles.image}/>
+                <Image source={coverImage ? {uri: coverImage} : defaultImage} style={styles.image}/>
                 <View style={styles.textContainer}>
                     <View style={styles.titleContainer}>
-                        <Text style={styles.title}>{item.title}</Text>
-                        <TouchableOpacity>
-                            <Entypo name="add-to-list" size={24} color="black" />
-                        </TouchableOpacity>
+                        <Text style={styles.title}>{item.name}</Text>
                     </View>
-                    <Text style={styles.position}>Tác giả: {authors}</Text>
-                    <Text style={styles.position}>Thể loại: {categories}</Text>
-                    <Text style={styles.position}>Năm xuất bản: {item.publicationYear}</Text>
+                    <Text style={styles.position}>Cuốn: {bookTitle}</Text>
+                    <Text style={styles.position}>Lượt thích: {likesCount}</Text>
+                    <Text style={styles.position}>Người đóng góp: {contributor}</Text>
                 </View>
             </View>
         </TouchableOpacity>
     );
 });
 
-export default BookCard;
+export default RecapCard;
 
 const styles = StyleSheet.create({
     card: {
@@ -42,7 +40,7 @@ const styles = StyleSheet.create({
         padding: 10,
         backgroundColor: '#fff',
         marginVertical: 5,
-        height: 440
+        height: 400
     },
     image: {
         width: '100%',
