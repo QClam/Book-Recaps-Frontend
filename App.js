@@ -19,9 +19,9 @@ import LoginScreen from "./screens/LoginScreen";
 import { Ionicons } from '@expo/vector-icons'
 import RecapDetail from "./components/Books/RecapDetail";
 import RecapItemDetail from "./components/Books/RecapItemDetail";
-import RecapScreen from "./screens/RecapScreen";
 import PlaylistScreen from "./screens/PlaylistScreen";
 import ProfileScreen from "./screens/ProfileScreen";
+import RecapsScreen from "./screens/RecapsScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -62,12 +62,12 @@ const TabNavigator = () => {
             />
             <Tab.Screen
                 name="Recap"
-                component={RecapScreen}
+                component={RecapsScreen}
                 options={{ title: "Recap" }}
             />
             <Tab.Screen
                 name="Profile"
-                component={ProfileScreen} 
+                component={ProfileScreen } 
                 options={{ title: "Profile" }}
             />
         </Tab.Navigator>

@@ -215,20 +215,7 @@ const RecapItemDetail = ({ route }) => {
       <View style={styles.versionInfo}>
         <Text style={styles.audioURL}>Audio URL: {currentVersion.audioURL}</Text>
       </View>
-       
-      {recapVersions.$values && recapVersions.$values.length > 0 && (
-        <View style={styles.versionList}>
-          <Text style={styles.sectionTitle}>Recap Versions</Text>
-          {recapVersions.$values.map((version, index) => (
-            <View key={index} style={styles.versionItem}>
-              <Text style={styles.versionName}>Version {version.versionName}</Text>
-             
-              {renderTranscript()}
-            </View>
-          ))}
-        </View>
-      )}
-  
+ 
         <View style={styles.versionInfo}>    
         {renderTranscript()}
       </View>
