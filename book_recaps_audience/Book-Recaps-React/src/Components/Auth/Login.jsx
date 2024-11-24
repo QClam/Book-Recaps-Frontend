@@ -1,14 +1,17 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import axios from "axios";
-import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import "./Login.scss";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../contexts/Auth";
+import { jwtDecode } from "jwt-decode";
+import { isRoleMatched, isValidToken } from "../../utils/axios";
 
 function Login() {
-  const [isActive, setIsActive] = useState(false);
+  const { login } = useAuth();
+  const [ isActive, setIsActive ] = useState(false);
   const navigate = useNavigate();
 
-  const [registerForm, setRegisterForm] = useState({
+  const [ registerForm, setRegisterForm ] = useState({
     fullName: "",
     email: "",
     password: "",
@@ -16,10 +19,9 @@ function Login() {
     phoneNumber: "",
 
   });
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
-  const { executeRecaptcha } = useGoogleReCaptcha();
+  const [ email, setEmail ] = useState("");
+  const [ password, setPassword ] = useState("");
+  const [ error, setError ] = useState(null);
 
   const handleRegisterClick = () => {
     setIsActive(true);
@@ -77,14 +79,7 @@ function Login() {
       return; // Nếu form không hợp lệ, dừng lại
     }
 
-    if (!executeRecaptcha) {
-      setError("reCAPTCHA chưa được khởi tạo");
-      return;
-    }
-
     try {
-
-      const capcha = await executeRecaptcha("signup")
 
       const newUser = {
         fullName: registerForm.fullName,
@@ -92,7 +87,7 @@ function Login() {
         password: registerForm.password,
         confirmPassword: registerForm.confirmPassword,
         phoneNumber: registerForm.phoneNumber,
-        captchaToken: capcha,
+        captchaToken: "string",
       };
 
       const response = await axios.post(
@@ -124,63 +119,63 @@ function Login() {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-  
-    if (!executeRecaptcha) {
-      setError("reCAPTCHA chưa được khởi tạo");
-      return;
-    }
-  
+
     try {
-      // Thực hiện reCAPTCHA
-      const capcha = await executeRecaptcha("login");
-  
       // Login request
       const response = await axios.post("https://bookrecaps.cloud/api/tokens", {
         email,
         password,
-        captchaToken: capcha,
+        captchaToken: "string",
       });
-  
+
       const { accessToken, refreshToken } = response.data.message.token;
 
       // Save the tokens if they exist
       if (accessToken && refreshToken) {
         localStorage.setItem("authToken", accessToken);
         localStorage.setItem("refreshToken", refreshToken);
-       
+
         // Fetch the user's profile to check if they have completed onboarding
-      const profileResponse = await axios.get("https://bookrecaps.cloud/api/personal/profile", {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+        const profileResponse = await axios.get("https://bookrecaps.cloud/api/personal/profile", {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
 
-      const { isOnboarded } = profileResponse.data;
+        const { isOnboarded, id } = profileResponse.data;
 
-      if (isOnboarded) {
-        // Redirect to /explore if the user is onboarded
-        navigate("/explore");
+        const decoded = jwtDecode(accessToken)
+        const userId = decoded[import.meta.env.VITE_CLAIMS_IDENTIFIER]
+
+        if (
+          profileResponse.data &&
+          isValidToken(decoded) &&
+          (isRoleMatched(decoded, "Contributor") || isRoleMatched(decoded, "Customer")) &&
+          id === userId
+        ) {
+          login({
+            email: decoded.email,
+            name: decoded[import.meta.env.VITE_CLAIMS_NAME],
+            id: userId,
+            isOnboarded,
+            profileData: profileResponse.data,
+          }, accessToken);
+        } else {
+          setError("Vui lòng đăng nhập bằng tài khoản Contributor hoặc Audience.");
+        }
       } else {
-        // Redirect to /onboarding if the user is not onboarded
-        navigate("/onboarding");
+        console.error("Tokens not found in API response");
+        setError("Không tìm thấy token trong phản hồi của API.");
       }
-    } else {
-      console.error("Tokens not found in API response");
-      setError("Không tìm thấy token trong phản hồi của API.");
+    } catch (error) {
+      console.error("Error logging in:", error.response ? error.response.data : error.message);
+      setError("Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản và mật khẩu.");
     }
-  } catch (error) {
-    console.error("Error logging in:", error.response ? error.response.data : error.message);
-    setError("Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản và mật khẩu.");
-  }
-};
+  };
 
-
-
-  
   const forgetPasswordClick = () => {
     navigate("/forget-password");
   }
-
 
   return (
     <div className="login-page">
@@ -269,10 +264,11 @@ function Login() {
               placeholder="Mật khẩu"
             />
             <button type="submit">Đăng nhập</button>
-            <a style={{textDecoration: "none", cursor: "pointer"}} onClick={() => forgetPasswordClick()}>Forget password</a>
+            <a style={{ textDecoration: "none", cursor: "pointer" }} onClick={() => forgetPasswordClick()}>Forget
+              password</a>
             {error && <p style={{ color: 'red' }}>{error}</p>}
-           
-   
+
+
           </form>
         </div>
 

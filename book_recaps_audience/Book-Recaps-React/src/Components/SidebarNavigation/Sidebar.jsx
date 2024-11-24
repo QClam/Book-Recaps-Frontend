@@ -1,31 +1,31 @@
-import React, { useState, useEffect } from "react";  
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import JKROW from "../../image/jkrow.jpg";
 import { SidebarItems } from "./SidebarItems";
 import "../SidebarNavigation/css/Sidebar.scss";
 import bookRecap from '../../image/removeBR.png';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faBell } from '@fortawesome/free-solid-svg-icons';
-import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
+import { faBell, faSearch, faSignInAlt } from '@fortawesome/free-solid-svg-icons';
+import { routes } from "../../routes";
 
 function Sidebar() {
   const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filteredBooks, setFilteredBooks] = useState([]);
-  const [showLogout, setShowLogout] = useState(false); // State to manage logout option visibility
-  const [userName, setUserName] = useState(''); // State for user's name
-  const [imageUrl, setImageUrl] = useState(''); // State for user's avatar image URL
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // State to manage login status
+  const [ searchTerm, setSearchTerm ] = useState('');
+  const [ filteredBooks, setFilteredBooks ] = useState([]);
+  const [ showLogout, setShowLogout ] = useState(false); // State to manage logout option visibility
+  const [ userName, setUserName ] = useState(''); // State for user's name
+  const [ imageUrl, setImageUrl ] = useState(''); // State for user's avatar image URL
+  const [ isLoggedIn, setIsLoggedIn ] = useState(false); // State to manage login status
 
-    // Check if user is logged in by checking if authToken exists
-    useEffect(() => {
-      const token = localStorage.getItem('authToken');
-      if (token) {
-        setIsLoggedIn(true); // Set logged in status if token exists
-      } else {
-        setIsLoggedIn(false); // Set logged out status if no token
-      }
-    }, []);
+  // Check if user is logged in by checking if authToken exists
+  useEffect(() => {
+    const token = localStorage.getItem('authToken');
+    if (token) {
+      setIsLoggedIn(true); // Set logged in status if token exists
+    } else {
+      setIsLoggedIn(false); // Set logged out status if no token
+    }
+  }, []);
 
   const handleSearchChange = (e) => {
     setSearchTerm(e.target.value);
@@ -39,10 +39,7 @@ function Sidebar() {
   };
 
   const handleLogout = () => {
-    // Perform logout logic here (e.g., clear tokens, redirect to login page)
-    localStorage.removeItem('authToken'); // Example: remove auth token
-    navigate('/login'); // Redirect to login page
-    console.log("Logout successful"); // Log success
+    navigate(routes.logout)
   };
 
   const toggleLogout = () => {
@@ -75,10 +72,9 @@ function Sidebar() {
     };
 
     if (isLoggedIn) {
-      fetchUserProfile(); 
+      fetchUserProfile();
     }
-  }, [isLoggedIn]);
-
+  }, [ isLoggedIn ]);
 
   useEffect(() => {
     const fetchBooks = async () => {
@@ -116,13 +112,13 @@ function Sidebar() {
     };
 
     fetchBooks();
-  }, [searchTerm]);
+  }, [ searchTerm ]);
 
   return (
     <div className="Sidebar">
       <div className="Sidebar-bar">
         <div className="SidebarLogo">
-          <img src={bookRecap} alt="Logo" />
+          <img src={bookRecap} alt="Logo"/>
         </div>
 
         <ul className="SidebarList">
@@ -148,20 +144,20 @@ function Sidebar() {
               onChange={handleSearchChange}
             />
             <button type="button" className="search-buttonme">
-              <FontAwesomeIcon icon={faSearch} />
+              <FontAwesomeIcon icon={faSearch}/>
             </button>
           </form>
 
           {filteredBooks.length > 0 && (
             <ul className="search-results">
               {filteredBooks.map((book) => (
-                <li 
-                  key={book.id} 
+                <li
+                  key={book.id}
                   className="search-result-itemem"
                   onClick={() => handleBookClick(book.id)}
                 >
                   <div className="book-itemem">
-                    <img src={book.coverImage || "defaultCover.jpg"} alt="Book cover" className="book-cover" />
+                    <img src={book.coverImage || "defaultCover.jpg"} alt="Book cover" className="book-cover"/>
                     <div className="book-info">
                       <strong>{book.title}</strong>
                       <p>By: {book.authors.$values.map((author) => author.name).join(', ')}</p>
@@ -172,14 +168,14 @@ function Sidebar() {
             </ul>
           )}
 
-            <div className="user-info">
-            <FontAwesomeIcon icon={faBell} className="iconHeader" />
+          <div className="user-info">
+            <FontAwesomeIcon icon={faBell} className="iconHeader"/>
 
             {/* Chỉ hiển thị nút Login nếu chưa đăng nhập */}
             {/* Thay vì dùng button, bạn dùng div hoặc span */}
-            {!isLoggedIn && ( 
+            {!isLoggedIn && (
               <div onClick={() => navigate("/login")} className="login-button">
-                <FontAwesomeIcon icon={faSignInAlt} className="login-icon" /> {/* Sử dụng FontAwesome icon */}
+                <FontAwesomeIcon icon={faSignInAlt} className="login-icon"/> {/* Sử dụng FontAwesome icon */}
                 <span>Login</span>
               </div>
             )}
@@ -187,14 +183,14 @@ function Sidebar() {
 
             {/* Hiển thị avatar và tên người dùng khi đã đăng nhập */}
             {isLoggedIn && (
-              <div className="user-profile" onClick={toggleLogout}> 
-                <span className="user-name">{userName}</span> 
-                <img src={imageUrl} alt="User Avatar" className="user-avatar" />
+              <div className="user-profile" onClick={toggleLogout}>
+                <span className="user-name">{userName}</span>
+                <img src={imageUrl} alt="User Avatar" className="user-avatar"/>
               </div>
             )}
 
             {showLogout && (
-              <div className="logout-option"> 
+              <div className="logout-option">
                 <button onClick={handleLogout}>Logout</button>
               </div>
             )}

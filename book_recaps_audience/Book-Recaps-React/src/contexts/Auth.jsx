@@ -10,6 +10,7 @@ export function AuthProvider({ children }) {
   const [ user, setUser ] = useState(loaderData); // { id, email, name, isOnboarded, profileData }
   const [ reCaptchaTokens ] = useState({ loginToken: "...", signupToken: "..." });
   const matchOnboardingRoute = useMatch(routes.onboarding);
+  const matchLoginRoute = useMatch(routes.login);
 
   const login = (userData, accessToken) => {
     setUser(userData);
@@ -25,6 +26,10 @@ export function AuthProvider({ children }) {
 
   if (isAuthenticated && !user.isOnboarded && !matchOnboardingRoute) {
     return <Navigate to={routes.onboarding}/>;
+  }
+
+  if (isAuthenticated && matchLoginRoute) {
+    return <Navigate to={routes.index} replace/>;
   }
 
   return (
