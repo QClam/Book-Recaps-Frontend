@@ -188,8 +188,6 @@ function AppealList() {
                     </thead>
                     <tbody>
                         {displayAppeals
-                            .filter((val) => filterStatus === "" || val.appealStatus === filterStatus)
-                            .filter((val) => val.appealStatus !== 0 && val.staff?.id === profile.id)
                             .map((val) => (
                                 <tr key={val.id}>
                                     <td>{val.contributor?.fullName}</td>
@@ -222,6 +220,8 @@ function AppealList() {
                                             <button style={{ backgroundColor: "green", color: "#f0f0f0", width: "120px" }}>
                                                 Đã xử lý
                                             </button>
+                                        ) : val.appealStatus === 0 ? (
+                                            <button>Đang mở</button>
                                         ) : (
                                             <button>Unknow</button>
                                         )}
