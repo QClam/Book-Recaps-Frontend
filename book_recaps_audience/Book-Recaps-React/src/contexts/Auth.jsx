@@ -11,6 +11,7 @@ export function AuthProvider({ children }) {
   const [ reCaptchaTokens ] = useState({ loginToken: "...", signupToken: "..." });
   const matchOnboardingRoute = useMatch(routes.onboarding);
   const matchLoginRoute = useMatch(routes.login);
+  const isAuthenticated = !!user;
 
   const login = (userData, accessToken) => {
     setUser(userData);
@@ -22,12 +23,12 @@ export function AuthProvider({ children }) {
     setSession(null);
   };
 
-  const isAuthenticated = !!user;
-
+  // Redirect to onboarding if user is authenticated but not onboarded
   if (isAuthenticated && !user.isOnboarded && !matchOnboardingRoute) {
     return <Navigate to={routes.onboarding}/>;
   }
 
+  // Redirect to index if user is authenticated and tries to access login page
   if (isAuthenticated && matchLoginRoute) {
     return <Navigate to={routes.index} replace/>;
   }

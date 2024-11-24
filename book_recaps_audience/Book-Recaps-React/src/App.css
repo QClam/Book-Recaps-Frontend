@@ -4,7 +4,7 @@
   justify-content: space-between; /* Space out Sidebar and Filter */
   align-items: center;
   width: 100%;
-  padding: 0 20px;
+  /*padding: 0 20px;*/
   height: 80px; /* Fixed height for the header */
   background-color: #fff; /* Background color for better visibility */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);

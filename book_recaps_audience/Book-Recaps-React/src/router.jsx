@@ -30,8 +30,6 @@ import Logout from "./Components/Auth/Logout";
 import App from "./App";
 import { routes } from "./routes";
 
-
-
 export const router = createBrowserRouter(createRoutesFromElements(
   <Route element={<App/>} errorElement={<ErrorRoute/>} loader={sessionLoader}>
 

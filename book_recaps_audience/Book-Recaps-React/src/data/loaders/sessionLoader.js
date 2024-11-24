@@ -21,8 +21,6 @@ export const sessionLoader = async () => {
   const decoded = jwtDecode(token)
   const userId = decoded[import.meta.env.VITE_CLAIMS_IDENTIFIER]
 
-  console.log("decoded", decoded)
-
   if (
     profileData &&
     isValidToken(decoded) &&
