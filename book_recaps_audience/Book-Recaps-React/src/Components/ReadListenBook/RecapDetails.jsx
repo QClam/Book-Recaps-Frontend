@@ -3,6 +3,7 @@ import axios from "axios";
 import "./RecapDetails.scss";
 import { FaSyncAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { routes } from "../../routes";
 
 const RecapDetails = () => {
   const [audioURL, setAudioURL] = useState("");
@@ -52,7 +53,7 @@ const RecapDetails = () => {
       return newAccessToken;
     } catch (error) {
       setError("Session expired. Please log in again.");
-      navigate("/login"); // Redirect to login page
+      navigate(routes.login); // Redirect to login page
       return null;
     }
   };
@@ -522,7 +523,7 @@ const sendHighlightRequest = async (highlightData) => {
           </div>
           <div
             className="sidebar-item"
-            onClick={() => handleNavigation("/explore")}
+            onClick={() => handleNavigation(routes.explore)}
           >
             <span className="icon">🔍</span>
             {!isSidebarCollapsed && <span className="label">Explore</span>}

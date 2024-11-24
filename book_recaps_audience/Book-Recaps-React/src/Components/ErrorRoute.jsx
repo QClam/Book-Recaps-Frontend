@@ -55,7 +55,7 @@ function ErrorBoundary() {
   return (
     <div className="error-container">
       {renderContent()}
-      {/*<Link to="/" className="button">Go to Home</Link>*/}
+      {/*<Link to={routes.index} className="button">Go to Home</Link>*/}
     </div>
   );
 }

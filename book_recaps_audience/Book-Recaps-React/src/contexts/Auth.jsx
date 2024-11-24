@@ -1,7 +1,8 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { setSession } from "../utils/axios";
 import { Navigate, useLoaderData, useMatch } from "react-router-dom";
 import { routes } from "../routes";
+import _ from "lodash";
 
 const AuthContext = createContext(null);
 
@@ -12,6 +13,10 @@ export function AuthProvider({ children }) {
   const matchOnboardingRoute = useMatch(routes.onboarding);
   const matchLoginRoute = useMatch(routes.login);
   const isAuthenticated = !!user;
+
+  useEffect(() => {
+    !_.isEqual(loaderData, user) && setUser(loaderData);
+  }, [ loaderData ]);
 
   const login = (userData, accessToken) => {
     setUser(userData);
@@ -29,7 +34,8 @@ export function AuthProvider({ children }) {
   }
 
   // Redirect to index if user is authenticated and tries to access login page
-  if (isAuthenticated && matchLoginRoute) {
+  // Redirect to index if user is authenticated and onboarded and tries to access onboarding page
+  if (isAuthenticated && (matchLoginRoute || (matchOnboardingRoute && user.isOnboarded))) {
     return <Navigate to={routes.index} replace/>;
   }
 

@@ -106,7 +106,7 @@ function Sidebar() {
               <ul className="search-results">
                 {filteredBooks.map((book) => (
                   <li key={book.id}>
-                    <Link to={generatePath(routes.book, { id: book.id })} className="search-result-itemem">
+                    <Link to={generatePath(routes.bookDetail, { id: book.id })} className="search-result-itemem">
                       <div className="book-itemem">
                         <img src={book.coverImage || "defaultCover.jpg"} alt="Book cover" className="book-cover"/>
                         <div className="book-info">
@@ -127,10 +127,10 @@ function Sidebar() {
             {/* Chỉ hiển thị nút Login nếu chưa đăng nhập */}
             {/* Thay vì dùng button, bạn dùng div hoặc span */}
             <Show when={isAuthenticated} fallback={
-              <div onClick={() => navigate("/login")} className="login-button">
+              <Link to={routes.login} className="login-button">
                 <FontAwesomeIcon icon={faSignInAlt} className="login-icon"/> {/* Sử dụng FontAwesome icon */}
                 <span>Login</span>
-              </div>
+              </Link>
             }>
               <div className="user-profile" onClick={toggleLogout}>
                 <span className="user-name">{userName}</span>

@@ -12,6 +12,7 @@ faHeartbeat  } from '@fortawesome/free-solid-svg-icons';
 import './Onboarding.scss';
 import axios from 'axios';
 import bookRecap from '../../image/removeBR.png';
+import { routes } from "../../routes";
 
 const Onboarding = ({ onComplete = () => {} }) => {
   const [step, setStep] = useState(1);
@@ -124,7 +125,7 @@ const Onboarding = ({ onComplete = () => {} }) => {
       setStep(step + 1);
     } else {
       onComplete();
-      navigate("/");
+      navigate(routes.index);
     }
   };
 

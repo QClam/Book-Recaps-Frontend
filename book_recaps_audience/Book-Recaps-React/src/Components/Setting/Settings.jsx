@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import './Settings.scss';
 import { useNavigate } from 'react-router-dom';
+import { routes } from "../../routes";
 
 function Settings() {
     const navigate = useNavigate(); // Create a navigate function
@@ -284,7 +285,7 @@ function Settings() {
             localStorage.removeItem('authToken');
     
             // Navigate to login page
-            navigate('/login');
+            navigate(routes.login);
     
             // Đăng xuất khỏi các phiên làm việc cũ, nếu có
             await fetch('https://bookrecaps.cloud/api/personal/logout', {

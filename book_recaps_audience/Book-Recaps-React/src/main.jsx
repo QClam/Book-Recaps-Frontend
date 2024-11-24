@@ -13,10 +13,10 @@ import { router } from "./router";
 const recaptchaKey = import.meta.env.VITE_RECAPTCHA_KEY;
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  // <StrictMode>
     <GoogleReCaptchaProvider reCaptchaKey={recaptchaKey}>
       <RouterProvider router={router}/>
       <ToastContainer/>
     </GoogleReCaptchaProvider>
-  </StrictMode>,
+  // </StrictMode>,
 )

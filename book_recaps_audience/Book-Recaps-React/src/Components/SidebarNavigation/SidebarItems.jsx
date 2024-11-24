@@ -5,7 +5,7 @@ export const SidebarItems = [
   {
     title: "Explore",
     icon: <Search/>,
-    link: "/explore",
+    link: routes.explore,
   },
   {
     title: "Home",
@@ -15,22 +15,22 @@ export const SidebarItems = [
   {
     title: "Books",
     icon: <MenuBook/>,  // Icon cho Books
-    link: "/books",
+    link: routes.books,
   },
   {
     title: "Categories",  // Thêm title "Categories"
     icon: <Category/>,  // Icon Category
-    link: "/categories",
+    link: routes.categories,
   },
   {
     title: "Author",
     icon: <Person/>,  // Icon cho Author
-    link: "/author",
+    link: routes.authors,
   },
   {
     title: "Playlist",
     icon: <LibraryBooks/>,  // Icon cho Library
-    link: "/playlist",
+    link: routes.playlist,
   },
 
   // {

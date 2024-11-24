@@ -3,6 +3,7 @@ import axios from 'axios';
 import './Billing.scss';
 import { useNavigate, useLocation } from 'react-router-dom'; // Thêm useLocation
 import bookRecap from '../../../image/removeBR.png';
+import { routes } from "../../../routes";
 
 const Billing = () => {
   const [subscriptions, setSubscriptions] = useState([]);
@@ -99,7 +100,7 @@ const Billing = () => {
 
   // Hàm xử lý sự kiện nhấn vào logo
   const handleLogoClick = () => {
-    navigate('/explore'); // Điều hướng đến trang /explore
+    navigate(routes.explore);
   };
 
   return (

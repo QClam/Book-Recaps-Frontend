@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../Result/Result.scss';
 import axios from 'axios';
+import { routes } from "../../../../routes";
 
 const Result = () => {
   const location = useLocation();
@@ -134,8 +135,8 @@ const Result = () => {
       </div>
       {error && <p className="error">{error}</p>}
       <div className="button-group">
-        <button className="explore-button" onClick={() => navigate('/explore')}>Explore</button>
-        <button className="try-again-button" onClick={() => navigate('/billing')}>Try Again</button>
+        <button className="explore-button" onClick={() => navigate(routes.explore)}>Explore</button>
+        <button className="try-again-button" onClick={() => navigate(routes.billing)}>Try Again</button>
       </div>
     </div>
   );

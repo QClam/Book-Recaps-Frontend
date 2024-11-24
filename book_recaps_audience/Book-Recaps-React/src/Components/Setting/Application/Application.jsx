@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import "../Application/Application.scss";
 import { useNavigate } from 'react-router-dom';
+import { routes } from "../../../routes";
 
 const Application = () => {
   const [supportTickets, setSupportTickets] = useState([]);
@@ -89,7 +90,7 @@ const Application = () => {
   }, [userId, accessToken]);
 
   const goToExplore = () => {
-    navigate('/explore');
+    navigate(routes.explore);
   };
 
   return (

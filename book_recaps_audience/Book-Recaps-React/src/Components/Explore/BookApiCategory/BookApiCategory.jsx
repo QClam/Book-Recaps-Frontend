@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import './BookApiCategory.scss';
 import axios from "axios";
-import { useNavigate } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router-dom';
+import { routes } from "../../../routes";
 
 const BookApiCategory = () => {
-  const [categories, setCategories] = useState([]);
-  const [error, setError] = useState(null); // For error handling
+  const [ categories, setCategories ] = useState([]);
+  const [ error, setError ] = useState(null); // For error handling
   const navigate = useNavigate(); // Khởi tạo navigate
 
   const handleCategoryClick = (categoryId) => {
-    navigate(`/category/${categoryId}`); // Điều hướng tới trang danh sách sách theo category
+    navigate(generatePath(routes.categoryDetail, { categoryId })); // Điều hướng tới trang danh sách sách theo category
   };
   //qua BookListCategory de nhin may cuon sach thuoc category nao
   // Get accessToken and refreshToken from localStorage
@@ -49,7 +50,7 @@ const BookApiCategory = () => {
     };
 
     fetchCategories();
-  }, [accessToken, refreshToken]); // Use both tokens in dependency array
+  }, [ accessToken, refreshToken ]); // Use both tokens in dependency array
 
   // Token refresh function
   const handleTokenRefresh = async () => {
@@ -129,11 +130,11 @@ const BookApiCategory = () => {
       {error && <p className="error">{error}</p>}
       <div className="category-wrapper">
         {categories.map((category) => (
-         <div
-         key={category.id}
-         className="category-box"
-         onClick={() => handleCategoryClick(category.id)} // Gọi hàm khi bấm vào category
-       >
+          <div
+            key={category.id}
+            className="category-box"
+            onClick={() => handleCategoryClick(category.id)} // Gọi hàm khi bấm vào category
+          >
             <i className={`${getIconClass(category.name)} category-icon`} aria-hidden="true"></i>
             <p className="category-label">{category.name}</p>
           </div>
