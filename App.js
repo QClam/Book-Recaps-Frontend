@@ -21,6 +21,7 @@ import RecapDetail from "./components/Books/RecapDetail";
 import RecapItemDetail from "./components/Books/RecapItemDetail";
 import RecapScreen from "./screens/RecapScreen";
 import PlaylistScreen from "./screens/PlaylistScreen";
+import ProfileScreen from "./screens/ProfileScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -39,6 +40,8 @@ const TabNavigator = () => {
                         iconName = focused ? "list" : "list-outline";
                     } else if (route.name === "Recap") {
                         iconName = focused ? "albums" : "albums-outline";
+                    } else if (route.name === "Profile") {
+                        iconName = focused ? "person" : "person-outline";
                     }
 
                     return <Ionicons name={iconName} size={size} color={color} />;
@@ -61,6 +64,11 @@ const TabNavigator = () => {
                 name="Recap"
                 component={RecapScreen}
                 options={{ title: "Recap" }}
+            />
+            <Tab.Screen
+                name="Profile"
+                component={ProfileScreen} 
+                options={{ title: "Profile" }}
             />
         </Tab.Navigator>
     );

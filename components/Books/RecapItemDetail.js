@@ -5,8 +5,6 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CreatePlaylistModal from './CreatePlaylistModal';
 
-
-
 // Function to resolve $refs in the data
 const resolveRefs = (data) => {
     const refMap = new Map();
@@ -43,8 +41,7 @@ const RecapItemDetail = ({ route }) => {
   const [error, setError] = useState(null);
   const [transcriptData, setTranscriptData] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [audio, setAudio] = useState(null);
+
 
    // States for Like functionality
    const [liked, setLiked] = useState(false);
@@ -190,8 +187,7 @@ const RecapItemDetail = ({ route }) => {
   };
 
   const { book, currentVersion, recapVersions } = recapDetail;
-
-
+  
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.title}>{recapDetail.name}</Text>
@@ -220,12 +216,20 @@ const RecapItemDetail = ({ route }) => {
         <Text style={styles.audioURL}>Audio URL: {currentVersion.audioURL}</Text>
       </View>
        
-        {/* <View style={styles.versionInfo}>
-        <Text style={styles.audioURL}>Audio URL: {recapDetail.currentVersion?.audioURL}</Text>
-        {renderAudioPlayer()}
-      </View> */}
-
-      <View style={styles.versionInfo}>    
+      {recapVersions.$values && recapVersions.$values.length > 0 && (
+        <View style={styles.versionList}>
+          <Text style={styles.sectionTitle}>Recap Versions</Text>
+          {recapVersions.$values.map((version, index) => (
+            <View key={index} style={styles.versionItem}>
+              <Text style={styles.versionName}>Version {version.versionName}</Text>
+             
+              {renderTranscript()}
+            </View>
+          ))}
+        </View>
+      )}
+  
+        <View style={styles.versionInfo}>    
         {renderTranscript()}
       </View>
       {/* Like Button */}
