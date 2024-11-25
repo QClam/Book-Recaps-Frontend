@@ -3,7 +3,8 @@ import {
     TableContainer, Table, TableHead, TableRow, TableCell, TableBody,
     Paper, Typography, Button, Box, Modal, TextField, MenuItem, Pagination,
     TablePagination,
-    TableFooter
+    TableFooter,
+    Chip
 } from '@mui/material';
 import { Hourglass } from 'react-loader-spinner';
 
@@ -71,7 +72,7 @@ function WithdrawalList() {
     useEffect(() => {
         fetchWithdrawals();
     }, [])
-    
+
     useEffect(() => {
         let filteredData = withdrawals;
 
@@ -88,7 +89,7 @@ function WithdrawalList() {
         }
 
         setFilteredWithdrawals(filteredData);
-       
+
         // Kiểm tra nếu page vượt quá tổng số trang
         const totalPages = Math.ceil(filteredData.length / rowsPerPage);
         if (page >= totalPages) {
@@ -157,15 +158,17 @@ function WithdrawalList() {
                                 <TableCell>{item.contributorName}</TableCell>
                                 <TableCell>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.totalEarnings || 0)}</TableCell>
                                 <TableCell>{item.description || "Không có ghi chú"}</TableCell>
-                                {item.status === "Pending" ? (
-                                    <TableCell sx={{ color: "#edf5fa" }}>Đang mở</TableCell>
-                                ) : item.status === "Accepted" ? (
-                                    <TableCell sx={{ color: "green" }}>Hoàn tất</TableCell>
-                                ) : item.status === "Rejected" ? (
-                                    <TableCell sx={{ color: "red" }}>Hủy</TableCell>
-                                ) : (
-                                    <TableCell>Lỗi</TableCell>
-                                )}
+                                <TableCell>
+                                    {item.status === "Pending" ? (
+                                        <Chip label="Đang xử lý" color="primary" variant="outlined" />
+                                    ) : item.status === "Accepted" ? (
+                                        <Chip label="Hoàn tất" color="success" variant="outlined" />
+                                    ) : item.status === "Rejected" ? (
+                                        <Chip label="Hủy" color="error" variant="outlined" />
+                                    ) : (
+                                        <TableCell>Lỗi</TableCell>
+                                    )}
+                                </TableCell>
                                 <TableCell>{new Date(item.createAt).toLocaleDateString()}</TableCell>
                                 <TableCell>
                                     {item.status === "Pending" ? (
@@ -189,15 +192,7 @@ function WithdrawalList() {
                                             <Visibility />
                                         </Button>
                                     ) : (
-                                        <Button
-                                            color="error"
-                                            variant="outlined"
-                                            sx={{
-                                                '&:hover': { backgroundColor: '#edf5fa' },
-                                            }}
-                                        >
-                                            Bị hủy
-                                        </Button>
+                                        <Chip label="Bị Hủy" color="error" variant="outlined" />
                                     )}
                                 </TableCell>
                             </TableRow>
