@@ -36,7 +36,7 @@ function App() {
         <main>
             {!isLoginPage && <Sidebar />}
             <Routes>
-                <Route path="/" element={<PrivateRoute> <UsersList /> </PrivateRoute>} />
+                <Route path="/" element={<PrivateRoute> <Dashboard /> </PrivateRoute>} />
                 <Route path="/users" element={<PrivateRoute> <Users /> </PrivateRoute>} />
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/publisher-payout" element={<PublisherPayout />} />

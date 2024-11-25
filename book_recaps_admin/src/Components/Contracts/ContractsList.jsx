@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Box, Button, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material';
+import { Box, Button, MenuItem, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
 import { Hourglass } from 'react-loader-spinner';
 import { useNavigate } from "react-router-dom";
 
@@ -38,8 +38,12 @@ const resolveRefs = (data) => {
 function ContractsList() {
 
     const [contracts, setContracts] = useState([]);
+    const [filteredContracts, setFilteredContracts] = useState([]);
+    const [page, setPage] = useState(0); // Trang hiện tại
+    const [rowsPerPage, setRowsPerPage] = useState(5); // Dòng mỗi trang    
+    const [searchTerm, setSearchTerm] = useState(""); // Nhập input ô search
+    const [filterStatus, setFilterStatus] = useState(""); // Lọc trạng thái
     const [publishers, setPublishers] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
     const [loading, setLoading] = useState(true);
 
     const [contractForm, setContractForm] = useState({
@@ -48,21 +52,12 @@ function ContractsList() {
 
     const navigate = useNavigate();
 
-    const contractsPerPage = 5;
-
-    const displayContracts= contracts.slice(
-        (currentPage - 1) * contractsPerPage,
-        currentPage * contractsPerPage
-    ); // Adjust slicing for 1-based page indexing
-    const handlePageChange = (event, value) => {
-        setCurrentPage(value);
-    };
-
     const fetchContracts = async () => {
         try {
             const response = await api.get('/api/Contract/getallcontract')
             const contracts = resolveRefs(response.data.data.$values);
             setContracts(contracts);
+            setFilteredContracts(contracts)
             console.log(contracts);
             setLoading(false);
 
@@ -91,6 +86,43 @@ function ContractsList() {
         fetchContracts();
     }, [])
 
+    const handleChangePage = (event, newPage) => {
+        // Kiểm tra xem trang có hợp lệ hay không
+        const totalPages = Math.ceil(filteredContracts.length / rowsPerPage);
+        if (newPage < totalPages && newPage >= 0) {
+            setPage(newPage);
+        }
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0); // Reset to first page when rows per page changes
+    };
+
+    useEffect(() => {
+        let filteredData = contracts;
+
+        // Search filter
+        if (searchTerm) {
+            filteredData = filteredData.filter((item) =>
+                item.publisher?.publisherName.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        // Status filter
+        if (filterStatus) {
+            filteredData = filteredData.filter((item) => item.status === filterStatus);
+        }
+
+        setFilteredContracts(filteredData);
+
+        // Kiểm tra nếu page vượt quá tổng số trang
+        const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+        if (page >= totalPages) {
+            setPage(0);  // Reset page về 0 nếu vượt quá số trang
+        }
+    }, [searchTerm, filterStatus, contracts, page, rowsPerPage]);
+
     if (loading) {
         return (
             <div className="loading">
@@ -108,7 +140,31 @@ function ContractsList() {
     return (
         <div className='contract-list-container'>
             <Typography variant='h5'>Danh sách các bản hợp đồng</Typography>
-            <Box display="flex" justifyContent="flex-end" mt={2}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
+                <TextField
+                    label="Tìm kiếm theo tên NXB"
+                    variant="outlined"
+                    size="small"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    sx={{ width: "40%" }}
+                />
+                <TextField
+                    select
+                    label="Trạng thái"
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    size="small"
+                    sx={{ width: '20%' }}
+                >
+                    <MenuItem value="">Tất cả</MenuItem>
+                    <MenuItem value={1}>Đang xử lý</MenuItem>
+                    <MenuItem value={2}>Chưa bắt đầu</MenuItem>
+                    <MenuItem value={3}>Đang kích hoạt</MenuItem>
+                    <MenuItem value={4}>Hết hạn</MenuItem>
+                    <MenuItem value={5}>Từ chối</MenuItem>
+                    <MenuItem value={0}>Bản nháp</MenuItem>
+                </TextField>
                 <Button variant="contained" color="primary" onClick={() => createContract()}>
                     Thêm Hợp Đồng
                 </Button>
@@ -128,7 +184,7 @@ function ContractsList() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {displayContracts.map((item) => (
+                            {filteredContracts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
                                 <TableRow key={item.id}>
                                     <TableCell>{item.publisher?.publisherName}</TableCell>
                                     <TableCell>{item.revenueSharePercentage}%</TableCell>
@@ -158,19 +214,24 @@ function ContractsList() {
                                 </TableRow>
                             ))}
                         </TableBody>
+                        <TableFooter>
+                            <TableRow>
+                                <TablePagination
+                                    count={filteredContracts.length} // Tổng số dòng sau khi lọc
+                                    page={page} // Trang hiện tại
+                                    onPageChange={handleChangePage} // Hàm xử lý thay đổi trang
+                                    rowsPerPage={rowsPerPage} // Số dòng hiển thị mỗi trang
+                                    onRowsPerPageChange={handleChangeRowsPerPage} // Hàm xử lý thay đổi số dòng mỗi trang
+                                    rowsPerPageOptions={[5, 10, 25]} // Tùy chọn số dòng mỗi trang
+                                    labelRowsPerPage="Số dòng mỗi trang:" // Văn bản tiếng Việt
+                                    labelDisplayedRows={({ from, to, count }) =>
+                                        `${from}–${to} trên ${count !== -1 ? count : `nhiều hơn ${to}`}`
+                                    }
+                                />
+                            </TableRow>
+                        </TableFooter>
                     </Table>
                 </TableContainer>
-
-                <Pagination
-                className="center"
-                count={Math.ceil(contracts.length / contractsPerPage)} // Total number of pages
-                page={currentPage} // Current page
-                onChange={handlePageChange} // Handle page change
-                color="primary" // Styling options
-                showFirstButton
-                showLastButton
-                sx={{marginTop: 2}}
-            />
             </Box>
         </div>
     )
