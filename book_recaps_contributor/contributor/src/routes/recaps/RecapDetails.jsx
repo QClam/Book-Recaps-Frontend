@@ -60,7 +60,7 @@ const getRecapVersions = async (recapId, request) => {
 
 const getRecapStats = async (recapId, fromDate, toDate, request) => {
   try {
-    const response = await axiosInstance.get('/api/recap/getrecapdetail/' + recapId, {
+    const response = await axiosInstance.get('/api/dashboard/getrecapdetail/' + recapId, {
       params: { fromDate, toDate },
       signal: request.signal
     });
@@ -515,16 +515,14 @@ const RecapVersionStats = () => {
   const [ controller, setController ] = useState(null);
 
   useEffect(() => {
-    return () => controller?.abort();
-  }, [ controller ]);
-
-  useEffect(() => {
     applyDateFilter()
+    return () => controller?.abort();
   }, []);
 
   const applyDateFilter = async () => {
     // Convert dates to UTC format before sending to the backend
     const newController = new AbortController();
+    if (controller) controller.abort();
 
     setLoading(true);
     setController(newController);
@@ -579,14 +577,16 @@ const RecapVersionStats = () => {
             Quyết toán gần nhất
           </div>
           <Show when={!loading} fallback={
-            <div className="flex items-center gap-2">
-              <ProgressSpinner
-                style={{ width: '15px', height: '15px' }}
-                strokeWidth="8"
-                fill="var(--surface-ground)"
-                animationDuration=".5s"
-              />
-              <span>Loading...</span>
+            <div className="flex items-center justify-center gap-2">
+              <div>
+                <ProgressSpinner
+                  style={{ width: '15px', height: '15px' }}
+                  strokeWidth="8"
+                  fill="var(--surface-ground)"
+                  animationDuration=".5s"
+                />
+              </div>
+              <div>Loading...</div>
             </div>
           }>
             <Show when={stats && stats.lastPayout} fallback={<p>Chưa có quyết toán nào.</p>}>
@@ -608,6 +608,7 @@ const RecapVersionStats = () => {
             type="date"
             value={fromDate}
             onChange={(e) => setFromDate(e.target.value)}
+            disabled={loading}
             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-gray-100"
           />
         </div>
@@ -617,12 +618,14 @@ const RecapVersionStats = () => {
             type="date"
             value={toDate}
             onChange={(e) => setToDate(e.target.value)}
+            disabled={loading}
             className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-gray-100"
           />
         </div>
         <button
           onClick={applyDateFilter}
-          className="px-4 py-2 bg-blue-500 font-semibold text-white rounded-md"
+          disabled={loading}
+          className="px-4 py-2 bg-blue-500 font-semibold text-white rounded-md hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-progress"
         >
           Apply
         </button>

@@ -19,7 +19,7 @@ import { createRecapAction } from "./routes/actions/createRecapAction";
 import EarningWithdrawals, { earningWithdrawalsAction, earningWithdrawalsLoader } from "./routes/EarningWithdrawals";
 import Payouts, { payoutsLoader } from "./routes/Payouts";
 import PayoutDetails, { payoutDetailsLoader } from "./routes/PayoutDetails";
-import Dashboard from "./routes/Dashboard";
+import Dashboard, { dashboardLoader } from "./routes/Dashboard";
 // import Support, { supportTicketsAction, supportTicketsLoader } from "./routes/Support";
 
 export const routes = {
@@ -67,7 +67,8 @@ export const router = createBrowserRouter([
             children: [
               {
                 index: true,
-                element: <Dashboard/>
+                element: <Dashboard/>,
+                loader: dashboardLoader
               },
               {
                 path: routes.recaps,

@@ -920,8 +920,10 @@ const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
         <div className="flex justify-end gap-2">
           <div className="flex gap-4 items-center">
             <Show when={keyIdea.isSaving}>
-              <ProgressSpinner style={{ width: '10px', height: '10px' }} strokeWidth="8"
-                               fill="var(--surface-ground)" animationDuration=".5s"/>
+              <div>
+                <ProgressSpinner style={{ width: '10px', height: '10px' }} strokeWidth="8"
+                                 fill="var(--surface-ground)" animationDuration=".5s"/>
+              </div>
             </Show>
             <p className='italic font-semibold text-gray-500'>
               {keyIdea.isNewKeyIdea ? "Not saved yet" : keyIdea.isSaving ? 'Saving...' :

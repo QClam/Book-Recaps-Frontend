@@ -135,12 +135,14 @@ const EarningWithdrawals = () => {
           <div className="text-2xl text-indigo-600 font-bold mb-2">
             <Suspense fallback={
               <div className="flex items-center gap-2">
-                <ProgressSpinner
-                  style={{ width: '15px', height: '15px' }}
-                  strokeWidth="8"
-                  fill="var(--surface-ground)"
-                  animationDuration=".5s"
-                />
+                <div>
+                  <ProgressSpinner
+                    style={{ width: '15px', height: '15px' }}
+                    strokeWidth="8"
+                    fill="var(--surface-ground)"
+                    animationDuration=".5s"
+                  />
+                </div>
                 <span>Loading...</span>
               </div>
             }>
@@ -160,12 +162,14 @@ const EarningWithdrawals = () => {
           <div className="text-2xl text-indigo-600 font-bold mb-2">
             <Suspense fallback={
               <div className="flex items-center gap-2">
-                <ProgressSpinner
-                  style={{ width: '15px', height: '15px' }}
-                  strokeWidth="8"
-                  fill="var(--surface-ground)"
-                  animationDuration=".5s"
-                />
+                <div>
+                  <ProgressSpinner
+                    style={{ width: '15px', height: '15px' }}
+                    strokeWidth="8"
+                    fill="var(--surface-ground)"
+                    animationDuration=".5s"
+                  />
+                </div>
                 <span>Loading...</span>
               </div>
             }>
@@ -245,12 +249,14 @@ const EarningWithdrawals = () => {
                 <div className="text-lg font-semibold">Số dư hiện tại</div>
                 <Suspense fallback={
                   <div className="flex items-center gap-2">
-                    <ProgressSpinner
-                      style={{ width: '15px', height: '15px' }}
-                      strokeWidth="8"
-                      fill="var(--surface-ground)"
-                      animationDuration=".5s"
-                    />
+                    <div>
+                      <ProgressSpinner
+                        style={{ width: '15px', height: '15px' }}
+                        strokeWidth="8"
+                        fill="var(--surface-ground)"
+                        animationDuration=".5s"
+                      />
+                    </div>
                     <span>Loading...</span>
                   </div>
                 }>
@@ -265,12 +271,14 @@ const EarningWithdrawals = () => {
               </div>
               <Suspense fallback={
                 <div className="flex items-center gap-2">
-                  <ProgressSpinner
-                    style={{ width: '15px', height: '15px' }}
-                    strokeWidth="8"
-                    fill="var(--surface-ground)"
-                    animationDuration=".5s"
-                  />
+                  <div>
+                    <ProgressSpinner
+                      style={{ width: '15px', height: '15px' }}
+                      strokeWidth="8"
+                      fill="var(--surface-ground)"
+                      animationDuration=".5s"
+                    />
+                  </div>
                   <span>Loading...</span>
                 </div>
               }>
@@ -305,12 +313,14 @@ const EarningWithdrawals = () => {
             <Modal.Footer className="justify-end gap-3 text-sm">
               <Suspense fallback={
                 <div className="flex items-center gap-2">
-                  <ProgressSpinner
-                    style={{ width: '15px', height: '15px' }}
-                    strokeWidth="8"
-                    fill="var(--surface-ground)"
-                    animationDuration=".5s"
-                  />
+                  <div>
+                    <ProgressSpinner
+                      style={{ width: '15px', height: '15px' }}
+                      strokeWidth="8"
+                      fill="var(--surface-ground)"
+                      animationDuration=".5s"
+                    />
+                  </div>
                   <span>Loading...</span>
                 </div>
               }>
