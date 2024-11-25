@@ -271,7 +271,7 @@ const RightSidePanel = () => {
 }
 
 const RecapVersionDetails = () => {
-  const { recapVersion, setRecapVersion, isKeyIdeasEmpty } = useRecapVersion();
+  const { recapVersion, setRecapVersion, isKeyIdeasEmpty, isKeyIdeasChanged, setIsKeyIdeasChanged } = useRecapVersion();
   const navigate = useNavigate();
   const { showToast } = useToast();
 
@@ -294,6 +294,7 @@ const RecapVersionDetails = () => {
 
             if (result.transcriptStatus !== 1) {
               setRecapVersion({ ...result });
+              setIsKeyIdeasChanged(false);
               clearInterval(interval);
             }
           } catch (error) {
@@ -610,11 +611,12 @@ const RecapVersionDetails = () => {
               accept="audio/wav, .wav"
               className="absolute inset-0 opacity-0 cursor-pointer"
               onChange={handleUploadAudio}
+              disabled={loading || isKeyIdeasEmpty}
             />
             <button
               type="button"
               className="w-full px-4 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-400 focus:outline-none disabled:opacity-50"
-              disabled={loading}
+              disabled={loading || isKeyIdeasEmpty}
             >
               Upload audio
             </button>
@@ -622,9 +624,17 @@ const RecapVersionDetails = () => {
 
           <Divider/>
           <div>
+            <Show when={isKeyIdeasChanged}>
+              <p className="block text-xs text-red-500 mb-2">
+                Key ideas have been changed. Please run generate/upload audio before submitting for review.
+              </p>
+            </Show>
+            <Show when={isKeyIdeasEmpty}>
+              <p className="block text-xs text-red-500 mb-2">Key ideas cannot be empty.</p>
+            </Show>
             <button
               type="button"
-              disabled={loading}
+              disabled={loading || isKeyIdeasEmpty || isKeyIdeasChanged}
               onClick={handleSubmitForReview}
               className="w-full px-4 py-2 text-white bg-indigo-500 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring focus:ring-indigo-300 disabled:opacity-50">
               Submit for review
@@ -637,32 +647,17 @@ const RecapVersionDetails = () => {
 }
 
 const ListKeyIdeas = () => {
-  const { keyIdeas, setKeyIdeas, recapVersion } = useRecapVersion();
+  const { keyIdeas, addNewKeyIdea, recapVersion } = useRecapVersion();
 
   if (!keyIdeas) {
     return null;
-  }
-
-  const addNewKeyIdea = () => {
-    const highestOrder = keyIdeas.reduce((max, idea) => Math.max(max, idea.order), 0);
-
-    setKeyIdeas((prevIdeas) => [ ...prevIdeas, {
-      title: "",
-      body: "",
-      image: "",
-      order: highestOrder + 1,
-      recapVersionId: recapVersion.id,
-      id: new Date().getTime(),
-      isNewKeyIdea: true,
-      isSaving: false
-    } ]);
   }
 
   return (
     <div>
       {keyIdeas.map((idea) => (
         <KeyIdeaItem
-          key={idea.id}
+          key={String(idea.id).toLowerCase()}
           keyIdea={idea}
           recapVersionStatus={recapVersion.status}
         />
@@ -686,7 +681,7 @@ const ListKeyIdeas = () => {
 }
 
 const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
-  const { setKeyIdeas, setPlagiarismResults } = useRecapVersion();
+  const { setPlagiarismResults, setKeyIdeaById, removeKeyIdeaById, setIsKeyIdeasChanged } = useRecapVersion();
   const { showToast } = useToast();
   const [ formData, setFormData ] = useState({
     Title: keyIdea.title,
@@ -702,13 +697,12 @@ const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
 
       await handleSave();
     },
-    2000, [ formData.Title, formData.Body ]);
+    1000, [ formData.Title, formData.Body ]);
 
+  // Save key idea when the image is changed
   useEffect(() => {
     if (!formData.ImageKeyIdea) return;
-
     handleSave();
-
     return () => cancel();
   }, [ formData.ImageKeyIdea ]);
 
@@ -767,15 +761,13 @@ const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
       formdata.append('ImageKeyIdea', new Blob([]), "");
     }
 
-    setFormData({
-      ...formData,
+    setFormData((prevData) => ({
+      ...prevData,
       ImageKeyIdea: null,
       RemoveImage: false,
-    })
+    }))
 
-    setKeyIdeas((prevIdeas) => prevIdeas.map(idea =>
-      idea.id === keyIdea.id ? { ...idea, isSaving: true } : idea
-    ));
+    setKeyIdeaById(keyIdea.id, { isSaving: true });
 
     try {
       const response = keyIdea.isNewKeyIdea ?
@@ -784,18 +776,17 @@ const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
 
       const responseData = response.data.data;
 
-      setKeyIdeas((prevIdeas) => prevIdeas.map(idea =>
-        idea.id === keyIdea.id ? ({
-          title: responseData.title,
-          body: responseData.body,
-          image: responseData.image,
-          order: responseData.order,
-          recapVersionId: responseData.recapVersionId,
-          id: responseData.id,
-          isNewKeyIdea: false,
-          isSaving: false
-        }) : idea
-      ));
+      setKeyIdeaById(keyIdea.id, {
+        title: responseData.title,
+        body: responseData.body,
+        image: responseData.image,
+        order: responseData.order,
+        recapVersionId: responseData.recapVersionId,
+        id: responseData.id,
+        isNewKeyIdea: false,
+        isSaving: false,
+      });
+      setIsKeyIdeasChanged(true);
       setPlagiarismResults(null);
 
     } catch (error) {
@@ -807,9 +798,7 @@ const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
         detail: err.error,
       });
 
-      setKeyIdeas((prevIdeas) => prevIdeas.map(idea =>
-        idea.id === keyIdea.id ? { ...idea, isSaving: false } : idea
-      ));
+      setKeyIdeaById(keyIdea.id, { isSaving: false });
     }
   }
 
@@ -820,19 +809,17 @@ const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
     if (!isConfirmed) return;
 
     if (keyIdea.isNewKeyIdea) {
-      setKeyIdeas((prevIdeas) => prevIdeas.filter(idea => idea.id !== keyIdea.id));
+      removeKeyIdeaById(keyIdea.id);
       return;
     }
 
-    setKeyIdeas((prevIdeas) => prevIdeas.map(idea =>
-      idea.id === keyIdea.id ? { ...idea, isSaving: true } : idea
-    ));
+    setKeyIdeaById(keyIdea.id, { isSaving: true });
 
     // Delete key idea
     try {
       const response = await axiosInstance.delete('/api/keyidea/delete/' + keyIdea.id);
       console.log(response.data);
-      setKeyIdeas((prevIdeas) => prevIdeas.filter(idea => idea.id !== keyIdea.id));
+      removeKeyIdeaById(keyIdea.id);
       setPlagiarismResults(null);
       showToast({
         severity: 'success',
@@ -848,9 +835,7 @@ const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
         detail: err.error,
       });
 
-      setKeyIdeas((prevIdeas) => prevIdeas.map(idea =>
-        idea.id === keyIdea.id ? { ...idea, isSaving: false } : idea
-      ));
+      setKeyIdeaById(keyIdea.id, { isSaving: false });
     }
   }
 
@@ -872,7 +857,7 @@ const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
           <Show when={recapVersionStatus === 0}>
             <button
               type="button"
-              className="text-red-500 hover:text-red-700"
+              className="text-red-500 underline hover:text-red-700"
               tabIndex="-1"
               onClick={onClickRemoveKeyIdea}
               disabled={keyIdea.isSaving || recapVersionStatus !== 0}
@@ -939,7 +924,8 @@ const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
                                fill="var(--surface-ground)" animationDuration=".5s"/>
             </Show>
             <p className='italic font-semibold text-gray-500'>
-              {keyIdea.isNewKeyIdea ? 'Not saved yet' : keyIdea.isSaving ? 'Saving...' : 'Saved'}
+              {keyIdea.isNewKeyIdea ? "Not saved yet" : keyIdea.isSaving ? 'Saving...' :
+                <span className="text-green-600">Saved</span>}
             </p>
           </div>
         </div>
