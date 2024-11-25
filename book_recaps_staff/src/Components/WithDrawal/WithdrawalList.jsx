@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import {
     TableContainer, Table, TableHead, TableRow, TableCell, TableBody,
-    Paper, Typography, Button, Box, Modal, TextField, MenuItem, Pagination
+    Paper, Typography, Button, Box, Modal, TextField, MenuItem, Pagination,
+    TablePagination,
+    TableFooter
 } from '@mui/material';
 import { Hourglass } from 'react-loader-spinner';
 
@@ -12,11 +14,15 @@ import WithdrawalRequest from './WithdrawalRequest';
 function WithdrawalList() {
 
     const [withdrawals, setWithdrawals] = useState([]);
+    const [filteredWithdrawals, setFilteredWithdrawals] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [currentPage, setCurrentPage] = useState(1);
     const [selectedDrawalId, setSelectedDrawalId] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [dialogType, setDialogType] = useState(null); // State để xác định mở dialog Info hay Request
+    const [page, setPage] = useState(0); // Trang hiện tại
+    const [rowsPerPage, setRowsPerPage] = useState(5); // Dòng mỗi trang    
+    const [searchTerm, setSearchTerm] = useState(""); // Nhập input ô search
+    const [filterStatus, setFilterStatus] = useState(""); // Lọc trạng thái
 
     const handleInfoView = (drawalId) => {
         setSelectedDrawalId(drawalId);
@@ -36,16 +42,17 @@ function WithdrawalList() {
         setDialogType(null);
     };
 
+    const handleChangePage = (event, newPage) => {
+        // Kiểm tra xem trang có hợp lệ hay không
+        const totalPages = Math.ceil(filteredWithdrawals.length / rowsPerPage);
+        if (newPage < totalPages && newPage >= 0) {
+            setPage(newPage);
+        }
+    };
 
-    const withdrawalsPerPage = 7;
-
-    const displaywithdrawals = withdrawals.slice(
-        (currentPage - 1) * withdrawalsPerPage,
-        currentPage * withdrawalsPerPage
-    );
-
-    const handlePageChange = (event, value) => {
-        setCurrentPage(value);
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0); // Reset to first page when rows per page changes
     };
 
     const fetchWithdrawals = async () => {
@@ -54,6 +61,7 @@ function WithdrawalList() {
             const withdrawals = response.data.$values;
             console.log("Withdrawals: ", withdrawals);
             setWithdrawals(withdrawals);
+            setFilteredWithdrawals(withdrawals);
             setLoading(false)
         } catch (error) {
             console.error("Error Fetching Withdrawls", error);
@@ -63,6 +71,30 @@ function WithdrawalList() {
     useEffect(() => {
         fetchWithdrawals();
     }, [])
+    
+    useEffect(() => {
+        let filteredData = withdrawals;
+
+        // Search filter
+        if (searchTerm) {
+            filteredData = filteredData.filter((item) =>
+                item.contributorName.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        // Status filter
+        if (filterStatus) {
+            filteredData = filteredData.filter((item) => item.status === filterStatus);
+        }
+
+        setFilteredWithdrawals(filteredData);
+       
+        // Kiểm tra nếu page vượt quá tổng số trang
+        const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+        if (page >= totalPages) {
+            setPage(0);  // Reset page về 0 nếu vượt quá số trang
+        }
+    }, [searchTerm, filterStatus, withdrawals, page, rowsPerPage]);
 
     if (loading) {
         return (
@@ -83,6 +115,30 @@ function WithdrawalList() {
     return (
         <Box sx={{ width: "80vw" }}>
             <Typography variant='h5' margin={1}>Yêu cầu rút tiền của Người đóng góp</Typography>
+
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+                <TextField
+                    label="Tìm kiếm theo tên"
+                    variant="outlined"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    size="small"
+                    sx={{ width: '40%' }}
+                />
+                <TextField
+                    select
+                    label="Trạng thái"
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    size="small"
+                    sx={{ width: '20%' }}
+                >
+                    <MenuItem value="">Tất cả</MenuItem>
+                    <MenuItem value="Pending">Đang mở</MenuItem>
+                    <MenuItem value="Accepted">Hoàn tất</MenuItem>
+                    <MenuItem value="Rejected">Hủy</MenuItem>
+                </TextField>
+            </Box>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
@@ -91,30 +147,28 @@ function WithdrawalList() {
                             <TableCell><strong>Số tiền</strong></TableCell>
                             <TableCell><strong>Ghi chú</strong></TableCell>
                             <TableCell><strong>Trạng thái</strong></TableCell>
-                            <TableCell><strong>Ngày tạo</strong></TableCell>`
+                            <TableCell><strong>Ngày tạo</strong></TableCell>
                             <TableCell></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {displaywithdrawals.map((item) => (
+                        {filteredWithdrawals.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
                             <TableRow key={item.drawalId}>
                                 <TableCell>{item.contributorName}</TableCell>
                                 <TableCell>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.totalEarnings || 0)}</TableCell>
                                 <TableCell>{item.description || "Không có ghi chú"}</TableCell>
                                 {item.status === "Pending" ? (
-                                    <TableCell sx={{color: "#edf5fa"}}>Đang mở</TableCell>
-
+                                    <TableCell sx={{ color: "#edf5fa" }}>Đang mở</TableCell>
                                 ) : item.status === "Accepted" ? (
-                                    <TableCell sx={{color: "green"}}>Hoàn tất</TableCell>
+                                    <TableCell sx={{ color: "green" }}>Hoàn tất</TableCell>
                                 ) : item.status === "Rejected" ? (
-                                    <TableCell sx={{color: "red"}}>Hủy</TableCell>
+                                    <TableCell sx={{ color: "red" }}>Hủy</TableCell>
                                 ) : (
                                     <TableCell>Lỗi</TableCell>
                                 )}
-                                <TableCell>{new Date(withdrawals.createAt).toLocaleDateString()}</TableCell>
+                                <TableCell>{new Date(item.createAt).toLocaleDateString()}</TableCell>
                                 <TableCell>
                                     {item.status === "Pending" ? (
-
                                         <Button
                                             color="primary"
                                             onClick={() => handleRequestView(item.drawalId)}
@@ -125,7 +179,6 @@ function WithdrawalList() {
                                             <Edit />
                                         </Button>
                                     ) : item.status === "Accepted" ? (
-
                                         <Button
                                             color="primary"
                                             onClick={() => handleInfoView(item.drawalId)}
@@ -138,7 +191,7 @@ function WithdrawalList() {
                                     ) : (
                                         <Button
                                             color="error"
-                                            variant='outlined'
+                                            variant="outlined"
                                             sx={{
                                                 '&:hover': { backgroundColor: '#edf5fa' },
                                             }}
@@ -150,6 +203,22 @@ function WithdrawalList() {
                             </TableRow>
                         ))}
                     </TableBody>
+                    <TableFooter>
+                        <TableRow>
+                            <TablePagination
+                                rowsPerPageOptions={[5, 7, 10]}
+                                count={filteredWithdrawals.length}
+                                rowsPerPage={rowsPerPage}
+                                page={page}
+                                onPageChange={handleChangePage}
+                                onRowsPerPageChange={handleChangeRowsPerPage}
+                                labelRowsPerPage="Số hàng mỗi trang"
+                                labelDisplayedRows={({ from, to, count }) =>
+                                    `${from}–${to} trong tổng số ${count !== -1 ? count : `nhiều hơn ${to}`}`
+                                }
+                            />
+                        </TableRow>
+                    </TableFooter>
                 </Table>
             </TableContainer>
 
@@ -166,17 +235,6 @@ function WithdrawalList() {
                     drawalId={selectedDrawalId}
                     onUpdate={fetchWithdrawals} />
             )}
-
-            <Pagination
-                className="center"
-                count={Math.ceil(withdrawals.length / withdrawalsPerPage)}
-                page={currentPage}
-                onChange={handlePageChange}
-                color="primary"
-                showFirstButton
-                showLastButton
-                sx={{ margin: 1 }}
-            />
         </Box>
     )
 }

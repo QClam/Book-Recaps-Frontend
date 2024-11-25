@@ -7,17 +7,26 @@ import {
     DialogActions,
     Button,
     TextField,
-    FormControl,
-    InputLabel,
-    Select,
     MenuItem,
-    Pagination,
+    Box,
+    Typography,
+    TableContainer,
+    Paper,
+    TableHead,
+    TableRow,
+    TableCell,
+    TableBody,
+    Chip,
+    TableFooter,
+    TablePagination,
+    Table,
 } from "@mui/material";
 import Swal from 'sweetalert2';
 
 import { fetchProfile } from "../Auth/Profile";
 import api from "../Auth/AxiosInterceptors";
 import "./Appeal.scss";
+import { Hourglass } from "react-loader-spinner";
 
 const resolveRefs = (data) => {
     const refMap = new Map();
@@ -50,14 +59,17 @@ const resolveRefs = (data) => {
 
 function AppealList() {
     const [appeals, setAppeal] = useState([]);
+    const [filteredAppeal, setFilteredAppeal] = useState([]);
     const [selectedAppeal, setSelectedAppeal] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [responseText, setResponseText] = useState("");
     const [profile, setProfile] = useState([]);
     const [staffId, setStaffId] = useState("");
-    const [filterStatus, setFilterStatus] = useState("");
-    const [currentPage, setCurrentPage] = useState(1); // MUI Pagination uses 1-based indexing
-    const [isDarkMode, setIsDarkMode] = useState(true);
+    const [page, setPage] = useState(0); // Trang hiện tại
+    const [rowsPerPage, setRowsPerPage] = useState(5); // Dòng mỗi trang    
+    const [searchTerm, setSearchTerm] = useState(""); // Nhập input ô search
+    const [filterStatus, setFilterStatus] = useState(""); // Lọc trạng thái
+    const [loading, setLoading] = useState(true);
 
     const [responseForm, setResponseForm] = useState({
         id: "",
@@ -68,20 +80,16 @@ function AppealList() {
     const navigate = useNavigate();
     const token = localStorage.getItem("access_token")
 
-    const appealsPerPage = 3;
-
-    const displayAppeals = appeals.slice(
-        (currentPage - 1) * appealsPerPage,
-        currentPage * appealsPerPage
-    );
-
     const fetchAppeals = async () => {
         try {
             const response = await api.get("/api/appeal/getallappeals");
             const appeals = resolveRefs(response.data.data.$values);
-            appeals.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))
-            console.log(appeals);
+            appeals.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            console.log("Appeals: ", appeals);
+
             setAppeal(appeals);
+            setFilteredAppeal(appeals)
+            setLoading(false);
         } catch (error) {
             console.error("Error Fetching", error);
         }
@@ -99,6 +107,9 @@ function AppealList() {
     }, [token]);
 
     const handleResponse = async () => {
+
+        closeDialog();
+
         Swal.fire({
             title: 'Bạn có chắc chắn?',
             text: 'Bạn có muốn gửi phản hồi này?',
@@ -118,7 +129,6 @@ function AppealList() {
                     };
                     await api.put("/api/appeal/responseappealbystaff", responseForm);
                     Swal.fire('Thành công!', 'Phản hồi của bạn đã được gửi.', 'success');
-                    closeDialog();
                     fetchAppeals();
                 } catch (error) {
                     console.error("Error Response", error);
@@ -143,104 +153,162 @@ function AppealList() {
         setResponseText(e.target.value);
     };
 
-    const handleStatusChange = (event) => {
-        setFilterStatus(event.target.value);
-    };
-
-    const handlePageChange = (event, value) => {
-        setCurrentPage(value);
-    };
-
     useEffect(() => {
         fetchAppeals();
     }, []);
 
-    return (
-        <div className="appeal-container">
-            <div className="content-list">
-                <h2>Danh sách Kháng cáo của Contributor</h2>
-                <FormControl variant="outlined" style={{ minWidth: 200, marginBottom: 20 }} className="form-control">
-                    <InputLabel>{filterStatus === "" ? "Tất cả" : "Trạng thái"}</InputLabel>
-                    <Select
-                        value={filterStatus}
-                        onChange={handleStatusChange}
-                        label={filterStatus === "" ? "Tất cả" : "Trạng thái"}
-                    >
-                        <MenuItem value="">Tất cả</MenuItem>
-                        <MenuItem value={1}>Đang xử lý</MenuItem>
-                        <MenuItem value={2}>Đã xử lý</MenuItem>
-                    </Select>
-                </FormControl>
+    const handleChangePage = (event, newPage) => {
+        // Kiểm tra xem trang có hợp lệ hay không
+        const totalPages = Math.ceil(filteredAppeal.length / rowsPerPage);
+        if (newPage < totalPages && newPage >= 0) {
+            setPage(newPage);
+        }
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0); // Reset to first page when rows per page changes
+    };
+
+    useEffect(() => {
+        let filteredData = appeals;
+
+        // Search filter
+        if (searchTerm) {
+            filteredData = filteredData.filter((item) =>
+                item.contributor?.fullName.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        // Status filter
+        if (filterStatus) {
+            filteredData = filteredData.filter((item) => item.appealStatus === filterStatus);
+        }
+
+        setFilteredAppeal(filteredData);
+
+        // Kiểm tra nếu page vượt quá tổng số trang
+        const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+        if (page >= totalPages) {
+            setPage(0);  // Reset page về 0 nếu vượt quá số trang
+        }
+    }, [searchTerm, filterStatus, appeals, page, rowsPerPage]);
+
+
+    if (loading) {
+        return (
+            <div className="loading">
+                <Hourglass
+                    visible={true}
+                    height="80"
+                    width="80"
+                    ariaLabel="hourglass-loading"
+                    wrapperStyle={{}}
+                    wrapperClass=""
+                    colors={["#306cce", "#72a1ed"]}
+                />
             </div>
-            <div>
-                <table className="content-table table-appeal">
-                    <thead>
-                        <tr>
-                            <th>Tên Contributor </th>
-                            <th>Tên Staff </th>
-                            <th>Nội dung kháng cáo </th>
-                            <th>Phản hồi từ Staff </th>
-                            <th>Ngày </th>
-                            <th>Bản Review</th>
-                            <th>Phản hồi Kháng cáo</th>
-                            <th>Trạng Thái</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {displayAppeals
+        );
+    }
+
+    return (
+        <Box sx={{ width: "80vw" }}>
+            <Typography variant="h5" margin={1}>Danh sách Kháng cáo của Người đóng góp</Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+                <TextField
+                    label="Tìm kiếm theo tên"
+                    variant="outlined"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    size="small"
+                    sx={{ width: '40%' }}
+                />
+                <TextField
+                    select
+                    label="Trạng thái"
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    size="small"
+                    sx={{ width: '20%' }}
+                >
+                    <MenuItem value="">Tất cả</MenuItem>
+                    <MenuItem value={1}>Đang xử lý</MenuItem>
+                    <MenuItem value={2}>Đã xử lý</MenuItem>
+                </TextField>
+            </Box>
+
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell><strong>Tên Contributor</strong></TableCell>
+                            <TableCell><strong>Tên Staff </strong></TableCell>
+                            <TableCell><strong>Nội dung kháng cáo </strong> </TableCell>
+                            <TableCell><strong>Phản hồi từ Staff </strong></TableCell>
+                            <TableCell><strong>Ngày </strong></TableCell>
+                            <TableCell><strong>Bản Review</strong></TableCell>
+                            <TableCell><strong>Phản hồi Kháng cáo</strong></TableCell>
+                            <TableCell><strong>Trạng Thái</strong></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {filteredAppeal.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             .map((val) => (
-                                <tr key={val.id}>
-                                    <td>{val.contributor?.fullName}</td>
-                                    <td>{val.staff?.fullName || "Chưa có Staff phản hồi"}</td>
-                                    <td>{val.reason}</td>
-                                    <td>{val.response || "Chưa có phản hồi từ Staff"}</td>
-                                    <td>{new Date(val.createdAt).toLocaleDateString()}</td>
-                                    <td>
-                                        <button style={{ width: "150px", backgroundColor: "#007bff", color: "#fff" }}
+                                <TableRow key={val.id}>
+                                    <TableCell>{val.contributor?.fullName}</TableCell>
+                                    <TableCell>{val.staff?.fullName || "Chưa có Staff phản hồi"}</TableCell>
+                                    <TableCell>{val.reason}</TableCell>
+                                    <TableCell>{val.response || "Chưa có phản hồi từ Staff"}</TableCell>
+                                    <TableCell>{new Date(val.createdAt).toLocaleDateString()}</TableCell>
+                                    <TableCell>
+                                        <Button variant="contained" sx={{ width: 120 }}
                                             onClick={() =>
                                                 navigate(`/review/content_version/${val.reviewId}`)
                                             }
                                         >
                                             Xem Review
-                                        </button>
-                                    </td>
-                                    <td>
-                                        <button onClick={() => openDialog(val)}
-                                            disabled={val.appealStatus === 2}
-                                            style={{ width: "150px", backgroundColor: "red", color: "#f0f0f0" }}
+                                        </Button>
+                                    </TableCell>
+                                    <TableCell>
+                                        <Button onClick={() => openDialog(val)}
+                                            disabled={val.appealStatus === 2 || val.staff?.id !== staffId}
+                                            variant="contained" color="error" sx={{ width: 120 }}                                           
                                         >
-                                            Phản hồi</button>
-                                    </td>
-                                    <td>
+                                            Phản hồi</Button>
+                                    </TableCell>
+                                    <TableCell>
                                         {val.appealStatus === 1 ? (
-                                            <button style={{ backgroundColor: "#007bff", color: "#f0f0f0", width: "130px" }}>
-                                                Đang xử lý
-                                            </button>
+                                            <Chip label="Đang xử lý" color="primary" variant="outlined" />
                                         ) : val.appealStatus === 2 ? (
-                                            <button style={{ backgroundColor: "green", color: "#f0f0f0", width: "120px" }}>
-                                                Đã xử lý
-                                            </button>
+                                            <Chip label="Đã xử lý" color="success" variant="outlined" />
                                         ) : val.appealStatus === 0 ? (
-                                            <button>Đang mở</button>
+                                            <Chip label="Đang mở" color="warning" variant="outlined" />
                                         ) : (
-                                            <button>Unknow</button>
+                                            <Button>Unknow</Button>
                                         )}
-                                    </td>
-                                </tr>
+                                    </TableCell>
+                                </TableRow>
                             ))
                         }
-                        {appeals
-                            .filter((val) => filterStatus === "" || val.appealStatus === filterStatus)
-                            .filter((val) => val.appealStatus !== 0 && val.staff?.id === profile.id).length === 0 && (
-                                <tr>
-                                    <td colSpan="8" style={{ textAlign: 'center' }}>
-                                        Hiện tại không có kháng cáo
-                                    </td>
-                                </tr>
-                            )}
-                    </tbody>
-                </table>
-            </div>
+                    </TableBody>
+                    <TableFooter>
+                        <TableRow>
+                            <TablePagination
+                                rowsPerPageOptions={[5, 7, 10]}
+                                count={filteredAppeal.length}
+                                rowsPerPage={rowsPerPage}
+                                page={page}
+                                onPageChange={handleChangePage}
+                                onRowsPerPageChange={handleChangeRowsPerPage}
+                                labelRowsPerPage="Số hàng mỗi trang"
+                                labelDisplayedRows={({ from, to, count }) =>
+                                    `${from}–${to} trong tổng số ${count !== -1 ? count : `nhiều hơn ${to}`}`
+                                }
+                            />
+                        </TableRow>
+                    </TableFooter>
+                </Table>
+            </TableContainer>
 
             <Dialog open={isDialogOpen} onClose={closeDialog} fullWidth>
                 <DialogTitle>Phản hồi Kháng cáo</DialogTitle>
@@ -260,17 +328,7 @@ function AppealList() {
                     <Button color="primary" onClick={handleResponse}>Gửi Phản hồi</Button>
                 </DialogActions>
             </Dialog>
-
-            <Pagination
-                className="center"
-                count={Math.ceil(appeals.length / appealsPerPage)}
-                page={currentPage}
-                onChange={handlePageChange}
-                color="primary"
-                showFirstButton
-                showLastButton
-            />
-        </div>
+        </Box >
     );
 }
 

@@ -6,29 +6,26 @@ import Pagination from '@mui/material/Pagination';
 import empty_image from "../../data/empty-image.png"
 import './UsersList.scss';
 import '../Loading.scss';
+import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
 
 function UsersList() {
 
     const [users, setUsers] = useState([]);
+    const [filteredUsers, setFilteredUsers] = useState([]);
+    const [page, setPage] = useState(0); // Trang hiện tại
+    const [rowsPerPage, setRowsPerPage] = useState(4); // Dòng mỗi trang    
+    const [searchTerm, setSearchTerm] = useState(""); // Nhập input ô search
     const [loading, setLoading] = useState(true); // Start loading as true
-    const [currentPage, setCurrentPage] = useState(1); // MUI Pagination uses 1-based indexing
-    const [isDarkMode, setIsDarkMode] = useState(true); // State to toggle dark mode
-    const usersPerPage = 5;
 
-    const token = localStorage.getItem('access_token');
 
     useEffect(() => {
         const fetchUsers = async () => {
             try {
-                const response = await api.get('/api/users/getalluser',
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`
-                        }
-                    }
-                );
-                setUsers(response.data.$values);
-                console.log("Users: ", response.data);
+                const response = await api.get('/api/users/getalluser');
+                const users = response.data.$values
+                setUsers(users);
+                setFilteredUsers(users);
+                console.log("Users: ", users);
             } catch (error) {
                 console.log("Error fetching", error);
             } finally {
@@ -38,10 +35,27 @@ function UsersList() {
         fetchUsers();
     }, []);
 
-    const displayUsers = users.slice((currentPage - 1) * usersPerPage, currentPage * usersPerPage); // Adjust slicing for 1-based page indexing
-    const handlePageChange = (event, value) => {
-        setCurrentPage(value);
+    const handleChangePage = (event, newPage) => {
+        setPage(newPage);
     };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0); // Reset to first page when rows per page changes
+    };
+
+    useEffect(() => {
+        let filteredData = users;
+
+        // Search filter
+        if (searchTerm) {
+            filteredData = filteredData.filter((item) =>
+                item.fullName.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        setFilteredUsers(filteredData);
+    }, [searchTerm, users]);
 
     if (loading) {
         return (
@@ -60,66 +74,65 @@ function UsersList() {
     }
 
     return (
-        <div className='userlist-container'>
-            <h2>Danh sách Contributor và Audience</h2>
-            <div>
-                <table className='content-table'>
-                    <thead>
-                        <tr>
-                            <th>Họ & Tên</th>
-                            <th>Username</th>
-                            <th>Email</th>
-                            <th>Ảnh Đại Diện</th>
-                            <th>Ngày Sinh</th>
-                            <th>Số điện thoại</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {displayUsers.map((val) => (
-                            <tr key={val.$id}>
-                                <td>{val.fullName}</td>
-                                <td>{val.userName}</td>
-                                <td>{val.email}</td>
-                                <td><img src={val.imageUrl || empty_image} 
-                                            alt='Avatar' 
-                                            style={{ width: 80, height: 80 }} 
-                                            onError={({currentTarget}) => {
-                                                currentTarget.onerror = null;
-                                                currentTarget.src = empty_image
-                                            }}/></td>
-                                <td>{val.birthDate}</td>
-                                <td>{val.phoneNumber}</td>
-                            </tr>
+        <Box sx={{ width: "80vw" }}>
+            <Typography variant='h5' margin={1}>Danh sách Contributor và Audience</Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+                <TextField
+                    label="Tìm kiếm theo tên"
+                    variant="outlined"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    size="small"
+                    sx={{ width: '40%' }}
+                />
+            </Box>
+            <TableContainer component={Paper}>
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell><strong>Họ & Tên</strong></TableCell>
+                            <TableCell><strong>Email</strong></TableCell>
+                            <TableCell><strong>Ảnh Đại Diện</strong></TableCell>
+                            <TableCell><strong>Ngày Sinh</strong></TableCell>
+                            <TableCell><strong>Số điện thoại</strong></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((val) => (
+                            <TableRow key={val.id}>
+                                <TableCell>{val.fullName}</TableCell>
+                                <TableCell>{val.email}</TableCell>
+                                <TableCell><img src={val.imageUrl || empty_image}
+                                    alt='Avatar'
+                                    style={{ width: 80, height: 80, borderRadius: "50%" }}
+                                    onError={({ currentTarget }) => {
+                                        currentTarget.onerror = null;
+                                        currentTarget.src = empty_image
+                                    }} /></TableCell>
+                                <TableCell>{new Date(val.birthDate).toLocaleDateString()}</TableCell>
+                                <TableCell>{val.phoneNumber}</TableCell>
+                            </TableRow>
                         ))}
-                    </tbody>
-                </table>
-            </div>
-            <Pagination
-                className="center"
-                count={Math.ceil(users.length / usersPerPage)} // Total number of pages
-                page={currentPage} // Current page
-                onChange={handlePageChange} // Handle page change
-                color="primary" // Styling options
-                showFirstButton
-                showLastButton
-                sx={{
-                    "& .MuiPaginationItem-root": {
-                        color: isDarkMode ? "#fff" : "#000", // Change text color based on theme
-                        backgroundColor: isDarkMode ? "#555" : "#f0f0f0", // Button background color based on theme
-                    },
-                    "& .MuiPaginationItem-root.Mui-selected": {
-                        backgroundColor: isDarkMode ? "#306cce" : "#72a1ed", // Change color of selected page button
-                        color: "#fff", // Ensure selected text is white for contrast
-                    },
-                    "& .MuiPaginationItem-root.Mui-selected:hover": {
-                        backgroundColor: isDarkMode ? "#2057a4" : "#5698d3", // Color on hover for selected button
-                    },
-                    "& .MuiPaginationItem-root:hover": {
-                        backgroundColor: isDarkMode ? "#666" : "#e0e0e0", // Color on hover for non-selected buttons
-                    },
-                }}
-            />
-        </div>
+                    </TableBody>
+                    <TableFooter>
+                        <TableRow>
+                            <TablePagination
+                                rowsPerPageOptions={[4, 10, 15]}
+                                count={filteredUsers.length}
+                                rowsPerPage={rowsPerPage}
+                                page={page}
+                                onPageChange={handleChangePage}
+                                onRowsPerPageChange={handleChangeRowsPerPage}
+                                labelRowsPerPage="Số hàng mỗi trang"
+                                labelDisplayedRows={({ from, to, count }) =>
+                                    `${from}–${to} trong tổng số ${count !== -1 ? count : `nhiều hơn ${to}`}`
+                                }
+                            />
+                        </TableRow>
+                    </TableFooter>
+                </Table>
+            </TableContainer>
+        </Box>
     );
 }
 

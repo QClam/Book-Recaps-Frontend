@@ -3,7 +3,7 @@ import { Hourglass } from 'react-loader-spinner';
 import api from '../Auth/AxiosInterceptors';
 import { handleFetchError } from '../../utils/handleError';
 import { json } from 'react-router-dom';
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Pagination, Select, TextField } from '@mui/material';
+import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Pagination, Paper, Select, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
 import Swal from 'sweetalert2';
 
 import "./Report.scss"
@@ -41,27 +41,24 @@ function ReportList() {
 
     const [loading, setLoading] = useState(true);
     const [reports, setReports] = useState([]);
+    const [filteredReports, setFilteredReports] = useState([]);
     const [selectedReport, setSelectedReport] = useState(null);
     const [users, setUsers] = useState([]);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [responseText, setResponseText] = useState("");
-    const [filterStatus, setFilterStatus] = useState("");
-    const [currentPage, setCurrentPage] = useState(1); // MUI Pagination uses 1-based indexing
-
-    const reportsPerPage = 5;
-
-    const displayReports = reports.slice(
-        (currentPage - 1) * reportsPerPage,
-        currentPage * reportsPerPage
-    );
+    const [page, setPage] = useState(0); // Trang hiện tại
+    const [rowsPerPage, setRowsPerPage] = useState(5); // Dòng mỗi trang    
+    const [searchTerm, setSearchTerm] = useState(""); // Nhập input ô search
+    const [filterStatus, setFilterStatus] = useState(""); // Lọc trạng thái
 
     const fetchReports = async () => {
         try {
             const response = await api.get('/api/supportticket/getallsupportticket');
             let reports = resolveRefs(response.data.data.$values);
-            reports.sort((a,b) => new Date(b.createdAt) - new Date(a.createdAt))
-            console.log("Reports: ", reports);
+            reports.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
             setReports(reports);
+            setFilteredReports(reports)
+            setLoading(false);
             return reports.id;
         } catch (error) {
             const err = handleFetchError(error)
@@ -98,6 +95,7 @@ function ReportList() {
     };
 
     const handleResponse = async (id) => {
+        closeDialog();
         Swal.fire({
             title: 'Bạn có chắc chắn?',
             text: 'Bạn có muốn gửi phản hồi này?',
@@ -115,7 +113,6 @@ function ReportList() {
                     };
                     await api.put(`/api/supportticket/responseticket/${id}`, responseForm);
                     Swal.fire('Thành công!', 'Phản hồi của bạn đã được gửi.', 'success');
-                    closeDialog();
                     fetchReports();
                 } catch (error) {
                     console.error("Error Response", error);
@@ -125,18 +122,48 @@ function ReportList() {
         });
     };
 
-    const handleStatusChange = (event) => {
-        setFilterStatus(event.target.value);
-    };
-
-    const handlePageChange = (event, value) => {
-        setCurrentPage(value);
-    };
-
     useEffect(() => {
         fetchReports();
         fetchUsers();
     }, [])
+
+    const handleChangePage = (event, newPage) => {
+        // Kiểm tra xem trang có hợp lệ hay không
+        const totalPages = Math.ceil(filteredReports.length / rowsPerPage);
+        if (newPage < totalPages && newPage >= 0) {
+            setPage(newPage);
+        }
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0); // Reset to first page when rows per page changes
+    };
+
+    useEffect(() => {
+        let filteredData = reports;
+
+        // Tìm kiếm theo tên của Audience
+        if (searchTerm) {
+            filteredData = filteredData.filter((item) => {
+                const userName = getUserNamebyId(item.userId); // Lấy tên người dùng từ userId
+                return userName.toLowerCase().includes(searchTerm.toLowerCase());
+            });
+        }
+
+        // Lọc theo trạng thái
+        if (filterStatus) {
+            filteredData = filteredData.filter((item) => item.status === filterStatus);
+        }
+
+        setFilteredReports(filteredData);
+
+        // Kiểm tra nếu page vượt quá tổng số trang
+        const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+        if (page >= totalPages) {
+            setPage(0);  // Reset page về 0 nếu vượt quá số trang
+        }
+    }, [searchTerm, filterStatus, reports, page, rowsPerPage]);
 
     const getUserNamebyId = (userId) => {
         const user = users.find((user) => user.id.toString() === userId.toString());
@@ -144,9 +171,9 @@ function ReportList() {
         return user ? user.fullName : "Không xác định";
     }
 
-    if (!loading) {
+    if (loading) {
         return (
-            <div className="loading">
+            <Box className="loading">
                 <Hourglass
                     visible={true}
                     height="80"
@@ -156,80 +183,102 @@ function ReportList() {
                     wrapperClass=""
                     colors={["#306cce", "#72a1ed"]}
                 />
-            </div>
+            </Box>
         );
     }
 
     return (
-        <div style={{width: "80vw"}}>
-            <div className="content-list">
-                <h2>Danh sách Report của Audience</h2>
-                <FormControl variant="outlined" style={{ minWidth: 200, marginBottom: 20 }} className="form-control">
-                    <InputLabel>{filterStatus === "" ? "Tất cả" : "Trạng thái"}</InputLabel>
-                    <Select
-                        value={filterStatus}
-                        onChange={handleStatusChange}
-                        label={filterStatus === "" ? "Tất cả" : "Trạng thái"}
-                    >
-                        <MenuItem value="">Tất cả</MenuItem>
-                        <MenuItem value={1}>Đang xử lý</MenuItem>
-                        <MenuItem value={2}>Đã xử lý</MenuItem>
-                    </Select>
-                </FormControl>
-            </div>
-            <div>
-                <table className="content-table table-report">
-                    <thead>
-                        <tr>
-                            <th>Tên bản Recap</th>
-                            <th>Tên cuốn sách</th>
-                            <th>Tên Audience</th>
-                            <th>Nội dung</th>
-                            <th>Phản hồi từ Staff</th>
-                            <th>Ngày</th>
-                            <th>Phản hồi</th>
-                            <th>Trạng thái</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {displayReports
+        <Box sx={{ width: "80vw" }}>
+            <Typography variant='h5' margin={1}>Danh sách Report của Thính giả</Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+                <TextField
+                    label="Tìm kiếm theo tên"
+                    variant="outlined"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    size="small"
+                    sx={{ width: '40%' }}
+                />
+                <TextField
+                    select
+                    label="Trạng thái"
+                    value={filterStatus}
+                    onChange={(e) => setFilterStatus(e.target.value)}
+                    size="small"
+                    sx={{ width: '20%' }}
+                >
+                    <MenuItem value="">Tất cả</MenuItem>
+                    <MenuItem value={1}>Đang xử lý</MenuItem>
+                    <MenuItem value={2}>Đã xử lý</MenuItem>
+                </TextField>
+            </Box>
+
+
+            <TableContainer component={Paper} >
+                <Table>
+                    <TableHead>
+                        <TableRow>
+                            <TableCell><strong>Tên bản Recap</strong></TableCell>
+                            <TableCell><strong>Tên cuốn sách</strong></TableCell>
+                            <TableCell><strong>Tên Thính giả</strong></TableCell>
+                            <TableCell><strong>Nội dung</strong></TableCell>
+                            <TableCell><strong>Phản hồi từ Staff</strong></TableCell>
+                            <TableCell><strong>Ngày</strong></TableCell>
+                            <TableCell><strong>Phản hồi</strong></TableCell>
+                            <TableCell><strong>Trạng Thái</strong></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {filteredReports.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             .filter((val) => filterStatus === "" || val.status === filterStatus)
                             .map((val) => (
-                                <tr key={val.id}>
-                                    <td>{val.recaps?.name}</td>
-                                    <td>{val.recaps?.book?.title}</td>
-                                    <td>{getUserNamebyId(val.userId)}</td>
-                                    <td>{val.description}</td>
-                                    <td>{val.response || "Chưa có phản hồi từ staff"}</td>
-                                    <td>{new Date(val.createdAt).toLocaleDateString()}</td>
-                                    <td><button onClick={() => openDialog(val)}
+                                <TableRow key={val.id}>
+                                    <TableCell>{val.recaps?.name}</TableCell>
+                                    <TableCell>{val.recaps?.book?.title}</TableCell>
+                                    <TableCell>{getUserNamebyId(val.userId)}</TableCell>
+                                    <TableCell>{val.description}</TableCell>
+                                    <TableCell>{val.response || "Chưa có phản hồi từ staff"}</TableCell>
+                                    <TableCell>{new Date(val.createdAt).toLocaleDateString()}</TableCell>
+                                    <TableCell><Button onClick={() => openDialog(val)}
                                         disabled={val.status === 2}
-                                        style={{ width: "150px", backgroundColor: "green", color: "#fff" }}
+                                        variant='contained' color='error'
+                                        sx={{ width: 120 }}
                                     >
-                                        Phản hồi</button></td>
-                                    <td>{val.status === 1 ? (
-                                        <button style={{ backgroundColor: "#007bff", color: "#f0f0f0", width: "130px" }}>
-                                            Đang xử lý
-                                        </button>
+                                        Phản hồi</Button></TableCell>
+                                    <TableCell>{val.status === 1 ? (
+                                        <Chip label="Đang xử lý" color="primary" variant="outlined" />
                                     ) : val.status === 2 ? (
-                                        <button style={{ backgroundColor: "green", color: "#f0f0f0", width: "120px" }}>
-                                            Đã xử lý
-                                        </button>
+                                        <Chip label="Đã xử lý" color="success" variant="outlined" />
                                     ) : (
-                                        <button>Unknow</button>
-                                    )}</td>
-                                </tr>
+                                        <Chip label="Đã mở" color="warning" variant="outlined" />
+                                    )}</TableCell>
+                                </TableRow>
                             ))}
                         {reports.length === 0 && (
-                            <tr>
-                                <td colSpan="8" style={{ textAlign: 'center' }}>
+                            <TableRow>
+                                <TableCell colSpan="8" style={{ textAlign: 'center' }}>
                                     Hiện tại không có kháng cáo
-                                </td>
-                            </tr>
+                                </TableCell>
+                            </TableRow>
                         )}
-                    </tbody>
-                </table>
-            </div>
+                    </TableBody>
+                    <TableFooter>
+                        <TableRow>
+                            <TablePagination
+                                rowsPerPageOptions={[5, 7, 10]}
+                                count={filteredReports.length}
+                                rowsPerPage={rowsPerPage}
+                                page={page}
+                                onPageChange={handleChangePage}
+                                onRowsPerPageChange={handleChangeRowsPerPage}
+                                labelRowsPerPage="Số hàng mỗi trang"
+                                labelDisplayedRows={({ from, to, count }) =>
+                                    `${from}–${to} trong tổng số ${count !== -1 ? count : `nhiều hơn ${to}`}`}
+                            />
+                        </TableRow>
+                    </TableFooter>
+                </Table>
+            </TableContainer>
 
             <Dialog open={isDialogOpen} onClose={closeDialog} fullWidth>
                 <DialogTitle>Phản hồi Report</DialogTitle>
@@ -249,17 +298,7 @@ function ReportList() {
                     <Button color="primary" onClick={() => handleResponse(selectedReport?.id)}>Gửi Phản hồi</Button>
                 </DialogActions>
             </Dialog>
-
-            <Pagination
-                className="center"
-                count={Math.ceil(reports.length / reportsPerPage)}
-                page={currentPage}
-                onChange={handlePageChange}
-                color="primary"
-                showFirstButton
-                showLastButton
-            />
-        </div>
+        </Box>
     )
 }
 
