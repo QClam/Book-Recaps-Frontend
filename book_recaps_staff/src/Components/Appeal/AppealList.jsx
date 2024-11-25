@@ -271,7 +271,7 @@ function AppealList() {
                                     </TableCell>
                                     <TableCell>
                                         <Button onClick={() => openDialog(val)}
-                                            disabled={val.appealStatus === 2 || val.staff?.id !== staffId}
+                                            disabled={val.appealStatus === 2 || val.review?.staffId !== staffId}
                                             variant="contained" color="error" sx={{ width: 120 }}                                           
                                         >
                                             Phản hồi</Button>

@@ -178,7 +178,7 @@ function RecapVersions() {
                     <TableBody>
                         {filteredVersions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
                             <TableRow key={item.recapVersionId}>
-                                <TableCell>{item.recapName}</TableCell>
+                                <TableCell>{item.versionName}</TableCell>
                                 <TableCell>{item.bookTitle}</TableCell>
                                 <TableCell>{item.contributorName}</TableCell>
                                 <TableCell>{new Date(item.createAt).toLocaleDateString()}</TableCell>
