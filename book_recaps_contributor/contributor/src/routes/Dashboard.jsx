@@ -1,12 +1,13 @@
 import CustomBreadCrumb from "../components/CustomBreadCrumb";
 import { Divider } from "primereact/divider";
-import { defer, json, Link, useLoaderData } from "react-router-dom";
+import { defer, generatePath, json, Link, useLoaderData } from "react-router-dom";
 import { routes } from "../routes";
 import { Fragment } from "react";
 import Show from "../components/Show";
 import { axiosInstance } from "../utils/axios";
 import { handleFetchError } from "../utils/handleFetchError";
 import { getCurrentUserInfo } from "../utils/getCurrentUserInfo";
+import { Image } from "primereact/image";
 
 const getDashboardData = async (request) => {
   try {
@@ -29,6 +30,7 @@ export const dashboardLoader = async ({ request }) => {
 
 const Dashboard = () => {
   const { data } = useLoaderData();
+  console.log(data.recaps.$values.length);
 
   return (
     <>
@@ -37,7 +39,7 @@ const Dashboard = () => {
       {/* Performance Overview Section */}
       <div className="grid grid-cols-4 gap-4 mb-8">
         <div className="bg-white p-6 rounded-md shadow-sm border border-gray-300 space-y-4">
-          <div className="text-lg font-semibold">Thu nhập</div>
+          <div className="text-lg font-semibold">Thu nhập chưa quyết toán</div>
           <div className="text-2xl font-bold mb-2">
             {data.totalIncome} VND
           </div>
@@ -86,17 +88,17 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="flex gap-4 items-end">
+      <div className="flex gap-4 items-start">
         {/* Published Recaps Section */}
         <div className="flex-1">
-          <div className="flex justify-between items-center mb-4">
+          <div className="relative flex justify-between items-center mb-4">
             <div className="text-xl font-semibold">Published recaps</div>
-            <Link to={routes.recaps} className="bg-blue-500 text-white font-semibold py-1.5 px-3 rounded-md">
+            <Link to={routes.recaps} className="bg-blue-500 text-white font-semibold py-1.5 px-3 rounded-md absolute right-0 bottom-0">
               All recaps
             </Link>
           </div>
-          <div className="space-y-4 bg-white rounded-md border border-gray-300 p-5">
-            <Show when={data.recaps.$values > 0} fallback={
+          <div className="space-y-4 bg-white rounded-md border border-gray-300 p-2">
+            <Show when={data.recaps.$values.length > 0} fallback={
               <div className="text-center text-gray-500">No recaps found</div>
             }>
               {data.recaps.$values.map((recap, index) => (
@@ -104,17 +106,23 @@ const Dashboard = () => {
                   <Show when={index !== 0}>
                     <Divider/>
                   </Show>
-                  <div className="flex gap-4">
-                    <div className="w-20 h-24 bg-gray-200 rounded-md flex items-center justify-center">
-                      --
+                  <Link to={generatePath(routes.recapDetails, {recapId: recap.recapId})} className="flex gap-4 p-5 hover:bg-gray-100">
+                    <div className="w-20 bg-gray-200 rounded-md flex items-center justify-center">
+                      <Image
+                        src={recap.bookImage || "/empty-image.jpg"}
+                        alt={recap.bookName}
+                        className="block overflow-hidden rounded-md shadow-md"
+                        imageClassName="aspect-[3/4] object-cover w-full bg-white"
+                      />
                     </div>
                     <div>
-                      <div className="text-lg font-semibold">Tóm tắt sách "..."</div>
-                      <div className="text-sm text-gray-500">Trạng thái: Công khai</div>
-                      <div className="text-sm text-gray-500">Lượt xem: 1000</div>
-                      <div className="text-sm text-gray-500">Lượt thích: 10</div>
+                      <div className="text-lg font-semibold">{recap.recapName}</div>
+                      <div className="text-sm font-semibold">Tóm tắt sách "{recap.bookName}"</div>
+                      <div className="text-sm text-gray-500">Trạng thái: {recap.isPublished ? "Công khai" : "Ẩn"}</div>
+                      <div className="text-sm text-gray-500">Lượt xem: {recap.viewsCount}</div>
+                      <div className="text-sm text-gray-500">Lượt thích: {recap.likesCount}</div>
                     </div>
-                  </div>
+                  </Link>
                 </Fragment>
               ))}
             </Show>
@@ -124,8 +132,8 @@ const Dashboard = () => {
         {/* Most Views in Last Month Section */}
         <div className="flex-1">
           <div className="text-xl font-semibold mb-4">Most views in last month</div>
-          <div className="space-y-4 bg-white rounded-md border border-gray-300 p-5">
-            <Show when={data.mostViewedRecaps.$values > 0} fallback={
+          <div className="space-y-4 bg-white rounded-md border border-gray-300 p-2">
+            <Show when={data.mostViewedRecaps.$values.length > 0} fallback={
               <div className="text-center text-gray-500">No recaps found</div>
             }>
               {data.mostViewedRecaps.$values.map((recap, index) => (
@@ -133,17 +141,23 @@ const Dashboard = () => {
                   <Show when={index !== 0}>
                     <Divider/>
                   </Show>
-                  <div className="flex gap-4">
-                    <div className="w-20 h-24 bg-gray-200 rounded-md flex items-center justify-center">
-                      --
+                  <Link to={generatePath(routes.recapDetails, {recapId: recap.recapId})} className="flex gap-4 p-5 hover:bg-gray-100">
+                    <div className="w-20 bg-gray-200 rounded-md flex items-center justify-center">
+                      <Image
+                        src={recap.bookImage || "/empty-image.jpg"}
+                        alt={recap.bookName}
+                        className="block overflow-hidden rounded-md shadow-md"
+                        imageClassName="aspect-[3/4] object-cover w-full bg-white"
+                      />
                     </div>
                     <div>
-                      <div className="text-lg font-semibold">Tóm tắt sách "..."</div>
-                      <div className="text-sm text-gray-500">Trạng thái: Công khai</div>
-                      <div className="text-sm text-gray-500">Lượt xem: 1000</div>
-                      <div className="text-sm text-gray-500">Lượt thích: 10</div>
+                      <div className="text-lg font-semibold">{recap.recapName}</div>
+                      <div className="text-sm font-semibold">Tóm tắt sách "{recap.bookName}"</div>
+                      <div className="text-sm text-gray-500">Trạng thái: {recap.isPublished ? "Công khai" : "Ẩn"}</div>
+                      <div className="text-sm text-gray-500">Lượt xem: {recap.viewsCount}</div>
+                      <div className="text-sm text-gray-500">Lượt thích: {recap.likesCount}</div>
                     </div>
-                  </div>
+                  </Link>
                 </Fragment>
               ))}
             </Show>

@@ -162,17 +162,33 @@ const SuspenseFallback = ({ message }) => (
   </div>
 )
 
-const handleClickForHighlight = (targetId, appliedClasses = []) => {
-  const targetElement = document.getElementById(targetId);
-  if (targetElement) {
-    targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    targetElement.classList.add(...appliedClasses); // Add the focus class for animation
-    setTimeout(() => {
-      targetElement.classList.remove(...appliedClasses); // Remove the focus class after 1s
-    }, 1000);
-  }
-}
+const handleClickForHighlight = (targetId, appliedClasses = [], targetClassName = false) => {
+  let targetElements;
 
+  if (targetClassName) {
+    targetElements = document.getElementsByClassName(targetId); // Returns an HTMLCollection
+  } else {
+    targetElements = [ document.getElementById(targetId) ]; // Wrap in an array for consistency
+  }
+
+  if (targetElements && targetElements.length > 0) {
+    // Iterate over the collection of elements
+    Array.from(targetElements).forEach(targetElement => {
+      if (targetElement) {
+        // Scroll into view for each element
+        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+        // Add focus classes for animation
+        targetElement.classList.add(...appliedClasses);
+
+        // Remove the focus class after 1 second
+        setTimeout(() => {
+          targetElement.classList.remove(...appliedClasses);
+        }, 1000);
+      }
+    });
+  }
+};
 const getRecapVersionStatusStr = (status) => {
   switch (status) {
     case 0:
@@ -1224,7 +1240,7 @@ const PlagiarismCheck = () => {
                       <Fragment key={sentence.sentence_index}>
                       <span
                         id={`highlight-plagiarism-${sentence.sentence_index}`}
-                        onClick={() => handleClickForHighlight(`card-plagiarism-${sentence.sentence_index}-0`, [ '!bg-yellow-100' ])}
+                        onClick={() => handleClickForHighlight(`card-plagiarism-${sentence.sentence_index}`, [ '!bg-yellow-100' ], true)}
                         className={cn({
                           'bg-yellow-200 py-0.5 cursor-pointer transition-all hover:bg-yellow-300': isPlagiarized
                         })}>{sentence.value}</span>{' '}
@@ -1367,7 +1383,7 @@ const PlagiarismResults = () => {
                 key={"card-plagiarism-" + result.sentence_index + "-" + idx}
                 id={"card-plagiarism-" + result.sentence_index + "-" + result.same_recap_version_index}
                 onClick={() => handleClickForHighlight(`highlight-plagiarism-${result.sentence_index}`, [ '!bg-red-200' ])}
-                className="border border-gray-300 p-4 mb-4 rounded-lg bg-gray-50 cursor-pointer"
+                className={`${"card-plagiarism-" + result.sentence_index} border border-gray-300 p-4 mb-4 rounded-lg bg-gray-50 cursor-pointer`}
               >
                 <h3 className="text-lg mb-2">{result.existing_recap_metadata?.book_title}</h3>
                 <p>Bài viết của: <span
