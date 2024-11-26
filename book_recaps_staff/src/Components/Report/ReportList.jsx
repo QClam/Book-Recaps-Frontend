@@ -56,6 +56,8 @@ function ReportList() {
             const response = await api.get('/api/supportticket/getallsupportticket');
             let reports = resolveRefs(response.data.data.$values);
             reports.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+            console.log(reports);
+            
             setReports(reports);
             setFilteredReports(reports)
             setLoading(false);
@@ -143,12 +145,12 @@ function ReportList() {
     useEffect(() => {
         let filteredData = reports;
 
-        // Tìm kiếm theo tên của Audience
+        // Search filter
         if (searchTerm) {
-            filteredData = filteredData.filter((item) => {
-                const userName = getUserNamebyId(item.userId); // Lấy tên người dùng từ userId
-                return userName.toLowerCase().includes(searchTerm.toLowerCase());
-            });
+            filteredData = filteredData.filter((item) =>
+                item.recaps?.book.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.recaps?.name.toLowerCase().includes(searchTerm.toLowerCase())
+            );
         }
 
         // Lọc theo trạng thái
@@ -192,7 +194,7 @@ function ReportList() {
             <Typography variant='h5' margin={1}>Danh sách Report của Thính giả</Typography>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
                 <TextField
-                    label="Tìm kiếm theo tên"
+                    label="Tìm kiếm theo tên Recap hoặc Tên sách"
                     variant="outlined"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
