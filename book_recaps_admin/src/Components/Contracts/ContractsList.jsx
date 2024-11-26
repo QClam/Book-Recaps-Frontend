@@ -188,8 +188,8 @@ function ContractsList() {
                                 <TableRow key={item.id}>
                                     <TableCell>{item.publisher?.publisherName}</TableCell>
                                     <TableCell>{item.revenueSharePercentage}%</TableCell>
-                                    <TableCell>{item.startDate}</TableCell>
-                                    <TableCell>{item.endDate}</TableCell>
+                                    <TableCell>{new Date(item.startDate).toLocaleDateString()}</TableCell>
+                                    <TableCell>{new Date(item.endDate).toLocaleDateString()}</TableCell>
                                     <TableCell>{item.autoRenew === true ? (
                                         <Button>Có</Button>
                                     ) : (

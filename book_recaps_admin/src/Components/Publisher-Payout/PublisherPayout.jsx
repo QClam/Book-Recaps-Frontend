@@ -203,7 +203,7 @@ function PublisherPayout() {
                         {payouts.map((item) => (
                             <TableRow key={item.id}>
                                 <TableCell>{item.publisherName}</TableCell>
-                                <TableCell>{dayjs(item.fromdate).format('DD/MM/YYYY')} - {dayjs(item.todate).format('DD/MM/YYYY')}</TableCell>
+                                <TableCell>{new Date(item.fromdate).toLocaleDateString('en-GB')} - {new Date(item.todate).toLocaleDateString('en-GB')}</TableCell>
                                 <TableCell>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.totalEarnings)}</TableCell>
                                 <TableCell>Hoàn thành</TableCell>
                                 <TableCell align="center">

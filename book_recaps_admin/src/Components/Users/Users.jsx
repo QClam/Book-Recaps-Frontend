@@ -221,7 +221,7 @@ function Users() {
             </Box>
             <Box display="flex" justifyContent="flex-end" mt={2} padding={2}>
                 <Button variant="contained" color="primary" onClick={handleAddUser}>
-                    Tạo mới
+                    Thêm mới người dùng
                 </Button>
             </Box>
             <TableContainer component={Paper}>
@@ -242,7 +242,7 @@ function Users() {
                                 <TableCell>{user.fullName}</TableCell>
                                 <TableCell>{user.email}</TableCell>
                                 <TableCell>{user.phoneNumber}</TableCell>
-                                <TableCell>{dayjs(user.birthDate).format("DD/MM/YYYY")}</TableCell>
+                                <TableCell>{new Date(user.birthDate).toLocaleDateString('en-GB')}</TableCell>
                                 <TableCell>
                                     {user.roleType === 0 ? (
                                         <Chip label="Super Admin" color="error" variant="outlined" />

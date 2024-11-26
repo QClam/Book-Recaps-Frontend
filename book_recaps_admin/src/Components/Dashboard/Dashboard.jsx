@@ -55,16 +55,16 @@ function Dashboard() {
 
     const overview = [
         { title: 'Doanh thu gói Package', value: dashboardData?.revenueFromPackages || "Chưa tính toán" },
-        { title: 'Số lượng Gói Premium đã bán (Theo tháng)', value: premiumPackage[0]?.count || "Chưa tính toán" },
-        { title: 'Số lượng Gói Premium đã bán (Theo năm)', value: premiumPackage[1]?.count || "Chưa tính toán" },
+        { title: 'Số lượng Gói Premium đã bán (Theo tháng)', value: premiumPackage[0]?.count || "Chưa tính toán hoặc chưa có" },
+        { title: 'Số lượng Gói Premium đã bán (Theo năm)', value: premiumPackage[1]?.count || "Chưa tính toán hoặc chưa có" },
         { title: 'Số bài viết mới', value: dashboardData?.newRecaps || "Chưa tính toán" },
         { title: 'Tiền chi cho Nhà xuất bản', value: dashboardData.publisherExpense || "Chưa tính toán" },
         { title: 'Tiền chi cho Người đóng góp', value: dashboardData.contributorExpense || "Chưa tính toán" },
     ];
     const views = [
-        { title: 'Tổng lượt View', value: dashboardData.totalViews || "Chưa tính toán" },
-        { title: 'Doanh thu từ lượt View', value: dashboardData.revenueFromViews || "Chưa tính toán" },
-        { title: 'Lợi nhuận từ lượt View', value: dashboardData.platformProfit || "Chưa tính toán" },
+        { title: 'Tổng lượt xem', value: dashboardData.totalViews || "Chưa tính toán" },
+        { title: 'Doanh thu từ lượt xem', value: dashboardData.revenueFromViews || "Chưa tính toán" },
+        { title: 'Lợi nhuận từ lượt xem', value: dashboardData.platformProfit || "Chưa tính toán" },
     ];
     const platform = [
         { title: 'Số dư hiện tại', value: dashboardData.currentBalance || "Chưa tính toán" },
@@ -90,7 +90,7 @@ function Dashboard() {
     };
 
     const getUnit = (title) => {
-        if (title.includes('Tổng lượt View')) return 'Views';
+        if (title.includes('Tổng lượt xem')) return 'Lượt';
         if (title.includes('Doanh thu') ||
             title.includes('Lợi nhuận') ||
             title.includes('Tiền chi') ||
@@ -119,7 +119,7 @@ function Dashboard() {
         <div className='dashboard-container'>
             <div className='header'>
                 <div className="date-picker-container">
-                    <Typography variant='body' textAlign='center' sx={{ marginBottom: 2 }}>Hãy chọn khoảng thời gian để hiển thị số liệu</Typography>
+                    <Typography variant='h6' textAlign='center' sx={{ marginBottom: 2 }}>Hãy chọn khoảng thời gian để hiển thị số liệu</Typography>
                     <DateRangePicker
                         onChange={handleDateChange}
                     />
