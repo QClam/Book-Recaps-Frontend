@@ -2,7 +2,6 @@ import axios from "axios";
 
 const api = axios.create({
   baseURL: "https://bookrecaps.cloud",
-  timeout: 5000,
 });
 
 const refreshAccessToken = async () => {

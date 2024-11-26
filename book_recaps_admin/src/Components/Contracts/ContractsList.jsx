@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react'
-import { Box, Button, MenuItem, Pagination, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
+import { Box, Button, MenuItem, Chip, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
 import { Hourglass } from 'react-loader-spinner';
 import { useNavigate } from "react-router-dom";
+import { Visibility } from "@mui/icons-material";
 
 import api from '../Auth/AxiosInterceptors';
 import './Contract.scss'
@@ -123,6 +124,10 @@ function ContractsList() {
         }
     }, [searchTerm, filterStatus, contracts, page, rowsPerPage]);
 
+    const handleDetail = (id) => {
+        navigate(`/contract/${id}`);
+    }
+
     if (loading) {
         return (
             <div className="loading">
@@ -196,21 +201,21 @@ function ContractsList() {
                                         <Button color="error">Không</Button>
                                     )}</TableCell>
                                     <TableCell>{item.status === 0 ? (
-                                        <Button variant="contained" color='warning'>Bản nháp</Button>
+                                        <Chip label="Bản nháp" color="warning" variant="outlined" />
                                     ) : item.status === 1 ? (
-                                        <Button variant="contained" color='primary'>Đang xử lý</Button>
+                                        <Chip label="Đang xử lý" color="primary" variant="outlined" />
                                     ) : item.status === 2 ? (
-                                        <Button variant="contained" color='info'>Chưa bắt đầu</Button>
+                                        <Chip label="Chưa bắt đàu" color="info" variant="outlined" />
                                     ) : item.status === 3 ? (
-                                        <Button variant="contained" color='success'>Đang kích hoạt</Button>
+                                        <Chip label="Đang kích hoạt" color="success" variant="outlined" />
                                     ) : item.status === 4 ? (
-                                        <Button variant="contained" color='error'>Hết hạn</Button>
+                                        <Chip label="Hết hạn" color="error" variant="outlined" />
                                     ) : item.status === 5 ? (
-                                        <Button variant="contained" color='error'>Từ chối</Button>
+                                        <Chip label="Từ chối" color="error" variant="outlined" />
                                     ) : (
                                         <Button variant="contained">Unknow</Button>
                                     )}</TableCell>
-                                    <TableCell><Button variant='outlined' href={`/contract/${item.id}`}>Xem chi tiết</Button></TableCell>
+                                    <TableCell><Button onClick={() => handleDetail(item.id)}><Visibility /></Button></TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
