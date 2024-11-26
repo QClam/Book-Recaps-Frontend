@@ -120,13 +120,13 @@ function PublisherPayout() {
                                         <Typography variant="body1" fontWeight="bold">
                                             Tài khoản ngân hàng:
                                         </Typography>
-                                        <Typography variant="body1">...</Typography>
+                                        <Typography variant="body1">{publisher.bankAccount}</Typography>
                                     </Box>
                                     <Box display="flex" justifyContent="space-between">
                                         <Typography variant="body1" fontWeight="bold">
                                             Thông tin liên hệ:
                                         </Typography>
-                                        <Typography variant="body1">...</Typography>
+                                        <Typography variant="body1">{publisher.contactInfo}</Typography>
                                     </Box>
                                 </Paper>
                             </Grid>
@@ -168,8 +168,8 @@ function PublisherPayout() {
                 <Box borderBottom={1} mb={3} pb={2}>
                     <Typography variant="h6" gutterBottom>Tạo quyết toán mới</Typography>
                     <Box display="flex" gap={2}>
-                        <TextField label="Từ ngày" value={formatDate(publisher?.fromDate)} />
-                        <TextField label="Đến ngày" value={formatDate(publisher?.toDate)} />
+                        <TextField label="Từ ngày" value={formatDate(publisher?.fromDate)} disabled/>
+                        <TextField label="Đến ngày" value={formatDate(publisher?.toDate)} disabled/>
 
                         <Box display="flex"
                             alignItems="center"
