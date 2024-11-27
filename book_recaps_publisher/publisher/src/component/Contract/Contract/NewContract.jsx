@@ -84,10 +84,18 @@ const Contract = () => {
             },
           }
         );
+        // console.log("Raw contract data:", response.data);
         
         const result = resolveRefs(response.data);
+        // console.log("Resolved contract data:", result);
         // Filter contracts based on the userId
-        const userContracts = result.data.$values.filter(contract => contract.publisher.userId === userId);
+        const userContracts = result.data.$values.filter(contract => {
+          //console.log("Contract data:", contract); // Log từng hợp đồng
+          const publisher = contract.publisher;
+          return publisher && publisher.userId === userId;
+        });
+        
+        console.log("Filtered contracts:", userContracts); 
         setContracts(userContracts);
         setLoading(false);
       } catch (error) {
@@ -187,7 +195,7 @@ const Contract = () => {
       <table className="contract-table">
         <thead>
           <tr>
-          <th>ID</th>
+            <th>ID</th>
             <th>Publisher Name</th>
             <th>Revenue Share</th>
             <th>Start Date</th>

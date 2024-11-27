@@ -12,11 +12,11 @@
     text-align: center;
     margin-bottom: 20px;
     font-size: 1.8rem;
-     color: #333;
+    
   }
   
   .book-table {
-    width: 500px;
+    width: 900px;
     border-collapse: collapse;
     margin-bottom: 20px;
     height: 400px;
@@ -24,7 +24,7 @@
     
   
     .book-table th, td {
-      padding: 12px 15px;
+      padding: 12px 18px;
       text-align: left;
       border-bottom: 1px solid #ddd;
       margin-left: 20px;
@@ -67,7 +67,7 @@
         border-radius: 4px;
         font-size: 0.8rem;
         font-weight: bold;
-        color: #000; // Set text color to black
+       
         text-align: center;
       }
       
@@ -131,6 +131,7 @@
       border: none;
       font-size: 18px;
       cursor: pointer;
+      color: #218838;
     }
   
     .dropdown-menu {

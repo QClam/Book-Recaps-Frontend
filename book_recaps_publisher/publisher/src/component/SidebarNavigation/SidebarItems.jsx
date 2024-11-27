@@ -10,7 +10,7 @@ export const SidebarItems = [
     // },
 
     {
-        title: "Dashboard",
+        title: "Tổng quan",
        
         link: "/dashboard",
     },
@@ -21,12 +21,12 @@ export const SidebarItems = [
     //     link: "/contract",
     // },
     {
-        title: "Book Management",
+        title: "Quản lý sách",
         
         link: "/bookmanager",
     },
     {
-        title: "Contract Managerment",
+        title: "Quản lý hợp đồng",
        
         link: "/contractmanager",
     },
@@ -36,7 +36,7 @@ export const SidebarItems = [
     //     link: "/earnings",
     // },
     {
-        title: "Earning ",
+        title: "Doanh thu ",
        
         link: "/publisher",
     },
@@ -52,7 +52,7 @@ export const SidebarItems = [
     //     link: "/feedback",
     // },
     {
-        title: "Settings",
+        title: "Cài đặt",
       
         link: "/settings",
     },

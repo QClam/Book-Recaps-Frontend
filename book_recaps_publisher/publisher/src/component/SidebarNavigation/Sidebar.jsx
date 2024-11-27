@@ -84,7 +84,7 @@ const Sidebar = () => {
         ))}
         {/* Nút Logout */}
         <li onClick={handleLogout} className="logout">
-          Logout
+          Đăng xuất
         </li>
       </ul>
     </div>

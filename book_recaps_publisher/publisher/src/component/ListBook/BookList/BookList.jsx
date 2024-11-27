@@ -164,16 +164,16 @@ const cancelDelete = () => {
   return (
     <div className="list-book-container-container">
     <div className="header">
-      <h3>List of Books</h3>
+      <h3>Danh sách sách</h3>
       <div className="search-bar-container">
       <button className="add-new-book-btn" onClick={handleAddBook}>
-            Add New Book
+            Thêm mới sách
           </button>
 
           <SearchIcon className="search-icon" />
           <input
             type="text"
-            placeholder="Search "
+            placeholder="Tìm kiếm sách "
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-bar"
@@ -185,11 +185,13 @@ const cancelDelete = () => {
         <thead>
           <tr>
             <th>STT</th>
-            <th>Genre</th>
-            <th>Title</th>
-            <th>Author</th>
-            <th>PublicationYear</th>
-            <th>Action</th>
+            <th>Thể loại</th>
+            <th>Tiêu đề</th>
+            <th>Tác giả</th>
+            <th>Năm xuất bản</th>
+            <th>Hợp đồng</th>
+            <th>Thao tác</th>
+            
            
           </tr>
         </thead>
@@ -209,8 +211,11 @@ const cancelDelete = () => {
       </td>
       <td>{book.publicationYear || 'N/A'}</td> {/* Display publication year */}
       <td>
+        {book.publisher?.contracts?.$values?.length > 0 ? "Có hợp đồng" : "Không có hợp đồng"}
+      </td>
+      <td>
         <div className="action-menu">
-          <button
+          <button 
             className="action-button"
             onClick={() => toggleMenu(index)}
           >
@@ -237,6 +242,16 @@ const cancelDelete = () => {
 
         </div>
       </td>
+{/* 
+              <td>
+          {book.publisher?.contracts?.$values?.length > 0
+            ? book.publisher.contracts.$values
+                .map(contract => `ID: ${contract.id}, Status: ${contract.status}`)
+                .join("; ")
+            : "Không có hợp đồng"}
+        </td> */}
+       
+
     </tr>
   ))}
 </tbody>

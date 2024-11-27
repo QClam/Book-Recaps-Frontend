@@ -72,7 +72,13 @@ const PublisherPayout = () => {
                             <p><strong>From Date:</strong> {new Date(payoutDetail?.data?.fromDate).toLocaleDateString()}</p>
                             <p><strong>To Date:</strong> {new Date(payoutDetail?.data?.toDate).toLocaleDateString()}</p>
                             <p><strong>Revenue Share Percentage:</strong> {payoutDetail?.data?.publisher?.revenueSharePercentage}%</p>
-                            <p><strong>Amount:</strong> {payoutDetail?.data?.amount}</p>
+                            {/* <p><strong>Earning:</strong> {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(payoutDetail?.data?.amount)}</p>
+                             */}
+                            <p><strong>Earning:</strong> {payoutDetail?.data?.amount} <span className="currency-symbol">₫</span></p>
+
+                           
+
+
                         </div>
                     </div>
 
@@ -98,7 +104,9 @@ const PublisherPayout = () => {
                                         <td>
                                             <img src={book.coverImage} alt={book.title} width="50" />
                                         </td>
-                                        <td>{book.earningAmount}</td>
+                                        <td>
+                                        {new Intl.NumberFormat('vi-VN').format(book.earningAmount)} <span className="currency-symbol">₫</span>
+                                        </td>
                                         <td>{new Date(book.fromDate).toLocaleDateString()}</td>
                                         <td>{new Date(book.toDate).toLocaleDateString()}</td>
                                     </tr>

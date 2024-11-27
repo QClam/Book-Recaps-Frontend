@@ -99,13 +99,13 @@ const FetchPublisherData = () => {
 
     return (
         <div className="publisherinfo">
-            <h2>Publisher Payout Data</h2>
+            <h2>Thông tin Nhà xuất bản</h2>
             {error && <p style={{ color: 'red' }}>Error: {error}</p>}
 
             {publisherData ? (
                 <div>
                     <p><strong>Publisher Name:</strong> {publisherData.publisherName}</p>
-                    <p><strong>Revenue Share Percentage:</strong> {publisherData.revenueSharePercentage}%</p>
+                    {/* <p><strong>Revenue Share Percentage:</strong> {publisherData.revenueSharePercentage}%</p> */}
                     <p><strong>Contact Info:</strong> {publisherData.contactInfo}</p>
                     <p><strong>Bank Account:</strong> {publisherData.bankAccount}</p>
                 </div>
@@ -115,7 +115,7 @@ const FetchPublisherData = () => {
 
             {payoutData && payoutData.length > 0 ? (
                 <div>
-                    <h2>Payout Data</h2>
+                    <h2>Doanh thu</h2>
                     <table>
                         <thead>
                             <tr>
@@ -123,7 +123,7 @@ const FetchPublisherData = () => {
                                 <th>Revenue Share Percentage</th> {/* New Column */}
                                 <th>Image</th>
                                 <th>Description</th>
-                                <th>Amount</th>
+                                <th>Earning</th>
                                 <th>Status</th>
                                 <th>From Date</th>
                                 <th>To Date</th>
@@ -143,7 +143,9 @@ const FetchPublisherData = () => {
                                         />
                                     </td>
                                     <td>{payout.description}</td>
-                                    <td>{payout.totalEarnings}</td>
+                                    <td>
+                                    {new Intl.NumberFormat('vi-VN').format(payout.totalEarnings)} <span className="currency-symbol">₫</span>
+                                    </td>
                                     <td>{payout.status}</td>
                                     <td>{new Date(payout.fromDate).toLocaleDateString()}</td>
                                     <td>{new Date(payout.toDate).toLocaleDateString()}</td>
