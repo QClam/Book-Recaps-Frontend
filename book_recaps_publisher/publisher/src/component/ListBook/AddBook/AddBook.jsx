@@ -31,7 +31,7 @@ const AddBook = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('https://160.25.80.100:7124/api/category/getallcategory', {
+        const response = await axios.get('https://bookrecaps.cloud/api/category/getallcategory', {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
           },
@@ -44,7 +44,7 @@ const AddBook = () => {
 
     const fetchAuthors = async () => {
       try {
-        const response = await axios.get('https://160.25.80.100:7124/api/authors/getallauthors', {
+        const response = await axios.get('https://bookrecaps.cloud/api/authors/getallauthors', {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
           },
@@ -91,7 +91,7 @@ const AddBook = () => {
     if (bookData.authorImageFile) formData.append('authorImage', bookData.authorImageFile);
 
     try {
-        const response = await axios.post('https://160.25.80.100:7124/api/book/createbook', formData, {
+        const response = await axios.post('https://bookrecaps.cloud/api/book/createbook', formData, {
             headers: {
                 'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'multipart/form-data',

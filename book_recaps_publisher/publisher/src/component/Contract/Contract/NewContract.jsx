@@ -46,7 +46,7 @@ const Contract = () => {
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const profileResponse = await fetch('https://160.25.80.100:7124/api/personal/profile', {
+        const profileResponse = await fetch('https://bookrecaps.cloud/api/personal/profile', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${accessToken}`,
@@ -75,7 +75,7 @@ const Contract = () => {
 
       try {
         const response = await axios.get(
-          `https://160.25.80.100:7124/api/Contract/getallcontract`,
+          `https://bookrecaps.cloud/api/Contract/getallcontract`,
           {
             headers: {
               'Authorization': `Bearer ${accessToken}`,
@@ -113,7 +113,7 @@ const Contract = () => {
     const fetchAttachments = async (contractId) => {
       try {
         const response = await axios.get(
-          `https://160.25.80.100:7124/api/contract-attachment/getallattachmentbycontractid/${contractId}`,
+          `https://bookrecaps.cloud/api/contract-attachment/getallattachmentbycontractid/${contractId}`,
           {
             headers: {
               'Authorization': `Bearer ${accessToken}`,

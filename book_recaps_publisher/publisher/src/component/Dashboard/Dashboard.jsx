@@ -19,7 +19,7 @@ const Dashboard = ( ) => {
     const fetchData = async () => {
       try {
         // Lấy thông tin hồ sơ
-        const profileResponse = await fetch('https://160.25.80.100:7124/api/personal/profile', {
+        const profileResponse = await fetch('https://bookrecaps.cloud/api/personal/profile', {
           method: 'GET',
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -32,7 +32,7 @@ const Dashboard = ( ) => {
 
         // Lấy thông tin nhà xuất bản
         const publisherResponse = await fetch(
-          `https://160.25.80.100:7124/api/publisher/getbypublisheruser/${profileId}`,
+          `https://bookrecaps.cloud/api/publisher/getbypublisheruser/${profileId}`,
           {
             method: 'GET',
             headers: {
@@ -47,7 +47,7 @@ const Dashboard = ( ) => {
 
         // Lấy dữ liệu bảng điều khiển
         const dashboardResponse = await fetch(
-          `https://160.25.80.100:7124/api/dashboard/publisherdashboard/${publisherId}`,
+          `https://bookrecaps.cloud/api/dashboard/publisherdashboard/${publisherId}`,
           {
             method: 'GET',
             headers: {

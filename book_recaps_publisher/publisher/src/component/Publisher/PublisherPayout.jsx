@@ -12,7 +12,7 @@ const PublisherPayout = () => {
         const fetchPayoutDetail = async () => {
             const accessToken = localStorage.getItem('authToken');
             try {
-                const response = await fetch(`https://160.25.80.100:7124/api/PublisherPayout/getpayoutinfobyid/${id}`, {
+                const response = await fetch(`https://bookrecaps.cloud/api/PublisherPayout/getpayoutinfobyid/${id}`, {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${accessToken}`,
@@ -30,7 +30,7 @@ const PublisherPayout = () => {
                 // Fetch detailed book information for each book ID in the payout details
                 const detailedBooksPromises = data?.data?.bookEarnings?.$values?.map(async (earning) => {
                     const bookResponse = await fetch(
-                        `https://160.25.80.100:7124/api/book/getbookbyid/${earning.bookId}`,
+                        `https://bookrecaps.cloud/api/book/getbookbyid/${earning.bookId}`,
                         {
                             method: 'GET',
                             headers: {

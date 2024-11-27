@@ -51,7 +51,7 @@ const ContractDetail = () => {
     const fetchContractDetail = async () => {
       try {
         const response = await axios.get(
-          `https://160.25.80.100:7124/api/Contract/getcontractby/${id}`,
+          `https://bookrecaps.cloud/api/Contract/getcontractby/${id}`,
           {
             headers: {
               'Authorization': `Bearer ${accessToken}`,
@@ -85,7 +85,7 @@ const ContractDetail = () => {
   const handleStatusChange = async (newStatus) => {
     try {
       await axios.put(
-        `https://160.25.80.100:7124/api/Contract/change-status/${id}`,
+        `https://bookrecaps.cloud/api/Contract/change-status/${id}`,
         { status: newStatus },
         {
           headers: {

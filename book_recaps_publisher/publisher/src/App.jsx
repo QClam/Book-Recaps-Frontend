@@ -68,8 +68,8 @@ const App = () => {
             <Route path="/dashboard" element={<Dashboard/>} />
             {/* <Route path="/dashboard" element={<PublisherDashboard/>} /> */}
             {/* <Route path="/earnings" element={<PayoutHistory/>} /> */}
-            <Route path="/earnings" element={<PayoutDetail/>} />
-            <Route path="/notifications" element={<Notification/>} />
+            {/* <Route path="/earnings" element={<PayoutDetail/>} /> */}
+            {/* <Route path="/notifications" element={<Notification/>} /> */}
             {/* <Route path="/feedback" element={<Feedback/>} /> */}
             {/* <Route path="/help" element={<Report/>} /> */}
             <Route path="/settings" element={<Settings/>} />

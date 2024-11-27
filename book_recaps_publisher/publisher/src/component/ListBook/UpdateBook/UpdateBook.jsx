@@ -25,7 +25,7 @@ const UpdateBook = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('https://160.25.80.100:7124/api/category/getallcategory', {
+        const response = await axios.get('https://bookrecaps.cloud/api/category/getallcategory', {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
           },
@@ -43,7 +43,7 @@ const UpdateBook = () => {
   useEffect(() => {
     const fetchBookDetails = async () => {
       try {
-        const response = await axios.get(`https://160.25.80.100:7124/api/book/getbook/${id}`, {
+        const response = await axios.get(`https://bookrecaps.cloud/api/book/getbook/${id}`, {
           headers: {
            'Authorization': `Bearer ${accessToken}`,
           },
@@ -80,7 +80,7 @@ const UpdateBook = () => {
     }
 
     try {
-      await axios.put(`https://160.25.80.100:7124/api/book/updatebook/${id}`, formData, {
+      await axios.put(`https://bookrecaps.cloud/api/book/updatebook/${id}`, formData, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('authToken')}`,
           'Content-Type': 'multipart/form-data',

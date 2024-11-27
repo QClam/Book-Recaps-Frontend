@@ -14,7 +14,7 @@ const FetchPublisherData = () => {
             const accessToken = localStorage.getItem('authToken');
             try {
                 // Gọi API đầu tiên để lấy `id`
-                const profileResponse = await fetch('https://160.25.80.100:7124/api/personal/profile', {
+                const profileResponse = await fetch('https://bookrecaps.cloud/api/personal/profile', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${accessToken}`,
@@ -37,7 +37,7 @@ const FetchPublisherData = () => {
 
                 // Gọi API thứ hai với `id` để lấy dữ liệu nhà xuất bản
                 const publisherResponse = await fetch(
-                    `https://160.25.80.100:7124/api/publisher/getbypublisheruser/${profileId}`,
+                    `https://bookrecaps.cloud/api/publisher/getbypublisheruser/${profileId}`,
                     {
                         method: 'GET',
                         headers: {
@@ -62,7 +62,7 @@ const FetchPublisherData = () => {
 
                 // Gọi API để lấy thông tin thanh toán của nhà xuất bản
                 const payoutResponse = await fetch(
-                    `https://160.25.80.100:7124/api/PublisherPayout/getlistpayoutinfobypublisherid/${publisherId}`,
+                    `https://bookrecaps.cloud/api/PublisherPayout/getlistpayoutinfobypublisherid/${publisherId}`,
                     {
                         method: 'GET',
                         headers: {

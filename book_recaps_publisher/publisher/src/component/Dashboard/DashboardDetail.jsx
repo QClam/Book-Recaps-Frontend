@@ -10,7 +10,7 @@ const DashboardDetail = () => {
   useEffect(() => {
     const fetchBookDetail = async () => {
       try {
-        const response = await fetch(`https://160.25.80.100:7124/api/book/getbookbyid/${bookId}`, {
+        const response = await fetch(`https://bookrecaps.cloud/api/book/getbookbyid/${bookId}`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
