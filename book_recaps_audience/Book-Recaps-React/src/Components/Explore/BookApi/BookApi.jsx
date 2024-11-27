@@ -73,7 +73,7 @@ const BookApi = () => {
         );
 
         const data = resolveRefs(response.data);
-        console.log("Fetched Books Data:", data); // Kiểm tra dữ liệu
+        // console.log("Fetched Books Data:", data); // Kiểm tra dữ liệu
         
 
         if (data && data.data && Array.isArray(data.data.$values)) {
