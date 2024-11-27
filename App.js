@@ -4,24 +4,24 @@ import {
     StyleSheet,
     View,
 } from "react-native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
+import { Ionicons } from '@expo/vector-icons'
 
-import AsyncStorage from "@react-native-async-storage/async-storage";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
-import Onboarding from "./components/Onboarding";
-import HomeScreen from "./screens/HomeScreen";
 import LoginScreen from "./screens/LoginScreen";
-
-import { Ionicons } from '@expo/vector-icons'
-import RecapDetail from "./components/Books/RecapDetail";
-import RecapItemDetail from "./components/Books/RecapItemDetail";
+import HomeScreen from "./screens/HomeScreen";
 import PlaylistScreen from "./screens/PlaylistScreen";
 import ProfileScreen from "./screens/ProfileScreen";
 import RecapsScreen from "./screens/RecapsScreen";
+
+import Onboarding from "./components/Onboarding";
+import RecapDetail from "./components/Books/RecapDetail";
+import RecapItemDetail from "./components/Books/RecapItemDetail";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();

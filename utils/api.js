@@ -27,26 +27,26 @@ const resolveRefs = (data) => {
     };
     createRefMap(data);
     return resolveRef(data);
-  };
+};
 
-  export const getBooks = async () => {
+export const getBooks = async () => {
     try {
-      const response = await api.get('/api/book/getallbooks');
-      const data = resolveRefs(response.data.data.$values);
-  
-      return data;
-    } catch (error) {
-      console.error("Error Fetching Books", error);
-    }
-  }
+        const response = await api.get('/api/book/getallbooks');
+        const data = resolveRefs(response.data.data.$values);
 
-  export const getRecaps = async () => {
+        return data;
+    } catch (error) {
+        console.error("Error Fetching Books", error);
+    }
+}
+
+export const getRecaps = async () => {
     try {
         const response = await api.get('/api/recap/Getallrecap');
         const data = resolveRefs(response.data.data.$values)
 
         return data;
     } catch (error) {
-      console.error("Error Fetching Recaps", error);       
+        console.error("Error Fetching Recaps", error);
     }
-  }
+}
