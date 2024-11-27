@@ -1,8 +1,8 @@
 .sidebar {
   width: 250px;
   height: 100vh;
-  background-color: #2c3e50;
-  color: #ecf0f1;
+  background-color: #ffffff; /* Sidebar màu trắng */
+  color: #2c3e50; /* Màu chữ tối */
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -10,21 +10,30 @@
   position: fixed;
   left: 0;
   top: 0;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /* Tạo hiệu ứng đổ bóng nhẹ */
 
   .logo {
     font-size: 10px;
     font-weight: bold;
-    color: #ecf0f1;
+    color: #2c3e50; /* Màu chữ */
     margin-bottom: 30px;
-    
+    text-align: center;
+
+    p {
+      font-size: 20px;
+    }
+
+    img {
+      width: 70px;
+      height: 70px;
+      margin-bottom: -10px;
+    }
   }
-  .logo p {
-    font-size: 20px;
-  }
-  .logo img {
-    width: 70px;
-    height: 70px;
-    margin-bottom: -20px;
+
+  .publisher-name {
+    font-size: 18px;
+    color: #34495e; /* Màu chữ nhẹ hơn */
+    margin-bottom: 30px;
   }
 
   .nav-links {
@@ -41,10 +50,10 @@
         display: flex;
         align-items: center;
         text-decoration: none;
-        color: #bdc3c7;
+        color: #7f8c8d; /* Màu chữ mặc định */
         padding: 10px 20px;
         border-radius: 8px;
-        transition: background-color 0.3s;
+        transition: background-color 0.3s, color 0.3s;
 
         span {
           margin-left: 15px;
@@ -52,26 +61,31 @@
         }
 
         &:hover {
-          background-color: #34495e;
-          color: #fff;
+          background-color: #ecf0f1; /* Màu nền khi hover */
+          color: #2c3e50; /* Màu chữ khi hover */
         }
 
         &.active {
-          background-color: #1abc9c;
-          color: #fff;
+          background-color: #3498db; /* Màu nền khi active */
+          color: #ffffff; /* Màu chữ khi active */
         }
       }
     }
   }
-}
-.logout {
-  cursor: pointer;
-  padding: 10px;
-  color: #fff; /* Màu chữ */
-  transition: color 0.3s;
-  margin-left: 12px;
-}
 
-.logout:hover {
-  color: #ff6666; /* Màu khi hover */
+  .logout {
+    cursor: pointer;
+    padding: 10px;
+    color: #e74c3c; /* Màu nút logout */
+    text-align: left;
+    width: 100%;
+    margin-top: auto; /* Đẩy nút logout xuống cuối sidebar */
+    border-radius: 8px;
+    transition: background-color 0.3s, color 0.3s;
+
+    &:hover {
+      background-color: #fceae9; /* Nền khi hover */
+      color: #c0392b; /* Màu chữ khi hover */
+    }
+  }
 }

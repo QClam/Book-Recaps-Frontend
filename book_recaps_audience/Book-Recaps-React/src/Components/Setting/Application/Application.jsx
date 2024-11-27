@@ -47,11 +47,12 @@ const Application = () => {
               'Authorization': `Bearer ${accessToken}`,
               'Content-Type': 'application/json',
             },
-          });
+          }
+        );
 
-          if (response.data.succeeded) {
-            const tickets = response.data.data.$values;
-            setSupportTickets(tickets);
+        if (response.data.succeeded) {
+          const tickets = response.data.data.$values;
+          setSupportTickets(tickets);
 
             // Get book titles for each ticket
             for (const ticket of tickets) {
@@ -63,31 +64,37 @@ const Application = () => {
                       'Authorization': `Bearer ${accessToken}`,
                       'Content-Type': 'application/json',
                     },
-                  });
-                  if (bookResponse.data.succeeded && bookResponse.data.data.book) {
-                    ticket.bookTitle = bookResponse.data.data.book.title;
-                  } else {
-                    ticket.bookTitle = "Unknown Book Title";
                   }
-                } catch (error) {
-                  console.error('Error fetching book title:', error);
-                  ticket.bookTitle = "Error fetching title";
+                );
+                if (bookResponse.data.succeeded && bookResponse.data.data) {
+                  const recapData = bookResponse.data.data;
+                  ticket.bookTitle = recapData.book?.title || "Unknown Book Title";
+                  ticket.recapName = recapData.name || "Unknown Recap Name";
+                } else {
+                  ticket.bookTitle = "Unknown Book Title";
+                  ticket.recapName = "Unknown Recap Name";
                 }
+              } catch (error) {
+                console.error('Error fetching recap data:', error);
+                ticket.bookTitle = "Error fetching title";
+                ticket.recapName = "Error fetching recap name";
               }
             }
-            setSupportTickets([...tickets]);
-          } else {
-            setErrorMessage('Failed to fetch support tickets');
           }
-        } catch (error) {
-          setErrorMessage('');
-          console.error('Error:', error);
+          setSupportTickets([...tickets]);
+        } else {
+          setErrorMessage('Failed to fetch support tickets');
         }
-      };
+      } catch (error) {
+        setErrorMessage('Error fetching support tickets');
+        console.error('Error:', error);
+      }
+    };
 
-      fetchSupportTickets();
-    }
-  }, [userId, accessToken]);
+    fetchSupportTickets();
+  }
+}, [userId, accessToken]);
+
 
   const goToExplore = () => {
     navigate(routes.explore);
@@ -106,7 +113,8 @@ const Application = () => {
           <tr>
             <th>Type</th>
             <th>Book Title</th>
-            
+            <th>Recap Name</th>
+
            
             <th>Descriptions</th>
             <th>Status</th>
@@ -120,11 +128,12 @@ const Application = () => {
             <tr key={ticket.id}>
               <td><a href="#">{ticket.category}</a></td>
               <td>{ticket.bookTitle || "Unknown Book Title"}</td>
-             
+              <td>{ticket.recapName || "Unknown Recap Name"}</td>
+
 
               <td>{ticket.description}</td>
-              <td className={`status ${ticket.status === 0 ? 'open' : 'closed'}`}>
-                {ticket.status === 0 ? 'Inprogress' : 'Done'}
+              <td className={`status ${ticket.status === 1 ? 'open' : 'closed'}`}>
+                {ticket.status === 1 ? 'Đang xử lí' : 'Đã xử lí'}
 
               </td>
               

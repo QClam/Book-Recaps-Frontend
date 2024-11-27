@@ -43,7 +43,7 @@ const SubscriptionHistory = () => {
       setLoading(false);
     } catch (err) {
       console.error("Error fetching subscription data:", err);
-      setError("Failed to fetch subscription data");
+      setError("No subcription history available");
       setLoading(false);
     }
   };
@@ -59,7 +59,7 @@ const SubscriptionHistory = () => {
   }, []);
 
   if (loading) return <div className="loading">Loading...</div>;
-  if (error) return <div className="error">Error: {error}</div>;
+  if (error) return <div className="error"> {error}</div>;
 
   return (
     <div className="subscription-history">

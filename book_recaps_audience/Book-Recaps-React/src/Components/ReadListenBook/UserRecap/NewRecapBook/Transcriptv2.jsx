@@ -75,8 +75,9 @@ const Transcriptv2 = ({
 
         setTranscriptContent(data);
       } catch (error) {
-        setTranscriptError('Error fetching transcript data');
-        console.error('Error fetching transcript data:', error);
+        // setTranscriptError('Error fetching transcript data');
+        // console.error('Error fetching transcript data:', error);
+        console.error(error);
       }
     };
 
@@ -127,11 +128,11 @@ const Transcriptv2 = ({
     const { sectionIndex, sentenceIndex } = contextMenu;
     const sentenceElement = document.getElementById(`sentence-${sectionIndex}-${sentenceIndex}`);
     const selectedText = sentenceElement ? sentenceElement.textContent : '';
-    const startIndex = sentenceElement?.dataset.startIndex;
-    const endIndex = sentenceElement?.dataset.endIndex;
+    const startIndex = sentenceElement?.dataset.start;
+    const endIndex = sentenceElement?.dataset.end;
   
     if (!selectedText) return;
-  
+    
     const sentenceId = `sentence-${sectionIndex}-${sentenceIndex}`;
     const isAlreadyHighlighted = highlightedSentences.includes(sentenceId);
   
@@ -145,14 +146,14 @@ const Transcriptv2 = ({
   
       alert("Highlight removed successfully!");
   
-      console.log("Highlight removed successfully!", {
-        recapVersionId,
-        userId,
-        targetText: selectedText,
-        sentenceId,
-        startIndex,
-        endIndex,
-      });
+      // console.log("Highlight removed successfully!", {
+      //   recapVersionId,
+      //   userId,
+      //   targetText: selectedText,
+      //   sentenceId,
+      //   startIndex,
+      //   endIndex,
+      // });
     } else {
       // Add the highlight
       try {
@@ -165,7 +166,7 @@ const Transcriptv2 = ({
             endIndex: endIndex || "0",
             sentenceIndex: sentenceIndex.toString(),
           };
-          console.log('Request Body:', requestBody);
+          // console.log('Request Body:', requestBody);
           
   
         const response = await axios.post('https://bookrecaps.cloud/api/highlight/createhighlight', requestBody, {
@@ -176,7 +177,7 @@ const Transcriptv2 = ({
           },
           
         });
-        console.log('API Response:', response.data);
+        // console.log('API Response:', response.data);
   
         if (response.data && response.data.succeeded) {
           const updatedHighlights = [...highlightedSentences, sentenceId];
@@ -187,14 +188,15 @@ const Transcriptv2 = ({
   
           alert("Highlight saved successfully!");
   
-          console.log("Highlight saved successfully!", {
-            recapVersionId,
-            userId,
-            targetText: selectedText,
-            sentenceId,
-            startIndex,
-            endIndex,
-          });
+          // console.log("Highlight saved successfully!", {
+          //   recapVersionId,
+          //   userId,
+          //   targetText: selectedText,
+          //   sentenceId,
+          //   startIndex,
+          //   endIndex,
+          //   sentenceIndex
+          // });
         } else {
           throw new Error(response.data.message || 'Failed to save highlight');
         }
@@ -214,36 +216,31 @@ const Transcriptv2 = ({
     if (savedHighlights) {
       setHighlightedSentences(JSON.parse(savedHighlights));
     }
-    const fetchUserHighlights = async () => {
-        try {
-          const response = await axios.get(`https://bookrecaps.cloud/api/highlight/gethighlightbyrecapid/${recapVersionId}?userId=${userId}`, {
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-              'Content-Type': 'application/json',
-            },
-          });
-          if (response.data && response.data.data && response.data.data.$values) {
-            const apiHighlights = response.data.data.$values.map(item => `sentence-${item.sentenceIndex}`);
-            setHighlightedSentences(apiHighlights);
-            // Save to localStorage for persistence
-            localStorage.setItem(getUserHighlightsKey(userId), JSON.stringify(apiHighlights));
-          }
-        } catch (error) {
-          console.error("Error fetching highlights:", error);
-        }
-      };
+    // const fetchUserHighlights = async () => {
+    //     try {
+    //       const response = await axios.get(`https://160.25.80.100:7124/api/highlight/gethighlightbyrecapid/${recapVersionId}?userId=${userId}`);
+    //       if (response.data && response.data.data && response.data.data.$values) {
+    //         const apiHighlights = response.data.data.$values.map(item => `sentence-${item.sentenceIndex}`);
+    //         setHighlightedSentences(apiHighlights);
+    //         // Save to localStorage for persistence
+    //         localStorage.setItem(getUserHighlightsKey(userId), JSON.stringify(apiHighlights));
+    //       }
+    //     } catch (error) {
+    //       console.error("Error fetching highlights:", error);
+    //     }
+    //   };
     
-      fetchUserHighlights();
+    //   fetchUserHighlights();
     }, [userId, recapVersionId]); 
 
 
-    useEffect(() => {
-        // Tải lại highlight từ localStorage khi component mount
-        const storedHighlights = localStorage.getItem('highlightedSentences');
-        if (storedHighlights) {
-          setHighlightedSentences(JSON.parse(storedHighlights));
-        }
-      }, []);
+    // useEffect(() => {
+    //     // Tải lại highlight từ localStorage khi component mount
+    //     const storedHighlights = localStorage.getItem('highlightedSentences');
+    //     if (storedHighlights) {
+    //       setHighlightedSentences(JSON.parse(storedHighlights));
+    //     }
+    //   }, []);
       
 
 
@@ -371,6 +368,8 @@ const Transcriptv2 = ({
                 id={sentenceId}
                 ref={el => sentenceRefs.current[sentence.sentence_index] = el}
                 className={`transcript-sentence ${activeSentence === sentence.sentence_index ? 'active' : ''} ${isHighlighted ? 'user-highlighted' : ''}`}
+                data-start={sentence.start}
+                data-end={sentence.end}
                 onClick={() => {
                   if (isFinite(time)) {
                     handleSentenceClick(time);

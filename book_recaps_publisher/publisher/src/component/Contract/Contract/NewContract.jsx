@@ -46,7 +46,7 @@ const Contract = () => {
   useEffect(() => {
     const fetchProfileData = async () => {
       try {
-        const profileResponse = await fetch('https://160.25.80.100:7124/api/personal/profile', {
+        const profileResponse = await fetch('https://bookrecaps.cloud/api/personal/profile', {
           method: 'GET',
           headers: {
             'Authorization': `Bearer ${accessToken}`,
@@ -75,7 +75,7 @@ const Contract = () => {
 
       try {
         const response = await axios.get(
-          `https://160.25.80.100:7124/api/Contract/getallcontract`,
+          `https://bookrecaps.cloud/api/Contract/getallcontract`,
           {
             headers: {
               'Authorization': `Bearer ${accessToken}`,
@@ -84,10 +84,18 @@ const Contract = () => {
             },
           }
         );
+        // console.log("Raw contract data:", response.data);
         
         const result = resolveRefs(response.data);
+        // console.log("Resolved contract data:", result);
         // Filter contracts based on the userId
-        const userContracts = result.data.$values.filter(contract => contract.publisher.userId === userId);
+        const userContracts = result.data.$values.filter(contract => {
+          //console.log("Contract data:", contract); // Log từng hợp đồng
+          const publisher = contract.publisher;
+          return publisher && publisher.userId === userId;
+        });
+        
+        console.log("Filtered contracts:", userContracts); 
         setContracts(userContracts);
         setLoading(false);
       } catch (error) {
@@ -105,7 +113,7 @@ const Contract = () => {
     const fetchAttachments = async (contractId) => {
       try {
         const response = await axios.get(
-          `https://160.25.80.100:7124/api/contract-attachment/getallattachmentbycontractid/${contractId}`,
+          `https://bookrecaps.cloud/api/contract-attachment/getallattachmentbycontractid/${contractId}`,
           {
             headers: {
               'Authorization': `Bearer ${accessToken}`,
@@ -187,7 +195,7 @@ const Contract = () => {
       <table className="contract-table">
         <thead>
           <tr>
-          <th>ID</th>
+            <th>ID</th>
             <th>Publisher Name</th>
             <th>Revenue Share</th>
             <th>Start Date</th>

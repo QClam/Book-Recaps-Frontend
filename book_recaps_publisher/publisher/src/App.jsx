@@ -26,6 +26,8 @@ import FetchPublisherData from './component/Publisher/Publisher';
 import PublisherPayout from './component/Publisher/PublisherPayout';
 import PublisherDashboard from './component/Dashboard/PublisherDashboard';
 import UpdateBook from './component/ListBook/UpdateBook/UpdateBook';
+import BookDetail from '../../../book_recaps_audience/Book-Recaps-React/src/Components/TodayFreeRead/BookDetail/BookDetai';
+import DashboardDetail from './component/Dashboard/DashboardDetail';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -63,17 +65,18 @@ const App = () => {
             <Route path="/addbook" element={<AddBook/>} />
             <Route path="/updatebook/:id" element={<UpdateBook />} />
             {/* <Route path="/overview" element={<BookGraph/>} /> */}
-            {/* <Route path="/dashboard" element={<Dashboard/>} /> */}
-            <Route path="/dashboard" element={<PublisherDashboard/>} />
+            <Route path="/dashboard" element={<Dashboard/>} />
+            {/* <Route path="/dashboard" element={<PublisherDashboard/>} /> */}
             {/* <Route path="/earnings" element={<PayoutHistory/>} /> */}
-            <Route path="/earnings" element={<PayoutDetail/>} />
-            <Route path="/notifications" element={<Notification/>} />
+            {/* <Route path="/earnings" element={<PayoutDetail/>} /> */}
+            {/* <Route path="/notifications" element={<Notification/>} /> */}
             {/* <Route path="/feedback" element={<Feedback/>} /> */}
             {/* <Route path="/help" element={<Report/>} /> */}
             <Route path="/settings" element={<Settings/>} />
             <Route path="/publisher" element={<FetchPublisherData/>} />
             <Route path="/publisher-payout-detail/:id" element={<PublisherPayout />} /> 
-            
+            {/* <Route path="/book-detail-tt/:id" element={<BookDetailbook />} /> */}
+            <Route path="/book-dashboard/:bookId" element={<DashboardDetail />} />
             
             
             </Route>

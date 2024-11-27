@@ -43,14 +43,15 @@ const ContractDetail = () => {
   const [isApproved, setIsApproved] = useState(false); // Track if approved
   const [showConfirmModal, setShowConfirmModal] = useState(false); // Modal visibility state
   const [books, setBooks] = useState([]); // State for books
-
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  const [isRejected, setIsRejected] = useState(false); 
   const accessToken = localStorage.getItem("authToken");
 
   useEffect(() => {
     const fetchContractDetail = async () => {
       try {
         const response = await axios.get(
-          `https://160.25.80.100:7124/api/Contract/getcontractby/${id}`,
+          `https://bookrecaps.cloud/api/Contract/getcontractby/${id}`,
           {
             headers: {
               'Authorization': `Bearer ${accessToken}`,
@@ -84,7 +85,7 @@ const ContractDetail = () => {
   const handleStatusChange = async (newStatus) => {
     try {
       await axios.put(
-        `https://160.25.80.100:7124/api/Contract/change-status/${id}`,
+        `https://bookrecaps.cloud/api/Contract/change-status/${id}`,
         { status: newStatus },
         {
           headers: {
@@ -110,10 +111,19 @@ const ContractDetail = () => {
     }
   };
   const confirmApprove = () => {
-    handleStatusChange(2); // Set status to "Approved"
-    setShowConfirmModal(false); // Close modal
+    handleStatusChange(2); // Set trạng thái "Chấp thuận"
+    setShowConfirmModal(false); // Đóng modal
+    setIsApproved(true); // Đánh dấu đã "Chấp thuận"
+    setIsRejected(false); // Vô hiệu hóa "Từ chối"
   };
-
+  
+  const confirmReject = () => {
+    handleStatusChange(5); // Set trạng thái "Từ chối"
+    setShowRejectModal(false); // Đóng modal
+    setIsRejected(true); // Đánh dấu đã "Từ chối"
+    setIsApproved(false); // Vô hiệu hóa "Chấp thuận"
+  };
+  
 
 
   if (loading) return <div>Loading...</div>;
@@ -133,19 +143,24 @@ const ContractDetail = () => {
         <p><strong>Ngày kết thúc:</strong> {new Date(contract.endDate).toLocaleDateString()}</p>
         <p><strong>Trạng thái:</strong> <span className="status">{getStatusLabel(contract.status)}</span></p>
         <div className="buttons">
-        <button 
-            className="edit-btn" 
-            onClick={() => handleStatusChange(4)} 
-            disabled={isApproved} // Disable if approved
-          >
-            Từ chối
-          </button>
-          <button 
-            className="approve-btn" 
-            onClick={() => setShowConfirmModal(true)}
-          >
-            Chấp thuận
-          </button>
+        <div className="buttons">
+  <button
+    className="edit-btn"
+    onClick={() => setShowRejectModal(true)}
+    disabled={isApproved || contract?.status === 2} // Disable nếu đã "Chấp thuận"
+  >
+    Từ chối
+  </button>
+
+  <button
+    className="approve-btn"
+    onClick={() => setShowConfirmModal(true)}
+    disabled={isRejected || contract?.status === 5} // Disable nếu đã "Từ chối"
+  >
+    Chấp thuận
+  </button>
+</div>
+
 
         </div>
       </div>
@@ -218,6 +233,24 @@ const ContractDetail = () => {
           </div>
         </div>
       )}
+
+      {showRejectModal && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <h3>Bạn muốn hủy hợp đồng này?</h3>
+            <p>Nếu hủy, hợp đồng sẽ không còn hiệu lực.</p>
+            <div className="modal-buttons">
+              <button className="cancel-btn" onClick={() => setShowRejectModal(false)}>
+                Hủy bỏ
+              </button>
+              <button className="confirm-btn" onClick={confirmReject}>
+                Đồng ý
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
 
     </div>
   );

@@ -96,7 +96,7 @@ function Login() {
       };
 
       const response = await axios.post(
-        "https://160.25.80.100:7124/api/register",
+        "https://bookrecaps.cloud/api/register",
         newUser
       );
       console.log("Register Successfully", newUser);
@@ -135,7 +135,7 @@ function Login() {
       const capcha = await executeRecaptcha("login");
   
       // Login request
-      const response = await axios.post("https://160.25.80.100:7124/api/tokens", {
+      const response = await axios.post("https://bookrecaps.cloud/api/tokens", {
         email,
         password,
         captchaToken: capcha,
