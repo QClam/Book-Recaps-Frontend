@@ -1,23 +1,17 @@
 import { Suspense } from 'react';
-import { Await, generatePath, Link, useLoaderData } from 'react-router-dom';
+import { Await, generatePath, Link } from 'react-router-dom';
 import { routes } from "../../../routes";
 import Show from "../../Show";
 
-const ForUser = () => {
-  const { recapsForYou } = useLoaderData();
-
+const ForUser = ({ promisedRecaps, title, description }) => {
   return (
     <div className="flex flex-col w-full pt-6 md:pt-16 mx-auto md:px-12">
       <div className="flex flex-col mb-8">
-        <h3 className="font-semibold text-2xl">
-          Đề xuất cho bạn
-        </h3>
-        <p>
-          Các bài viết được đề xuất dựa trên lịch sử xem của bạn
-        </p>
+        <h3 className="font-semibold text-2xl">{title}</h3>
+        <p>{description}</p>
       </div>
       <Suspense fallback={<div>Loading...</div>}>
-        <Await resolve={recapsForYou} errorElement={<div>Error fetching recommendations</div>}>
+        <Await resolve={promisedRecaps} errorElement={<div>Error fetching recommendations</div>}>
           {(recaps) => (
             <Show
               when={recaps.length > 0}

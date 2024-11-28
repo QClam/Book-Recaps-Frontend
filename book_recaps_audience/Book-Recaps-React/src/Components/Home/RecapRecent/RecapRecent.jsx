@@ -15,7 +15,7 @@ const RecapRecent = () => {
   // Function to fetch recaps from the API
   const fetchRecaps = async (currentPage) => {
     try {
-      const response = await axios.get(`https://ai.hieuvo.dev/ml/recommendations/recently-added-recaps?page=${currentPage}`);
+      const response = await axios.get("https://ai.hieuvo.dev/ml/recommendations/recently-added-recaps");
       const data = response.data;
 
       setRecaps(data.items);

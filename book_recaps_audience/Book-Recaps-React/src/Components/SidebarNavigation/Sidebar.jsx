@@ -170,6 +170,7 @@ function Sidebar() {
                   type="search"
                   className="search-inputme text-sm"
                   placeholder="Tìm kiếm tác giả hoặc tiêu đề"
+                  autoComplete="off"
                   value={searchTerm}
                   onChange={handleSearchChange}
                   onFocus={() => setShowSearchResultDropDown(true)}
