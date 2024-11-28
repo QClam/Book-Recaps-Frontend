@@ -1,8 +1,5 @@
 @charset "UTF-8";
 /* Bố cục lưới cho danh sách các tác giả */
-.author-page {
-  margin-top: -70px;
-}
 
 .author-grid {
   display: grid;

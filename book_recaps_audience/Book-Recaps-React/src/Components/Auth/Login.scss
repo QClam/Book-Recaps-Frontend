@@ -13,8 +13,9 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-left: 250px;
-  margin-top: 50px;
+  //margin-left: 250px;
+  //margin-top: 50px;
+  margin: 50px auto;
 
   p {
     font-size: 14px;
@@ -88,7 +89,7 @@
 
   &.active .toggle-container {
     transform: translateX(-100%);
-    border-radius: 0 150px 100px 0;
+    //border-radius: 0 150px 100px 0;
   }
 
   &.active .toggle {
@@ -159,7 +160,7 @@
   height: 100%;
   overflow: hidden;
   transition: all 0.6s ease-in-out;
-  border-radius: 150px 0 0 100px;
+  //border-radius: 150px 0 0 100px;
   z-index: 1000;
 }
 

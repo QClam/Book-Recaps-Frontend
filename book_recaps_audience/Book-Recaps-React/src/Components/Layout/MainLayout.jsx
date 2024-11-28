@@ -1,7 +1,6 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../SidebarNavigation/Sidebar';
 //import Filter from '../Search/Filter';
-
 import '../Search/Filter.scss';
 
 function MainLayout() {
@@ -12,9 +11,7 @@ function MainLayout() {
         {/* <Filter /> */}
       </header>
       <div className="main-content">
-        <div className="page-content">
-          <Outlet/>
-        </div>
+        <Outlet/>
 
         <div className="footer">
           ©{new Date().getFullYear()} BookRecaps {import.meta.env.VITE_WEB_NAME}. All rights reserved

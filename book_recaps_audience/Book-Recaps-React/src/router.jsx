@@ -19,7 +19,7 @@ import OnboardingStepper from "./Components/Onboarding/OnboardML/Onboarding";
 import UsRecapDetail from "./Components/ReadListenBook/UserRecap/UserRecapNewDetail/UsRecapDetail";
 import RecapNewTues from "./Components/ReadListenBook/UserRecap/UserRecapNewDetail/RecapNewTues";
 import History from "./Components/History/History";
-import Homepage from "./Components/Home/Homepage";
+import Homepage, { homepageLoader } from "./Components/Home/Homepage";
 import SubscriptionHistory from "./Components/Setting/SubcriptionHistory/SubcriptionHistory";
 import ErrorRoute from "./Components/ErrorRoute";
 import { sessionLoader } from "./data/loaders/sessionLoader";
@@ -36,7 +36,7 @@ export const router = createBrowserRouter(createRoutesFromElements(
 
     <Route element={<MainLayout/>}>
       {/* ko cần đăng nhập */}
-      <Route path={routes.index} element={<Homepage/>}/>
+      <Route path={routes.index} element={<Homepage/>} loader={homepageLoader}/>
       <Route path={routes.explore} element={<Explore/>}/>
 
       <Route path={routes.categories} element={<ExploreCategory/>}/>

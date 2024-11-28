@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { generatePath, Link, NavLink, useLocation, useNavigate } from "react-router-dom";
+import { generatePath, Link, NavLink, useLocation } from "react-router-dom";
 import "../SidebarNavigation/css/Sidebar.scss";
 import { routes } from "../../routes";
 import Show from "../Show";
@@ -8,8 +8,6 @@ import { useAuth } from "../../contexts/Auth";
 import { axiosInstance } from "../../utils/axios";
 import { CgClose, CgMenu } from "react-icons/cg";
 import { cn } from "../../utils/cn";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSignInAlt } from "@fortawesome/free-solid-svg-icons";
 import { TbSearch } from "react-icons/tb";
 
 function Sidebar() {
@@ -24,7 +22,8 @@ function Sidebar() {
   const searchResultsDropdownEl = useRef(null);
 
   const userName = user?.profileData.userName || user?.profileData.fullName || '';
-  const imageUrl = user?.profileData.imageUrl.replace("Files/Image/jpg/ad.jpg", "") || '/avatar-placeholder.png';
+  const imageUrl = user?.profileData.imageUrl?.replace("Files/Image/jpg/ad.jpg", "") || '/avatar-placeholder.png';
+  const isPremium = user?.profileData.subscriptions.$values.some((sub) => sub.status === 0);
 
   useClickAway(profileDropdownEl, () => {
     if (showProfileDropDown) setShowProfileDropDown(false);
@@ -78,7 +77,7 @@ function Sidebar() {
 
   return (
     <nav className="relative py-2 border-b border-gray-300 z-10">
-      <div className="mx-auto max-w-screen-2xl p-2 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-screen-xl p-2 sm:px-6 lg:px-8">
         <div className="relative flex items-stretch justify-between">
           <div className="absolute inset-y-0 left-2 h-fit flex items-center sm:hidden">
             {/* Mobile menu button */}
@@ -112,7 +111,7 @@ function Sidebar() {
                       "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,
                       "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive
                     })}>
-                    Home
+                    Trang chủ
                   </NavLink>
                   <NavLink
                     to={routes.explore}
@@ -120,42 +119,43 @@ function Sidebar() {
                       "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,
                       "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive
                     })}>
-                    Explore
+                    Khám phá
                   </NavLink>
-                  <NavLink
-                    to={routes.playlist}
-                    className={({ isActive }) => cn("grid place-items-center h-full mt-0.5 border-b-2 border-transparent px-3 py-2 text-sm font-medium", {
-                      "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,
-                      "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive
-                    })}>
-                    Playlist
-                  </NavLink>
+                  <Show when={isAuthenticated}>
+                    <NavLink
+                      to={routes.playlist}
+                      className={({ isActive }) => cn("grid place-items-center h-full mt-0.5 border-b-2 border-transparent px-3 py-2 text-sm font-medium", {
+                        "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,
+                        "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive
+                      })}>
+                      Danh sách phát
+                    </NavLink>
+                  </Show>
 
-
-                  <NavLink
-                    to={routes.books}
-                    className={({ isActive }) => cn("grid place-items-center h-full mt-0.5 border-b-2 border-transparent px-3 py-2 text-sm font-medium", {
-                      "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,
-                      "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive
-                    })}>
-                    Books
-                  </NavLink>
-                  <NavLink
-                    to={routes.categories}
-                    className={({ isActive }) => cn("grid place-items-center h-full mt-0.5 border-b-2 border-transparent px-3 py-2 text-sm font-medium", {
-                      "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,
-                      "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive
-                    })}>
-                    Categories
-                  </NavLink>
-                  <NavLink
-                    to={routes.authors}
-                    className={({ isActive }) => cn("grid place-items-center h-full mt-0.5 border-b-2 border-transparent px-3 py-2 text-sm font-medium", {
-                      "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,
-                      "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive
-                    })}>
-                    Authors
-                  </NavLink>
+                  {/*<NavLink*/}
+                  {/*  to={routes.books}*/}
+                  {/*  className={({ isActive }) => cn("grid place-items-center h-full mt-0.5 border-b-2 border-transparent px-3 py-2 text-sm font-medium", {*/}
+                  {/*    "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,*/}
+                  {/*    "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive*/}
+                  {/*  })}>*/}
+                  {/*  Books*/}
+                  {/*</NavLink>*/}
+                  {/*<NavLink*/}
+                  {/*  to={routes.categories}*/}
+                  {/*  className={({ isActive }) => cn("grid place-items-center h-full mt-0.5 border-b-2 border-transparent px-3 py-2 text-sm font-medium", {*/}
+                  {/*    "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,*/}
+                  {/*    "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive*/}
+                  {/*  })}>*/}
+                  {/*  Categories*/}
+                  {/*</NavLink>*/}
+                  {/*<NavLink*/}
+                  {/*  to={routes.authors}*/}
+                  {/*  className={({ isActive }) => cn("grid place-items-center h-full mt-0.5 border-b-2 border-transparent px-3 py-2 text-sm font-medium", {*/}
+                  {/*    "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,*/}
+                  {/*    "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive*/}
+                  {/*  })}>*/}
+                  {/*  Authors*/}
+                  {/*</NavLink>*/}
                 </div>
               </div>
             </div>
@@ -168,22 +168,22 @@ function Sidebar() {
               >
                 <input
                   type="search"
-                  className="search-inputme"
+                  className="search-inputme text-sm"
                   placeholder="Tìm kiếm tác giả hoặc tiêu đề"
                   value={searchTerm}
                   onChange={handleSearchChange}
                   onFocus={() => setShowSearchResultDropDown(true)}
                 />
-                <button type="button" className="search-buttonme text-gray-600">
+                <div className="search-buttonme text-gray-600">
                   <TbSearch size={20}/>
-                </button>
+                </div>
                 <Show when={filteredBooks.length > 0 && showSearchResultDropDown}>
                   <ul className="search-results">
                     {filteredBooks.map((book) => (
                       <li key={book.id}>
                         <Link to={generatePath(routes.bookDetail, { id: book.id })} className="search-result-itemem">
                           <div className="book-itemem">
-                            <img src={book.coverImage || "defaultCover.jpg"} alt="Book cover" className="book-cover"/>
+                            <img src={book.coverImage || "/empty-image.jpg"} alt="Book cover" className="book-cover"/>
                             <div className="book-info">
                               <strong>{book.title}</strong>
                               <p>By: {book.authors.$values.map((author) => author.name).join(', ')}</p>
@@ -196,23 +196,40 @@ function Sidebar() {
                 </Show>
               </div>
 
-              <div className="relative items-center hidden sm:flex" ref={profileDropdownEl}>
+              <div className="relative items-center ml-2 hidden sm:flex" ref={profileDropdownEl}>
                 <Show when={isAuthenticated} fallback={
-                  <Link to={routes.login} className="login-button">
-                    <FontAwesomeIcon icon={faSignInAlt} className="login-icon"/>
-                    <span>Login</span>
-                  </Link>
+                  <div className="flex items-center gap-4">
+                    <Link
+                      to={routes.login}
+                      className="block w-max p-2 border border-[#FF6F61] rounded-md text-sm font-semibold text-[#FF6F61] hover:text-[#FF6F61]/80">
+                      Đăng nhập
+                    </Link>
+                    <Link
+                      to={routes.login}
+                      state={{ isRegister: true }}
+                      className="block w-max p-2 border border-[#FF6F61] rounded-md text-sm font-semibold text-white bg-[#FF6F61] hover:bg-[#FF6F61]/80">
+                      Đăng ký
+                    </Link>
+                  </div>
                 }>
                   <div className="user-profile" onClick={toggleLogout}>
-                    <span className="user-name">{userName}</span>
-                    <div className="w-8 h-8">
+                    <div className="text-sm">
+                      <p className="font-semibold">{userName}</p>
+                      <p className={cn("text-xs rounded-full px-2 py-0.5", {
+                        "bg-[#FF6F61] text-white": isPremium,
+                        "bg-gray-300 text-gray-700": !isPremium
+                      })}>
+                        {isPremium ? "Premium" : "Miễn phí"}
+                      </p>
+                    </div>
+                    <div className="w-10 h-10">
                       <img src={imageUrl} alt="User Avatar" className="w-full h-full object-cover rounded-full"/>
                     </div>
                   </div>
                 </Show>
 
                 <Show when={showProfileDropDown}>
-                  <div className="logout-option rounded ">
+                  <div className="logout-option rounded">
                     <Link
                       className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20"
                       to={routes.profileSettings}>
@@ -258,41 +275,41 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
           className={({ isActive }) => cn("text-gray-700 block rounded-md px-3 py-2 text-base font-medium",
             isActive ? "bg-[#FF6F61]/30" : "hover:bg-[#FF6F61]/30")}
         >
-          Home
+          Trang chủ
         </NavLink>
         <NavLink
           to={routes.explore}
           className={({ isActive }) => cn("text-gray-700 block rounded-md px-3 py-2 text-base font-medium",
             isActive ? "bg-[#FF6F61]/30" : "hover:bg-[#FF6F61]/30")}
         >
-          Explore
+          Khám phá
         </NavLink>
         <NavLink
           to={routes.playlist}
           className={({ isActive }) => cn("text-gray-700 block rounded-md px-3 py-2 text-base font-medium",
             isActive ? "bg-[#FF6F61]/30" : "hover:bg-[#FF6F61]/30")}
         >
-          Playlist
+          Danh sách phát
         </NavLink>
         <NavLink
           to={routes.viewHistory}
           className={({ isActive }) => cn("text-gray-700 block rounded-md px-3 py-2 text-base font-medium",
             isActive ? "bg-[#FF6F61]/30" : "hover:bg-[#FF6F61]/30")}
         >
-          View history
+          Lịch sử xem
         </NavLink>
         <NavLink
           to={routes.profileSettings}
           className={({ isActive }) => cn("text-gray-700 block rounded-md px-3 py-2 text-base font-medium",
             isActive ? "bg-[#FF6F61]/30" : "hover:bg-[#FF6F61]/30")}
         >
-          Profile settings
+          Tài khoản
         </NavLink>
         <Link
           to={routes.logout}
           className="text-gray-700 block rounded-md px-3 py-2 text-base font-medium hover:bg-[#FF6F61]/30"
         >
-          Logout
+          Đăng xuất
         </Link>
       </div>
     </div>

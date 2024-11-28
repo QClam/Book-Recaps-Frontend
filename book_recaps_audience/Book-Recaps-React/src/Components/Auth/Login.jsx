@@ -1,15 +1,16 @@
 import { useState } from "react";
 import axios from "axios";
 import "./Login.scss";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/Auth";
 import { jwtDecode } from "jwt-decode";
 import { isRoleMatched, isValidToken } from "../../utils/axios";
 
 function Login() {
-  const { login } = useAuth();
-  const [ isActive, setIsActive ] = useState(false);
+  const location = useLocation();
   const navigate = useNavigate();
+  const { login } = useAuth();
+  const [ isActive, setIsActive ] = useState(location.state?.isRegister || false);
 
   const [ registerForm, setRegisterForm ] = useState({
     fullName: "",
@@ -279,7 +280,7 @@ function Login() {
               <p>
                 Nhập thông tin cá nhân để sử dụng các chức năng của trang web
               </p>
-              <button className="hidden" id="login" onClick={handleLoginClick}>
+              <button id="login" onClick={handleLoginClick}>
                 Đăng nhập
               </button>
             </div>
@@ -289,7 +290,6 @@ function Login() {
                 Đăng ký thông tin cá nhân để sử dụng các chức năng của trang web
               </p>
               <button
-                className="hidden"
                 id="register"
                 onClick={handleRegisterClick}
               >
