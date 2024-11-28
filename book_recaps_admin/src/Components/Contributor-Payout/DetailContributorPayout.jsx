@@ -1,14 +1,16 @@
 import { Box, Button, Grid, Link, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, TextField, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import * as XLSX from 'xlsx'
 import api from '../Auth/AxiosInterceptors';
 import dayjs from 'dayjs';
+import { Visibility } from '@mui/icons-material';
 
 
 function DetailContributorPayout() {
 
     const { id } = useParams();
+    const navigate = useNavigate();
 
     const [payoutData, setPayoutData] = useState([]);
     const [recapEarnings, setRecapEarnings] = useState([]);
@@ -51,6 +53,9 @@ function DetailContributorPayout() {
         XLSX.writeFile(workbook, "RecapData.xlsx");
     }
 
+    const detailRecap = async (id) => {
+        navigate(`/recap/${id}`)
+    }
 
     return (
         <Box sx={{ width: "80vw" }}>
@@ -162,8 +167,8 @@ function DetailContributorPayout() {
                                     <TableCell>Tiêu đề</TableCell>
                                     <TableCell>Từ ngày</TableCell>
                                     <TableCell>Tới ngày</TableCell>
-                                    {/* <TableCell>Lượt xem</TableCell> */}
                                     <TableCell>Doanh thu (VND)</TableCell>
+                                    <TableCell></TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -173,8 +178,8 @@ function DetailContributorPayout() {
                                             <TableCell>{item.recap?.name}</TableCell>
                                             <TableCell>{dayjs(payoutData.fromDate).format('DD/MM/YYYY')}</TableCell>
                                             <TableCell>{dayjs(payoutData.toDate).format('DD/MM/YYYY')}</TableCell>
-                                            {/* <TableCell>{item.recap?.viewCount || 0} Lượt</TableCell> */}
-                                            <TableCell>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.earningAmount)}</TableCell>
+                                            <TableCell>{(item.earningAmount ?? 0).toLocaleString('vi-VN')} VND</TableCell>
+                                            <TableCell><Button onClick={() => detailRecap(item.recapId)}><Visibility /></Button></TableCell>
                                         </TableRow>
                                     ))
                                 ) : (

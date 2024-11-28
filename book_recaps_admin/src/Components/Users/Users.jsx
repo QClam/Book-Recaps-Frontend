@@ -18,6 +18,7 @@ function Users() {
     const [page, setPage] = useState(0); // Trang hiện tại
     const [rowsPerPage, setRowsPerPage] = useState(5); // Dòng mỗi trang    
     const [searchTerm, setSearchTerm] = useState(""); // Nhập input ô search
+    const [filterRole, setFilterRole] = useState(""); // Lọc vai trò
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [modalType, setModalType] = useState(null); // State để xác định mở Modal AddUser hay UpdateUser
@@ -74,6 +75,11 @@ function Users() {
             );
         }
 
+        // Status filter
+        if (filterRole) {
+            filteredData = filteredData.filter((item) => item.roleType === filterRole);
+        }
+
         setFilteredUsers(filteredData);
 
         // Kiểm tra nếu page vượt quá tổng số trang
@@ -81,7 +87,7 @@ function Users() {
         if (page >= totalPages) {
             setPage(0);  // Reset page về 0 nếu vượt quá số trang
         }
-    }, [searchTerm, users, page, rowsPerPage]);
+    }, [searchTerm, filterRole, users, page, rowsPerPage]);
 
     const handleChangePage = (event, newPage) => {
         // Kiểm tra xem trang có hợp lệ hay không
@@ -101,7 +107,7 @@ function Users() {
             const response = await api.get('/api/users/getalluser');
             const users = response.data.$values;
             console.log(users);
-            
+
             setFilteredUsers(users)
             setUsers(users);
         } catch (error) {
@@ -194,7 +200,7 @@ function Users() {
 
     if (loading) {
         return (
-            <div className="loading">
+            <Box display="flex" justifyContent="center" width="80vw">
                 <Hourglass
                     visible={true}
                     height="80"
@@ -202,27 +208,37 @@ function Users() {
                     ariaLabel="hourglass-loading"
                     colors={["#306cce", "#72a1ed"]}
                 />
-            </div>
+            </Box>
         );
     }
 
     return (
         <Box sx={{ width: "80vw", padding: '24px' }}>
             <Typography variant='h5' gutterBottom>Quản lý người dùng</Typography>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2, gap: 2 }}>
                 <TextField
                     label="Tìm kiếm theo tên"
                     variant="outlined"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     size="small"
-                    sx={{ width: '40%' }}
+                    sx={{ width: "30%" }}
                 />
-            </Box>
-            <Box display="flex" justifyContent="flex-end" mt={2} padding={2}>
-                <Button variant="contained" color="primary" onClick={handleAddUser}>
-                    Thêm mới người dùng
-                </Button>
+                <TextField
+                    select
+                    label="Vai trò"
+                    value={filterRole}
+                    onChange={(e) => setFilterRole(e.target.value)}
+                    size="small"
+                    sx={{ width: "20%" }}
+                >
+                    <MenuItem value="">Tất cả</MenuItem>
+                    <MenuItem value={1}>Nhân viên</MenuItem>
+                    <MenuItem value={2}>Người đóng góp</MenuItem>
+                    <MenuItem value={3}>Nhà xuất bản</MenuItem>
+                    <MenuItem value={4}>Thính giả</MenuItem>
+                </TextField>
+                <Chip label="Thêm mới người dùng" variant="outlined" color="primary" onClick={handleAddUser} sx={{ marginLeft: 'auto' }} />
             </Box>
             <TableContainer component={Paper}>
                 <Table>
@@ -245,15 +261,15 @@ function Users() {
                                 <TableCell>{new Date(user.birthDate).toLocaleDateString('en-GB')}</TableCell>
                                 <TableCell>
                                     {user.roleType === 0 ? (
-                                        <Chip label="Super Admin" color="error" variant="outlined" />
+                                        <Typography color='error'>Super Admin</Typography>
                                     ) : user.roleType === 1 ? (
-                                        <Chip label="Nhân viên" color="warning" variant="outlined" />
+                                        <Typography color='warning'>Nhân viên</Typography>
                                     ) : user.roleType === 2 ? (
-                                        <Chip label="Người đóng góp" color="primary" variant="outlined" />
+                                        <Typography color='primary'>Người đóng góp</Typography>
                                     ) : user.roleType === 3 ? (
-                                        <Chip label="Nhà xuất bản" color="success" variant="outlined" />
+                                        <Typography color='success'>Nhà xuất bản</Typography>
                                     ) : user.roleType === 4 ? (
-                                        <Chip label="Thính giả" color="error" variant="outlined" />
+                                        <Typography color='error'>Thính giả</Typography>
                                     ) : (
                                         <Chip label="Unknow" color="primary" variant="outlined" />
                                     )}
@@ -279,6 +295,8 @@ function Users() {
                                 labelDisplayedRows={({ from, to, count }) =>
                                     `${from}–${to} trên ${count !== -1 ? count : `nhiều hơn ${to}`}`
                                 }
+                                showFirstButton
+                                showLastButton
                             />
                         </TableRow>
                     </TableFooter>

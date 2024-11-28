@@ -2,56 +2,91 @@ import React, { useEffect, useRef, useState } from 'react';
 import Chart from 'chart.js/auto';
 import { Box, Typography, Card, CardContent, Grid, Button, Paper } from '@mui/material';
 import { DateRangePicker } from 'rsuite';
-import 'rsuite/dist/rsuite.min.css';
-import revenueData from './data/revenueData.json';
+import { useParams } from 'react-router-dom';
+import api from '../Auth/AxiosInterceptors';
+import dayjs from 'dayjs';
 
 function BookDetail() {
+    const { id } = useParams();
     const chartRef = useRef(null);
     const chartInstanceRef = useRef(null);
-    const [dateRange, setDateRange] = useState([]);
+
+    const today = dayjs().format("YYYY-MM-DD");
+    const [dateRange, setDateRange] = useState([today, today]);
+
+    const [bookData, setBookData] = useState({
+        title: '',
+        dailyStats: [],
+        lastPayout: { fromDate: '', toDate: '', amount: 0 },
+    });
+
+    const getBookData = async (fromDate, toDate) => {
+        if (!id) return;
+
+        try {
+            const response = await api.get(`/api/dashboard/getbookdetail/${id}`, {
+                params: { fromDate, toDate },
+            });
+
+            const bookDetails = response.data.data || {};
+            const dailyStats = bookDetails.dailyStats?.$values || [];
+
+            setBookData({
+                title: bookDetails.title || "Không có tiêu đề",
+                dailyStats,
+                lastPayout: bookDetails.lastPayout || { fromDate: '', toDate: '', amount: 0 },
+            });
+
+            updateChart(dailyStats);
+        } catch (error) {
+            console.error("Error Fetching Book Detail: ", error);
+        }
+    };
+
+    useEffect(() => {
+        const [fromDate, toDate] = dateRange;
+        getBookData(fromDate, toDate); // Sử dụng dateRange từ state
+    }, []); // Chỉ chạy một lần khi component render
+
+
+    const handleDateChange = async (range) => {
+        if (range?.[0] && range?.[1]) {
+            const fromDate = dayjs(range[0]).format("YYYY-MM-DD");
+            const toDate = dayjs(range[1]).format("YYYY-MM-DD");
+
+            setDateRange([fromDate, toDate]);
+            await getBookData(fromDate, toDate);
+        } else {
+            console.error("Invalid date range");
+        }
+    };
+
 
     useEffect(() => {
         if (chartRef.current) {
-            // Hủy biểu đồ cũ nếu đã tồn tại
-            if (chartInstanceRef.current) {
-                chartInstanceRef.current.destroy();
-            }
-
             const ctx = chartRef.current.getContext('2d');
+
             chartInstanceRef.current = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: revenueData.map((item) => item.label),
+                    labels: [], // Sẽ được cập nhật sau
                     datasets: [
                         {
-                            label: 'Revenue',
-                            data: revenueData.map((item) => item.revenue),
+                            label: 'Earnings',
+                            data: [],
                             borderColor: 'rgba(75, 192, 192, 1)',
                             backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        },
-                        {
-                            label: 'Cost',
-                            data: revenueData.map((item) => item.cost),
-                            borderColor: 'rgba(255, 99, 132, 1)',
-                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
                         },
                     ],
                 },
                 options: {
                     responsive: true,
                     plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Thu nhập của cuốn sách',
-                        },
+                        legend: { position: 'top' },
+                        title: { display: true, text: 'Doanh thu theo thời gian' },
                     },
                     scales: {
-                        y: {
-                            beginAtZero: true,
-                        },
+                        y: { beginAtZero: true },
                     },
                 },
             });
@@ -65,20 +100,22 @@ function BookDetail() {
         };
     }, []);
 
+    const updateChart = (dailyStats) => {
+        if (!chartInstanceRef.current || !chartRef.current || dailyStats.length === 0) return;
 
-    const handleFilter = () => {
-        const [startDate, endDate] = dateRange;
-        if (startDate && endDate) {
-            alert(`Đã chọn từ ngày: ${startDate.toLocaleDateString()} đến ngày: ${endDate.toLocaleDateString()}`);
-          } else {
-            alert('Vui lòng chọn khoảng thời gian hợp lệ.');
-          }
+        const labels = dailyStats.map((stat) => dayjs(stat.date).format('DD-MM-YYYY'));
+        const earnings = dailyStats.map((stat) => stat.earning);
+
+        chartInstanceRef.current.data.labels = labels;
+        chartInstanceRef.current.data.datasets[0].data = earnings;
+
+        chartInstanceRef.current.update();
     };
 
     return (
         <Box sx={{ padding: 4, width: "80vw" }}>
             <Typography variant="h4" gutterBottom>
-                Doanh thu của cuốn (Tên fetch API sau)
+                Doanh thu của cuốn sách: {bookData.title}
             </Typography>
             <Box display="flex">
                 <Paper
@@ -93,15 +130,14 @@ function BookDetail() {
                     <Typography variant="subtitle1" color="textSecondary">
                         Thu nhập
                     </Typography>
-                    <Typography
-                        variant="caption"
-                        display="block"
-                        color="textSecondary"
-                        gutterBottom
-                    >
-                        (01-02-2010 tới current_date)
+                    <Typography variant="caption" display="block" color="textSecondary" gutterBottom>
+                        ({bookData.lastPayout?.fromDate ? dayjs(bookData.lastPayout.fromDate).format('DD-MM-YYYY') : 'N/A'} -
+                        {bookData.lastPayout?.toDate ? dayjs(bookData.lastPayout.toDate).format('DD-MM-YYYY') : 'N/A'})
                     </Typography>
-                    <Typography variant="h6">-- VND</Typography>
+                    <Typography variant="h6">
+                        {(bookData.lastPayout?.amount ?? 0).toLocaleString('vi-VN')} VND
+                    </Typography>
+
                 </Paper>
 
                 <Paper
@@ -122,31 +158,20 @@ function BookDetail() {
                         color="textSecondary"
                         gutterBottom
                     >
-                        (01-01-2010 tới 01-02-2010)
+                        ({dayjs(bookData.lastPayout.fromDate).format('DD-MM-YYYY')} - {dayjs(bookData.lastPayout.toDate).format('DD-MM-YYYY')})
                     </Typography>
-                    <Typography variant="h6">100.000 VND</Typography>
+                    <Typography variant="h6">{(bookData.lastPayout.amount ?? 0).toLocaleString('vi-VN')} VND</Typography>
                 </Paper>
             </Box>
-            <Grid container spacing={1} mb={2}>
-                <Grid item xs={4}>
+            <Box>
+                <Typography textAlign='center' sx={{ marginBottom: 2 }}>Hãy chọn khoảng thời gian để hiển thị số liệu</Typography>
+                <Box display='flex' justifyContent='center'>
                     <DateRangePicker
                         format="dd-MM-yyyy"
-                        value={dateRange}
-                        onChange={(value) => setDateRange(value)}
-                        style={{ width: '100%' }}
+                        onChange={handleDateChange}
                     />
-                </Grid>
-                <Grid item xs={8} sm={1}>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        fullWidth
-                        onClick={handleFilter}
-                    >
-                        Chọn
-                    </Button>
-                </Grid>
-            </Grid>
+                </Box>
+            </Box>
             <Card>
                 <CardContent>
                     <canvas ref={chartRef}></canvas>

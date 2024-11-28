@@ -59,7 +59,7 @@ function ContractsList() {
             const contracts = resolveRefs(response.data.data.$values);
             setContracts(contracts);
             setFilteredContracts(contracts)
-            console.log(contracts);
+            // console.log(contracts);
             setLoading(false);
 
         } catch (error) {
@@ -73,7 +73,7 @@ function ContractsList() {
             const contractId = response.data.data?.id;
 
             if (contractId) {
-                console.log("Create Contract successfully: ", response.data.data);
+                // console.log("Create Contract successfully: ", response.data.data);
                 navigate(`/contract/${contractId}`);
             } else {
                 console.log("ContractId not Found.");
@@ -101,6 +101,7 @@ function ContractsList() {
     };
 
     useEffect(() => {
+        // console.log("useEffect triggered - filterStatus:", filterStatus); // Kiểm tra xem useEffect có được kích hoạt không
         let filteredData = contracts;
 
         // Search filter
@@ -111,8 +112,11 @@ function ContractsList() {
         }
 
         // Status filter
-        if (filterStatus) {
-            filteredData = filteredData.filter((item) => item.status === filterStatus);
+        if (filterStatus !== "") {
+            filteredData = filteredData.filter((item) => {
+                // console.log("Item Status: ", item.status); // Kiểm tra giá trị của item.status
+                return item.status === Number(filterStatus);
+            });
         }
 
         setFilteredContracts(filteredData);
@@ -130,7 +134,7 @@ function ContractsList() {
 
     if (loading) {
         return (
-            <div className="loading">
+            <Box display="flex" justifyContent="center" width="80vw">
                 <Hourglass
                     visible={true}
                     height="80"
@@ -138,7 +142,7 @@ function ContractsList() {
                     ariaLabel="hourglass-loading"
                     colors={["#306cce", "#72a1ed"]}
                 />
-            </div>
+            </Box>
         );
     }
 
@@ -158,21 +162,25 @@ function ContractsList() {
                     select
                     label="Trạng thái"
                     value={filterStatus}
-                    onChange={(e) => setFilterStatus(e.target.value)}
+                    onChange={(e) => {
+                        const value = e.target.value === "" ? "" : Number(e.target.value); 
+                        setFilterStatus(value); // Cập nhật giá trị của filterStatus
+                    }}
                     size="small"
                     sx={{ width: '20%' }}
                 >
                     <MenuItem value="">Tất cả</MenuItem>
+                    <MenuItem value={0}>Bản nháp</MenuItem>
                     <MenuItem value={1}>Đang xử lý</MenuItem>
                     <MenuItem value={2}>Chưa bắt đầu</MenuItem>
                     <MenuItem value={3}>Đang kích hoạt</MenuItem>
                     <MenuItem value={4}>Hết hạn</MenuItem>
                     <MenuItem value={5}>Từ chối</MenuItem>
-                    <MenuItem value={0}>Bản nháp</MenuItem>
                 </TextField>
-                <Button variant="contained" color="primary" onClick={() => createContract()}>
-                    Thêm Hợp Đồng
-                </Button>
+
+                <Chip label="Thêm hợp đồng" variant="outlined" color="primary" onClick={() => createContract()} />
+
+
             </Box>
             <Box>
                 <TableContainer component={Paper}>
@@ -196,22 +204,22 @@ function ContractsList() {
                                     <TableCell>{new Date(item.startDate).toLocaleDateString()}</TableCell>
                                     <TableCell>{new Date(item.endDate).toLocaleDateString()}</TableCell>
                                     <TableCell>{item.autoRenew === true ? (
-                                        <Button>Có</Button>
+                                        <Typography color='success'>Có</Typography>
                                     ) : (
-                                        <Button color="error">Không</Button>
+                                        <Typography color='error'>Không</Typography>
                                     )}</TableCell>
                                     <TableCell>{item.status === 0 ? (
-                                        <Chip label="Bản nháp" color="warning" variant="outlined" />
+                                        <Typography color='warning'>Bản nháp</Typography>
                                     ) : item.status === 1 ? (
-                                        <Chip label="Đang xử lý" color="primary" variant="outlined" />
+                                        <Typography color='primary'>Đang xử lý</Typography>
                                     ) : item.status === 2 ? (
-                                        <Chip label="Chưa bắt đàu" color="info" variant="outlined" />
+                                        <Typography color='info'>Chưa bắt đầu</Typography>
                                     ) : item.status === 3 ? (
-                                        <Chip label="Đang kích hoạt" color="success" variant="outlined" />
+                                        <Typography color='success'>Đang kích hoạt</Typography>
                                     ) : item.status === 4 ? (
-                                        <Chip label="Hết hạn" color="error" variant="outlined" />
+                                        <Typography color='error'>Hết hạn</Typography>
                                     ) : item.status === 5 ? (
-                                        <Chip label="Từ chối" color="error" variant="outlined" />
+                                        <Typography color='error'>Từ chối</Typography>
                                     ) : (
                                         <Button variant="contained">Unknow</Button>
                                     )}</TableCell>

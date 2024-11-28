@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SidebarItems } from "./SidebarItems";
 
-import avatar from "../../data/avarta.png"
+import avatar from "../../data/avatar.png"
 import "../Sidebar/Sidebar.scss";
 import { Logout } from "@mui/icons-material";
 

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import api from "../Auth/AxiosInterceptors";
 import {
+    Box,
     Button,
     Dialog,
     DialogActions,
@@ -16,18 +17,25 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
+import { Edit } from "@mui/icons-material";
+import { Hourglass } from "react-loader-spinner";
 
 function PublisherList() {
     const [publishers, setPublishsers] = useState([]);
     const [selectedPublisher, setSelectedPublisher] = useState(null);
     const [open, setOpen] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const fetchPublishers = async () => {
+
+        setLoading(true);
+
         try {
             const response = await api.get("/api/publisher/getallpublishers");
             const publishers = response.data.$values;
             setPublishsers(publishers);
             console.log("Publishers: ", publishers);
+            setLoading(false)
         } catch (error) {
             console.error("Error Fetching Publishers", error);
         }
@@ -72,8 +80,22 @@ function PublisherList() {
         setSelectedPublisher(null);
     };
 
+    if (loading) {
+        return (
+            <Box display="flex" justifyContent="center" width="80vw">
+                <Hourglass
+                    visible={true}
+                    height="80"
+                    width="80"
+                    ariaLabel="hourglass-loading"
+                    colors={["#306cce", "#72a1ed"]}
+                />
+            </Box>
+        );
+    }
+
     return (
-        <div className="userlist-container">
+        <Box sx={{width: "80vw"}}>
             <Typography variant="h5" sx={{margin: 2}}>Danh sách các NXB</Typography>
             <TableContainer component={Paper}>
                 <Table>
@@ -98,13 +120,12 @@ function PublisherList() {
                                 <TableCell>{item.publisherName}</TableCell>
                                 <TableCell>{item.contactInfo}</TableCell>
                                 <TableCell>{item.bankAccount}</TableCell>
-                                <TableCell>{item.revenueSharePercentage} %</TableCell>
+                                <TableCell><Typography color="success">{item.revenueSharePercentage} %</Typography></TableCell>
                                 <TableCell>
                                     <Button
-                                        variant="outlined"
                                         onClick={() => handleEditClick(item)}
                                     >
-                                        Chỉnh sửa
+                                        <Edit />
                                     </Button>
                                 </TableCell>
                             </TableRow>
@@ -117,7 +138,7 @@ function PublisherList() {
                 <DialogTitle>Thông tin Nhà Xuất Bản</DialogTitle>
                 <DialogContent>
                     {selectedPublisher && (
-                        <div>
+                        <Box>
                             <TextField
                                 label="Tên NXB"
                                 name="publisherName"
@@ -151,7 +172,7 @@ function PublisherList() {
                                 fullWidth
                                 margin="normal"
                             />
-                        </div>
+                        </Box>
                     )}
                 </DialogContent>
                 <DialogActions>
@@ -163,7 +184,7 @@ function PublisherList() {
                     </Button>
                 </DialogActions>
             </Dialog>
-        </div>
+        </Box>
     );
 }
 

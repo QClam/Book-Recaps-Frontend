@@ -15,6 +15,8 @@ import {
     Select,
     MenuItem,
     InputLabel,
+    FormControlLabel,
+    Checkbox,
 } from '@mui/material';
 import Swal from 'sweetalert2';
 
@@ -22,6 +24,7 @@ import api from '../Auth/AxiosInterceptors';
 import AddContractAttachment from './AddContractAttachment';
 import AddContractBooks from './AddContractBooks';
 import { fetchContractDetail } from './ContractServices';
+import { Hourglass } from 'react-loader-spinner';
 
 
 function ContractDetail() {
@@ -34,6 +37,8 @@ function ContractDetail() {
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
     const [publishers, setPublishsers] = useState([]);
+    const [isCheckbox, setIsCheckbox] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const [contractForm, setContractForm] = useState({
         isPublisherApproved: false,
@@ -55,6 +60,7 @@ function ContractDetail() {
                 setContract(result.contract);
                 setContractAttachments(result.contractAttachments);
                 console.log(result.contract);
+                setLoading(false);
             }
         } catch (error) {
             console.error("Error Fetching Contract Details", error);
@@ -123,6 +129,10 @@ function ContractDetail() {
         }));
     };
 
+    const handleCheckboxChange = (e) => {
+        setIsCheckbox(e.target.checked); // Cập nhật trạng thái của checkbox
+    };
+
     const handleSaveContract = async () => {
 
         const contractFormData = {
@@ -148,15 +158,15 @@ function ContractDetail() {
 
     const handleSendContract = async () => {
         const contractFormData = {
-            status: 1,
+            status: isCheckbox ? 3 : 1,
         };
 
         const result = await Swal.fire({
-            title: 'Bạn có chắc chắn muốn gửi?',
-            text: 'Bạn có muốn gửi bản hợp đồng này?',
+            title: isCheckbox ? 'Bạn có chắc chắn muốn kích hoạt hợp đồng?' : 'Bạn có chắc chắn muốn gửi?',
+            text: isCheckbox ? 'Hợp đồng sẽ được kích hoạt ngay lập tức.' : 'Hợp đồng sẽ được gửi để xử lý.',
             icon: 'question',
             showCancelButton: true,
-            confirmButtonText: 'Có, gửi!',
+            confirmButtonText: 'Có, ' + (isCheckbox ? 'Kích hoạt' : 'Gửi') + '!',
             cancelButtonText: 'Hủy!',
             confirmButtonColor: "#d33",
             cancelButtonColor: "#3085d6",
@@ -171,13 +181,15 @@ function ContractDetail() {
                 setContractForm(response.data);
                 console.log("Contract Form: ", response.data);
                 getContractDetail();
-                Swal.fire('Thành công', 'Bản hợp đồng đã được gửi!', 'success');
+                Swal.fire('Thành công',
+                    isCheckbox ? 'Hợp đồng đã được kích hoạt!' : 'Bản hợp đồng đã được gửi!',
+                    'success');
             } catch (error) {
                 console.log("Error Posting", error);
                 Swal.fire('Lỗi', 'Đã xảy ra lỗi!', 'error');
             }
         } else {
-            Swal.fire('Đã hủy', 'Hủy gửi bản hợp đồng', 'info');
+            Swal.fire('Đã hủy', 'Hành động đã bị hủy', 'info');
         }
     };
 
@@ -198,6 +210,20 @@ function ContractDetail() {
             });
         }
     }, [contract]);
+
+    if (loading) {
+        return (
+            <Box display="flex" justifyContent="center" width="80vw">
+                <Hourglass
+                    visible={true}
+                    height="80"
+                    width="80"
+                    ariaLabel="hourglass-loading"
+                    colors={["#306cce", "#72a1ed"]}
+                />
+            </Box>
+        );
+    }
 
     return (
         <div className='contract-list-container'>
@@ -289,7 +315,19 @@ function ContractDetail() {
 
                                 <Grid item xs={12}>
                                     <Box display="flex" justifyContent="flex-end" gap={2}>
-                                        <Button variant="contained" color="primary" onClick={handleSendContract} disabled={disableUpdate}>
+                                        <FormControlLabel
+                                            control={<Checkbox checked={isCheckbox} onChange={handleCheckboxChange} disabled={disableUpdate} />}
+                                            label="Kích hoạt ngay"
+                                        />
+                                        <Button
+                                            variant="contained"
+                                            color="secondary"
+                                            onClick={handleSendContract}
+                                            disabled={!isCheckbox || disableUpdate}
+                                        >
+                                            Kích hoạt hợp đồng
+                                        </Button>
+                                        <Button variant="contained" color="primary" onClick={handleSendContract} disabled={disableUpdate || isCheckbox}>
                                             Gửi
                                         </Button>
                                         <Button variant="contained" color="success" onClick={handleSaveContract} disabled={disableUpdate}>
@@ -325,9 +363,9 @@ function ContractDetail() {
                     </Card>
                 </Box>
 
-                <AddContractAttachment contractId={contractId} disableUpdate={disableUpdate}/>
+                <AddContractAttachment contractId={contractId} disableUpdate={disableUpdate} />
 
-                <AddContractBooks contractId={contractId} disableUpdate={disableUpdate}/>
+                <AddContractBooks contractId={contractId} disableUpdate={disableUpdate} />
 
             </Box>
         </div>

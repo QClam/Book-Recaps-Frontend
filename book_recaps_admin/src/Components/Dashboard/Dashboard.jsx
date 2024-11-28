@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import { DateRangePicker } from 'rsuite';
-import 'rsuite/dist/rsuite.min.css';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import { Typography, Box } from '@mui/material';
@@ -27,9 +26,6 @@ function Dashboard() {
             const premiumPackage = data.packageSales.$values;
             setDashboardData(data);
             setPremiumPackage(premiumPackage);
-            console.log("DashboardData: ", data);
-            console.log("Package: ", premiumPackage);
-
         } catch (error) {
             console.error('Lỗi khi gọi API:', error);
         }
@@ -54,22 +50,22 @@ function Dashboard() {
     };
 
     const overview = [
-        { title: 'Doanh thu gói Package', value: dashboardData?.revenueFromPackages || "Chưa tính toán" },
-        { title: 'Số lượng Gói Premium đã bán (Theo tháng)', value: premiumPackage[0]?.count || "Chưa tính toán hoặc chưa có" },
-        { title: 'Số lượng Gói Premium đã bán (Theo năm)', value: premiumPackage[1]?.count || "Chưa tính toán hoặc chưa có" },
-        { title: 'Số bài viết mới', value: dashboardData?.newRecaps || "Chưa tính toán" },
-        { title: 'Tiền chi cho Nhà xuất bản', value: dashboardData.publisherExpense || "Chưa tính toán" },
-        { title: 'Tiền chi cho Người đóng góp', value: dashboardData.contributorExpense || "Chưa tính toán" },
+        { title: 'Doanh thu gói Package', value: dashboardData?.revenueFromPackages || "0" },
+        { title: 'Số lượng Gói Premium đã bán (Theo tháng)', value: premiumPackage[0]?.count || "0" },
+        { title: 'Số lượng Gói Premium đã bán (Theo năm)', value: premiumPackage[1]?.count || "0" },
+        { title: 'Số bài viết mới', value: dashboardData?.newRecaps || "0" },
+        { title: 'Tiền chi cho Nhà xuất bản', value: dashboardData.publisherExpense || "0" },
+        { title: 'Tiền chi cho Người đóng góp', value: dashboardData.contributorExpense || "0" },
     ];
     const views = [
-        { title: 'Tổng lượt xem', value: dashboardData.totalViews || "Chưa tính toán" },
-        { title: 'Doanh thu từ lượt xem', value: dashboardData.revenueFromViews || "Chưa tính toán" },
-        { title: 'Lợi nhuận từ lượt xem', value: dashboardData.platformProfit || "Chưa tính toán" },
+        { title: 'Tổng lượt xem', value: dashboardData.totalViews || "0" },
+        { title: 'Doanh thu từ lượt xem', value: dashboardData.revenueFromViews || "0" },
+        { title: 'Lợi nhuận từ lượt xem', value: dashboardData.platformProfit || "0" },
     ];
     const platform = [
-        { title: 'Số dư hiện tại', value: dashboardData.currentBalance || "Chưa tính toán" },
-        { title: 'Tổng thu được', value: dashboardData.totalRevenue || "Chưa tính toán" },
-        { title: 'Tổng đã chi', value: dashboardData.totalExpenses || "Chưa tính toán" },
+        { title: 'Số dư hiện tại', value: dashboardData.currentBalance || "0" },
+        { title: 'Tổng thu được', value: dashboardData.totalRevenue || "0" },
+        { title: 'Tổng đã chi', value: dashboardData.totalExpenses || "0" },
     ];
 
     const getIcon = (title) => {
@@ -106,7 +102,7 @@ function Dashboard() {
             <Grid item xs={4} sm={4} md={4} key={index}>
                 <Paper elevation={3} sx={{ padding: 2, position: 'relative' }}>
                     <Typography variant="subtitle1">{item.title}</Typography>
-                    <Typography variant="h5">
+                    <Typography variant="h6">
                         {(item.value ?? 0).toLocaleString('vi-VN')} {getUnit(item.title)}
                     </Typography>
                     {getIcon(item.title)}

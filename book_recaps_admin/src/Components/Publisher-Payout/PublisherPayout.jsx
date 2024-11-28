@@ -13,7 +13,8 @@ import {
     TableContainer,
     Modal,
     TextField,
-    MenuItem
+    MenuItem,
+    Chip
 } from '@mui/material';
 import dayjs from 'dayjs';
 import { CalendarMonth, Visibility } from '@mui/icons-material';
@@ -162,7 +163,7 @@ function PublisherPayout() {
 
     if (loading) {
         return (
-            <div className="loading">
+            <Box display="flex" justifyContent="center" width="80vw">
                 <Hourglass
                     visible={true}
                     height="80"
@@ -170,7 +171,7 @@ function PublisherPayout() {
                     ariaLabel="hourglass-loading"
                     colors={["#306cce", "#72a1ed"]}
                 />
-            </div>
+            </Box>
         );
     }
 
@@ -182,9 +183,7 @@ function PublisherPayout() {
             </Typography>
 
             <Box display="flex" justifyContent="flex-end" mt={2} padding={2}>
-                <Button variant="contained" color="primary" onClick={handleOpenModal}>
-                    Tạo mới
-                </Button>
+                <Chip label="Tạo mới" variant="outlined" color="primary" onClick={handleOpenModal} />                
             </Box>
 
             {/* Bảng quyết toán */}
@@ -204,8 +203,8 @@ function PublisherPayout() {
                             <TableRow key={item.id}>
                                 <TableCell>{item.publisherName}</TableCell>
                                 <TableCell>{new Date(item.fromdate).toLocaleDateString('en-GB')} - {new Date(item.todate).toLocaleDateString('en-GB')}</TableCell>
-                                <TableCell>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.totalEarnings)}</TableCell>
-                                <TableCell>Hoàn thành</TableCell>
+                                <TableCell>{(item.totalEarnings ?? 0).toLocaleString("vi-VN")} VND</TableCell>
+                                <TableCell><Typography color='success'>Đã Hoàn tất</Typography></TableCell>
                                 <TableCell align="center">
                                     <Box>
                                         <Button

@@ -7,7 +7,8 @@ import {
     Groups,
     MenuBook,
     CurrencyExchange,
-    People
+    People,
+    Summarize
 } from "@mui/icons-material";
 
 export const SidebarItems = [
@@ -40,6 +41,11 @@ export const SidebarItems = [
         title: "Quản lý sách",
         icon: <MenuBook />,
         link: "/books",
+    },
+    {
+        title: "Giám sát Recap",
+        icon: <Summarize />,
+        link: "/recaps",
     },
     {
         title: "Hợp đồng",

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import {
     TableContainer, Table, TableHead, TableRow, TableCell, TableBody,
-    Paper, Typography, Button, Box, Modal, TextField, MenuItem
+    Paper, Typography, Button, Box, Modal, TextField, MenuItem,
+    Chip
 } from '@mui/material';
 import { CalendarMonth, Visibility } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom';
@@ -153,7 +154,7 @@ function ContributorPayout() {
 
     if (loading) {
         return (
-            <div className="loading">
+            <Box display="flex" justifyContent="center" width="80vw">
                 <Hourglass
                     visible={true}
                     height="80"
@@ -161,7 +162,7 @@ function ContributorPayout() {
                     ariaLabel="hourglass-loading"
                     colors={["#306cce", "#72a1ed"]}
                 />
-            </div>
+            </Box>
         );
     }
 
@@ -169,9 +170,7 @@ function ContributorPayout() {
         <Box sx={{ padding: '24px', width: '80vw' }}>
             <Typography variant="h5">Quyết toán thu nhập cho Người đóng góp</Typography>
             <Box display="flex" justifyContent="flex-end" mt={2} padding={2}>
-                <Button variant="contained" color="primary" onClick={handleOpenModal}>
-                    Tạo mới
-                </Button>
+            <Chip label="Tạo mới quyết toán" variant="outlined" color="primary" onClick={handleOpenModal} />
             </Box>
             <TableContainer component={Paper}>
                 <Table>
@@ -189,9 +188,9 @@ function ContributorPayout() {
                             <TableRow key={item.contributorId}>
                                 <TableCell>{item.contributorName}</TableCell>
                                 <TableCell> {new Date(item.fromdate).toLocaleDateString('en-GB')} - {new Date(item.todate).toLocaleDateString('en-GB')}</TableCell>
-                                <TableCell>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.totalEarnings)}</TableCell>
+                                <TableCell>{(item.totalEarnings ?? 0).toLocaleString("vi-VN")} VND</TableCell>
                                 {item.status === "Done" ? (
-                                    <TableCell>Hoàn thành</TableCell>
+                                    <TableCell><Typography color='success'>Hoàn thành</Typography></TableCell>
 
                                 ) : (
                                     <TableCell>Lỗi</TableCell>

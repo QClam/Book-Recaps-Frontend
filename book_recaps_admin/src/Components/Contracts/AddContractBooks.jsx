@@ -35,7 +35,7 @@ function AddContractBooks({ contractId }) {
     };
 
     const fetchBooks = async () => {
-        const response = await api.get('/api/book/getallbookswithnocontract')
+        const response = await api.get('/api/book/getallbookswithnoapprovedcontract')
         const books = response.data.data.$values;
         setBooks(books);
     }

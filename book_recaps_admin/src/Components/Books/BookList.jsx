@@ -2,10 +2,39 @@ import React, { useState, useEffect } from 'react'
 import api from '../Auth/AxiosInterceptors'
 import { Visibility } from "@mui/icons-material";
 import empty_image from "../../data/empty-image.png"
-import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
+import { Box, Button, Chip, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import AddBookModal from './AddBookModal';
 import { Hourglass } from 'react-loader-spinner';
+
+const resolveRefs = (data) => {
+    const refMap = new Map();
+    const createRefMap = (obj) => {
+        if (typeof obj !== "object" || obj === null) return;
+        if (obj.$id) {
+            refMap.set(obj.$id, obj);
+        }
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                createRefMap(obj[key]);
+            }
+        }
+    };
+    const resolveRef = (obj) => {
+        if (typeof obj !== "object" || obj === null) return obj;
+        if (obj.$ref) {
+            return refMap.get(obj.$ref);
+        }
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                obj[key] = resolveRef(obj[key]);
+            }
+        }
+        return obj;
+    };
+    createRefMap(data);
+    return resolveRef(data);
+};
 
 function BookList() {
 
@@ -16,6 +45,7 @@ function BookList() {
     const [searchTerm, setSearchTerm] = useState(""); // Nhập input ô search
     const [modalIsOpen, setModalIsOpen] = useState(false); // Modal visibility state
     const [loading, setLoading] = useState(true);
+    const [contracts, setContracts] = useState([]);
 
     const navigate = useNavigate();
 
@@ -23,10 +53,13 @@ function BookList() {
         setLoading(true);
         try {
             const response = await api.get('/api/book/getallbooks')
-            const books = response.data.data.$values;
+            const books = resolveRefs(response.data.data.$values);
+            const contracts = books.map((book) => book.contracts?.$values || []);
             console.log("Books: ", books);
+            console.log("Contracts: ", contracts);
             setBooks(books);
             setFilteredBooks(books);
+            setContracts(contracts);
             setLoading(false);
         } catch (error) {
             console.error("Error fetching books", error);
@@ -77,7 +110,7 @@ function BookList() {
 
     if (loading) {
         return (
-            <div className="loading">
+            <Box display="flex" justifyContent="center" width="80vw">
                 <Hourglass
                     visible={true}
                     height="80"
@@ -85,7 +118,7 @@ function BookList() {
                     ariaLabel="hourglass-loading"
                     colors={["#306cce", "#72a1ed"]}
                 />
-            </div>
+            </Box>
         );
     }
 
@@ -101,9 +134,7 @@ function BookList() {
                     size="small"
                     sx={{ width: '40%' }}
                 />
-                <Button variant="contained" color="primary" onClick={() => setModalIsOpen(true)}>
-                    Tạo mới cuốn sách
-                </Button>
+                <Chip label="Tạo mới cuốn sách" variant="outlined" color="primary" onClick={() => setModalIsOpen(true)} />
             </Box>
 
             <TableContainer component={Paper}>
@@ -111,9 +142,10 @@ function BookList() {
                     <TableHead>
                         <TableRow>
                             <TableCell></TableCell>
+                            <TableCell><strong>Hợp đồng kèm theo</strong></TableCell>
                             <TableCell><strong>Tên Sách</strong></TableCell>
                             <TableCell><strong>Tên Gốc</strong></TableCell>
-                            <TableCell><strong>Mô tả</strong></TableCell>
+                            <TableCell><strong>Mã ISBN</strong></TableCell>
                             <TableCell><strong>Xuất bản</strong></TableCell>
                             <TableCell><strong>Tác giả</strong></TableCell>
                             <TableCell><strong>Độ tuổi</strong></TableCell>
@@ -132,9 +164,30 @@ function BookList() {
                                         e.currentTarget.src = empty_image; // Đặt lại ảnh nếu lỗi
                                     }}
                                 /></TableCell>
+                                <TableCell>
+                                    {book.contracts?.$values?.length > 0 ? (
+                                        book.contracts.$values.map((contract) => (
+                                            <Button
+                                                key={contract.id}
+                                                color="primary"
+                                                onClick={() => navigate(`/contract/${contract.id}`)}
+                                                style={{ marginRight: '8px', textTransform: 'none' }} // Thêm khoảng cách giữa các nút
+                                            >
+                                                Chi tiết hợp đồng {contract.publisher?.publisherName}
+                                            </Button>
+                                        ))
+                                    ) : (
+                                        <Typography>Chưa có hợp đồng</Typography>
+                                    )}
+                                </TableCell>
                                 <TableCell>{book.title}</TableCell>
                                 <TableCell>{book.originalTitle}</TableCell>
-                                <TableCell>{book.description.length > 100 ? `${book.description.substring(0, 100)}...` : book.description}</TableCell>
+                                <TableCell>
+                                    <Box>
+                                        <Typography>ISBN_10: {book.isbN_10 || "Hệ thống chưa gắn mã ISBN"}</Typography>
+                                        <Typography>ISBN_13: {book.isbN_13 || "Hệ thống chưa gắn mã ISBN"}</Typography>
+                                    </Box>
+                                </TableCell>
                                 <TableCell>{book.publicationYear}</TableCell>
                                 <TableCell> {book.authors.$values ? book.authors.$values.map(author => author.name).join(", ") : "N/A"}</TableCell>
                                 <TableCell>{book.ageLimit} tuổi</TableCell>
@@ -155,6 +208,8 @@ function BookList() {
                                 labelDisplayedRows={({ from, to, count }) =>
                                     `${from}–${to} trên ${count !== -1 ? count : `nhiều hơn ${to}`}`
                                 }
+                                showFirstButton
+                                showLastButton
                             />
                         </TableRow>
                     </TableFooter>
