@@ -189,6 +189,7 @@ const handleClickForHighlight = (targetId, appliedClasses = [], targetClassName 
     });
   }
 };
+
 const getRecapVersionStatusStr = (status) => {
   switch (status) {
     case 0:
@@ -271,7 +272,7 @@ const RightSidePanel = () => {
         <RecapVersionDetails/>
       </div>
 
-      <div className={cn({ 'hidden': activeIndex !== 1 })}>
+      <div className={cn("sticky top-8", { 'hidden': activeIndex !== 1 })}>
         <Suspense fallback={<SuspenseFallback message="Loading review..."/>}>
           <Await resolve={review}>
             <StaffReviewNotes/>
@@ -279,7 +280,7 @@ const RightSidePanel = () => {
         </Suspense>
       </div>
 
-      <div className={cn({ 'hidden': activeIndex !== 2 })}>
+      <div className={cn("sticky top-8", { 'hidden': activeIndex !== 2 })}>
         <PlagiarismResults/>
       </div>
     </div>
@@ -1150,7 +1151,7 @@ const StaffReviewNotes = () => {
   }
 
   return (
-    <div className="">
+    <>
       <h2 className="text-2xl font-bold mb-4">Kết quả xét duyệt</h2>
 
       <div className="mb-6">
@@ -1180,7 +1181,7 @@ const StaffReviewNotes = () => {
           </div>
         ))}
       </div>
-    </div>
+    </>
   )
 }
 
@@ -1352,7 +1353,7 @@ const PlagiarismResults = () => {
   const plagiResults = useMemo(() => mergePlagiarismResults(plagiarismResults), [ plagiarismResults ]);
 
   return (
-    <div>
+    <>
       <div className="text-center mb-4">
         <button
           className="px-4 py-2 text-white bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300 disabled:opacity-50"
@@ -1404,7 +1405,7 @@ const PlagiarismResults = () => {
           </div>
         )}
       </div>
-    </div>
+    </>
   )
 }
 

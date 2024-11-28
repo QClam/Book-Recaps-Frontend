@@ -796,7 +796,7 @@ const RightSidePanel = () => {
           </div>
           <InputSwitch checked={recapData.isPremium}
                        onChange={(e) => setRecapData({ ...recapData, isPremium: e.value })}
-                       disabled={loading || recap.isPublished}/>
+                       disabled={loading}/>
         </div>
 
         {/* Current Version */}
