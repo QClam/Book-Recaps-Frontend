@@ -245,7 +245,7 @@ const MainPanel = () => {
           </Await>
         </Suspense>
       </TabPanel>
-      <TabPanel header="Kiểm tra đạo văn">
+      <TabPanel header="Kiểm tra trùng lặp nội dung">
         <Suspense fallback={<SuspenseFallback message="Loading key ideas..."/>}>
           <Await
             resolve={keyIdeas}
@@ -1360,7 +1360,7 @@ const PlagiarismResults = () => {
           onClick={onCheckPlagiarism}
           disabled={plagiarismResultsLoading || recapVersionInfoLoading || recapVersion.plagiarismCheckStatus === 1}
         >
-          {plagiarismResultsLoading || recapVersionInfoLoading || recapVersion.plagiarismCheckStatus === 1 ? "Đang kiểm tra..." : "Kiểm tra đạo văn"}
+          {plagiarismResultsLoading || recapVersionInfoLoading || recapVersion.plagiarismCheckStatus === 1 ? "Đang kiểm tra..." : "Kiểm tra trùng lặp"}
         </button>
       </div>
       <div className="">
