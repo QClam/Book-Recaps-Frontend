@@ -7,7 +7,7 @@ import '../Search/Filter.scss';
 function MainLayout() {
   return (
     <div className="App">
-      <header className="header-layout">
+      <header className="header-layout sticky inset-x-0 top-0 bg-white">
         <Sidebar/>
         {/* <Filter /> */}
       </header>

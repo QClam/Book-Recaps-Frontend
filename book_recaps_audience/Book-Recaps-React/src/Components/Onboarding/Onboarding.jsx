@@ -11,7 +11,6 @@ faChartPie,
 faHeartbeat  } from '@fortawesome/free-solid-svg-icons';
 import './Onboarding.scss';
 import axios from 'axios';
-import bookRecap from '../../image/removeBR.png';
 import { routes } from "../../routes";
 
 const Onboarding = ({ onComplete = () => {} }) => {
@@ -174,7 +173,7 @@ const Onboarding = ({ onComplete = () => {} }) => {
       {/* Timeline Component */}
  
       <div className="SidebarLogoImg">
-          <img src={bookRecap} alt="Logo" />
+          <img src="/logo-transparent.png" alt="Logo" />
         </div>
       <div className="timeline">      
         {["Self-Assessment", "Genre Selection",  "Desired Book",  "Select Author", "Confirmation"].map((label, index) => (

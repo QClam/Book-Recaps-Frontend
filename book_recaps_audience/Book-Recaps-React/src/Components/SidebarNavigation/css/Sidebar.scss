@@ -63,7 +63,7 @@
 .filter-sectionme {
   display: flex;
   align-items: center;
-  margin-left: 30px; /* Khoảng cách từ danh sách đến phần tìm kiếm và thông tin người dùng */
+  //margin-left: 30px; /* Khoảng cách từ danh sách đến phần tìm kiếm và thông tin người dùng */
   position: relative; /* Để chứa kết quả tìm kiếm với position absolute */
   /* width: 300px; */ /* Bỏ hoặc điều chỉnh lại nếu cần */
 }
@@ -81,7 +81,7 @@
 .search-inputme {
   background: transparent;
   border: none;
-  color: white;
+  //color: white;
   outline: none;
   padding: 7px;
   width: 100%; /* Đảm bảo input chiếm hết không gian */
@@ -90,7 +90,7 @@
 .search-buttonme {
   background: none;
   border: none;
-  color: white;
+  //color: white;
   cursor: pointer;
 }
 
@@ -152,7 +152,7 @@
 // }
 
 .user-info {
-  display: flex;
+  //display: flex;
   align-items: center;
   position: relative;
 }
@@ -186,14 +186,16 @@
   position: absolute; // Position it according to your layout
   right: 0; // Adjust as needed
   top: 110%;
-  background-color: rgb(244, 242, 241); // Background color
-  border: 1px solid #ccc; // Border
-  border-radius: 4px; // Rounded corners
-  padding: 10px; // Padding
   z-index: 10; // Ensure it appears above other elements
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  background-color: white; // Background color
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: max-content;
+  //border: 1px solid #ccc; // Border
+  //border-radius: 4px; // Rounded corners
+  padding: 5px; // Padding
+  //gap: 8px;
   
   button, a {
     background: none; // Remove default button styling

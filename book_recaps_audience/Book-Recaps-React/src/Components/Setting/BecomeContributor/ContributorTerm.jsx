@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import './ContributorTerm.scss';
 import axios from 'axios';
-import RecapImage from "../../../image/removeBR.png";
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -99,7 +98,7 @@ const ContributorTerm = () => {
     <div className="terms-container">
       {submitted ? (
         <div className="welcome-message">
-           <img src={RecapImage} alt="Logo" />
+           <img src="/logo-transparent.png" alt="Logo" />
           <h1>Congratulations on becoming an contributor!</h1>
           <p>You've successfully created an account. We think this calls for a little celebration.</p>
           <p>Now, are you ready to explore?</p>

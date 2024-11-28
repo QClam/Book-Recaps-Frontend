@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './Billing.scss';
 import { useNavigate, useLocation } from 'react-router-dom'; // Thêm useLocation
-import bookRecap from '../../../image/removeBR.png';
 import { routes } from "../../../routes";
 
 const Billing = () => {
@@ -107,7 +106,7 @@ const Billing = () => {
     <div className="billing-container">
      <div className="logo-container">
         <img 
-          src={bookRecap} 
+          src="/logo-transparent.png"
           alt="Logo" 
           className="logobr" 
           onClick={handleLogoClick} // Xử lý sự kiện nhấn vào logo
