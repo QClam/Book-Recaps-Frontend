@@ -338,7 +338,6 @@ const RecapItemDetail = ({ route }) => {
             {/* <Text style={styles.views}>Views: {recapDetail.viewsCount}</Text> */}
 
             <View style={styles.bookInfo}>
-                <Text style={styles.bookTitle}>{book.title}</Text>
                 <Image source={{ uri: book.coverImage }} style={styles.bookImage} />
                 <Text style={styles.views}>{recapDetail.viewsCount} Views</Text>
                 <View style={styles.likeContainer}>
@@ -352,10 +351,6 @@ const RecapItemDetail = ({ route }) => {
                     </TouchableOpacity>
 
                 </View>
-            </View>
-
-            <View style={styles.versionInfo}>
-                {renderTranscript()}
             </View>
 
             <View style={styles.audioPlayerContainer}>
@@ -401,6 +396,11 @@ const RecapItemDetail = ({ route }) => {
                     thumbTintColor="#FFD700"
                 />
             </View>
+
+            <View style={styles.versionInfo}>
+                {renderTranscript()}
+            </View>
+
             {/* Create Playlist Modal */}
             <CreatePlaylistModal
                 isOpen={isModalOpen}
@@ -441,7 +441,7 @@ const styles = StyleSheet.create({
         marginVertical: 20,
         alignItems: 'center',
         borderRadius: 8,
-        padding: 16,
+        // padding: 16,
         shadowColor: '#000',
         shadowOpacity: 0.1,
         shadowRadius: 8,
@@ -462,8 +462,8 @@ const styles = StyleSheet.create({
     },
     versionInfo: {
         marginVertical: 20,
-        marginBottom: -18,
-        marginTop: -50,
+        // marginBottom: -18,
+        // marginTop: -50,
     },
     versionList: {
         marginVertical: 20,
@@ -543,11 +543,11 @@ const styles = StyleSheet.create({
         width: '90%',
         marginBottom: 15
     },
-    loader: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-      },
+ loader: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });
 
 export default RecapItemDetail;

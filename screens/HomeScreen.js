@@ -1,4 +1,4 @@
-import { Alert, StyleSheet, Text, TouchableOpacity, View, FlatList, RefreshControl, ScrollView } from 'react-native'
+import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View, FlatList, RefreshControl, ScrollView } from 'react-native'
 import React, { useEffect, useState } from 'react'
 
 import { getBooks } from '../utils/api'
@@ -13,6 +13,7 @@ const HomeScreen = ({ navigation }) => {
 
     const [categories, setCategories] = useState([]);
     const [selectedCategory, setSelectedCategory] = useState("All");
+    const [searchQuery, setSearchQuery] = useState(""); // State cho tìm kiếm
 
     const pageSize = 10; // Số lượng sách mỗi lần hiển thị
 
@@ -82,10 +83,12 @@ const HomeScreen = ({ navigation }) => {
         </TouchableOpacity>
     );
 
+    // Lọc dữ liệu theo danh mục và tìm kiếm
     const filteredData = items.filter(
         (item) =>
-            selectedCategory === "All" ||
-            item.categories?.$values?.map((category) => category.name).join(", ") === selectedCategory
+            (selectedCategory === "All" ||
+                item.categories?.$values?.map((category) => category.name).join(", ") === selectedCategory) &&
+            item.title.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     if (error && !loading) {
@@ -98,6 +101,17 @@ const HomeScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
+            {/* Ô tìm kiếm */}
+            <View style={styles.searchContainer}>
+                <TextInput
+                    style={styles.searchInput}
+                    placeholder="Tìm kiếm sách..."
+                    value={searchQuery}
+                    onChangeText={(text) => setSearchQuery(text)}
+                />
+            </View>
+
+            {/* Bộ lọc danh mục */}
             <View style={styles.filterContainer}>
                 <ScrollView
                     horizontal
@@ -110,6 +124,7 @@ const HomeScreen = ({ navigation }) => {
                 </ScrollView>
             </View>
 
+            {/* Danh sách sách */}
             <FlatList
                 data={filteredData}
                 keyExtractor={(item) => item.id.toString()}
@@ -141,6 +156,17 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#f5f5f5",
+    },
+    searchContainer: {
+        padding: 12,
+        backgroundColor: "#fff",
+    },
+    searchInput: {
+        backgroundColor: "#f0f0f0",
+        borderRadius: 8,
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        fontSize: 16,
     },
     filterContainer: {
         backgroundColor: "#fff",
@@ -176,4 +202,4 @@ const styles = StyleSheet.create({
         flex: 1,
         margin: 8, // Khoảng cách giữa các card
     },
-})
+});
