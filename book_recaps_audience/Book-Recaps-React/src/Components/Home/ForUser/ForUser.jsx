@@ -3,7 +3,18 @@ import { Await, generatePath, Link } from 'react-router-dom';
 import { routes } from "../../../routes";
 import Show from "../../Show";
 
-const ForUser = ({ promisedRecaps, title, description }) => {
+const ForUser = ({ promisedRecaps, title, description, emptyMessageIdx }) => {
+  const emptyMessage = [
+    {
+      title: "Lịch sử xem của bạn đang trống",
+      content: "Hãy bắt đầu đọc sách để nhận được các bài viết đề xuất dành riêng cho bạn!"
+    },
+    {
+      title: "Chưa có bài viết nào",
+      content: "Hãy quay lại sau để xem các bài viết mới nhé."
+    }
+  ]
+
   return (
     <div className="flex flex-col w-full pt-6 md:pt-16 mx-auto md:px-12">
       <div className="flex flex-col mb-8">
@@ -18,10 +29,10 @@ const ForUser = ({ promisedRecaps, title, description }) => {
               fallback={
                 <div className="rounded-md border border-gray-300 p-5 bg-white/50">
                   <h4 className="font-semibold text-gray-900">
-                    Lịch sử xem của bạn đang trống
+                    {emptyMessage[emptyMessageIdx].title}
                   </h4>
                   <p>
-                    Hãy bắt đầu đọc sách để nhận được các bài viết đề xuất dành riêng cho bạn!
+                    {emptyMessage[emptyMessageIdx].content}
                   </p>
                 </div>
               }

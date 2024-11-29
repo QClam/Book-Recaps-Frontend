@@ -1,6 +1,4 @@
 import ForUser from './ForUser/ForUser';
-import TopRecap from './TopRecap/TopRecap';
-import RecapRecent from './RecapRecent/RecapRecent';
 import { useAuth } from "../../contexts/Auth";
 import Show from "../Show";
 import { getCurrentUserInfo } from "../../utils/getCurrentUserInfo";
@@ -28,7 +26,7 @@ const getTopRecaps = async (request) => {
       signal: request.signal
     })
 
-    return response.data.items;
+    return response.data;
   } catch (e) {
     const err = handleFetchError(e);
     throw json({ error: err.error }, { status: err.status });
@@ -41,7 +39,7 @@ const getRecentlyAddedRecaps = async (request) => {
       signal: request.signal
     })
 
-    return response.data.items;
+    return response.data;
   } catch (e) {
     const err = handleFetchError(e);
     throw json({ error: err.error }, { status: err.status });
@@ -68,13 +66,25 @@ const Homepage = () => {
   return (
     <div className="container mx-auto max-w-screen-xl mb-4">
       <Show when={isAuthenticated}>
-        <ForUser promisedRecaps={recapsForYou} title="Đề xuất cho bạn"
-                 description="Các bài viết được đề xuất dựa trên lịch sử xem của bạn"/>
+        <ForUser
+          promisedRecaps={recapsForYou}
+          emptyMessageIdx={0}
+          title="Đề xuất cho bạn"
+          description="Các bài viết được đề xuất dựa trên lịch sử xem của bạn"
+        />
       </Show>
-      <ForUser promisedRecaps={topRecaps} title="Top bài viết"
-               description="Các bài viết có điểm tương tác cao nhất"/>
-      <ForUser promisedRecaps={recentlyAddedRecaps} title="Bài viết mới nhất"
-               description="Các bài viết mới được thêm vào hệ thống"/>
+      <ForUser
+        promisedRecaps={topRecaps}
+        emptyMessageIdx={1}
+        title="Top bài viết"
+        description="Các bài viết có điểm tương tác cao nhất"
+      />
+      <ForUser
+        promisedRecaps={recentlyAddedRecaps}
+        emptyMessageIdx={1}
+        title="Bài viết mới nhất"
+        description="Các bài viết mới được thêm vào hệ thống"
+      />
     </div>
   );
 };
