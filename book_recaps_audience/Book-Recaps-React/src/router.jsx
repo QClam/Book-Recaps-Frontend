@@ -31,11 +31,11 @@ import ProtectedRoute from "./Components/ProtectedRoute";
 export const router = createBrowserRouter(createRoutesFromElements(
   <Route element={<App/>} errorElement={<ErrorRoute/>} loader={sessionLoader}>
 
-    <Route path={routes.login} element={<Login/>}/>
     <Route path={routes.logout} element={<Logout/>}/>
     <Route path={routes.forgetPassword} element={<ForgetPassword/>}/>
 
     <Route element={<MainLayout/>}>
+      <Route path={routes.login} element={<Login/>}/>
       {/* ko cần đăng nhập */}
       <Route path={routes.index} element={<Homepage/>} loader={homepageLoader}/>
       <Route path={routes.explore} element={<Explore/>}/>

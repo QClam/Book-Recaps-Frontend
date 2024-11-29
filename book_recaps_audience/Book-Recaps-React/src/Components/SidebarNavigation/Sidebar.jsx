@@ -263,6 +263,7 @@ export default Sidebar;
 
 const MobileMenu = ({ isOpen, setIsOpen }) => {
   const menuRef = useRef(null);
+  const { isAuthenticated } = useAuth();
 
   useClickAway(menuRef, () => {
     if (isOpen) setIsOpen(false);
@@ -285,33 +286,51 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
         >
           Khám phá
         </NavLink>
-        <NavLink
-          to={routes.playlist}
-          className={({ isActive }) => cn("text-gray-700 block rounded-md px-3 py-2 text-base font-medium",
-            isActive ? "bg-[#FF6F61]/30" : "hover:bg-[#FF6F61]/30")}
-        >
-          Danh sách phát
-        </NavLink>
-        <NavLink
-          to={routes.viewHistory}
-          className={({ isActive }) => cn("text-gray-700 block rounded-md px-3 py-2 text-base font-medium",
-            isActive ? "bg-[#FF6F61]/30" : "hover:bg-[#FF6F61]/30")}
-        >
-          Lịch sử xem
-        </NavLink>
-        <NavLink
-          to={routes.profileSettings}
-          className={({ isActive }) => cn("text-gray-700 block rounded-md px-3 py-2 text-base font-medium",
-            isActive ? "bg-[#FF6F61]/30" : "hover:bg-[#FF6F61]/30")}
-        >
-          Tài khoản
-        </NavLink>
-        <Link
-          to={routes.logout}
-          className="text-gray-700 block rounded-md px-3 py-2 text-base font-medium hover:bg-[#FF6F61]/30"
-        >
-          Đăng xuất
-        </Link>
+        <Show when={isAuthenticated} fallback={
+          <>
+            <Link
+              to={routes.login}
+              className="text-gray-700 block rounded-md px-3 py-2 text-base font-medium hover:bg-[#FF6F61]/30"
+            >
+              Đăng nhập
+            </Link>
+            <Link
+              to={routes.login}
+              state={{ isRegister: true }}
+              className="text-gray-700 block rounded-md px-3 py-2 text-base font-medium hover:bg-[#FF6F61]/30"
+            >
+              Đăng ký
+            </Link>
+          </>
+        }>
+          <NavLink
+            to={routes.playlist}
+            className={({ isActive }) => cn("text-gray-700 block rounded-md px-3 py-2 text-base font-medium",
+              isActive ? "bg-[#FF6F61]/30" : "hover:bg-[#FF6F61]/30")}
+          >
+            Danh sách phát
+          </NavLink>
+          <NavLink
+            to={routes.viewHistory}
+            className={({ isActive }) => cn("text-gray-700 block rounded-md px-3 py-2 text-base font-medium",
+              isActive ? "bg-[#FF6F61]/30" : "hover:bg-[#FF6F61]/30")}
+          >
+            Lịch sử xem
+          </NavLink>
+          <NavLink
+            to={routes.profileSettings}
+            className={({ isActive }) => cn("text-gray-700 block rounded-md px-3 py-2 text-base font-medium",
+              isActive ? "bg-[#FF6F61]/30" : "hover:bg-[#FF6F61]/30")}
+          >
+            Tài khoản
+          </NavLink>
+          <Link
+            to={routes.logout}
+            className="text-gray-700 block rounded-md px-3 py-2 text-base font-medium hover:bg-[#FF6F61]/30"
+          >
+            Đăng xuất
+          </Link>
+        </Show>
       </div>
     </div>
   )

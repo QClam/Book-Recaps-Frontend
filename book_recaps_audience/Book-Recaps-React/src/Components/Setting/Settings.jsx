@@ -210,15 +210,13 @@ function Settings() {
 
   // Handle Image Upload
   const handleUpdateImage = async () => {
-    const userId = profile?.userId || ''; // Assuming `userId` is part of the profile data
-
     if (!imageFile) {
       alert('Please select an image file first!');
       return;
     }
 
     const formData = new FormData();
-    formData.append('UserId', userId);
+    formData.append('UserId', user.id);
     formData.append('Image', imageFile); // Add the image file
     formData.append('DeleteCurrentImage', false); // Modify based on your logic
 
