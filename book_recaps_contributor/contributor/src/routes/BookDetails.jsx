@@ -23,6 +23,8 @@ import TextInput from "../components/form/TextInput";
 import { cn } from "../utils/cn";
 import { useToast } from "../contexts/Toast";
 import { ProgressSpinner } from "primereact/progressspinner";
+import { Divider } from "primereact/divider";
+import { RiEyeLine, RiHeadphoneLine, RiThumbUpLine } from "react-icons/ri";
 
 const getBook = async (bookId, request) => {
   try {
@@ -116,25 +118,31 @@ const BookDetailsImpl = ({ dialogVisible, setDialogVisible }) => {
               imageClassName="aspect-[3/4] object-cover w-full bg-white"
               preview
             />
+
+            <div className="flex justify-center mx-auto mt-4">
+              <button
+                className="bg-indigo-600 text-white rounded py-1.5 px-3 border font-semibold hover:bg-indigo-700"
+                onClick={() => setDialogVisible(true)}
+              >
+                Tạo bài viết tóm tắt
+              </button>
+            </div>
           </div>
 
           {/* Book Information */}
           <div className="w-2/3">
-            <h1 className="text-3xl font-bold mb-2">{book.title}</h1>
+            <h1 className="text-3xl font-bold mb-2">{book.title} ({book.publicationYear})</h1>
             {book.originalTitle && (
-              <h2 className="text-lg text-gray-600 mb-4 italic">
-                Original Title: {book.originalTitle}
+              <h2 className="text-gray-700 mb-3 italic">
+                Tên gốc: {book.originalTitle}
               </h2>
             )}
             <p className="text-gray-800 mb-4">{book.description}</p>
-            <div className="text-gray-700 mb-4">
-              <strong>Publication Year:</strong> {book.publicationYear}
-            </div>
 
             {/* Authors Section */}
             {book.authors?.$values && book.authors.$values.length > 0 && (
-              <div className="mb-4">
-                <strong>Authors:</strong>
+              <div className="mb-3">
+                <strong>Tác giả:</strong>
                 <ul className="list-disc ml-5">
                   {book.authors.$values.map((author) => (
                     <li key={author.id} className="text-gray-700">
@@ -147,8 +155,8 @@ const BookDetailsImpl = ({ dialogVisible, setDialogVisible }) => {
 
             {/* Categories Section */}
             {book.categories?.$values && book.categories.$values.length > 0 && (
-              <div className="mb-4">
-                <strong>Categories:</strong>
+              <div className="mb-3">
+                <strong>Thể loại:</strong>
                 <ul className="list-disc ml-5">
                   {book.categories.$values.map((category) => (
                     <li key={category.id} className="text-gray-700">
@@ -161,21 +169,78 @@ const BookDetailsImpl = ({ dialogVisible, setDialogVisible }) => {
 
             {/* Publisher Section */}
             {book.publisher && (
-              <div className="mb-4">
-                <strong>Publisher:</strong> <span className="text-gray-700">{book.publisher.publisherName}</span>
+              <div className="mb-3">
+                <strong>Nhà xuất bản:</strong>
+                <ul className="list-disc ml-5">
+                  <li className="text-gray-700">
+                    {book.publisher.publisherName}
+                  </li>
+                </ul>
               </div>
             )}
 
-            <div className="flex justify-start">
-              <button
-                className="bg-indigo-600 text-white rounded py-1.5 px-3 border font-semibold hover:bg-indigo-700"
-                onClick={() => setDialogVisible(true)}
-              >
-                Tạo bài viết tóm tắt
-              </button>
-            </div>
           </div>
         </div>
+
+        <Divider/>
+
+        <h2 className="font-semibold mb-3 italic text-gray-700">
+          Các bài viết hiện có:
+        </h2>
+        {book.recaps && book.recaps.$values.length > 0 ? (
+          book.recaps.$values.map((recap) => {
+            return (
+              <a
+                key={recap.id}
+                href={import.meta.env.VITE_AUDIENCE_ENDPOINT + '/recap/' + recap.id}
+                rel="noopener noreferrer"
+                target="_blank"
+                className="relative block border border-gray-300 p-4 pr-20 my-4 rounded-md cursor-pointer hover:bg-gray-50"
+              >
+                {recap.contributor && (
+                  <div className="flex gap-2 items-center text-sm mb-2">
+                    <div className="w-6 h-6">
+                      <img
+                        src={recap.contributor.imageUrl?.replace("Files/Image/jpg/ad.jpg", "") || '/avatar-placeholder.png'}
+                        alt="User Avatar" className="w-full h-full object-cover rounded-full"/>
+                    </div>
+                    <p className="font-semibold line-clamp-2">{recap.contributor.fullName}</p>
+                  </div>
+                )}
+
+                <p className="text-gray-700 mb-2 italic line-clamp-2" title={recap.name || book.title}>
+                  Bài viết: <strong>{recap.name || `"${recap.book.title}"`}</strong>
+                </p>
+
+                {/* Views, Likes, Audio length*/}
+                <div className="flex gap-2 items-center text-sm text-gray-500">
+                  <p className="flex items-center gap-2">
+                    <span className="bg-green-100 p-1 rounded"><RiEyeLine size={17}/></span>
+                    <span>{recap.viewsCount || 0} Lượt xem</span>
+                  </p>
+                  <p>·</p>
+                  <p className="flex items-center gap-2">
+                    <span className="bg-green-100 p-1 rounded"><RiThumbUpLine size={17}/></span>
+                    <span>{recap.likesCount || 0} Lượt thích</span>
+                  </p>
+                  <p>·</p>
+                  <p className="flex items-center gap-2">
+                    <span className="bg-green-100 p-1 rounded"><RiHeadphoneLine size={17}/></span>
+                    <span>{Number((recap.currentVersion?.audioLength || 0) / 60).toFixed(0)} phút</span>
+                  </p>
+                </div>
+
+                {recap.isPremium && (
+                  <span className="absolute top-2 right-2 bg-yellow-400 text-sm rounded px-2 py-1">Premium</span>
+                )}
+              </a>
+            );
+          })
+        ) : (
+          <p className="text-gray-400 text-center italic">
+            Sách chưa có Recap nào.
+          </p>
+        )}
       </div>
 
       <Dialog
