@@ -81,7 +81,7 @@ const ForUser = ({ promisedRecaps, title, description, emptyMessageIdx }) => {
                             src={recap.user.imageUrl?.replace("Files/Image/jpg/ad.jpg", "") || '/avatar-placeholder.png'}
                             alt="User Avatar" className="w-full h-full object-cover rounded-full"/>
                         </div>
-                        <p className="font-semibold">{recap.user.fullName}</p>
+                        <p className="font-semibold line-clamp-2">{recap.user.fullName}</p>
                       </div>
                     </div>
                   </Link>

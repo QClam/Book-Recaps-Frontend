@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router-dom';
 //import "../UserRecap/UserRecap.scss";  // Đổi tên SCSS file
 import "../NewRecapBook/UserRecapV2.scss";
 import { axiosInstance } from "../../../../utils/axios";
 import { resolveRefs } from "../../../../utils/resolveRefs";
+import { routes } from "../../../../routes";
 
 const UserRecapV2 = () => {
   const [ books, setBooks ] = useState([]);
@@ -32,7 +33,7 @@ const UserRecapV2 = () => {
   }, []);
 
   const handleBookClick = (book) => {
-    navigate(`/user-recap-detail-item/${book.id}`); // Navigate to UserRecapDetail with the book ID
+    navigate(generatePath(routes.bookDetail, { id: book.id })); // Navigate to UserRecapDetail with the book ID
   };
 
   const displayedBooks = showAll ? books : books.slice(0, 12); // Show first 8 books by default

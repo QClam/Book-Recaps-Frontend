@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import "../PlaylistBook/PlaylistBook.scss";
-import { useNavigate } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router-dom';
 import { axiosInstance } from "../../../utils/axios";
+import { routes } from "../../../routes";
 
 const PlaylistBook = () => {
   const [ playlists, setPlaylists ] = useState([]);
@@ -89,9 +90,7 @@ const PlaylistBook = () => {
   // };
 
   const handleBookClick = (book) => {
-
-    navigate(`/user-recap-detail-item/${book.id}`);
-
+    navigate(generatePath(routes.bookDetail, { id: book.id }));
   };
 
   if (isLoading) {

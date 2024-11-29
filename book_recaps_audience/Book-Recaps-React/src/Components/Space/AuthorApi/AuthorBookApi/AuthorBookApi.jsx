@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { generatePath, useLocation, useNavigate } from 'react-router-dom';
 import "../AuthorBookApi/AuthorBookApi.scss";
 import { axiosInstance } from "../../../../utils/axios";
 import { resolveRefs } from "../../../../utils/resolveRefs";
+import { routes } from "../../../../routes";
 
 const AuthorBookApi = () => {
   const [ books, setBooks ] = useState([]);
@@ -39,7 +40,7 @@ const AuthorBookApi = () => {
   // };
 
   const handleBookClick = (id) => {
-    navigate(`/user-recap-detail-item/${id}`); // Navigate to UserRecapDetail with the book ID
+    navigate(generatePath(routes.bookDetail, { id })); // Navigate to UserRecapDetail with the book ID
   };
 
   return (

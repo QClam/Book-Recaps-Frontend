@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { generatePath, useNavigate, useParams } from 'react-router-dom';
 import './BookListCategory.scss';
 import { resolveRefs } from "../../../../utils/resolveRefs";
-import { axiosInstance } from "../../../../utils/axios"; // Import file SCSS mới
+import { axiosInstance } from "../../../../utils/axios";
+import { routes } from "../../../../routes"; // Import file SCSS mới
 
 const BookListCategory = () => {
   const { categoryId } = useParams(); // Lấy categoryId từ URL
@@ -62,7 +63,7 @@ const BookListCategory = () => {
   // };
 
   const handleBookClick = (id) => {
-    navigate(`/user-recap-detail-item/${id}`); // Navigate to UserRecapDetail with the book ID
+    navigate(generatePath(routes.bookDetail, { id })); // Navigate to UserRecapDetail with the book ID
   };
   //chạy qua class BookDetailBook qua tiep RecapDetail
 

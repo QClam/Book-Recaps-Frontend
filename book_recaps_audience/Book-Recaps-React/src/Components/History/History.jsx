@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import "../History/History.scss";
-import { useNavigate } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router-dom';
 import { axiosInstance } from "../../utils/axios";
 import { useAuth } from "../../contexts/Auth";
+import { routes } from "../../routes";
 
 const History = () => {
   const [ recapData, setRecapData ] = useState([]);
@@ -40,7 +41,6 @@ const History = () => {
     }
   };
 
-
   // Render loading or error state
   if (loading) return <div className="loading">Loading...</div>;
   if (error) return <div className="error">Error: {error}</div>;
@@ -59,7 +59,7 @@ const History = () => {
                 src={recap.book.coverImage}
                 alt={recap.book.title}
                 style={{ cursor: 'pointer' }}
-                onClick={() => navigate(`/user-recap-detail-item/${recap.book.bookId}`)} // Navigate to the detail page
+                onClick={() => navigate(generatePath(routes.bookDetail, { id: recap.book.bookId }))} // Navigate to the detail page
               />
             </div>
 

@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router-dom';
 import ReactPaginate from "react-paginate";
 import "./BookApi.scss";
 import { axiosInstance } from "../../../utils/axios";
-import { resolveRefs } from "../../../utils/resolveRefs"; // Import CSS cho styling
-
+import { resolveRefs } from "../../../utils/resolveRefs";
+import { routes } from "../../../routes"; // Import CSS cho styling
 
 const BookApi = () => {
   const [ books, setBooks ] = useState([]);
@@ -193,7 +193,7 @@ const BookApi = () => {
   //   navigate(`/bookdetailbook/${id}`); // Use the book's id for navigation
   // };
   const handleBookClick = (id) => {
-    navigate(`/user-recap-detail-item/${id}`); // Navigate to UserRecapDetail with the book ID
+    navigate(generatePath(routes.bookDetail, { id })); // Navigate to UserRecapDetail with the book ID
   };
 
   return (
