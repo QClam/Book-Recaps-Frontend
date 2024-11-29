@@ -6,15 +6,10 @@ import {
     Button,
     Typography,
     Card,
-    CardContent,
-    IconButton,
-    Grid,
-    List,
-    ListItem,
-    ListItemButton,
+    CardContent, 
+    Grid,   
     Select,
-    MenuItem,
-    InputLabel,
+    MenuItem, 
     FormControlLabel,
     Checkbox,
 } from '@mui/material';
@@ -320,7 +315,7 @@ function ContractDetail() {
                                             label="Kích hoạt ngay"
                                         />
                                         <Button
-                                            variant="contained"
+                                            variant= "contained"
                                             color="secondary"
                                             onClick={handleSendContract}
                                             disabled={!isCheckbox || disableUpdate}

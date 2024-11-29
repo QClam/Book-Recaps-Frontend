@@ -183,7 +183,7 @@ function PublisherPayout() {
             </Typography>
 
             <Box display="flex" justifyContent="flex-end" mt={2} padding={2}>
-                <Chip label="Tạo mới" variant="outlined" color="primary" onClick={handleOpenModal} />                
+                <Chip label="Tạo mới quyết toán" variant="outlined" color="primary" onClick={handleOpenModal} />                
             </Box>
 
             {/* Bảng quyết toán */}
