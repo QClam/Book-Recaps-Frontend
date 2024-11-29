@@ -91,7 +91,7 @@ const PlaylistScreen = () => {
   };
 
   const handleBookClick = (recapId) => {
-    navigation.navigate('RecapDetail', { recapId });
+    navigation.navigate("RecapItemDetail", { recapId });
   };
 
   if (isLoading) {
