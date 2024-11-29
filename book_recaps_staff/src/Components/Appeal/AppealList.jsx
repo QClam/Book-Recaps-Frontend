@@ -70,6 +70,8 @@ function AppealList() {
     const [searchTerm, setSearchTerm] = useState(""); // Nhập input ô search
     const [filterStatus, setFilterStatus] = useState(""); // Lọc trạng thái
     const [loading, setLoading] = useState(true);
+    const [hoverState, setHoverState] = useState({});
+    const [hoverDetailState, setHoverDetailState] = useState({});
 
     const [responseForm, setResponseForm] = useState({
         id: "",
@@ -194,6 +196,18 @@ function AppealList() {
         }
     }, [searchTerm, filterStatus, appeals, page, rowsPerPage]);
 
+    const handleMouseEnter = (id) => {
+        setHoverState((prev) => ({ ...prev, [id]: true }));
+    };
+
+    const handleDetailMouseEnter = (id) => {
+        setHoverDetailState((prev) => ({ ...prev, [id]: true }));
+    };
+
+    const handleMouseLeave = (id) => {
+        setHoverState((prev) => ({ ...prev, [id]: false }));
+        setHoverDetailState((prev) => ({ ...prev, [id]: false }));
+    };
 
     if (loading) {
         return (
@@ -216,7 +230,7 @@ function AppealList() {
             <Typography variant="h5" margin={1}>Danh sách Kháng cáo của Người đóng góp</Typography>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
                 <TextField
-                    label="Tìm kiếm theo tên"
+                    label="Tìm kiếm theo tên Người đóng góp"
                     variant="outlined"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -261,28 +275,33 @@ function AppealList() {
                                     <TableCell>{val.response || "Chưa có phản hồi từ Staff"}</TableCell>
                                     <TableCell>{new Date(val.createdAt).toLocaleDateString()}</TableCell>
                                     <TableCell>
-                                        <Button variant="contained" sx={{ width: 120 }}
+                                        <Chip
+                                            label="Xem Review"
+                                            color="info"
+                                            variant={hoverState[val.id] ? 'contained' : 'outlined'}
                                             onClick={() =>
                                                 navigate(`/review/content_version/${val.reviewId}`)
                                             }
-                                        >
-                                            Xem Review
-                                        </Button>
+                                            onMouseEnter={() => handleMouseEnter(val.id)}
+                                            onMouseLeave={() => handleMouseLeave(val.id)} />
                                     </TableCell>
                                     <TableCell>
-                                        <Button onClick={() => openDialog(val)}
+                                        <Chip onClick={() => openDialog(val)}
                                             disabled={val.appealStatus === 2 || val.review?.staffId !== staffId}
-                                            variant="contained" color="error" sx={{ width: 120 }}                                           
-                                        >
-                                            Phản hồi</Button>
+                                            variant={hoverDetailState[val.id] ? 'contained' : 'outlined'}
+                                            label="Phản hồi"
+                                            color="error"
+                                            onMouseEnter={() => handleDetailMouseEnter(val.id)}
+                                            onMouseLeave={() => handleMouseLeave(val.id)}
+                                        />
                                     </TableCell>
-                                    <TableCell>
+                                    <TableCell width={120}>
                                         {val.appealStatus === 1 ? (
-                                            <Chip label="Đang xử lý" color="primary" variant="outlined" />
+                                            <Typography color="primary">Đang xử lý</Typography>
                                         ) : val.appealStatus === 2 ? (
-                                            <Chip label="Đã xử lý" color="success" variant="outlined" />
+                                            <Typography color="success">Đã xử lý</Typography>
                                         ) : val.appealStatus === 0 ? (
-                                            <Chip label="Đang mở" color="warning" variant="outlined" />
+                                            <Typography color="warning">Đang mở</Typography>
                                         ) : (
                                             <Button>Unknow</Button>
                                         )}

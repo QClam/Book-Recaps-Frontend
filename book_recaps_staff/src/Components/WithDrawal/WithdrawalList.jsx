@@ -135,9 +135,9 @@ function WithdrawalList() {
                     sx={{ width: '20%' }}
                 >
                     <MenuItem value="">Tất cả</MenuItem>
-                    <MenuItem value="Pending">Đang mở</MenuItem>
-                    <MenuItem value="Accepted">Hoàn tất</MenuItem>
-                    <MenuItem value="Rejected">Hủy</MenuItem>
+                    <MenuItem value="Pending">Đang xử lý</MenuItem>
+                    <MenuItem value="Accepted">Đã hoàn tất</MenuItem>
+                    <MenuItem value="Rejected">Đã hủy</MenuItem>
                 </TextField>
             </Box>
             <TableContainer component={Paper}>
@@ -147,8 +147,8 @@ function WithdrawalList() {
                             <TableCell><strong>Tên</strong></TableCell>
                             <TableCell><strong>Số tiền</strong></TableCell>
                             <TableCell><strong>Ghi chú</strong></TableCell>
-                            <TableCell><strong>Trạng thái</strong></TableCell>
                             <TableCell><strong>Ngày tạo</strong></TableCell>
+                            <TableCell><strong>Trạng thái</strong></TableCell>
                             <TableCell></TableCell>
                         </TableRow>
                     </TableHead>
@@ -158,18 +158,18 @@ function WithdrawalList() {
                                 <TableCell>{item.contributorName}</TableCell>
                                 <TableCell>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.totalEarnings || 0)}</TableCell>
                                 <TableCell>{item.description || "Không có ghi chú"}</TableCell>
+                                <TableCell>{new Date(item.createAt).toLocaleDateString()}</TableCell>
                                 <TableCell>
                                     {item.status === "Pending" ? (
-                                        <Chip label="Đang xử lý" color="primary" variant="outlined" />
+                                        <Typography color="primary" >Đang xử lý</Typography>
                                     ) : item.status === "Accepted" ? (
-                                        <Chip label="Hoàn tất" color="success" variant="outlined" />
+                                        <Typography color="success" >Đã hoàn tất</Typography>
                                     ) : item.status === "Rejected" ? (
-                                        <Chip label="Hủy" color="error" variant="outlined" />
+                                        <Typography color="error" >Đã hủy</Typography>
                                     ) : (
                                         <TableCell>Lỗi</TableCell>
                                     )}
                                 </TableCell>
-                                <TableCell>{new Date(item.createAt).toLocaleDateString()}</TableCell>
                                 <TableCell>
                                     {item.status === "Pending" ? (
                                         <Button
@@ -192,7 +192,7 @@ function WithdrawalList() {
                                             <Visibility />
                                         </Button>
                                     ) : (
-                                        <Chip label="Bị Hủy" color="error" variant="outlined" />
+                                        <Typography></Typography>
                                     )}
                                 </TableCell>
                             </TableRow>

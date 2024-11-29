@@ -50,6 +50,7 @@ function ReportList() {
     const [rowsPerPage, setRowsPerPage] = useState(5); // Dòng mỗi trang    
     const [searchTerm, setSearchTerm] = useState(""); // Nhập input ô search
     const [filterStatus, setFilterStatus] = useState(""); // Lọc trạng thái
+    const [hoverState, setHoverState] = useState({});
 
     const fetchReports = async () => {
         try {
@@ -57,7 +58,7 @@ function ReportList() {
             let reports = resolveRefs(response.data.data.$values);
             reports.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
             console.log(reports);
-            
+
             setReports(reports);
             setFilteredReports(reports)
             setLoading(false);
@@ -173,6 +174,14 @@ function ReportList() {
         return user ? user.fullName : "Không xác định";
     }
 
+    const handleMouseEnter = (id) => {
+        setHoverState((prev) => ({ ...prev, [id]: true }));
+    };
+
+    const handleMouseLeave = (id) => {
+        setHoverState((prev) => ({ ...prev, [id]: false }));
+    };
+
     if (loading) {
         return (
             <Box className="loading">
@@ -215,7 +224,6 @@ function ReportList() {
                 </TextField>
             </Box>
 
-
             <TableContainer component={Paper} >
                 <Table>
                     <TableHead>
@@ -241,18 +249,22 @@ function ReportList() {
                                     <TableCell>{val.description}</TableCell>
                                     <TableCell>{val.response || "Chưa có phản hồi từ staff"}</TableCell>
                                     <TableCell>{new Date(val.createdAt).toLocaleDateString()}</TableCell>
-                                    <TableCell><Button onClick={() => openDialog(val)}
-                                        disabled={val.status === 2}
-                                        variant='contained' color='error'
-                                        sx={{ width: 120 }}
-                                    >
-                                        Phản hồi</Button></TableCell>
-                                    <TableCell>{val.status === 1 ? (
-                                        <Chip label="Đang xử lý" color="primary" variant="outlined" />
+                                    <TableCell>
+                                        <Chip onClick={() => openDialog(val)}
+                                            disabled={val.status === 2}
+                                            variant={hoverState[val.id] ? 'contained' : 'outlined'}
+                                            color='error'
+                                            label="Phản hồi"
+                                            onMouseEnter={() => handleMouseEnter(val.id)}
+                                            onMouseLeave={() => handleMouseLeave(val.id)}
+                                        />
+                                    </TableCell>
+                                    <TableCell width={120}>{val.status === 1 ? (
+                                        <Typography color="primary" >Đang xử lý</Typography>
                                     ) : val.status === 2 ? (
-                                        <Chip label="Đã xử lý" color="success" variant="outlined" />
+                                        <Typography color="success" >Đã xử lý</Typography>
                                     ) : (
-                                        <Chip label="Đã mở" color="warning" variant="outlined" />
+                                        <Typography color="warning" >Đã mở</Typography>
                                     )}</TableCell>
                                 </TableRow>
                             ))}

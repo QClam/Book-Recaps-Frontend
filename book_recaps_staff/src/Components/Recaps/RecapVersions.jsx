@@ -21,6 +21,8 @@ function RecapVersions() {
     const [filterStatus, setFilterStatus] = useState(""); // Lọc trạng thái
     const [profile, setProfile] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [hoverState, setHoverState] = useState({});
+    const [hoverDetailState, setHoverDetailState] = useState({});
 
     const [reviewForm, setReviewForm] = useState({
         staffId: "",
@@ -116,7 +118,20 @@ function RecapVersions() {
             console.error("Error creating review:", error);
         }
     };
-    
+
+    const handleMouseEnter = (id) => {
+        setHoverState((prev) => ({ ...prev, [id]: true }));
+    };
+
+    const handleDetailMouseEnter = (id) => {
+        setHoverDetailState((prev) => ({ ...prev, [id]: true }));
+    };
+
+    const handleMouseLeave = (id) => {
+        setHoverState((prev) => ({ ...prev, [id]: false }));
+        setHoverDetailState((prev) => ({ ...prev, [id]: false }));
+    };
+
     if (loading) {
         return (
             <div className="loading">
@@ -157,8 +172,8 @@ function RecapVersions() {
                 >
                     <MenuItem value="">Tất cả</MenuItem>
                     <MenuItem value="Pending">Đang xử lý</MenuItem>
-                    <MenuItem value="Approved">Chấp nhận</MenuItem>
-                    <MenuItem value="Rejected">Từ chối</MenuItem>
+                    <MenuItem value="Approved">Đã chấp thuận</MenuItem>
+                    <MenuItem value="Rejected">Đã từ chối</MenuItem>
                 </TextField>
             </Box>
 
@@ -183,17 +198,24 @@ function RecapVersions() {
                                 <TableCell>{item.contributorName}</TableCell>
                                 <TableCell>{new Date(item.createAt).toLocaleDateString()}</TableCell>
                                 <TableCell>
-                                    <Button variant='contained' disabled={!!item.reviewId}
-                                        onClick={() => createReview(item.recapVersionId)}>
-                                        Duyệt
-                                    </Button>
+                                    <Chip
+                                        variant={hoverState[item.recapVersionId] ? 'contained' : 'outlined'}
+                                        label="Duyệt"
+                                        color='primary'
+                                        disabled={!!item.reviewId}
+                                        onClick={() => createReview(item.recapVersionId)}
+                                        onMouseEnter={() => handleMouseEnter(item.recapVersionId)}
+                                        onMouseLeave={() => handleMouseLeave(item.recapVersionId)} />
                                 </TableCell>
                                 <TableCell>{item.reviewId ? (
-                                    <Button variant='contained' color='success'
+                                    <Chip
+                                        variant={hoverDetailState[item.recapVersionId] ? 'contained' : 'outlined'}
+                                        color='success'
+                                        label="Xem chi tiết"
                                         onClick={() => navigate(`/review/content_version/${item.reviewId}`)}
-                                    >
-                                        Xem chi tiết
-                                    </Button>
+                                        onMouseEnter={() => handleDetailMouseEnter(item.recapVersionId)}
+                                        onMouseLeave={() => handleMouseLeave(item.recapVersionId)}
+                                    />
                                 ) : (
                                     <Typography variant="body2" color="textSecondary">
                                         Chưa có Review
@@ -201,13 +223,13 @@ function RecapVersions() {
                                 )}</TableCell>
                                 <TableCell>
                                     {item.status === "Pending" ? (
-                                        <Chip label="Đang xử lý" color="primary" variant="outlined" />
+                                        <Typography color="primary" >Đang xử lý</Typography>
                                     ) : item.status === "Approved" ? (
-                                        <Chip label="Chấp thuận" variant='outlined' color="success" />
+                                        <Typography color="success" >Đã Chấp thuận</Typography>
                                     ) : item.status === "Rejected" ? (
-                                        <Chip label="Từ chối" variant='outlined' color='error' />
+                                        <Typography color='error' >Đã Từ chối</Typography>
                                     ) : (
-                                        <Chip label="Unknown" variant='outlined' sx={{ color: "#bdbfbe" }} />
+                                        <Typography sx={{ color: "#bdbfbe" }} >Unknown</Typography>
                                     )}
                                 </TableCell>
                             </TableRow>
