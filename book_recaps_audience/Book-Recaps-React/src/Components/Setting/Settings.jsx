@@ -52,7 +52,7 @@ function Settings() {
   };
 
   const handleViewSubcriptionHistory = () => {
-    navigate('/subscription-history');
+    navigate(routes.subscriptionHistory);
   };
 
   // Fetch user profile data

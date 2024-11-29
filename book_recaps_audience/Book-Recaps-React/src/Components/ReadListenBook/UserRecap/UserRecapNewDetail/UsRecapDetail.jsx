@@ -112,10 +112,10 @@ const UserRecapDetail = () => {
                     <Link
                       key={recap.id}
                       to={generatePath(routes.recapPlayer, { recapId: recap.id })}
-                      className="relative block border border-gray-300 p-4 pr-20 my-4 rounded-md cursor-pointer hover:bg-green-50/50"
+                      className="relative block border border-gray-300 p-4 pr-20 my-4 rounded-md cursor-pointer hover:bg-gray-50"
                     >
                       {recap.contributor && (
-                        <div className="flex gap-2 items-center text-xs">
+                        <div className="flex gap-2 items-center text-sm mb-2">
                           <div className="w-6 h-6">
                             <img
                               src={recap.contributor.imageUrl?.replace("Files/Image/jpg/ad.jpg", "") || '/avatar-placeholder.png'}

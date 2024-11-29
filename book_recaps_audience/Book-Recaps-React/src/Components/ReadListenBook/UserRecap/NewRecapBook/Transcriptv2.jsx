@@ -1,102 +1,75 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import PropTypes from 'prop-types';
 import Modal from 'react-modal';
+import { axiosInstance } from "../../../../utils/axios";
 
 const Transcriptv2 = ({
-  transcriptData,
-  highlightedSentences,
-  setHighlightedSentences,
-  handleSentenceClick,
-  userId,
-  recapVersionId,
-  isGenAudio,
-  transcriptUrl,
-  currentTime
- 
-}) => {
-    // console.log('User ID:', userId);
-    // console.log('Recap Version ID:', recapVersionId);
-  const [contextMenu, setContextMenu] = useState({
+                        transcriptData,
+                        highlightedSentences,
+                        setHighlightedSentences,
+                        handleSentenceClick,
+                        userId,
+                        recapVersionId,
+                        isGenAudio,
+                        transcriptUrl,
+                        currentTime
+                      }) => {
+  const [ contextMenu, setContextMenu ] = useState({
     visible: false,
     x: 0,
     y: 0,
     sectionIndex: null,
     sentenceIndex: null,
   });
-  const [transcriptContent, setTranscriptContent] = useState(null);
-  const [transcriptError, setTranscriptError] = useState(null);
-  const [activeSentence, setActiveSentence] = useState(null);
-  
-  const [notes, setNotes] = useState({});
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [currentNote, setCurrentNote] = useState('');
-  const [currentSentenceId, setCurrentSentenceId] = useState(null);
+  const [ transcriptContent, setTranscriptContent ] = useState(null);
+  const [ activeSentence, setActiveSentence ] = useState(null);
+
+  const [ notes, setNotes ] = useState({});
+  const [ isModalOpen, setIsModalOpen ] = useState(false);
+  const [ currentNote, setCurrentNote ] = useState('');
+  const [ currentSentenceId, setCurrentSentenceId ] = useState(null);
   const sentenceRefs = useRef({});
   const contextMenuRef = useRef(null);
   const accessToken = localStorage.getItem("authToken");
-  // Function to get the storage key for the user's highlights
-  const getUserHighlightsKey = (userId) => `highlightedSentences_${userId}`;
 
-  // Function to get the storage key for the user's notes
-  const getUserNotesKey = (userId) => `transcriptNotes_${userId}`;
-  
-    // Tải ghi chú từ localStorage khi component mount
-    useEffect(() => {
-      try {
-        const storedNotes = JSON.parse(localStorage.getItem(getUserNotesKey(userId)));
-        setNotes(storedNotes && typeof storedNotes === 'object' ? storedNotes : {});
-      } catch (error) {
-        console.error('Error parsing transcriptNotes from localStorage:', error);
-        setNotes({});
-        // Optionally, you can remove the invalid entry from localStorage
-        localStorage.removeItem(getUserNotesKey(userId));
-      }
-    }, [userId]);
+  // Tải ghi chú từ localStorage khi component mount
+  useEffect(() => {
+    try {
+      const storedNotes = JSON.parse(localStorage.getItem(getUserNotesKey(userId)));
+      setNotes(storedNotes && typeof storedNotes === 'object' ? storedNotes : {});
+    } catch (error) {
+      console.error('Error parsing transcriptNotes from localStorage:', error);
+      setNotes({});
+      // Optionally, you can remove the invalid entry from localStorage
+      localStorage.removeItem(getUserNotesKey(userId));
+    }
+  }, [ userId ]);
 
   useEffect(() => {
     const fetchTranscript = async () => {
       try {
-        const response = await axios.get(transcriptUrl, {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        });
-        const data = response.data;
-
-        // Chuyển đổi start và end thành số nếu cần
-        data.transcriptSections.forEach(section => {
-          section.transcriptSentences.forEach(sentence => {
-            sentence.start = parseFloat(sentence.start);
-            sentence.end = parseFloat(sentence.end);
-          });
-        });
-
-        setTranscriptContent(data);
+        const response = await axios.get(transcriptUrl);
+        setTranscriptContent(response.data);
       } catch (error) {
-        // setTranscriptError('Error fetching transcript data');
-        // console.error('Error fetching transcript data:', error);
         console.error(error);
       }
     };
 
     fetchTranscript();
-  }, [transcriptUrl, accessToken]);
-  
+  }, [ transcriptUrl ]);
 
   // Function to handle highlighting
-
 
   useEffect(() => {
     // console.log("Current time:", currentTime); // Log current time để kiểm tra
     // console.log("isGenAudio:", isGenAudio);   // Log isGenAudio để đảm bảo nó đúng là true
-  
+
     if (!isGenAudio) {
       setActiveSentence(null);
       return;
     }
-  
+
     if (transcriptContent) {
       let found = false;
       for (let section of transcriptContent.transcriptSections) {
@@ -105,7 +78,7 @@ const Transcriptv2 = ({
             if (currentTime >= sentence.start && currentTime <= sentence.end) {
               setActiveSentence(sentence.sentence_index);
               console.log("Highlighting sentence index:", sentence.sentence_index); // Log câu được highlight
-  
+
               if (sentenceRefs.current[sentence.sentence_index]) {
                 sentenceRefs.current[sentence.sentence_index];
               }
@@ -116,13 +89,18 @@ const Transcriptv2 = ({
         }
         if (found) break;
       }
-  
+
       if (!found) {
         setActiveSentence(null);
       }
     }
-  }, [currentTime, transcriptContent, isGenAudio]);
+  }, [ currentTime, transcriptContent, isGenAudio ]);
 
+  // Function to get the storage key for the user's highlights
+  const getUserHighlightsKey = (userId) => `highlightedSentences_${userId}`;
+
+  // Function to get the storage key for the user's notes
+  const getUserNotesKey = (userId) => `transcriptNotes_${userId}`;
 
   const handleHighlight = async () => {
     const { sectionIndex, sentenceIndex } = contextMenu;
@@ -130,86 +108,56 @@ const Transcriptv2 = ({
     const selectedText = sentenceElement ? sentenceElement.textContent : '';
     const startIndex = sentenceElement?.dataset.start;
     const endIndex = sentenceElement?.dataset.end;
-  
+
     if (!selectedText) return;
-    
+
     const sentenceId = `sentence-${sectionIndex}-${sentenceIndex}`;
     const isAlreadyHighlighted = highlightedSentences.includes(sentenceId);
-  
+
     if (isAlreadyHighlighted) {
       // Remove the highlight
       const updatedHighlights = highlightedSentences.filter(id => id !== sentenceId);
       setHighlightedSentences(updatedHighlights);
-  
+
       // Remove highlight from localStorage
       localStorage.setItem(getUserHighlightsKey(userId), JSON.stringify(updatedHighlights));
-  
       alert("Highlight removed successfully!");
-  
-      // console.log("Highlight removed successfully!", {
-      //   recapVersionId,
-      //   userId,
-      //   targetText: selectedText,
-      //   sentenceId,
-      //   startIndex,
-      //   endIndex,
-      // });
+
     } else {
       // Add the highlight
       try {
         const requestBody = {
-            recapVersionId: recapVersionId,
-            userId: userId,
-            note: currentNote || "",
-            targetText: selectedText,
-            startIndex: startIndex || "0",
-            endIndex: endIndex || "0",
-            sentenceIndex: sentenceIndex.toString(),
-          };
-          // console.log('Request Body:', requestBody);
-          
-  
-        const response = await axios.post('https://bookrecaps.cloud/api/highlight/createhighlight', requestBody, {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
+          recapVersionId: recapVersionId,
+          userId: userId,
+          note: currentNote || "",
+          targetText: selectedText,
+          startIndex: startIndex || "0",
+          endIndex: endIndex || "0",
+          sentenceIndex: sentenceIndex.toString(),
+        };
 
-            'Content-Type': 'application/json',
-          },
-          
-        });
-        // console.log('API Response:', response.data);
-  
+        const response = await axiosInstance.post('/api/highlight/createhighlight', requestBody);
+
         if (response.data && response.data.succeeded) {
-          const updatedHighlights = [...highlightedSentences, sentenceId];
+          const updatedHighlights = [ ...highlightedSentences, sentenceId ];
           setHighlightedSentences(updatedHighlights);
-  
+
           // Save to localStorage with user-specific key
           localStorage.setItem(getUserHighlightsKey(userId), JSON.stringify(updatedHighlights));
-  
+
           alert("Highlight saved successfully!");
-  
-          // console.log("Highlight saved successfully!", {
-          //   recapVersionId,
-          //   userId,
-          //   targetText: selectedText,
-          //   sentenceId,
-          //   startIndex,
-          //   endIndex,
-          //   sentenceIndex
-          // });
         } else {
           throw new Error(response.data.message || 'Failed to save highlight');
         }
       } catch (error) {
         console.error('Error saving highlight:', error.response ? error.response.data : error);
-
         alert("Failed to save highlight.");
       }
     }
-  
+
     setContextMenu({ ...contextMenu, visible: false });
   };
-  
+
   useEffect(() => {
     // Load saved highlights for the user from localStorage
     const savedHighlights = localStorage.getItem(getUserHighlightsKey(userId));
@@ -229,20 +177,17 @@ const Transcriptv2 = ({
     //       console.error("Error fetching highlights:", error);
     //     }
     //   };
-    
+
     //   fetchUserHighlights();
-    }, [userId, recapVersionId]); 
+  }, [ userId, recapVersionId ]);
 
-
-    // useEffect(() => {
-    //     // Tải lại highlight từ localStorage khi component mount
-    //     const storedHighlights = localStorage.getItem('highlightedSentences');
-    //     if (storedHighlights) {
-    //       setHighlightedSentences(JSON.parse(storedHighlights));
-    //     }
-    //   }, []);
-      
-
+  // useEffect(() => {
+  //     // Tải lại highlight từ localStorage khi component mount
+  //     const storedHighlights = localStorage.getItem('highlightedSentences');
+  //     if (storedHighlights) {
+  //       setHighlightedSentences(JSON.parse(storedHighlights));
+  //     }
+  //   }, []);
 
   // Xử lý hành động Take Note
   const handleTakeNote = () => {
@@ -253,7 +198,6 @@ const Transcriptv2 = ({
     setIsModalOpen(true);
     setContextMenu({ ...contextMenu, visible: false });
   };
-
 
   // Xử lý lưu ghi chú
   const saveNote = () => {
@@ -299,7 +243,7 @@ const Transcriptv2 = ({
     // };
 
     // fetchUserHighlights();
-  }, [userId, recapVersionId]);
+  }, [ userId, recapVersionId ]);
 
   // Xử lý sự kiện right-click trên câu
   const handleContextMenu = (event, sectionIndex, sentenceIndex) => {
@@ -316,28 +260,28 @@ const Transcriptv2 = ({
       sentenceIndex,
     });
   };
-    // Update the active sentence based on currentTime
-    useEffect(() => {
-      if (transcriptData) {
-        transcriptData.transcriptSections.forEach((section) => {
-          section.transcriptSentences.forEach((sentence) => {
-            if (
-              currentTime >= sentence.start &&
-              currentTime <= sentence.end
-            ) {
-              setActiveSentence(sentence.sentence_index);
-            }
-          });
+  // Update the active sentence based on currentTime
+  useEffect(() => {
+    if (transcriptData) {
+      transcriptData.transcriptSections.forEach((section) => {
+        section.transcriptSentences.forEach((sentence) => {
+          if (
+            currentTime >= sentence.start &&
+            currentTime <= sentence.end
+          ) {
+            setActiveSentence(sentence.sentence_index);
+          }
         });
-      }
-    }, [currentTime, transcriptData]);
+      });
+    }
+  }, [ currentTime, transcriptData ]);
 
-    // Xử lý đóng modal
-    const closeModal = () => {
-      setIsModalOpen(false);
-    };
-    
-     // Xử lý hành động Copy
+  // Xử lý đóng modal
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  // Xử lý hành động Copy
   const handleCopy = () => {
     const { selectedText } = contextMenu;
     navigator.clipboard.writeText(selectedText)
@@ -355,8 +299,8 @@ const Transcriptv2 = ({
     <div className="transcript-container">
       {transcriptData.transcriptSections.map((section, index) => (
         <div key={index} className="transcript-section">
-           {section.title && <h3 className="transcript-title">{section.title}</h3>}
-          
+          {section.title && <h3 className="transcript-title">{section.title}</h3>}
+
           {section.transcriptSentences.map((sentence, idx) => {
             const time = sentence.start;
             const sentenceId = `sentence-${index}-${idx}`;
@@ -408,8 +352,8 @@ const Transcriptv2 = ({
       )}
 
       {/* Note Modal */}
-       {/* Modal Ghi Chú */}
-       <Modal
+      {/* Modal Ghi Chú */}
+      <Modal
         isOpen={isModalOpen}
         onRequestClose={closeModal}
         contentLabel="Take Note"

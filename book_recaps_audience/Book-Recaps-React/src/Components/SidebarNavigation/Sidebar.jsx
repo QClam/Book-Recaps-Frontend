@@ -119,7 +119,7 @@ function Sidebar() {
                       "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,
                       "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive
                     })}>
-                    Khám phá
+                    Tìm sách
                   </NavLink>
                   <Show when={isAuthenticated}>
                     <NavLink
@@ -284,7 +284,7 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
           className={({ isActive }) => cn("text-gray-700 block rounded-md px-3 py-2 text-base font-medium",
             isActive ? "bg-[#FF6F61]/30" : "hover:bg-[#FF6F61]/30")}
         >
-          Khám phá
+          Tìm sách
         </NavLink>
         <Show when={isAuthenticated} fallback={
           <>
