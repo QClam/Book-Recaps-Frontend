@@ -19,12 +19,15 @@
     "@mui/material": "^6.1.1",
     "axios": "^1.7.7",
     "chart.js": "^4.4.4",
+    "dayjs": "^1.11.13",
+    "lodash": "^4.17.21",
     "mammoth": "^1.8.0",
     "react": "^18.3.1",
     "react-chartjs-2": "^5.2.0",
     "react-dom": "^18.3.1",
     "react-google-recaptcha-v3": "^1.10.1",
     "react-router-dom": "^6.27.0",
+    "rsuite": "^5.74.2",
     "sass": "^1.79.4"
   },
   "devDependencies": {

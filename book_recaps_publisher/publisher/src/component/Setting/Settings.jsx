@@ -362,19 +362,19 @@ function Settings() {
             <div className="settings-content">
             {currentTab === 'profile' && (
                 <div>
-                <h2>Basic Info</h2>
+                <h2>Thông tin NXB</h2>
                 {publisher ? (
                     <div className="info-group">
                         <div className="info-item">
-                            <label>Publisher Name</label>
+                            <label>Tên NXB</label>
                             <span>{publisher.publisherName || "N/A"}</span>
                         </div>
                         <div className="info-item">
-                            <label>Contact Info</label>
+                            <label>Thông tin liên lạc</label>
                             <span>{publisher.contactInfo || "N/A"}</span>
                         </div>
                         <div className="info-item">
-                            <label>Bank Account</label>
+                            <label>Số tài khoản</label>
                             <span>{publisher.bankAccount || "N/A"}</span>
                         </div>
                     </div>
@@ -384,35 +384,35 @@ function Settings() {
                 {profile ? (
                     <div className="info-group">
                         <div className="info-item">
-                            <label>FullName</label>
+                            <label>Họ Tên</label>
                             <span>{profile.fullName || "N/A"}</span>
                         </div>
                         <div className="info-item">
-                            <label>Username</label>
+                            <label>Tên</label>
                             <span>{profile.userName || "N/A"}</span>
                         </div>
                         <div className="info-item">
-                            <label>Email ID</label>
+                            <label>Email</label>
                             <span>{profile.email || "N/A"}</span>
                         </div>
                         <div className="info-item">
-                            <label>Location</label>
+                            <label>Địa chỉ</label>
                             <span>{profile.address || "N/A"}</span>
                         </div>
                         <div className="info-item">
-                            <label>Phone Number</label>
+                            <label>Số điện thoại</label>
                             <span>{profile.phoneNumber || "N/A"}</span>
                         </div>
                         <div className="info-item">
-                            <label>Gender</label>
+                            <label>Giới tính</label>
                             <span>{profile.gender === 0 ? "Female" : profile.gender === 1 ? "Male" : "Other"}</span>
                         </div>
                         <div className="info-item">
-                            <label>Birth Date</label>
+                            <label>Ngày tháng năm sinh</label>
                             <span>{profile.birthDate ? new Date(profile.birthDate).toLocaleDateString() : "N/A"}</span>
                         </div>
                         <div className="info-item">
-                            <label>Profile Image</label>
+                            <label>Hình</label>
                             {profile.imageUrl ? (
                                 <img src={profile.imageUrl} alt="Profile" className="profile-image" />
                             ) : (

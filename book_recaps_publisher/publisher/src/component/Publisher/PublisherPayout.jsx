@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import "../Publisher/PublisherPayout.scss";
 
 const PublisherPayout = () => {
@@ -7,6 +7,7 @@ const PublisherPayout = () => {
     const [payoutDetail, setPayoutDetail] = useState(null);
     const [error, setError] = useState(null);
     const [detailedBooks, setDetailedBooks] = useState([]);
+    const navigate = useNavigate(); // Initialize navigate hook
 
     useEffect(() => {
         const fetchPayoutDetail = async () => {
@@ -54,53 +55,62 @@ const PublisherPayout = () => {
         fetchPayoutDetail();
     }, [id]);
 
+    const handleBookClick = (bookId) => {
+        navigate(`/book-dashboard/${bookId}`); // Navigate to the book details page with the bookId
+    };
+
+
     return (
         <div className="thanhtoanv1">
-            {error && <p style={{ color: 'red' }}>Error: {error}</p>}
+            {error && <p style={{ color: 'red' }}>Lỗi: {error}</p>}
             {payoutDetail ? (
                 <div>
-                    <h2>Payout Detail</h2>
+                    <h2>Chi Tiết Thanh Toán</h2>
                     <div className="payout-info">
                         <div className="left">
-                            <p><strong>Publisher Name:</strong> {payoutDetail?.data?.publisher?.publisherName}</p>
-                            <p><strong>Contact Info:</strong> {payoutDetail?.data?.publisher?.contactInfo}</p>
-                            <p><strong>Bank Account:</strong> {payoutDetail?.data?.publisher?.bankAccount}</p>
-                            <p><strong>Description:</strong> {payoutDetail?.data?.description || "No description"}</p>
+                            <p><strong>Tên Nhà Xuất Bản:</strong> {payoutDetail?.data?.publisher?.publisherName}</p>
+                            <p><strong>Thông Tin Liên Hệ:</strong> {payoutDetail?.data?.publisher?.contactInfo}</p>
+                            <p><strong>Số Tài Khoản Ngân Hàng:</strong> {payoutDetail?.data?.publisher?.bankAccount}</p>
+                            <p><strong>Mô Tả:</strong> {payoutDetail?.data?.description || "Không có mô tả"}</p>
+                            <p>
+                                <strong>Hình Ảnh:</strong>  
+                                <img 
+                                    src={payoutDetail?.data?.imageURL || "Không có hình ảnh"} 
+                                    className="small-image" 
+                                    alt="Chi Tiết Thanh Toán"
+                                />
+                            </p>
                         </div>
-
+    
                         <div className="right">
-                            <p><strong>From Date:</strong> {new Date(payoutDetail?.data?.fromDate).toLocaleDateString()}</p>
-                            <p><strong>To Date:</strong> {new Date(payoutDetail?.data?.toDate).toLocaleDateString()}</p>
-                            <p><strong>Revenue Share Percentage:</strong> {payoutDetail?.data?.publisher?.revenueSharePercentage}%</p>
-                            {/* <p><strong>Earning:</strong> {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(payoutDetail?.data?.amount)}</p>
-                             */}
-                            <p><strong>Earning:</strong> {payoutDetail?.data?.amount} <span className="currency-symbol">₫</span></p>
-
-                           
-
-
+                            <p><strong>Từ Ngày:</strong> {new Date(payoutDetail?.data?.fromDate).toLocaleDateString()}</p>
+                            <p><strong>Đến Ngày:</strong> {new Date(payoutDetail?.data?.toDate).toLocaleDateString()}</p>
+                            <p><strong>Tỷ Lệ Chia Lợi Nhuận:</strong> {payoutDetail?.data?.publisher?.revenueSharePercentage}%</p>
+                            <p><strong>Số Tiền:</strong> {new Intl.NumberFormat('vi-VN').format(payoutDetail?.data?.amount)} <span className="currency-symbol">₫</span></p>
+                            <p><strong>Trạng Thái:</strong> {payoutDetail?.data?.status === 1 ? "Đã Thanh Toán" : "Chưa Thanh Toán"}</p>
                         </div>
                     </div>
-
-                    {/* Book Earnings Table */}
+    
+                    {/* Bảng Doanh Thu Sách */}
                     <div className="book-earnings">
-                        <h3>Book Earnings</h3>
+                        <h3>Doanh Thu Sách</h3>
                         <table>
                             <thead>
                                 <tr>
-                                    {/* <th>Book ID</th> */}
-                                    <th>Book Title</th>
-                                    <th>Cover Image</th>
-
-                                    <th>Earning Amount</th>
-                                    <th>From Date</th>
-                                    <th>To Date</th>
+                                    <th>Tên Sách</th>
+                                    <th>Hình Ảnh Bìa</th>
+                                    <th>Số Tiền</th>
+                                    <th>Từ Ngày</th>
+                                    <th>Đến Ngày</th>
                                 </tr>
                             </thead>
                             <tbody>
                             {detailedBooks?.map((book, index) => (
                                     <tr key={index}>
-                                        <td>{book.title}</td>
+                                         <td onClick={() => handleBookClick(book.bookId)} style={{ cursor: 'pointer', color: 'blue' }}>
+                                        {book.title}
+                                    </td>
+    
                                         <td>
                                             <img src={book.coverImage} alt={book.title} width="50" />
                                         </td>
@@ -111,16 +121,17 @@ const PublisherPayout = () => {
                                         <td>{new Date(book.toDate).toLocaleDateString()}</td>
                                     </tr>
                                 ))}
-
+    
                             </tbody>
                         </table>
                     </div>
                 </div>
             ) : (
-                <p>Loading payout detail...</p>
+                <p>Đang tải chi tiết thanh toán...</p>
             )}
         </div>
     );
+    
 };
 
 export default PublisherPayout;

@@ -172,7 +172,7 @@ const Contract = () => {
 
   return (
     <div className="contract-manager">
-      <h2>Contract List</h2>
+      <h2>Danh sách hợp đồng</h2>
       {/* Status filter controls */}
       <div>
                 <label htmlFor="status-filter">Filter by Status:</label>
@@ -181,7 +181,7 @@ const Contract = () => {
                     value={statusFilter}
                     onChange={(e) => setStatusFilter(e.target.value)}
                 >
-                    <option value="All">All</option>
+                    <option value="All">Tất cả</option>
                     <option value="Bản nháp">Bản nháp</option>
                     <option value="Đang xử lý">Đang xử lý</option>
                     <option value="Chưa bắt đầu">Chưa bắt đầu</option>
@@ -193,17 +193,18 @@ const Contract = () => {
             </div>
 
       <table className="contract-table">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Publisher Name</th>
-            <th>Revenue Share</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>Status</th>
-            <th>Attachment Name</th>
-            <th>Actions</th>
-          </tr>
+        <thead  className="contract-th">
+        <tr>
+        <th>ID</th>
+        <th>Nhà Xuất Bản</th>
+        <th>Chia Sẻ Doanh Thu</th>
+        <th>Ngày Bắt Đầu</th>
+        <th>Ngày Kết Thúc</th>
+        <th>Trạng Thái</th>
+        <th>Tên Tệp Đính Kèm</th>
+        <th>Hành Động</th>
+      </tr>
+
         </thead>
         <tbody>
           {filteredContracts.map((contract) => (
@@ -224,7 +225,7 @@ const Contract = () => {
               </td>
 
               <td>
-              <button onClick={() => handleDetailClick(contract.id)}>Detail</button>
+              <button onClick={() => handleDetailClick(contract.id)} className="contract-button">Chi tiết</button>
               </td>
             </tr>
           ))}

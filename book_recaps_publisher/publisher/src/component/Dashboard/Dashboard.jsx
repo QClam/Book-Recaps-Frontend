@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react'; 
 import './Dashboard.scss';
 import { useNavigate } from 'react-router-dom';
+import emptyImage from "../../assets/empty-image.png";
 
 const Dashboard = ( ) => {
   const [books, setBooks] = useState([]); // Danh sách sách
@@ -11,8 +12,8 @@ const Dashboard = ( ) => {
   const accessToken = localStorage.getItem('authToken');
   const navigate = useNavigate();
 
-  const handleRowClick = (bookId) => {
-    navigate(`/book-dashboard/${bookId}`); // Điều hướng kèm bookId
+  const handleRowClick = (bookId, totalEarnings) => {
+    navigate(`/book-dashboard/${bookId}`, { state: { totalEarnings } }); // Điều hướng kèm bookId
   };
 
   useEffect(() => {
@@ -62,8 +63,9 @@ const Dashboard = ( ) => {
         // Cập nhật state
         const data = dashboardData?.data || {};
         setIncome(data.lastPayoutAmount || 0);
-        setNewPosts(data.newRecapsCount || 0);
-        setViews(data.newViewCount + data.oldViewCount || 0);
+        setNewPosts(data.oldRecapsCount || 0);
+        // setViews(data.newViewCount + data.oldViewCount || 0);
+        setViews(data.oldViewCount || 0);
         setBooks(data.books?.$values || []);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
@@ -124,9 +126,9 @@ const Dashboard = ( ) => {
           </thead>
           <tbody>
             {books.slice(0, booksToShow === "All" ? books.length : booksToShow).map((book) => (
-                <tr key={book.bookId} onClick={() => handleRowClick(book.bookId)} className="book-r">
+                <tr key={book.bookId} onClick={() => handleRowClick(book.bookId, book.totalEarnings)} className="book-r">
 
-                <td><img src={book.coverImage} alt={book.title} className="book-cover" /></td>
+                <td><img src={book.coverImage ? book.coverImage : emptyImage} alt={book.title} className="book-cover" /></td>
                 <td >{book.title}</td>
                 <td>{book.publicationYear}</td>
                 <td>{book.recapCount}</td>

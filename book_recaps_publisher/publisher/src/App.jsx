@@ -28,6 +28,8 @@ import PublisherDashboard from './component/Dashboard/PublisherDashboard';
 import UpdateBook from './component/ListBook/UpdateBook/UpdateBook';
 import BookDetail from '../../../book_recaps_audience/Book-Recaps-React/src/Components/TodayFreeRead/BookDetail/BookDetai';
 import DashboardDetail from './component/Dashboard/DashboardDetail';
+import BookListDetail from './component/ListBook/BookList/BookListDetail';
+import 'rsuite/dist/rsuite.min.css';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -62,6 +64,7 @@ const App = () => {
             <Route path="/contract-detail/:id" element={<ContractDetail />} />
             {/* <Route path="/bookmanager" element={<ListBook/>} /> */}
             <Route path="/bookmanager" element={<BookList/>} />
+            <Route path="/book-detail/:id" element={<BookListDetail />} />
             <Route path="/addbook" element={<AddBook/>} />
             <Route path="/updatebook/:id" element={<UpdateBook />} />
             {/* <Route path="/overview" element={<BookGraph/>} /> */}

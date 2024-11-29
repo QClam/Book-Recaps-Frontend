@@ -52,7 +52,7 @@
     overflow: hidden;
 
     thead {
-      background-color: #f2f2f2;
+      background-color:#3498db;
       position: sticky;
       top: 0;
       z-index: 1;
@@ -151,4 +151,19 @@
       }
     }
   }
+}
+.contract-button {
+  background-color: #3498db;
+  color: white;
+}
+
+.contract-th {
+  background-color: #3498db; /* Màu nền xanh */
+  color: white; /* Màu chữ trắng */
+}
+
+.contract-th th {
+  padding: 12px 15px;
+  text-align: left; /* Căn trái, hoặc có thể thay bằng 'center' nếu muốn căn giữa */
+  font-size: 16px;
 }

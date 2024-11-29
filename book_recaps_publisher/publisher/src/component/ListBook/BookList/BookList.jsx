@@ -3,7 +3,7 @@ import axios from 'axios';
 import '../BookList/BookList.scss';
 import SearchIcon from '@mui/icons-material/Search';
 import { useNavigate } from 'react-router-dom';
-
+import emptyImage from "../../../assets/empty-image.png"
 const resolveRefs = (data) => {
   const refMap = new Map();
   const createRefMap = (obj) => {
@@ -47,6 +47,7 @@ const BookList = () => {
   const [showPopup, setShowPopup] = useState(false);
   const [selectedBook, setSelectedBook] = useState(null);
   const [bookToDelete, setBookToDelete] = useState(null);
+  const [userId, setUserId] = useState(null);
 
 const toggleMenu = (index) => {
   setOpenMenuIndex(openMenuIndex === index ? null : index);
@@ -81,48 +82,59 @@ const cancelDelete = () => {
   setBookToDelete(null); // Xóa thông tin cuốn sách đã chọn
 };
 
+useEffect(() => {
+  const fetchUserId = async () => {
+    try {
+      const profileResponse = await axios.get(
+        "https://bookrecaps.cloud/api/personal/profile",
+        {
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+      setUserId(profileResponse.data.id);
+    } catch (error) {
+      console.error("Error fetching user profile:", error);
+      setError("Unable to fetch user profile.");
+    }
+  };
+
+  fetchUserId();
+}, [accessToken]);
+
+
 
   useEffect(() => {
+    if (!userId) return;
+
     const fetchBooks = async () => {
       try {
-        const response = await axios.get('https://bookrecaps.cloud/api/book/getallbooks', {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        });
-        const bookData = resolveRefs(response.data?.data?.$values || []);
-        setBooks(bookData);
+        const booksResponse = await axios.get(
+          "https://bookrecaps.cloud/api/book/getallbooks",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        const resolvedBooks = resolveRefs(booksResponse.data?.data?.$values || []);
+        const userBooks = resolvedBooks.filter(
+          (book) => book.publisher?.userId === userId
+        );
+
+        setBooks(userBooks);
       } catch (error) {
-        if (error.response && error.response.status === 401) {
-          await handleTokenRefresh();
-          fetchBooks();
-        } else {
-          setError(error.message);
-          console.error("Error fetching books:", error);
-        }
-      }
-    };
-
-
-    const handleTokenRefresh = async () => {
-      try {
-        const response = await axios.post("https://bookrecaps.cloud/api/tokens/refresh", {
-          refreshToken,
-        });
-
-        const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data.message.token;
-        localStorage.setItem("authToken", newAccessToken);
-        localStorage.setItem("refreshToken", newRefreshToken);
-        console.log("Token refreshed successfully");
-      } catch (error) {
-        console.error("Error refreshing token:", error);
-        setError("Session expired. Please log in again.");
+        console.error("Error fetching books:", error);
+        setError("Unable to fetch books.");
       }
     };
 
     fetchBooks();
-  }, [accessToken, refreshToken]);
+  }, [userId, accessToken, refreshToken]);
 
   // Calculate total pages
   const totalPages = Math.ceil(books.length / booksPerPage);
@@ -160,15 +172,36 @@ const cancelDelete = () => {
   const handleUpdate = (book) => {
     navigate(`/updatebook/${book.id}`);
   };
+
+  const handleNavigate = (contractId) => {
+    navigate(`/contract-detail/${contractId}`);
+  };
+
+  const handleBookInfoClick = (id) => {
+    navigate(`/book-detail/${id}`); // Điều hướng đến trang chi tiết với `id` của sách
+  };
+
+  
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 0: return "Bản nháp";
+      case 1: return "Đang xử lý";
+      case 2: return "Chưa bắt đầu";
+      case 3: return "Đang kích hoạt";
+      case 4: return "Hết hạn";
+      case 5: return "Từ chối";
+      default: return "Không xác định";
+    }
+  };
   
   return (
     <div className="list-book-container-container">
     <div className="header">
       <h3>Danh sách sách</h3>
       <div className="search-bar-container">
-      <button className="add-new-book-btn" onClick={handleAddBook}>
+      {/* <button className="add-new-book-btn" onClick={handleAddBook}>
             Thêm mới sách
-          </button>
+          </button> */}
 
           <SearchIcon className="search-icon" />
           <input
@@ -185,20 +218,21 @@ const cancelDelete = () => {
         <thead>
           <tr>
             <th>STT</th>
+            <th>Ảnh bìa</th>
             <th>Thể loại</th>
             <th>Tiêu đề</th>
             <th>Tác giả</th>
             <th>Năm xuất bản</th>
             <th>Hợp đồng</th>
-            <th>Thao tác</th>
-            
-           
+            {/* <th>Thao tác</th>*/}
           </tr>
         </thead>
         <tbody>
         {currentBooks.map((book, index) => (
-            <tr key={index}>
+             <tr key={index} onDoubleClick={() => handleBookInfoClick(book.id)} style={{ cursor: 'pointer' }}>
+
               <td>{(currentPage - 1) * booksPerPage + index + 1}</td>
+              <td> <img src={book.coverImage ? book.coverImage : emptyImage} width="50" height="95" /></td>
       
       <td>
         <span className={`tag ${book.categories?.$values[0]?.name?.toLowerCase() || 'unknown'}`}>
@@ -210,10 +244,26 @@ const cancelDelete = () => {
         {book.authors?.$values.map(author => author.name).join(', ') || 'Unknown Author'}
       </td>
       <td>{book.publicationYear || 'N/A'}</td> {/* Display publication year */}
+     
       <td>
-        {book.publisher?.contracts?.$values?.length > 0 ? "Có hợp đồng" : "Không có hợp đồng"}
-      </td>
-      <td>
+    {book.publisher?.contracts?.$values?.length > 0
+    ? book.publisher.contracts.$values.map(contract => (
+        <div key={contract.id} className="contract-item">
+          <span
+        className="contract-id"
+        onClick={() => handleNavigate(contract.id)}
+        style={{ cursor: "pointer", color: "blue", textDecoration: "underline" }}
+      >
+        ID: {contract.id}
+      </span>
+          <span className="contract-status">Status: {getStatusLabel(contract.status)}</span>
+        </div>
+      ))
+    : "Không có hợp đồng"}
+</td>
+
+
+      {/* <td>
         <div className="action-menu">
           <button 
             className="action-button"
@@ -238,20 +288,8 @@ const cancelDelete = () => {
                   </div>
                 </div>
               )}
-
-
         </div>
-      </td>
-{/* 
-              <td>
-          {book.publisher?.contracts?.$values?.length > 0
-            ? book.publisher.contracts.$values
-                .map(contract => `ID: ${contract.id}, Status: ${contract.status}`)
-                .join("; ")
-            : "Không có hợp đồng"}
-        </td> */}
-       
-
+      </td>     */}
     </tr>
   ))}
 </tbody>

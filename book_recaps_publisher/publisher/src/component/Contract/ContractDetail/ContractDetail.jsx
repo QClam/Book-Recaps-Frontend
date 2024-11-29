@@ -133,10 +133,11 @@ const ContractDetail = () => {
     <div className="contract-detail">
       <h2>Contract Detail</h2>
       <div className="info-box">
-        <p><strong>Publisher:</strong> {contract.publisherId}</p>
-         <p>{contract.publisher.publisherName || ""}</p> 
-         <p><strong>Contact Info:</strong> {contract.publisher.contactInfo || "N/A"}</p>
-        <p><strong>Bank Account:</strong> {contract.publisher.bankAccount || "N/A"}</p>
+       <p><strong>Tên Nhà xuất bản:</strong>{contract.publisher.publisherName || ""}</p> 
+        <p><strong>Mã Nhà xuất bản:</strong> {contract.publisherId}</p>
+         
+         <p><strong>Thông tin liên hệ:</strong> {contract.publisher.contactInfo || "N/A"}</p>
+        <p><strong>Tài khoản ngân hàng:</strong> {contract.publisher.bankAccount || "N/A"}</p>
         <p><strong>Phần trăm chia sẻ doanh thu:</strong> <span>{contract.revenueSharePercentage}%</span></p>
         <p><strong>Ngày tạo:</strong> {new Date(contract.startDate).toLocaleDateString()}</p>
         <p><strong>Ngày bắt đầu:</strong> {new Date(contract.startDate).toLocaleDateString()}</p>

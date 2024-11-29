@@ -176,7 +176,7 @@ function Login() {
                 <i className="fa-brands fa-facebook"></i>
               </a>
             </div> */}
-            <span>hoặc sử dụng email để đăng ký</span>
+            {/* <span>hoặc sử dụng email để đăng ký</span> */}
             <input
               required
               type="text"
@@ -233,7 +233,7 @@ function Login() {
                 <i className="fa-brands fa-facebook"></i>
               </a>
             </div> */}
-            <span>hoặc sử dụng email để đăng nhập</span>
+           
             <input
               type="email"
               value={email}

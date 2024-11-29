@@ -1,6 +1,8 @@
 .thanhtoanv1 {
-    padding: 20px;
-    padding-left: 10cm;  
+    // padding: 20px;
+     padding-left: 10cm; 
+    width: 70vw;
+    font-size: 20px;
 }
 
 .payout-info {
@@ -45,7 +47,15 @@
 }
 
 .currency-symbol {
-    font-size: 1.7em; /* Tăng kích thước */
-    vertical-align: middle;
+    font-size: 1.2em; /* Tăng kích thước */
+    //vertical-align: middle;
+    margin-top: -50px;
+  }
+  
+  .small-image {
+    width: 150px; /* Chiều rộng cố định */
+    height: auto; /* Chiều cao tự động */
+    border-radius: 8px; /* Bo góc */
+    object-fit: cover; /* Giữ tỷ lệ hình ảnh */
   }
   
