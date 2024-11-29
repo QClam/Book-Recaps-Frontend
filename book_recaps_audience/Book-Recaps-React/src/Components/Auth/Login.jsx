@@ -1,10 +1,10 @@
 import { useState } from "react";
-import axios from "axios";
 import "./Login.scss";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../../contexts/Auth";
 import { jwtDecode } from "jwt-decode";
-import { isRoleMatched, isValidToken } from "../../utils/axios";
+import { axiosInstance, isRoleMatched, isValidToken } from "../../utils/axios";
+import { routes } from "../../routes";
 
 function Login() {
   const location = useLocation();
@@ -91,13 +91,10 @@ function Login() {
         captchaToken: "string",
       };
 
-      const response = await axios.post(
-        "https://bookrecaps.cloud/api/register",
-        newUser
-      );
+      const response = await axiosInstance.post("/api/register", newUser);
       console.log("Register Successfully", newUser);
       console.log("Link: ", response.data.message);
-      navigate("/confirm-email", {
+      navigate(routes.confirmEmail, {
         state: {
           email: registerForm.email,
           message: response.data.message,
@@ -123,7 +120,7 @@ function Login() {
 
     try {
       // Login request
-      const response = await axios.post("https://bookrecaps.cloud/api/tokens", {
+      const response = await axiosInstance.post("/api/tokens", {
         email,
         password,
         captchaToken: "string",
@@ -133,11 +130,8 @@ function Login() {
 
       // Save the tokens if they exist
       if (accessToken && refreshToken) {
-        localStorage.setItem("authToken", accessToken);
-        localStorage.setItem("refreshToken", refreshToken);
-
         // Fetch the user's profile to check if they have completed onboarding
-        const profileResponse = await axios.get("https://bookrecaps.cloud/api/personal/profile", {
+        const profileResponse = await axiosInstance.get("/api/personal/profile", {
           headers: {
             Authorization: `Bearer ${accessToken}`,
           },
@@ -175,7 +169,7 @@ function Login() {
   };
 
   const forgetPasswordClick = () => {
-    navigate("/forget-password");
+    navigate(routes.forgetPassword);
   }
 
   return (

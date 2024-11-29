@@ -16,7 +16,9 @@ import ForgetPassword from "./Components/Auth/ForgetPassword";
 import ContributorTerm from "./Components/Setting/BecomeContributor/ContributorTerm";
 import Result from "./Components/Setting/Billing/Result/Result";
 import OnboardingStepper from "./Components/Onboarding/OnboardML/Onboarding";
-import UsRecapDetail from "./Components/ReadListenBook/UserRecap/UserRecapNewDetail/UsRecapDetail";
+import UsRecapDetail, {
+  bookDetailLoader
+} from "./Components/ReadListenBook/UserRecap/UserRecapNewDetail/UsRecapDetail";
 import RecapNewTues from "./Components/ReadListenBook/UserRecap/UserRecapNewDetail/RecapNewTues";
 import History from "./Components/History/History";
 import Homepage, { homepageLoader } from "./Components/Home/Homepage";
@@ -32,10 +34,11 @@ export const router = createBrowserRouter(createRoutesFromElements(
   <Route element={<App/>} errorElement={<ErrorRoute/>} loader={sessionLoader}>
 
     <Route path={routes.logout} element={<Logout/>}/>
-    <Route path={routes.forgetPassword} element={<ForgetPassword/>}/>
 
     <Route element={<MainLayout/>}>
       <Route path={routes.login} element={<Login/>}/>
+      <Route path={routes.forgetPassword} element={<ForgetPassword/>}/>
+
       {/* ko cần đăng nhập */}
       <Route path={routes.index} element={<Homepage/>} loader={homepageLoader}/>
       <Route path={routes.explore} element={<Explore/>}/>
@@ -47,7 +50,7 @@ export const router = createBrowserRouter(createRoutesFromElements(
       <Route path={routes.authorBooks} element={<AuthorBookApi/>}/>
 
       {/* Book details - recaps */}
-      <Route path={routes.bookDetail} element={<UsRecapDetail/>}/>
+      <Route path={routes.bookDetail} element={<UsRecapDetail/>} loader={bookDetailLoader}/>
       <Route path={routes.books} element={<BookFree/>}/>
 
       {/* RecapVersion detail - Audio player */}

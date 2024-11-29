@@ -177,7 +177,7 @@ const handleBookClick = (book) => {
             <div className="recap-contributor">
               {recap.contributor ? (
                 <>
-                  <img src={`https://bookrecaps.cloud/${recap.contributor.imageUrl}`} alt={recap.contributor.fullName} className="contributor-image" />
+                  <img src={recap.contributor.imageUrl} alt={recap.contributor.fullName} className="contributor-image" />
                   <h3>{recap.contributor.fullName}</h3>
                 </>
               ) : (

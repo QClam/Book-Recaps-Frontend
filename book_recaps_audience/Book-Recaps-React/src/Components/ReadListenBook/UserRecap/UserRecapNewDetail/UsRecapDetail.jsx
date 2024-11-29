@@ -1,147 +1,167 @@
-import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Await, defer, generatePath, json, Link, useLoaderData } from 'react-router-dom';
 import "./UsRecapDetail.scss";
 import { axiosInstance } from "../../../../utils/axios";
 import { resolveRefs } from "../../../../utils/resolveRefs";
+import { routes } from "../../../../routes";
+import { Image } from "primereact/image";
+import { handleFetchError } from "../../../../utils/handleFetchError";
+import { Suspense } from "react";
+import { Divider } from "primereact/divider";
+import { RiEyeLine, RiHeadphoneLine, RiThumbUpLine } from "react-icons/ri";
+
+const getBookDetail = async (bookId, request) => {
+  try {
+    const response = await axiosInstance.get(`/api/book/getbookbyid/${bookId}`, {
+      signal: request.signal
+    });
+    return resolveRefs(response.data.data);
+  } catch (e) {
+    const err = handleFetchError(e);
+    throw json({ error: err.error }, { status: err.status });
+  }
+}
+
+export const bookDetailLoader = async ({ params, request }) => {
+  return defer({
+    book: getBookDetail(params.id, request),
+  })
+}
 
 const UserRecapDetail = () => {
-  const { id } = useParams();
-  const [ book, setBook ] = useState(null);
-  const [ error, setError ] = useState(null);
-  const navigate = useNavigate();
-  const [ contributors, setContributors ] = useState([]);
-
-  useEffect(() => {
-    const fetchBookDetail = async () => {
-      try {
-        const response = await axiosInstance.get(`/api/book/getbookbyid/${id}`);
-        const bookRecapNew = resolveRefs(response.data.data);
-        setBook(bookRecapNew);
-
-        if (bookRecapNew.recaps && bookRecapNew.recaps.$values.length > 0) {
-          const contributorsData = await Promise.all(
-            bookRecapNew.recaps.$values.map(async (recap) => {
-              if (recap.userId) {
-                const userResponse = await axiosInstance.get(`/api/users/get-user-account-byID?userId=${recap.userId}`);
-                return {
-                  recapId: recap.id,
-                  contributor: userResponse.data.data,
-                };
-              }
-              return null;
-            })
-          );
-          setContributors(
-            contributorsData.filter((data) => data !== null)
-          );
-        }
-      } catch (error) {
-        setError("Failed to fetch book details");
-        console.error("Error fetching book details:", error);
-      }
-    };
-
-    fetchBookDetail();
-  }, [ id ]);
-
-  if (error) return <p>{error}</p>;
-  if (!book) return <p>Loading...</p>;
-
-  const handleRecapClick = (recapId) => {
-    navigate(`/recap-item-detail/${recapId}`);
-  };
+  const { book: promisedBook } = useLoaderData();
 
   return (
-    <div className="user-recap-detail-dtdt">
-      <h2 className="book-title">{book.title}</h2>
-      <img className="book-cover-cover" src={book.coverImage} alt={book.title}
-           style={{ marginLeft: '330px', alignItems: 'center' }}/>
-      <p className="book-description">{book.description}</p>
-      <p className="publication-year">Publication Year: {book.publicationYear}</p>
-      <p className="author">
-        Author(s):{" "}
-        {book.authors && book.authors.$values.length > 0 && (
-          <strong>{book.authors.$values[0].name}</strong>
-        )}
-      </p>
-      <p className="publisher">
-        Publisher: {book.publisher.publisherName}
-      </p>
-      <p className="categories">
-        Categories:{" "}
-        {book.categories && book.categories.$values.length > 0 && (
-          <strong>{book.categories.$values[0].name}</strong>
-        )}
-      </p>
+    <Suspense fallback={<div>Loading...</div>}>
+      <Await resolve={promisedBook} errorElement={<div>Error fetching book details</div>}>
+        {(book) => (
+          <div className="mt-10 mx-5 p-6 max-w-4xl md:mx-auto bg-white shadow-md rounded-lg">
+            <div className="flex flex-col md:flex-row gap-6">
+              {/* Book Cover Image */}
+              <div className="w-full md:w-1/3 mb-0">
+                <Image
+                  src={book.coverImage || "/empty-image.jpg"}
+                  alt={book.title + " (" + book.publicationYear + ")"}
+                  className="block overflow-hidden rounded-md shadow-md w-full"
+                  imageClassName="aspect-[3/4] object-cover w-full bg-white"
+                  preview
+                />
+              </div>
 
-      <div className="recaps">
-        <h2 className="recaps-title">Recaps</h2>
-        {book.recaps && book.recaps.$values.length > 0 ? (
-          book.recaps.$values
-            .filter((recap) => recap.isPublished)
-            .map((recap) => {
-              const contributorData = contributors.find(
-                (data) => data.recapId === recap.id
-              );
-              return (
-                <div
-                  className="recap-item-it"
-                  key={recap.id}
-                  onClick={() => handleRecapClick(recap.id)}
-                >
-                  <h2 className="recap-name">{recap.name}</h2>
-                  {/* <p className="recap-published">
-                    Published: {recap.isPublished ? "Yes" : "No"}
-                  </p> */}
-                  {recap.isPremium && (
-                    <p className="recap-premium" style={{ color: 'orange', fontWeight: 'bold', fontSize: '17px' }}>
-                      Premium
-                    </p>
-                  )}
+              {/* Book Information */}
+              <div className="w-full md:w-2/3">
+                <h1 className="text-3xl font-bold mb-2">{book.title} ({book.publicationYear})</h1>
+                {book.originalTitle && (
+                  <h2 className="text-gray-700 mb-3 italic">
+                    Tên gốc: <strong>{book.originalTitle}</strong>
+                  </h2>
+                )}
+                <p className="text-gray-800 mb-4">{book.description}</p>
 
-                  {contributorData && contributorData.contributor && (
-                    <div className="contributor">
-                      <img
-                        className="contributor-image"
-                        src={`https://bookrecaps.cloud/${contributorData.contributor.imageUrl}`}
-                        alt={contributorData.contributor.fullName}
-                      />
-                      <div>
-                        <h5 className="contributor-name">
-                          Contributor: {contributorData.contributor.fullName}
-                        </h5>
-                        <p className="contributor-gender">
-                          Gender:{" "}
-                          {contributorData.contributor.gender === 0
-                            ? "Male"
-                            : "Female"}
+                {/* Authors Section */}
+                {book.authors?.$values && book.authors.$values.length > 0 && (
+                  <div className="mb-3">
+                    <strong>Tác giả:</strong>
+                    <ul className="list-disc ml-5">
+                      {book.authors.$values.map((author) => (
+                        <li key={author.id} className="text-gray-700">
+                          {author.name}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Categories Section */}
+                {book.categories?.$values && book.categories.$values.length > 0 && (
+                  <div className="mb-3">
+                    <strong>Thể loại:</strong>
+                    <ul className="list-disc ml-5">
+                      {book.categories.$values.map((category) => (
+                        <li key={category.id} className="text-gray-700">
+                          {category.name}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Publisher Section */}
+                {book.publisher && (
+                  <div className="mb-3">
+                    <strong>Nhà xuất bản:</strong>
+                    <ul className="list-disc ml-5">
+                      <li className="text-gray-700">
+                        {book.publisher.publisherName}
+                      </li>
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            <Divider/>
+
+            <h2 className="font-semibold mb-3 italic text-gray-700">
+              Các bài viết hiện có:
+            </h2>
+            {book.recaps && book.recaps.$values.length > 0 ? (
+              book.recaps.$values
+                .filter((recap) => recap.isPublished)
+                .map((recap) => {
+                  return (
+                    <Link
+                      key={recap.id}
+                      to={generatePath(routes.recapPlayer, { recapId: recap.id })}
+                      className="relative block border border-gray-300 p-4 pr-20 my-4 rounded-md cursor-pointer hover:bg-green-50/50"
+                    >
+                      {recap.contributor && (
+                        <div className="flex gap-2 items-center text-xs">
+                          <div className="w-6 h-6">
+                            <img
+                              src={recap.contributor.imageUrl?.replace("Files/Image/jpg/ad.jpg", "") || '/avatar-placeholder.png'}
+                              alt="User Avatar" className="w-full h-full object-cover rounded-full"/>
+                          </div>
+                          <p className="font-semibold line-clamp-2">{recap.contributor.fullName}</p>
+                        </div>
+                      )}
+
+                      <p className="text-gray-700 mb-2 italic line-clamp-2" title={recap.name || book.title}>
+                        Bài viết: <strong>{recap.name || `"${recap.book.title}"`}</strong>
+                      </p>
+
+                      {/* Views, Likes, Audio length*/}
+                      <div className="flex gap-2 items-center text-sm text-gray-500">
+                        <p className="flex items-center gap-2">
+                          <span className="bg-green-100 p-1 rounded"><RiEyeLine size={17}/></span>
+                          <span>{recap.viewsCount || 0} Lượt xem</span>
                         </p>
-                        <p className="contributor-birth-date">
-                          Birth Date: {contributorData.contributor.birthDate}
+                        <p>·</p>
+                        <p className="flex items-center gap-2">
+                          <span className="bg-green-100 p-1 rounded"><RiThumbUpLine size={17}/></span>
+                          <span>{recap.likesCount || 0} Lượt thích</span>
+                        </p>
+                        <p>·</p>
+                        <p className="flex items-center gap-2">
+                          <span className="bg-green-100 p-1 rounded"><RiHeadphoneLine size={17}/></span>
+                          <span>{Number((recap.currentVersion?.audioLength || 0) / 60).toFixed(0)} phút</span>
                         </p>
                       </div>
-                    </div>
-                  )}
 
-                  {recap.isPublished &&
-                    recap.recapVersions &&
-                    recap.recapVersions.$values.length > 0 && (
-                      <div className="recap-versions">
-                        {recap.recapVersions.$values.map((version) => (
-                          <p key={version.id}>
-                            Version Name: {version.versionName}
-                          </p>
-                        ))}
-                      </div>
-                    )}
-                </div>
-              );
-            })
-        ) : (
-          <p className="no-recaps">No recaps available for this book.</p>
+                      {recap.isPremium && (
+                        <span className="absolute top-2 right-2 bg-yellow-400 text-sm rounded px-2 py-1">Premium</span>
+                      )}
+                    </Link>
+                  );
+                })
+            ) : (
+              <p className="text-gray-400 text-center italic">
+                Sách chưa có bài Recap nào. Hãy đợi vài ngày nữa nhé!
+              </p>
+            )}
+          </div>
         )}
-      </div>
-    </div>
+      </Await>
+    </Suspense>
   );
 };
 

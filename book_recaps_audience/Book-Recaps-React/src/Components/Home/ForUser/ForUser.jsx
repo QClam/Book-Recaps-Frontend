@@ -16,8 +16,8 @@ const ForUser = ({ promisedRecaps, title, description, emptyMessageIdx }) => {
   ]
 
   return (
-    <div className="flex flex-col w-full pt-6 md:pt-16 mx-auto md:px-12">
-      <div className="flex flex-col mb-8">
+    <div className="flex flex-col w-full pt-6 md:pt-12 mx-auto md:px-12">
+      <div className="flex flex-col mb-6">
         <h3 className="font-semibold text-2xl">{title}</h3>
         <p>{description}</p>
       </div>

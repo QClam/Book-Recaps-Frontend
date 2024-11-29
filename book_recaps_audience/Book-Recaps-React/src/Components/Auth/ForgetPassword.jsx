@@ -1,9 +1,9 @@
-import axios from 'axios';
 import { useState } from 'react';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { Link, useNavigate } from 'react-router-dom';
 import "../Auth/ForgetPassword.scss";
 import { routes } from "../../routes";
+import { axiosInstance } from "../../utils/axios";
 
 function ForgetPassword() {
   const [ isActive, setIsActive ] = useState(false);
@@ -62,7 +62,7 @@ function ForgetPassword() {
     try {
       const captchaToken = await executeRecaptcha("reset_password");
       const params = { email: email, captchaToken: captchaToken };
-      const response = await axios.post("https://bookrecaps.cloud/api/forget-password", null, { params });
+      const response = await axiosInstance.post("/api/forget-password", null, { params });
 
       const resetToken = response.data.message;
       localStorage.setItem("reset_token", resetToken);
@@ -102,7 +102,7 @@ function ForgetPassword() {
         captchaToken: captchaToken
       };
 
-      await axios.post("https://bookrecaps.cloud/api/reset-password", null, { params });
+      await axiosInstance.post("/api/reset-password", null, { params });
       navigate(routes.login);
       setRegisterForm({ email: "", NewPassword: "", ConfirmPassword: "" });
       setError(null);

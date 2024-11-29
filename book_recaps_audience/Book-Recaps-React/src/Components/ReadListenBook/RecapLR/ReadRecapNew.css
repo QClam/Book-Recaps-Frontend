@@ -1,7 +1,6 @@
 .read-recap-container {
   padding: 20px;
   text-align: center;
-  margin-top: -80px;
 }
 .read-recap-container .book-list {
   display: grid;
