@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button, TextField } from '@mui/material';
-import { axiosInstance } from "../api";
+import { axiosInstance } from "../../../utils/axios";
 
 const getAuthors = async (query, categories, page, controller) => {
   try {

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import { axiosInstance } from "../api";
 import { useRevalidator } from "react-router-dom";
 import { useAuth } from "../../../contexts/Auth";
+import { axiosInstance } from "../../../utils/axios";
 
 const postOnboardingFinish = async (userId, categories, authors, books, controller) => {
   try {

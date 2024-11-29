@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Button } from "@mui/material";
-import { axiosInstance } from "../api";
+import { axiosInstance } from "../../../utils/axios";
 
 const getBooks = async (categories, authors, controller) => {
   try {

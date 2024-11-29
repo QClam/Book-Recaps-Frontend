@@ -1,6 +1,3 @@
-
-import React from 'react';
-
 import ReadRecapNew from '../ReadListenBook/RecapLR/ReadRecapNew';
 import UserRecap from '../ReadListenBook/UserRecap/UserRecap';
 import UserRecapV2 from '../ReadListenBook/UserRecap/NewRecapBook/UserRecapV2';

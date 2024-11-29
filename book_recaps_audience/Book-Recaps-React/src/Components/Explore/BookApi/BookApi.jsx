@@ -1,80 +1,42 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import ReactPaginate from "react-paginate";
-import axios from "axios";
-import "./BookApi.scss"; // Import CSS cho styling
-const resolveRefs = (data) => {
-  const refMap = new Map();
-  const createRefMap = (obj) => {
-    if (typeof obj !== "object" || obj === null) return;
-    if (obj.$id) {
-      refMap.set(obj.$id, obj);
-    }
-    for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        createRefMap(obj[key]);
-      }
-    }
-  };
-  const resolveRef = (obj) => {
-    if (typeof obj !== "object" || obj === null) return obj;
-    if (obj.$ref) {
-      return refMap.get(obj.$ref);
-    }
-    for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        obj[key] = resolveRef(obj[key]);
-      }
-    }
-    return obj;
-  };
-  createRefMap(data);
-  return resolveRef(data);
-};
+import "./BookApi.scss";
+import { axiosInstance } from "../../../utils/axios";
+import { resolveRefs } from "../../../utils/resolveRefs"; // Import CSS cho styling
+
 
 const BookApi = () => {
-  const [books, setBooks] = useState([]);
-  const [filteredBooks, setFilteredBooks] = useState([]);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [error, setError] = useState(null); // For error handling
+  const [ books, setBooks ] = useState([]);
+  const [ filteredBooks, setFilteredBooks ] = useState([]);
+  const [ currentPage, setCurrentPage ] = useState(0);
+  const [ error, setError ] = useState(null); // For error handling
   const booksPerPage = 16; // Số lượng sách mỗi trang
   const navigate = useNavigate();
   // Trạng thái cho Search
-  const [searchTitle, setSearchTitle] = useState("");
-  const [searchAuthor, setSearchAuthor] = useState("");
+  const [ searchTitle, setSearchTitle ] = useState("");
+  const [ searchAuthor, setSearchAuthor ] = useState("");
 
   // Trạng thái cho Filter
-  const [categories, setCategories] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const [ageLimits, setAgeLimits] = useState([]);
-  const [selectedAgeLimit, setSelectedAgeLimit] = useState("");
-  const [publicationYears, setPublicationYears] = useState([]);
-  const [selectedPublicationYear, setSelectedPublicationYear] = useState("");
+  const [ categories, setCategories ] = useState([]);
+  const [ selectedCategories, setSelectedCategories ] = useState([]);
+  const [ ageLimits, setAgeLimits ] = useState([]);
+  const [ selectedAgeLimit, setSelectedAgeLimit ] = useState("");
+  const [ publicationYears, setPublicationYears ] = useState([]);
+  const [ selectedPublicationYear, setSelectedPublicationYear ] = useState("");
 
   // State for publisher filter
-  const [publishers, setPublishers] = useState([]);
-  const [selectedPublisher, setSelectedPublisher] = useState("");
-
-  // Lấy accessToken và refreshToken từ localStorage
-  const accessToken = localStorage.getItem("authToken");
-  const refreshToken = localStorage.getItem("refreshToken");
+  const [ publishers, setPublishers ] = useState([]);
+  const [ selectedPublisher, setSelectedPublisher ] = useState("");
 
   useEffect(() => {
     const fetchBooks = async () => {
       try {
         // Fetch books data from the API
-        const response = await axios.get(
-          "https://bookrecaps.cloud/api/book/getallbooks",
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
+        const response = await axiosInstance.get("/api/book/getallbooks");
 
         const data = resolveRefs(response.data);
         // console.log("Fetched Books Data:", data); // Kiểm tra dữ liệu
-        
 
         if (data && data.data && Array.isArray(data.data.$values)) {
           setBooks(data.data.$values); // Giả sử dữ liệu sách nằm trong `data.$values`
@@ -86,44 +48,13 @@ const BookApi = () => {
         }
       } catch (error) {
         // Nếu token hết hạn, thử làm mới nó
-        if (error.response && error.response.status === 401) {
-          await handleTokenRefresh();
-          fetchBooks(); // Thử lại việc lấy sách sau khi làm mới token
-        } else {
-          setError(error.message);
-          console.error("Error fetching books:", error);
-        }
+        setError(error.message);
+        console.error("Error fetching books:", error);
       }
     };
 
     fetchBooks();
-  }, [accessToken]);
-
-  // Hàm làm mới token
-  const handleTokenRefresh = async () => {
-    try {
-      const response = await axios.post(
-        "https://bookrecaps.cloud/api/tokens/refresh",
-        {
-          refreshToken,
-        }
-      );
-
-      const {
-        accessToken: newAccessToken,
-        refreshToken: newRefreshToken,
-      } = response.data.message.token;
-
-      // Cập nhật localStorage với token mới
-      localStorage.setItem("authToken", newAccessToken);
-      localStorage.setItem("refreshToken", newRefreshToken);
-
-      console.log("Token refreshed successfully");
-    } catch (error) {
-      console.error("Error refreshing token:", error);
-      setError("Session expired. Please log in again.");
-    }
-  };
+  }, []);
 
   // Hàm để trích xuất các giá trị lọc từ dữ liệu sách
   const extractFilters = (booksData) => {
@@ -150,16 +81,16 @@ const BookApi = () => {
 
     });
 
-    setCategories([...categorySet]);
-    setAgeLimits([...ageLimitSet].sort((a, b) => a - b));
-    setPublicationYears([...publicationYearSet].sort((a, b) => b - a));
-    setPublishers([...publisherSet]);
+    setCategories([ ...categorySet ]);
+    setAgeLimits([ ...ageLimitSet ].sort((a, b) => a - b));
+    setPublicationYears([ ...publicationYearSet ].sort((a, b) => b - a));
+    setPublishers([ ...publisherSet ]);
 
   };
 
   // Hàm xử lý khi thay đổi Search hoặc Filter
   useEffect(() => {
-    let tempBooks = [...books];
+    let tempBooks = [ ...books ];
 
     // Apply Search by title
     if (searchTitle) {
@@ -240,7 +171,7 @@ const BookApi = () => {
   const handleCategoryChange = (e) => {
     const { value, checked } = e.target;
     if (checked) {
-      setSelectedCategories([...selectedCategories, value]);
+      setSelectedCategories([ ...selectedCategories, value ]);
     } else {
       setSelectedCategories(selectedCategories.filter((cat) => cat !== value));
     }
@@ -257,7 +188,6 @@ const BookApi = () => {
   const handlePublisherChange = (e) => {
     setSelectedPublisher(e.target.value);
   };
-
 
   // const handleBookClick = (id) => {
   //   navigate(`/bookdetailbook/${id}`); // Use the book's id for navigation

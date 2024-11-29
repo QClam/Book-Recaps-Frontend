@@ -26,6 +26,7 @@ import { sessionLoader } from "./data/loaders/sessionLoader";
 import Logout from "./Components/Auth/Logout";
 import App from "./App";
 import { routes } from "./routes";
+import ProtectedRoute from "./Components/ProtectedRoute";
 
 export const router = createBrowserRouter(createRoutesFromElements(
   <Route element={<App/>} errorElement={<ErrorRoute/>} loader={sessionLoader}>
@@ -58,14 +59,15 @@ export const router = createBrowserRouter(createRoutesFromElements(
 
 
       {/* Cần đăng nhập trước */}
-      <Route path={routes.playlist} element={<LibraryBook/>}/>
-      <Route path={routes.viewHistory} element={<History/>}/>
-
-      <Route path={routes.supportTickets} element={<Application/>}/>
-      <Route path={routes.profileSettings} element={<Settings/>}/>
-      <Route path={routes.subscriptionHistory} element={<SubscriptionHistory/>}/>
-      <Route path={routes.onboarding} element={<OnboardingStepper/>}/>
-      <Route path={routes.becomeContributor} element={<ContributorTerm/>}/>
+      <Route element={<ProtectedRoute/>}>
+        <Route path={routes.playlist} element={<LibraryBook/>}/>
+        <Route path={routes.viewHistory} element={<History/>}/>
+        <Route path={routes.supportTickets} element={<Application/>}/>
+        <Route path={routes.subscriptionHistory} element={<SubscriptionHistory/>}/>
+        <Route path={routes.onboarding} element={<OnboardingStepper/>}/>
+        <Route path={routes.becomeContributor} element={<ContributorTerm/>}/>
+        <Route path={routes.profileSettings} element={<Settings/>}/>
+      </Route>
 
 
       {/*<Route path={routes.authorDetailProfile} element={<AuthorDetailProfile/>}/>*/}

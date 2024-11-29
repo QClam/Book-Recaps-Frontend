@@ -216,7 +216,7 @@ function Sidebar() {
                   <div className="user-profile" onClick={toggleLogout}>
                     <div className="text-sm">
                       <p className="font-semibold">{userName}</p>
-                      <p className={cn("text-xs rounded-full px-2 py-0.5", {
+                      <p className={cn("text-xs rounded-full px-2 py-0.5 w-max", {
                         "bg-[#FF6F61] text-white": isPremium,
                         "bg-gray-300 text-gray-700": !isPremium
                       })}>

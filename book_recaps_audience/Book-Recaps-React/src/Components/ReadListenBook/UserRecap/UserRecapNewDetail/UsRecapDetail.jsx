@@ -1,57 +1,20 @@
-import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import "./UsRecapDetail.scss";
-
-const resolveRefs = (data) => {
-  const refMap = new Map();
-  const createRefMap = (obj) => {
-    if (typeof obj !== "object" || obj === null) return;
-    if (obj.$id) {
-      refMap.set(obj.$id, obj);
-    }
-    for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        createRefMap(obj[key]);
-      }
-    }
-  };
-  const resolveRef = (obj) => {
-    if (typeof obj !== "object" || obj === null) return obj;
-    if (obj.$ref) {
-      return refMap.get(obj.$ref);
-    }
-    for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        obj[key] = resolveRef(obj[key]);
-      }
-    }
-    return obj;
-  };
-  createRefMap(data);
-  return resolveRef(data);
-};
+import { axiosInstance } from "../../../../utils/axios";
+import { resolveRefs } from "../../../../utils/resolveRefs";
 
 const UserRecapDetail = () => {
   const { id } = useParams();
-  const [book, setBook] = useState(null);
-  const [error, setError] = useState(null);
-  const accessToken = localStorage.getItem("authToken");
+  const [ book, setBook ] = useState(null);
+  const [ error, setError ] = useState(null);
   const navigate = useNavigate();
-  const [contributors, setContributors] = useState([]);
+  const [ contributors, setContributors ] = useState([]);
 
   useEffect(() => {
     const fetchBookDetail = async () => {
       try {
-        const response = await axios.get(
-          `https://bookrecaps.cloud/api/book/getbookbyid/${id}`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
+        const response = await axiosInstance.get(`/api/book/getbookbyid/${id}`);
         const bookRecapNew = resolveRefs(response.data.data);
         setBook(bookRecapNew);
 
@@ -59,15 +22,7 @@ const UserRecapDetail = () => {
           const contributorsData = await Promise.all(
             bookRecapNew.recaps.$values.map(async (recap) => {
               if (recap.userId) {
-                const userResponse = await axios.get(
-                  `https://bookrecaps.cloud/api/users/get-user-account-byID?userId=${recap.userId}`,
-                  {
-                    headers: {
-                      Authorization: `Bearer ${accessToken}`,
-                      "Content-Type": "application/json",
-                    },
-                  }
-                );
+                const userResponse = await axiosInstance.get(`/api/users/get-user-account-byID?userId=${recap.userId}`);
                 return {
                   recapId: recap.id,
                   contributor: userResponse.data.data,
@@ -87,7 +42,7 @@ const UserRecapDetail = () => {
     };
 
     fetchBookDetail();
-  }, [id, accessToken]);
+  }, [ id ]);
 
   if (error) return <p>{error}</p>;
   if (!book) return <p>Loading...</p>;
@@ -99,7 +54,8 @@ const UserRecapDetail = () => {
   return (
     <div className="user-recap-detail-dtdt">
       <h2 className="book-title">{book.title}</h2>
-      <img className="book-cover-cover" src={book.coverImage} alt={book.title}  style={{ marginLeft: '330px', alignItems:'center' }} />
+      <img className="book-cover-cover" src={book.coverImage} alt={book.title}
+           style={{ marginLeft: '330px', alignItems: 'center' }}/>
       <p className="book-description">{book.description}</p>
       <p className="publication-year">Publication Year: {book.publicationYear}</p>
       <p className="author">

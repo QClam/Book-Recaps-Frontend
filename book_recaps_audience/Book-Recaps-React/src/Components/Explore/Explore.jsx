@@ -1,5 +1,3 @@
-
-import React from 'react';
 //import BookTrending from './BookTrending/BookTrending';
 //import Categories from './Categories/Categories';
 //import Collection from './Collection/Collection';

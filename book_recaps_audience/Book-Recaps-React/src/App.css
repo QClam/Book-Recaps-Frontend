@@ -38,7 +38,7 @@
     /* background:#FFF8E7; */
     display: flex;
     flex-direction: column;
-    /*min-height: 100vh; !* Đảm bảo sidebar và content bao phủ toàn bộ chiều cao của màn hình *!*/
+    min-height: 100vh; /* Đảm bảo sidebar và content bao phủ toàn bộ chiều cao của màn hình */
     /*overflow: hidden; !* Ngăn cuộn ngoài ý muốn trên toàn trang *!*/
 }
 

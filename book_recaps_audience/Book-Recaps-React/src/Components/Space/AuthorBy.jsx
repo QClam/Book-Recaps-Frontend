@@ -1,5 +1,3 @@
-
-import React from 'react';
 import Authors from './Author/Authors';
 import AuthorGeners from './AuthorGeners/AuthorGeners';
 import AuthorApi from './AuthorApi/AuthorApi';

@@ -1,29 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import './AuthorApi.scss';
-import axios from "axios";
 import { generatePath, useNavigate } from 'react-router-dom';
 import { routes } from "../../../routes";
+import { axiosInstance } from "../../../utils/axios";
 
 const AuthorApi = () => {
   const [ authors, setAuthors ] = useState([]);
   const [ sortedAuthors, setSortedAuthors ] = useState([]); // Tạo trạng thái riêng cho danh sách sắp xếp
   const [ error, setError ] = useState(null);
   const [ sortOrder, setSortOrder ] = useState("asc"); // Thêm trạng thái để lưu trữ thứ tự sắp xếp
-  const accessToken = localStorage.getItem("authToken");
-  const refreshToken = localStorage.getItem("refreshToken");
   const navigate = useNavigate(); // For navigating to author-specific pages
 
   useEffect(() => {
     const fetchAuthors = async () => {
       try {
-        const response = await axios.get(
-          "https://bookrecaps.cloud/api/authors/getallauthors",
-          {
-            headers: {
-              "Authorization": `Bearer ${accessToken}`,
-            },
-          }
-        );
+        const response = await axiosInstance.get("/api/authors/getallauthors");
 
         const data = response.data;
         if (data && data.data && Array.isArray(data.data.$values)) {
@@ -32,32 +23,12 @@ const AuthorApi = () => {
           setAuthors([]);
         }
       } catch (error) {
-        if (error.response && error.response.status === 401) {
-          await handleTokenRefresh();
-          fetchAuthors();
-        } else {
-          setError(error.message);
-        }
+        setError(error.message);
       }
     };
 
     fetchAuthors();
-  }, [ accessToken ]);
-
-  const handleTokenRefresh = async () => {
-    try {
-      const response = await axios.post("https://bookrecaps.cloud/api/tokens/refresh", {
-        refreshToken,
-      });
-
-      const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data.message.token;
-
-      localStorage.setItem("authToken", newAccessToken);
-      localStorage.setItem("refreshToken", newRefreshToken);
-    } catch (error) {
-      setError("Session expired. Please log in again.");
-    }
-  };
+  }, []);
 
   const handleAuthorClick = (author) => {
     navigate(generatePath(routes.authorBooks, { id: author.id }), { state: { author } }); // Pass author data via state

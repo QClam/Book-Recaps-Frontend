@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { axiosInstance } from "../api";
+import { axiosInstance } from "../../../utils/axios";
 
 const getCategories = async (controller) => {
   try {

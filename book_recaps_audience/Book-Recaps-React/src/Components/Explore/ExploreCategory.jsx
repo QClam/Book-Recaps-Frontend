@@ -1,5 +1,3 @@
-
-import React from 'react';
 import BookApiCategory from './BookApiCategory/BookApiCategory';
 import CategoryByBookApi from './CategoryByBookApi/CategoryByBookApi';
 

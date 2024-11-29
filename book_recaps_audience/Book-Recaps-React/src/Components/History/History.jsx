@@ -1,50 +1,24 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useEffect, useState } from 'react';
 import "../History/History.scss";
 import { useNavigate } from 'react-router-dom';
+import { axiosInstance } from "../../utils/axios";
+import { useAuth } from "../../contexts/Auth";
 
 const History = () => {
-  // State to store user ID and recap data
-  const [userId, setUserId] = useState('');
-  const [recapData, setRecapData] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [ recapData, setRecapData ] = useState([]);
+  const [ loading, setLoading ] = useState(true);
+  const [ error, setError ] = useState(null);
   const navigate = useNavigate(); // Initialize navigate
+  const { user } = useAuth();
 
-  // Retrieve the access token from local storage
-  const accessToken = localStorage.getItem('authToken');
-
-  // Function to fetch user ID
-  const fetchUserId = async () => {
-    try {
-      const response = await axios.get('https://bookrecaps.cloud/api/personal/profile', {
-        headers: {
-          'accept': '*/*',
-          'Authorization': `Bearer ${accessToken}`, // Use the access token
-        },
-      });
-      const id = response.data.id; // Extract user ID
-      setUserId(id);
-      return id;
-    } catch (err) {
-      console.error('Error fetching user ID:', err);
-      setError('Failed to fetch user ID');
-      setLoading(false);
-    }
-  };
+  useEffect(() => {
+    fetchRecapData();
+  }, []);
 
   // Function to fetch and filter recap data by user ID
-  const fetchRecapData = async (id) => {
+  const fetchRecapData = async () => {
     try {
-      const response = await axios.get(
-        `https://bookrecaps.cloud/api/viewtracking/getviewtrackingbyuserid/${id}?pageNumber=1&pageSize=10`,
-        {
-          headers: {
-            'accept': '*/*',
-            'Authorization': `Bearer ${accessToken}`, // Use the access token
-          },
-        }
-      );
+      const response = await axiosInstance.get(`/api/viewtracking/getviewtrackingbyuserid/${user.id}?pageNumber=1&pageSize=10`);
 
       // Extract recap data
       const recaps = response.data.data.data.$values;
@@ -66,16 +40,6 @@ const History = () => {
     }
   };
 
-  // Fetch user ID and recap data on component mount
-  useEffect(() => {
-    const getUserData = async () => {
-      const id = await fetchUserId();
-      if (id) {
-        await fetchRecapData(id);
-      }
-    };
-    getUserData();
-  }, []);
 
   // Render loading or error state
   if (loading) return <div className="loading">Loading...</div>;
@@ -88,16 +52,16 @@ const History = () => {
       <div className="history-list">
         {recapData.map((recap, index) => (
           <div key={index} className="history-card"
-          
-         >
-           <div className="recap-thumbnail">
-           <img 
-      src={recap.book.coverImage} 
-      alt={recap.book.title} 
-      style={{ cursor: 'pointer' }} 
-      onClick={() => navigate(`/user-recap-detail-item/${recap.book.bookId}`)} // Navigate to the detail page
-    />
-</div>
+
+          >
+            <div className="recap-thumbnail">
+              <img
+                src={recap.book.coverImage}
+                alt={recap.book.title}
+                style={{ cursor: 'pointer' }}
+                onClick={() => navigate(`/user-recap-detail-item/${recap.book.bookId}`)} // Navigate to the detail page
+              />
+            </div>
 
             <div className="recap-details">
               <h2>{recap.recapName}</h2>
@@ -106,7 +70,7 @@ const History = () => {
                 {/* <span className="created-at"><strong>Created At:</strong> {new Date(recap.createdAt).toLocaleString()}</span> */}
               </div>
               <div className="recap-meta">
-              {/* <p><strong>Book ID:</strong> {recap.book.bookId} </p> */}
+                {/* <p><strong>Book ID:</strong> {recap.book.bookId} </p> */}
                 <p><strong>Title:</strong> {recap.book.title} </p>
                 <p><strong>Original Title:</strong> {recap.book.originalTitle}</p>
                 <p className="likes-views">

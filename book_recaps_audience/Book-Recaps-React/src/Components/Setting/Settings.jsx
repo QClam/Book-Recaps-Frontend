@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import './Settings.scss';
 import { useNavigate } from 'react-router-dom';
 import { routes } from "../../routes";
+import { useAuth } from "../../contexts/Auth";
+import { axiosInstance } from "../../utils/axios";
 
 function Settings() {
   const navigate = useNavigate(); // Create a navigate function
@@ -31,6 +33,7 @@ function Settings() {
   const [ imageFile, setImageFile ] = useState(null); // New state to store selected image file
   const [ imageUploadLoading, setImageUploadLoading ] = useState(false);
   const [ subscriptionPackageName, setSubscriptionPackageName ] = useState('');
+  const { user } = useAuth();
 
   const handleViewApplication = () => {
     navigate('/application'); // Navigate to the Application route
@@ -55,22 +58,8 @@ function Settings() {
   // Fetch user profile data
   useEffect(() => {
     const fetchProfile = async () => {
-      const accessToken = localStorage.getItem('authToken');
       try {
-        const response = await fetch('https://bookrecaps.cloud/api/personal/profile', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        const data = await response.json();
-        console.log('Fetched profile data:', data); // Log the data to inspect its structure
+        const data = user.profileData
 
         if (data) { // Check if data exists
           setProfile(data); // Set profile directly
@@ -109,21 +98,10 @@ function Settings() {
 
   // Fetch subscription package name based on subscriptionPackageId
   const fetchSubscriptionPackage = async (subscriptionPackageId) => {
-    const accessToken = localStorage.getItem('authToken');
     try {
-      const response = await fetch(`https://bookrecaps.cloud/api/subscriptionpackages/getpackagebyid/${subscriptionPackageId}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await axiosInstance.get(`/api/subscriptionpackages/getpackagebyid/${subscriptionPackageId}`);
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const packageData = await response.json();
+      const packageData = response.data;
       if (packageData && packageData.data) {
         setSubscriptionPackageName(packageData.data.name); // Set the subscription package name
       }
@@ -134,35 +112,23 @@ function Settings() {
 
   // Handle profile update
   const handleUpdateProfile = async () => {
-    const accessToken = localStorage.getItem('authToken');
-
     // Log the form data to verify what is being sent
     console.log('Updated profile data:', updatedProfile);
 
     try {
-      const response = await fetch('https://bookrecaps.cloud/api/personal/profile', {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fullName: updatedProfile.fullName,
-          gender: parseInt(updatedProfile.gender, 10), // Ensure gender is sent as an integer
-          birthDate: updatedProfile.birthDate, // Ensure correct date format
-          address: updatedProfile.address,
-        }),
+      const response = await axiosInstance.put('/api/personal/profile', {
+        fullName: updatedProfile.fullName,
+        gender: parseInt(updatedProfile.gender, 10), // Ensure gender is sent as an integer
+        birthDate: updatedProfile.birthDate, // Ensure correct date format
+        address: updatedProfile.address,
       });
 
-      const result = await response.json();
+      const result = await response.data;
 
-      if (response.ok) {
-        console.log('Profile updated successfully!', result);
-        setProfile(result.data); // Update profile in state
-        setModalOpen(false); // Close modal
-      } else {
-        console.error('Error updating profile:', result.message || 'Unknown error');
-      }
+      console.log('Profile updated successfully!', result);
+      setProfile(result.data); // Update profile in state
+      setModalOpen(false); // Close modal
+
     } catch (error) {
       console.error('Error updating profile:', error);
     }
@@ -179,58 +145,22 @@ function Settings() {
 
   // Handle phone update
   const handleUpdatePhone = async () => {
-    const accessToken = localStorage.getItem('authToken');
-
     try {
-      const response = await fetch('https://bookrecaps.cloud/api/personal/update-phone', {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(phoneUpdate),
-      });
+      await axiosInstance.put('/api/personal/update-phone', phoneUpdate);
+      console.log('Phone number updated successfully!');
+      setPhoneUpdateModalOpen(false); // Close phone update modal
 
-      // Check if the response is JSON or text
-      const contentType = response.headers.get('content-type');
-      let result;
-      if (contentType && contentType.includes('application/json')) {
-        result = await response.json();
-      } else {
-        result = await response.text();
-        console.log('Response is not JSON:', result);  // Log the success message
-      }
-
-      if (response.ok) {
-        console.log('Phone number updated successfully!');
-        setPhoneUpdateModalOpen(false); // Close phone update modal
-
-        // Refetch the profile to update the state with the correct data
-        await fetchProfile();  // Ensure the latest profile data is fetched
-      } else {
-        console.error('Error updating phone number:', result);
-      }
+      // Refetch the profile to update the state with the correct data
+      await fetchProfile();  // Ensure the latest profile data is fetched
     } catch (error) {
       console.error('Error updating phone number:', error);
     }
   };
   const fetchProfile = async () => {
-    const accessToken = localStorage.getItem('authToken');
     try {
-      const response = await fetch('https://bookrecaps.cloud/api/personal/profile', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await axiosInstance.get('/api/personal/profile');
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const data = await response.json();
-      console.log('Fetched profile data:', data);
+      const data = await response.data;
 
       // Set profile data
       setProfile(data);
@@ -256,41 +186,16 @@ function Settings() {
 
   // Handle password update
   const handleUpdatePassword = async () => {
-    const accessToken = localStorage.getItem('authToken');
     try {
-      const response = await fetch('https://bookrecaps.cloud/api/personal/update-password', {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(passwordData) // Đảm bảo passwordData là đúng
-      });
-
-      // Kiểm tra xem response có ok không
-      if (!response.ok) {
-        const errorText = await response.text(); // Đọc phản hồi như là text
-        console.error('Error response text:', errorText); // Ghi log lỗi để kiểm tra
-        throw new Error(errorText); // Ném ra lỗi với nội dung phản hồi
-      }
+      await axiosInstance.put('/api/personal/update-password', passwordData);
 
       // Nếu không có lỗi, thông báo thành công
       alert('Thay đổi mật khẩu thành công! Vui lòng đăng nhập lại.');
 
-      // Clear auth token from localStorage
-      localStorage.removeItem('authToken');
-
-      // Navigate to login page
-      navigate(routes.login);
-
       // Đăng xuất khỏi các phiên làm việc cũ, nếu có
-      await fetch('https://bookrecaps.cloud/api/personal/logout', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-        }
-      });
+      await axiosInstance.post('/api/personal/logout');
 
+      navigate(routes.logout);
     } catch (error) {
       console.error('Error updating password:', error);
       // alert('Cập nhật mật khẩu thất bại: ' + error.message);
@@ -305,7 +210,6 @@ function Settings() {
 
   // Handle Image Upload
   const handleUpdateImage = async () => {
-    const accessToken = localStorage.getItem('authToken');
     const userId = profile?.userId || ''; // Assuming `userId` is part of the profile data
 
     if (!imageFile) {
@@ -320,27 +224,14 @@ function Settings() {
 
     try {
       setImageUploadLoading(true);
-      const response = await fetch('https://bookrecaps.cloud/api/personal/update-avatar', {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-        },
-        body: formData,
-      });
+      await axiosInstance.put('/api/personal/update-avatar', formData);
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log('Profile image updated successfully!', result);
-        // Gọi lại fetchProfile để cập nhật lại thông tin profile sau khi ảnh được cập nhật
-        await fetchProfile();
+      // Gọi lại fetchProfile để cập nhật lại thông tin profile sau khi ảnh được cập nhật
+      await fetchProfile();
 
-        // // Cập nhật profile trong state
-        // setProfile(result.data);
+      // // Cập nhật profile trong state
+      // setProfile(result.data);
 
-      } else {
-        const errorText = await response.text();
-        console.error('Error updating image:', errorText);
-      }
     } catch (error) {
       console.error('Error updating profile image:', error);
     } finally {

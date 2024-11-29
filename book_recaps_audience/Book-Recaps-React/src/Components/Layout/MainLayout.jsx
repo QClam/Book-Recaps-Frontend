@@ -12,10 +12,9 @@ function MainLayout() {
       </header>
       <div className="main-content">
         <Outlet/>
-
-        <div className="footer">
-          ©{new Date().getFullYear()} BookRecaps {import.meta.env.VITE_WEB_NAME}. All rights reserved
-        </div>
+      </div>
+      <div className="footer">
+        ©{new Date().getFullYear()} BookRecaps {import.meta.env.VITE_WEB_NAME}. All rights reserved
       </div>
     </div>
   );
