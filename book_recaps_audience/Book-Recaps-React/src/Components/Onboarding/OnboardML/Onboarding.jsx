@@ -7,6 +7,8 @@ import BookSelection from './BookSelection';
 import ThankYouStep from './ThankYouStep';
 import bookListen from "../../../image/bookListen.jpg";
 import { useAuth } from "../../../contexts/Auth";
+import { Link } from "react-router-dom";
+import { routes } from "../../../routes";
 
 const OnboardingStepper = () => {
   const { user, isAuthenticated } = useAuth();
@@ -43,7 +45,6 @@ const OnboardingStepper = () => {
         return (
           <div className="welcome-step">
             <div className="welcome-image-container">
-
               <img src={bookListen} alt="Welcome illustration" className="welcome-illustration"/>
             </div>
 
@@ -93,6 +94,20 @@ const OnboardingStepper = () => {
 
   return (
     <div className="onboarding-container">
+      <div className="relative text-center mb-7">
+        <h1 className="text-xl font-bold">
+          Onboarding
+        </h1>
+        <p className="max-w-screen-md mx-auto">
+          This will help us get to know you better and provide you with a personalized experience.
+        </p>
+        <Link
+          to={routes.logout}
+          className="absolute top-0 right-0 underline hover:text-[#FF6F61]"
+        >
+          Logout
+        </Link>
+      </div>
       <Stepper activeStep={activeStep} alternativeLabel>
         {steps.map((label, index) => (
           <Step key={index}>

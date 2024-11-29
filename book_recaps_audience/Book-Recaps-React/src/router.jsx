@@ -35,6 +35,12 @@ export const router = createBrowserRouter(createRoutesFromElements(
 
     <Route path={routes.logout} element={<Logout/>}/>
 
+    {/* Route không có header */}
+    <Route element={<ProtectedRoute/>}>
+      <Route path={routes.onboarding} element={<OnboardingStepper/>}/>
+    </Route>
+
+    {/* Route có header */}
     <Route element={<MainLayout/>}>
       <Route path={routes.login} element={<Login/>}/>
       <Route path={routes.forgetPassword} element={<ForgetPassword/>}/>
@@ -67,19 +73,15 @@ export const router = createBrowserRouter(createRoutesFromElements(
         <Route path={routes.viewHistory} element={<History/>}/>
         <Route path={routes.supportTickets} element={<Application/>}/>
         <Route path={routes.subscriptionHistory} element={<SubscriptionHistory/>}/>
-        <Route path={routes.onboarding} element={<OnboardingStepper/>}/>
         <Route path={routes.becomeContributor} element={<ContributorTerm/>}/>
         <Route path={routes.profileSettings} element={<Settings/>}/>
       </Route>
-
 
       {/*<Route path={routes.authorDetailProfile} element={<AuthorDetailProfile/>}/>*/}
       {/*<Route path={routes.authorsByCategory} element={<AuthorGenersDetail/>}/>*/}
       {/*<Route path={routes.contributor} element={<RecapByContributor/>}/>*/}
       {/* <Route path="/contributor-recaps/:userId" element={<ContributorRecaps />} /> */}
     </Route>
-
-    {/* Route không có sidebar */}
 
     {/*<Route path="/help" element={<Report/>}/>*/}
   </Route>

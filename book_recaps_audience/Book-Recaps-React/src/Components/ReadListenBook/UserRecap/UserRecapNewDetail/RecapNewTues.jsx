@@ -42,22 +42,6 @@ const RecapNewTues = () => {
   const hasSubscription = user?.profileData.subscriptions.$values.some((sub) => sub.status === 0);
   const accessToken = localStorage.getItem("authToken");
 
-  const closeModal = () => {
-    setIsModalOpen(false);
-  };
-
-  const handleSaveClick = () => {
-    setIsModalOpen(true);
-  };
-
-  const openReportModal = () => {
-    setIsReportModalOpen(true);
-  };
-
-  const closeReportModal = () => {
-    setIsReportModalOpen(false);
-  };
-
   // const recapIded = useParams().recapId;
   const deviceType = window.innerWidth <= 768 ? 0 : 1; // Mobile: 0, Desktop: 1
 
@@ -96,6 +80,21 @@ const RecapNewTues = () => {
     }
   }, [ recapId ]);
 
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleSaveClick = () => {
+    setIsModalOpen(true);
+  };
+
+  const openReportModal = () => {
+    setIsReportModalOpen(true);
+  };
+
+  const closeReportModal = () => {
+    setIsReportModalOpen(false);
+  };
   const trackView = async () => {
     if (!userId) {
       console.warn('User ID not available. Cannot track view.');

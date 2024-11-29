@@ -35,7 +35,6 @@ function Login() {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setRegisterForm({ ...registerForm, [name]: value });
-    console.log(value);
   };
 
   const validateForm = () => {
