@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Platform, Dimensions   } from 'react-native';
 import api from '../../utils/AxiosInterceptors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
 import CreatePlaylistModal from './CreatePlaylistModal';
 import { Audio } from 'expo-av';
+import Slider from '@react-native-community/slider';
+import CircularButtonWithArrow from './CircularButtonWithArrow';
+const screenWidth = Dimensions.get('window').width; // Chiều rộng màn hình thiết bị
 
 // Function to resolve $refs in the data
 const resolveRefs = (data) => {
@@ -55,76 +58,120 @@ const RecapItemDetail = ({ route }) => {
     const [sound, setSound] = useState(null);
     const [isPlaying, setIsPlaying] = useState(false);
     const [playbackStatus, setPlaybackStatus] = useState(null);
-
+    const [currentPosition, setCurrentPosition] = useState(0);
+    const [duration, setDuration] = useState(0);
+    
     useEffect(() => {
         const fetchUserProfile = async () => {
-            try {
-                const response = await api.get('/api/personal/profile');  // Use your custom API call here
-
-                if (response.data) {
-                    // Get user ID from the API response directly
-                    setUserId(response.data.id); // Ensure to set the ID correctly
-                } else {
-                    setErrorMessage('Failed to fetch user profile');
-                }
-            } catch (error) {
-                console.error('Error fetching user profile:', error);
-                setErrorMessage('Failed to fetch user profile'); // Update error message
+          try {
+            const response = await api.get('/api/personal/profile');  // Use your custom API call here
+            
+            if (response.data) {
+              // Get user ID from the API response directly
+              setUserId(response.data.id); // Ensure to set the ID correctly
+            } else {
+              setErrorMessage('Failed to fetch user profile');
             }
+          } catch (error) {
+            console.error('Error fetching user profile:', error);
+            setErrorMessage('Failed to fetch user profile'); // Update error message
+          }
         };
         fetchUserProfile();
-    }, []);
+      }, []);
+     
+       // Track view event inside useEffect to avoid hook errors
+       useEffect(() => {
+        const trackViewEvent = async () => {
+            try {
+                const deviceType = Platform.OS === 'ios' || Platform.OS === 'android' ? 0 : 1;
+                const recapIdFromStorage = await AsyncStorage.getItem('recapId');
+                const recapData = recapIdFromStorage || recapId;
+                const userId = await AsyncStorage.getItem('userId');
 
-    const handleLikeClick = async () => {
-        if (!userId) {
-            setErrorMessage('User not authenticated');
-            return;
-        }
-        try {
-            let response;
-            if (liked) {
-                // If already liked, remove the like
-                response = await api.delete(`/api/likes/remove/${recapId}`);  // Replace with your custom API
-                if (response.status === 200) {
-                    setLiked(false);
-                    AsyncStorage.setItem(`liked_${userId}_${recapId}`, JSON.stringify(false));
-                    setLikeCount(likeCount - 1);
-                }
-            } else {
-                // If not liked, add the like
-                response = await api.post(`/api/likes/createlike/${recapId}`, { recapId, userId });  // Replace with your custom API
-                if (response.status === 200) {
-                    setLiked(true);
-                    AsyncStorage.setItem(`liked_${userId}_${recapId}`, JSON.stringify(true));
-                    setLikeCount(likeCount + 1);
-                }
+                // API call with query params in URL
+                const response = await api.post(`/api/viewtracking/createviewtracking?recapid=${recapData}&deviceType=${deviceType}`, {
+                    userId: userId // Add additional body if necessary
+                });
+
+                console.log('View tracking event sent successfully:', response.data);
+            } catch (error) {
+                console.error('Error sending view tracking event:', error);
             }
-        } catch (error) {
-            console.error('Error handling like action:', error);
+        };
+
+        if (userId) {
+            trackViewEvent();
         }
+    }, [recapId, userId]);
+
+// Kiểm tra trạng thái liked từ AsyncStorage khi component render lại
+useEffect(() => {
+    const fetchLikeStatus = async () => {
+      try {
+        // Lấy trạng thái liked đã lưu trong AsyncStorage
+        const storedLikedStatus = await AsyncStorage.getItem(`liked_${userId}_${recapId}`);
+        if (storedLikedStatus !== null) {
+          setLiked(JSON.parse(storedLikedStatus));  // Thiết lập lại trạng thái liked từ AsyncStorage
+        }
+      } catch (error) {
+        console.error('Error fetching like status:', error);
+      }
     };
 
-    useEffect(() => {
-        if (userId) {
-            const fetchLikeCount = async () => {
-                try {
-                    const response = await api.get(`/api/likes/count/${recapId}`);  // Replace with your custom API
-                    if (response.status === 200) {
-                        setLikeCount(response.data.data);
-                    }
-                } catch (error) {
-                    console.error('Error fetching like count:', error);
-                }
-            };
-            fetchLikeCount();
-        }
-    }, [recapId, userId]);
+    if (userId) {
+      fetchLikeStatus();  // Lấy trạng thái liked khi component được render lại
+    }
+  }, [userId, recapId]);
 
-    useEffect(() => {
-        if (userId) {
-            fetchRecapDetail();
+  // Xử lý khi người dùng nhấn vào nút like
+  const handleLikeClick = async () => {
+    if (!userId) {
+      setErrorMessage('User not authenticated');
+      return;
+    }
+
+    try {
+      let response;
+
+      if (liked) {
+        // Nếu đã like, gọi API để bỏ like
+        response = await api.delete(`/api/likes/remove/${recapId}`);
+        if (response.status === 200) {
+          setLiked(false);  // Cập nhật trạng thái liked thành false
+          AsyncStorage.setItem(`liked_${userId}_${recapId}`, JSON.stringify(false)); // Lưu trạng thái bỏ like vào AsyncStorage
+          setLikeCount(likeCount - 1);  // Giảm số lượng like đi
         }
-    }, [recapId, userId]);
+      } else {
+        // Nếu chưa like, gọi API để thêm like
+        response = await api.post(`/api/likes/createlike/${recapId}`, { recapId, userId });
+        if (response.status === 200) {
+          setLiked(true);  // Cập nhật trạng thái liked thành true
+          AsyncStorage.setItem(`liked_${userId}_${recapId}`, JSON.stringify(true)); // Lưu trạng thái like vào AsyncStorage
+          setLikeCount(likeCount + 1);  // Tăng số lượng like lên
+        }
+      }
+    } catch (error) {
+      console.error('Error handling like action:', error);
+    }
+  };
+    
+      useEffect(() => {
+        if (userId) {
+          const fetchLikeCount = async () => {
+            try {
+              const response = await api.get(`/api/likes/count/${recapId}`);  // Replace with your custom API
+              if (response.status === 200) {
+                setLikeCount(response.data.data);
+              }
+            } catch (error) {
+              console.error('Error fetching like count:', error);
+            }
+          };
+          fetchLikeCount();
+        }
+      }, [recapId, userId]);
+
 
     const fetchRecapDetail = async () => {
         try {
@@ -167,6 +214,12 @@ const RecapItemDetail = ({ route }) => {
         setIsModalOpen(false); // Close the modal when the user cancels or saves
     };
 
+    useEffect(() => {
+        if (userId) {
+            fetchRecapDetail();
+        }
+    }, [recapId, userId]);
+
     // Load âm thanh khi component được render
     useEffect(() => {
         return () => {
@@ -196,12 +249,17 @@ const RecapItemDetail = ({ route }) => {
         }
     };
 
+    // Bắt sự kiện phát / tạm dừng
     const togglePlayPause = async () => {
         if (!sound) return;
+
         try {
             if (isPlaying) {
                 await sound.pauseAsync();
             } else {
+                if (currentPosition >= duration) {
+                    await sound.setPositionAsync(0);
+                }
                 await sound.playAsync();
             }
             setIsPlaying(!isPlaying);
@@ -215,6 +273,33 @@ const RecapItemDetail = ({ route }) => {
             loadSound(currentVersion.audioURL);
         }
     }, [currentVersion?.audioURL]);
+
+    useEffect(() => {
+        const updatePosition = setInterval(async () => {
+            if (sound) {
+                const status = await sound.getStatusAsync();
+                setCurrentPosition(status.positionMillis || 0);
+                setDuration(status.durationMillis || 0);
+
+                if (status.didJustFinish) {
+                    setIsPlaying(false);
+                    setCurrentPosition(0);
+                    await sound.setPositionAsync(0);
+                }
+            }
+        }, 1000);
+
+        return () => clearInterval(updatePosition);
+    }, [sound]);
+
+
+    // Xử lý seek
+    const handleSeek = async (value) => {
+        if (sound) {
+            await sound.setPositionAsync(value);
+            setCurrentPosition(value);
+        }
+    };
 
     if (error) {
         return <Text>{error}</Text>;
@@ -251,7 +336,7 @@ const RecapItemDetail = ({ route }) => {
             <View style={styles.bookInfo}>
                 <Text style={styles.bookTitle}>{book.title}</Text>
                 <Image source={{ uri: book.coverImage }} style={styles.bookImage} />
-                <Text style={styles.views}>Views: {recapDetail.viewsCount}</Text>
+                <Text style={styles.views}>{recapDetail.viewsCount} Views</Text>
                 <View style={styles.likeContainer}>
                     <TouchableOpacity onPress={handleLikeClick} style={styles.likeButton}>
                         <Icon name="heart" size={24} color={liked ? '#ff6347' : '#ccc'} />
@@ -264,18 +349,54 @@ const RecapItemDetail = ({ route }) => {
 
                 </View>
             </View>
-            <View style={styles.versionInfo}>
-                <Text style={styles.audioURL}>Audio URL: {currentVersion.audioURL}</Text>
-                <View style={styles.audioPlayerContainer}>
-                    <TouchableOpacity onPress={togglePlayPause} style={styles.playPauseButton}>
-                        <Text style={styles.playPauseText}>{isPlaying ? '⏸️ Pause' : '▶️ Play'}</Text>
-                    </TouchableOpacity>
-                </View>
-            </View>
-
+              
             <View style={styles.versionInfo}>
                 {renderTranscript()}
             </View>
+
+            <View style={styles.audioPlayerContainer}>
+                    {/* Các nút điều khiển */}
+                    <View style={styles.controlsRow}>
+                        {/* Nút Quay lại 15s */}
+                        <CircularButtonWithArrow
+                                    direction="backward"
+                                    onPress={async () => {
+                                        if (sound) {
+                                            const newPosition = Math.max(currentPosition - 15000, 0);
+                                            await sound.setPositionAsync(newPosition);
+                                            setCurrentPosition(newPosition);
+                                        }
+                                    }}
+                                />
+                        {/* Nút Play/Pause */}
+                        <TouchableOpacity onPress={togglePlayPause} style={styles.playPauseButton}>
+                            <Text style={styles.buttonIcon}>{isPlaying ? '⏸' : '▶️'}</Text>
+                        </TouchableOpacity>
+
+                        {/* Nút Tua tới 15s */}
+                        <CircularButtonWithArrow
+                                    direction="forward"
+                                    onPress={async () => {
+                                        if (sound) {
+                                            const newPosition = Math.min(currentPosition + 15000, duration);
+                                            await sound.setPositionAsync(newPosition);
+                                            setCurrentPosition(newPosition);
+                                        }
+                                    }}
+                                />
+                    </View>
+                    {/* Thanh tiến trình */}
+                    <Slider
+                        style={styles.progressBar}
+                        minimumValue={0}
+                        maximumValue={duration}
+                        value={currentPosition}
+                        onSlidingComplete={handleSeek}
+                        minimumTrackTintColor="#FFD700"
+                        maximumTrackTintColor="#D3D3D3"
+                        thumbTintColor="#FFD700"
+                    />
+                </View>
             {/* Create Playlist Modal */}
             <CreatePlaylistModal
                 isOpen={isModalOpen}
@@ -293,7 +414,7 @@ const styles = StyleSheet.create({
         flex: 1,
         padding: 20,
         backgroundColor: '#f5f5f5',
-        marginTop: 10
+        marginTop: -29
     },
     title: {
         fontSize: 28,
@@ -338,6 +459,8 @@ const styles = StyleSheet.create({
     },
     versionInfo: {
         marginVertical: 20,
+        marginBottom: -18,
+        marginTop: -50,
     },
     versionList: {
         marginVertical: 20,
@@ -371,7 +494,8 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         marginTop: 16,
-        marginBottom: 30
+        marginBottom: 20,
+        marginTop: -10
     },
     likeButton: {
         marginRight: 8,
@@ -382,30 +506,41 @@ const styles = StyleSheet.create({
         color: '#333',
     },
     audioPlayerContainer: {
-        flexDirection: 'column',
         alignItems: 'center',
-        marginVertical: 20,
+        backgroundColor: '#4A3F35',
+        paddingVertical: 15,
+        borderRadius: 17,
+        height: 145,
+
+    },
+    controlsRow: {
+        flexDirection: 'row', // Các nút nằm ngang hàng
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: 20, // Tạo khoảng cách với thanh tiến trình
+    },
+    controlButton: {
+        marginHorizontal: 20, // Khoảng cách giữa các nút
+        backgroundColor: '#6A5B52',
         padding: 10,
-        borderRadius: 8,
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        shadowOffset: { width: 0, height: 4 },
+        borderRadius: 50,
     },
     playPauseButton: {
-        padding: 10,
-        backgroundColor: '#007BFF',
-        borderRadius: 8,
-        marginBottom: 10,
+        marginHorizontal: 20,
+        backgroundColor: '#FFD700',
+        padding: 15,
+        borderRadius: 50,
     },
-    playPauseText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
+    buttonIcon: {
+        color: '#FFFFFF',
+        fontSize: 18,
+        textAlign: 'center',
     },
-    audioStatus: {
-        fontSize: 14,
-        color: '#666',
+    progressBar: {
+        width: '90%',
+        marginBottom: 15
     },
+
 });
 
 export default RecapItemDetail;

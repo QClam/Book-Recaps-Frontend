@@ -1,8 +1,8 @@
-import { FlatList, RefreshControl, StyleSheet, Text, View } from 'react-native'
+import { FlatList, RefreshControl, StyleSheet, Text, View, TextInput } from 'react-native'
 import React, { useEffect, useState } from 'react'
 import { getRecaps } from '../utils/api';
 import RecapCard from '../components/Recaps/RecapCard';
-
+import api from '../utils/AxiosInterceptors';
 const RecapsScreen = ({ navigation }) => {
 
     const [allRecaps, setAllRecaps] = useState([]);
@@ -10,11 +10,12 @@ const RecapsScreen = ({ navigation }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
-
+    const [searchText, setSearchText] = useState('');
     const pageSize = 10; // Số lượng sách mỗi lần hiển thị
 
     useEffect(() => {
         fetchData();
+        
 
         const unsubscribe = navigation.addListener("focus", () => {
             fetchData();
@@ -23,20 +24,58 @@ const RecapsScreen = ({ navigation }) => {
         return unsubscribe;
     }, [navigation]);
 
+   
+
     const fetchData = async () => {
         setLoading(true);
-
         try {
+            // Lấy tất cả các recap
             const data = await getRecaps();
-            console.log(data.name);
-            
-            setAllRecaps(data);
-            setItems(data.slice(0, pageSize));
+
+            // Lấy thêm thông tin người đóng góp
+            const enrichedData = await Promise.all(
+                data.map(async (recap) => {
+                    try {
+                        const userResponse = await api.get(
+                            `/api/users/get-user-account-byID?userId=${recap.userId}`
+                        );
+                        return {
+                            ...recap,
+                            contributor: userResponse.data.data.userName || "Không rõ",
+                        };
+                    } catch (error) {
+                        console.error("Error fetching contributor:", error);
+                        return { ...recap, contributor: "Không rõ" };
+                    }
+                })
+            );
+
+            setAllRecaps(enrichedData);
+            setItems(enrichedData.slice(0, pageSize));
         } catch (error) {
-            setError("An error occurred while fetching menu items");
+            console.error("Error fetching data:", error);
+            setError("An error occurred while fetching recaps.");
         }
         setLoading(false);
-    }
+    };
+
+    const handleSearch = (text) => {
+        setSearchText(text);
+        if (text.trim() === '') {
+            setItems(allRecaps.slice(0, pageSize));
+        } else {
+            const filteredItems = allRecaps.filter((recap) =>
+                recap.name.toLowerCase().includes(text.toLowerCase()) ||
+                recap.book?.title.toLowerCase().includes(text.toLowerCase()) ||
+                recap.contributor.toLowerCase().includes(text.toLowerCase())
+            );
+            setItems(filteredItems);
+        }
+    };
+    const handleRecapSelect = (recap) => {
+        // Điều hướng đến màn hình chi tiết recap hoặc phát recap
+        navigation.navigate('RecapItemDetail', { recap }); // Giả sử 'RecapDetailScreen' là màn hình chi tiết recap
+    };
 
     const handleLoadMore = () => {
         if (isLoadingMore || items.length >= allRecaps.length) return; // Nếu đang tải hoặc hết dữ liệu thì dừng
@@ -50,6 +89,7 @@ const RecapsScreen = ({ navigation }) => {
         setIsLoadingMore(false);
     };
 
+    
     if (error && !loading) {
         return (
             <View style={styles.container}>
@@ -60,6 +100,16 @@ const RecapsScreen = ({ navigation }) => {
 
     return (
         <View style={styles.container}>
+             {/* Thanh tìm kiếm */}
+             <View style={styles.searchContainer}>
+                <TextInput
+                    style={styles.searchInput}
+                    placeholder="Tìm kiếm recap..."
+                    value={searchText}
+                    onChangeText={handleSearch}
+                />
+            </View>
+
             <FlatList
                 data={items}
                 keyExtractor={(item) => item.id.toString()}
@@ -92,6 +142,28 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "#f5f5f5",
     },
+    searchContainer: {
+        padding: 10,
+        backgroundColor: '#fff',
+        borderBottomWidth: 1,
+        borderBottomColor: '#ddd',
+    },
+    searchInput: {
+        height: 40,
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 8,
+        paddingLeft: 10,
+        backgroundColor: '#f9f9f9',
+    },
+    listContainer: {
+        padding: 8,
+    },
+    cardContainer: {
+        flex: 1,
+        margin: 8,
+    },
+
     filterContainer: {
         backgroundColor: "#fff",
         paddingVertical: 12,

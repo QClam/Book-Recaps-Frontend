@@ -18,9 +18,7 @@ const BookCard = React.memo(({ item }) => {
                 <View style={styles.textContainer}>
                     <View style={styles.titleContainer}>
                         <Text style={styles.title}>{item.title}</Text>
-                        <TouchableOpacity>
-                            <Entypo name="add-to-list" size={24} color="black" />
-                        </TouchableOpacity>
+                       
                     </View>
                     <Text style={styles.position}>Tác giả: {authors}</Text>
                     <Text style={styles.position}>Thể loại: {categories}</Text>

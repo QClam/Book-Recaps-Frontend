@@ -127,9 +127,10 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   coverImage: {
-    width: '100%',
-    height: 300,
+    width: 120,
+    height: 200,
     borderRadius: 10,
+    marginLeft: 110
   },
   title: {
     fontSize: 24,

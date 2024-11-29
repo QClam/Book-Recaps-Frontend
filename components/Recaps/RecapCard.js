@@ -9,20 +9,23 @@ const RecapCard = React.memo(({ item }) => {
 
     const contributor = item.contributor || 'Không rõ';
     const likesCount = item.likesCount ? item.likesCount.toString() : '0';
+    const viewsCount = item.viewsCount ? item.viewsCount.toString() : '0';
     const bookTitle = item.book?.title || 'Không rõ';
     const coverImage = item.book?.coverImage;
 
     return (
-        <TouchableOpacity onPress={() => navigation.navigate("RecapItemDetail", { recapId: item.id })}>
+        <TouchableOpacity
+            onPress={() => navigation.navigate("RecapItemDetail", { recapId: item.id })}
+            style={styles.cardShadow}
+        >
             <View style={styles.card}>
-                <Image source={coverImage ? {uri: coverImage} : defaultImage} style={styles.image}/>
+                <Image source={coverImage ? { uri: coverImage } : defaultImage} style={styles.image} />
                 <View style={styles.textContainer}>
-                    <View style={styles.titleContainer}>
-                        <Text style={styles.title}>{item.name}</Text>
-                    </View>
-                    <Text style={styles.position}>Cuốn: {bookTitle}</Text>
-                    <Text style={styles.position}>Lượt thích: {likesCount}</Text>
-                    <Text style={styles.position}>Người đóng góp: {contributor}</Text>
+                    <Text style={styles.title}>{item.name}</Text>
+                    <Text style={styles.subtitle}>📚 Cuốn: {bookTitle}</Text>
+                    <Text style={styles.detail}>❤️ Lượt thích: {likesCount}</Text>
+                    <Text style={styles.detail}>👀 Lượt nghe: {viewsCount}</Text>
+                    <Text style={styles.detail}>👤 Người đóng góp: {contributor}</Text>
                 </View>
             </View>
         </TouchableOpacity>
@@ -32,37 +35,49 @@ const RecapCard = React.memo(({ item }) => {
 export default RecapCard;
 
 const styles = StyleSheet.create({
+    cardShadow: {
+        marginBottom: 15,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 3, // Hiệu ứng bóng trên Android
+        borderRadius: 10,
+        backgroundColor: 'transparent',
+    },
     card: {
-        width: '100%',
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
-        padding: 10,
+        borderRadius: 10,
         backgroundColor: '#fff',
-        marginVertical: 5,
-        height: 400
+        overflow: 'hidden',
+        height: 415, // Chiều cao cố định
+        width: '100%',
     },
     image: {
         width: '100%',
-        height: 200,
-        marginBottom: 10,
+        height: 250, // Chiều cao hình ảnh cố định
+        resizeMode: 'cover',
     },
     textContainer: {
-        flexDirection: 'column',
-    },
-    titleContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
+        flex: 1,
+        padding: 12,
+        backgroundColor: '#f8f9fa',
+        justifyContent: 'space-between', // Giãn đều các thành phần
     },
     title: {
-        fontWeight: 'bold',
-        fontSize: 18,
-        flex: 1,
-    },
-    position: {
         fontSize: 16,
+        fontWeight: '700',
+        color: '#333',
+        marginBottom: 8,
+    },
+    subtitle: {
+        fontSize: 14,
+        fontWeight: '500',
+        color: '#555',
+        marginBottom: 5,
+    },
+    detail: {
+        fontSize: 13,
         color: '#666',
-        marginTop: 5,
+        marginBottom: 4,
     },
 });

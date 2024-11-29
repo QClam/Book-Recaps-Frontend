@@ -12,6 +12,8 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import api from '../utils/AxiosInterceptors';
 
+import defaultImage from '../assets/empty-image.png';
+
 const PlaylistScreen = () => {
   const [playlists, setPlaylists] = useState([]);
   const [books, setBooks] = useState([]);
@@ -150,10 +152,15 @@ const PlaylistScreen = () => {
                         >
                           {book ? (
                             <>
-                              <Image
-                                source={{ uri: book.coverImage }}
-                                style={styles.bookImage}
+                              <Image 
+                                  source={
+                                      book.coverImage 
+                                      ? { uri: book.coverImage } 
+                                      : defaultImage
+                                  }
+                                  style={styles.bookImage}
                               />
+
                               <View style={styles.bookInfo}>
                                 <Text style={styles.bookTitle}>
                                   {book.title}
