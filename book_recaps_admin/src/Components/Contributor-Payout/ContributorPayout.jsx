@@ -48,6 +48,7 @@ function ContributorPayout() {
     const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'));
     const [payouts, setPayouts] = useState([]);
     const [contributors, setContributors] = useState([]);
+    const [isHover, setIsHover] = useState(false);
 
     const [loading, setLoading] = useState(true);
 
@@ -152,6 +153,14 @@ function ContributorPayout() {
 
     };
 
+    const handleMouseEnter = () => {
+        setIsHover(true);
+    }
+
+    const handleMouseLeave = () => {
+        setIsHover(false);
+    }
+
     if (loading) {
         return (
             <Box display="flex" justifyContent="center" width="80vw">
@@ -170,7 +179,14 @@ function ContributorPayout() {
         <Box sx={{ padding: '24px', width: '80vw' }}>
             <Typography variant="h5">Quyết toán thu nhập cho Người đóng góp</Typography>
             <Box display="flex" justifyContent="flex-end" mt={2} padding={2}>
-            <Chip label="Tạo mới quyết toán" variant="outlined" color="primary" onClick={handleOpenModal} />
+                <Chip
+                    label="Tạo mới quyết toán"
+                    variant={isHover ? "contained" : "outlined"}
+                    color="primary"
+                    onClick={handleOpenModal} 
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                    />
             </Box>
             <TableContainer component={Paper}>
                 <Table>

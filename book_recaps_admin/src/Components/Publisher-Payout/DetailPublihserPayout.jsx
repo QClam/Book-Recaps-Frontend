@@ -115,7 +115,7 @@ function DetailPublihserPayout() {
                               <Typography variant="body1" fontWeight="bold">
                                  Tổng chi:
                               </Typography>
-                              <Typography variant="body1">{(payoutData.amount ?? 0).toLocaleString('vi-VN')}</Typography>
+                              <Typography variant="body1">{(payoutData.amount ?? 0).toLocaleString('vi-VN')} VND</Typography>
                            </Box>
                            <Box display="flex" justifyContent="space-between">
                               <Link href={payoutData.imageURL} underline="hover" target="_blank">Hình ảnh</Link>
@@ -177,7 +177,7 @@ function DetailPublihserPayout() {
                                  <TableCell>{item.book?.title}</TableCell>
                                  <TableCell>{dayjs(payoutData.fromDate).format('DD/MM/YYYY')}</TableCell>
                                  <TableCell>{dayjs(payoutData.toDate).format('DD/MM/YYYY')}</TableCell>
-                                 <TableCell>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.earningAmount)}</TableCell>
+                                 <TableCell>{(item.earningAmount ?? 0).toLocaleString('vi-VN')} VND</TableCell>
                                  <TableCell><Button onClick={() => detailBook(item.bookId)}><Visibility /></Button></TableCell>
                               </TableRow>
                            )

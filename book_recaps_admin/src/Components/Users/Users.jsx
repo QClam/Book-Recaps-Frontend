@@ -22,6 +22,7 @@ function Users() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [modalType, setModalType] = useState(null); // State để xác định mở Modal AddUser hay UpdateUser
+    const [isHover, setIsHover] = useState(false);
 
     const [anchorEl, setAnchorEl] = useState(null); // State để lưu anchor của submenu
     const [submenuAnchorEl, setSubmenuAnchorEl] = useState(null); // State cho submenu lồng
@@ -64,6 +65,14 @@ function Users() {
         setSelectedUser(null);
         setModalType(null);
     };
+
+    const handleMouseEnter = () => {
+        setIsHover(true);
+    }
+
+    const handleMouseLeave = () => {
+        setIsHover(false);
+    }
 
     useEffect(() => {
         let filteredData = users;
@@ -238,7 +247,15 @@ function Users() {
                     <MenuItem value={3}>Nhà xuất bản</MenuItem>
                     <MenuItem value={4}>Thính giả</MenuItem>
                 </TextField>
-                <Chip label="Thêm mới người dùng" variant="outlined" color="primary" onClick={handleAddUser} sx={{ marginLeft: 'auto' }} />
+                <Chip
+                    label="Thêm mới người dùng"
+                    variant={isHover ? "contained" : "outlined"}
+                    color="primary"
+                    onClick={handleAddUser}
+                    sx={{ marginLeft: 'auto' }}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                />
             </Box>
             <TableContainer component={Paper}>
                 <Table>

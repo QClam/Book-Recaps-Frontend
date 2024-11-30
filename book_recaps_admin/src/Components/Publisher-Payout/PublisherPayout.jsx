@@ -60,6 +60,7 @@ function PublisherPayout() {
     const [selectedPublisherName, setSelectedPublisherName] = useState('');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'));
+    const [isHover, setIsHover] = useState(false);
 
     const [loading, setLoading] = useState(true);
 
@@ -141,25 +142,33 @@ function PublisherPayout() {
 
     const handlePublisherChange = (event) => {
         const publisherId = event.target.value;
-    
+
         // Tìm Publisher
         const publisher = publishers.find((c) => c.id === publisherId);
         const publisherName = publisher ? publisher.publisherName : "Unknown Publisher";
-    
+
         // Tìm quyết toán gần nhất
         const selectedPayout = payouts.find((payout) => payout.id === publisherId);
-    
+
         const startDate = selectedPayout?.todate
             ? dayjs(selectedPayout.todate).format('YYYY-MM-DD')
             : '';
-    
+
         const endDate = dayjs().format('YYYY-MM-DD');
-    
+
         setSelectedPublisher(publisherId);
         setSelectedPublisherName(publisherName);
         setStartDate(startDate);
         setEndDate(endDate);
-    };       
+    };
+
+    const handleMouseEnter = () => {
+        setIsHover(true);
+    }
+
+    const handleMouseLeave = () => {
+        setIsHover(false);
+    }
 
     if (loading) {
         return (
@@ -183,7 +192,14 @@ function PublisherPayout() {
             </Typography>
 
             <Box display="flex" justifyContent="flex-end" mt={2} padding={2}>
-                <Chip label="Tạo mới quyết toán" variant="outlined" color="primary" onClick={handleOpenModal} />                
+                <Chip
+                    label="Tạo mới quyết toán"
+                    variant={isHover ? "contained" : "outlined"}
+                    color="primary"
+                    onClick={handleOpenModal}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                />
             </Box>
 
             {/* Bảng quyết toán */}

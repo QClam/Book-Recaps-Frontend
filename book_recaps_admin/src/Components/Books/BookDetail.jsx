@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Chart from 'chart.js/auto';
-import { Box, Typography, Card, CardContent, Grid, Button, Paper } from '@mui/material';
+import { Box, Typography, Card, CardContent, Grid, Button, Paper, Divider } from '@mui/material';
 import { DateRangePicker } from 'rsuite';
 import { useParams } from 'react-router-dom';
 import api from '../Auth/AxiosInterceptors';
@@ -46,7 +46,7 @@ function BookDetail() {
     useEffect(() => {
         const [fromDate, toDate] = dateRange;
         getBookData(fromDate, toDate); // Sử dụng dateRange từ state
-    }, []); // Chỉ chạy một lần khi component render
+    }, [dateRange]); // Chỉ chạy một lần khi component render
 
 
     const handleDateChange = async (range) => {
@@ -72,7 +72,7 @@ function BookDetail() {
                     labels: [], // Sẽ được cập nhật sau
                     datasets: [
                         {
-                            label: 'Earnings',
+                            label: 'Thu nhập',
                             data: [],
                             borderColor: 'rgba(75, 192, 192, 1)',
                             backgroundColor: 'rgba(75, 192, 192, 0.2)',
@@ -112,59 +112,125 @@ function BookDetail() {
         chartInstanceRef.current.update();
     };
 
+    const totalViews = bookData.dailyStats?.reduce((total, item) => total + item.views, 0);
+    const totalTime = bookData.dailyStats?.reduce((total, item) => total + item.watchTime, 0);
+    const totalEarnings = bookData.dailyStats?.reduce((total, item) => total + item.earning, 0);
+
     return (
         <Box sx={{ padding: 4, width: "80vw" }}>
             <Typography variant="h4" gutterBottom>
                 Doanh thu của cuốn sách: {bookData.title}
             </Typography>
-            <Box display="flex">
-                <Paper
-                    elevation={3}
-                    style={{
-                        padding: "16px",
-                        borderRadius: "8px",
-                        flex: 1,
-                        margin: 15
-                    }}
-                >
-                    <Typography variant="subtitle1" color="textSecondary">
-                        Thu nhập
-                    </Typography>
-                    <Typography variant="caption" display="block" color="textSecondary" gutterBottom>
-                        ({bookData.lastPayout?.fromDate ? dayjs(bookData.lastPayout.fromDate).format('DD-MM-YYYY') : 'N/A'} -
-                        {bookData.lastPayout?.toDate ? dayjs(bookData.lastPayout.toDate).format('DD-MM-YYYY') : 'N/A'})
-                    </Typography>
-                    <Typography variant="h6">
-                        {(bookData.lastPayout?.amount ?? 0).toLocaleString('vi-VN')} VND
-                    </Typography>
+            <Box display="flex" flexDirection="column">
+                <Grid container spacing={2}>
+                    <Grid item xs={6}>
+                        <Paper
+                            elevation={3}
+                            style={{
+                                padding: "16px",
+                                borderRadius: "8px",
+                            }}
+                        >
+                            <Typography variant="subtitle1" color="textSecondary">
+                                Thu nhập gần nhất
+                            </Typography>
+                            <Typography variant="caption" display="block" color="textSecondary" gutterBottom>
+                                ({bookData.lastPayout?.fromDate ? dayjs(bookData.lastPayout.fromDate).format('DD-MM-YYYY') : 'N/A'} -
+                                {bookData.lastPayout?.toDate ? dayjs(bookData.lastPayout.toDate).format('DD-MM-YYYY') : 'N/A'})
+                            </Typography>
+                            <Typography variant="h6">
+                                {(bookData.lastPayout?.amount ?? 0).toLocaleString('vi-VN')} VND
+                            </Typography>
+                        </Paper>
+                    </Grid>
+                    <Grid item xs={6}>
+                        <Paper
+                            elevation={3}
+                            style={{
+                                padding: "16px",
+                                borderRadius: "8px",
+                            }}
+                        >
+                            <Typography variant="subtitle1" color="textSecondary">
+                                Quyết toán gần nhất
+                            </Typography>
+                            <Typography variant="caption" display="block" color="textSecondary" gutterBottom>
+                                ({dayjs(bookData.lastPayout?.fromDate).format('DD-MM-YYYY')} - {dayjs(bookData.lastPayout?.toDate).format('DD-MM-YYYY')})
+                            </Typography>
+                            <Typography variant="h6">
+                                {(bookData.lastPayout?.amount ?? 0).toLocaleString('vi-VN')} VND
+                            </Typography>
+                        </Paper>
+                    </Grid>
+                </Grid>
 
-                </Paper>
+                <Box mt={2}>
+                    <Grid container spacing={2}>
+                        {/* Lượt xem */}
+                        <Grid item xs={4}>
+                            <Paper elevation={3} style={{ padding: "16px", borderRadius: "8px" }}>
+                                <Typography variant="subtitle1" color="textSecondary" textAlign="center">
+                                    Lượt xem
+                                </Typography>
+                                <Typography variant="caption" display="block" color="textSecondary" textAlign="center">
+                                    ({dateRange[0] ? dayjs(dateRange[0]).format('DD-MM-YYYY') : 'N/A'} -
+                                    {dateRange[1] ? dayjs(dateRange[1]).format('DD-MM-YYYY') : 'N/A'})
+                                </Typography>
+                                <Divider sx={{ margin: "8px 0" }} />
+                                <Grid container direction="column" spacing={1}>
+                                    <Grid item>
+                                        <Typography variant="h6" textAlign="center">
+                                            {totalViews}
+                                        </Typography>
+                                    </Grid>
+                                </Grid>
+                            </Paper>
+                        </Grid>
 
-                <Paper
-                    elevation={3}
-                    style={{
-                        padding: "16px",
-                        borderRadius: "8px",
-                        flex: 1,
-                        margin: 15
-                    }}
-                >
-                    <Typography variant="subtitle1" color="textSecondary">
-                        Quyết toán gần nhất
-                    </Typography>
-                    <Typography
-                        variant="caption"
-                        display="block"
-                        color="textSecondary"
-                        gutterBottom
-                    >
-                        ({dayjs(bookData.lastPayout.fromDate).format('DD-MM-YYYY')} - {dayjs(bookData.lastPayout.toDate).format('DD-MM-YYYY')})
-                    </Typography>
-                    <Typography variant="h6">{(bookData.lastPayout.amount ?? 0).toLocaleString('vi-VN')} VND</Typography>
-                </Paper>
+                        {/* Thời lượng xem */}
+                        <Grid item xs={4}>
+                            <Paper elevation={3} style={{ padding: "16px", borderRadius: "8px" }}>
+                                <Typography variant="subtitle1" color="textSecondary" textAlign="center">
+                                    Thời lượng xem
+                                </Typography>
+                                <Typography variant="caption" display="block" color="textSecondary" textAlign="center">
+                                    ({dateRange[0] ? dayjs(dateRange[0]).format('DD-MM-YYYY') : 'N/A'} -
+                                    {dateRange[1] ? dayjs(dateRange[1]).format('DD-MM-YYYY') : 'N/A'})
+                                </Typography>
+                                <Divider sx={{ margin: "8px 0" }} />
+                                <Grid container direction="column" spacing={1}>
+                                    <Grid item>
+                                        <Typography variant="h6" textAlign="center">
+                                            {totalTime} Phút
+                                        </Typography>
+                                    </Grid>
+                                </Grid>
+                            </Paper>
+                        </Grid>
+
+                        {/* Thu nhập trong khoảng */}
+                        <Grid item xs={4}>
+                            <Paper elevation={3} style={{ padding: "16px", borderRadius: "8px" }}>
+                                <Typography variant="subtitle1" color="textSecondary" textAlign="center">
+                                    Thu nhập trong khoảng
+                                </Typography>
+                                <Typography variant="caption" display="block" color="textSecondary" textAlign="center">
+                                    ({dateRange[0] ? dayjs(dateRange[0]).format('DD-MM-YYYY') : 'N/A'} -
+                                    {dateRange[1] ? dayjs(dateRange[1]).format('DD-MM-YYYY') : 'N/A'})
+                                </Typography>
+                                <Divider sx={{ margin: "8px 0" }} />
+                                <Typography variant="h6" textAlign="center">
+                                    {(totalEarnings ?? 0).toLocaleString('vi-VN')} VND
+                                </Typography>
+                            </Paper>
+                        </Grid>
+                    </Grid>
+
+                </Box>
             </Box>
+
             <Box>
-                <Typography textAlign='center' sx={{ marginBottom: 2 }}>Hãy chọn khoảng thời gian để hiển thị số liệu</Typography>
+                <Typography textAlign='center' sx={{ marginBottom: 2, marginTop: 2 }}>Hãy chọn khoảng thời gian để hiển thị số liệu</Typography>
                 <Box display='flex' justifyContent='center'>
                     <DateRangePicker
                         format="dd-MM-yyyy"

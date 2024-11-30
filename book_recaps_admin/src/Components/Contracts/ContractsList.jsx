@@ -46,6 +46,7 @@ function ContractsList() {
     const [filterStatus, setFilterStatus] = useState(""); // Lọc trạng thái
     const [publishers, setPublishers] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isHover, setIsHover] = useState(false);
 
     const [contractForm, setContractForm] = useState({
         status: 0,
@@ -132,6 +133,14 @@ function ContractsList() {
         navigate(`/contract/${id}`);
     }
 
+    const handleMouseEnter = () => {
+        setIsHover(true);
+    }
+
+    const handleMouseLeave = () => {
+        setIsHover(false);
+    }
+
     if (loading) {
         return (
             <Box display="flex" justifyContent="center" width="80vw">
@@ -163,7 +172,7 @@ function ContractsList() {
                     label="Trạng thái"
                     value={filterStatus}
                     onChange={(e) => {
-                        const value = e.target.value === "" ? "" : Number(e.target.value); 
+                        const value = e.target.value === "" ? "" : Number(e.target.value);
                         setFilterStatus(value); // Cập nhật giá trị của filterStatus
                     }}
                     size="small"
@@ -178,7 +187,14 @@ function ContractsList() {
                     <MenuItem value={5}>Từ chối</MenuItem>
                 </TextField>
 
-                <Chip label="Thêm hợp đồng" variant="outlined" color="primary" onClick={() => createContract()} />
+                <Chip
+                    label="Thêm hợp đồng"
+                    variant={isHover ? "contained" : "outlined"}
+                    color="primary"
+                    onClick={() => createContract()}
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                />
 
 
             </Box>

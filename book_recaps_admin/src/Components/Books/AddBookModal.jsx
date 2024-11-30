@@ -11,10 +11,11 @@ import {
     MenuItem,
     InputLabel,
     FormControl,
+    Autocomplete,
 } from '@mui/material';
 import api from '../Auth/AxiosInterceptors';
 
-const AddBookModal = ({ isOpen, onClose, onBookAdded}) => {
+const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
     const [authors, setAuthors] = useState([]);
     const [categories, setCategories] = useState([]);
     const [errors, setErrors] = useState({});
@@ -22,34 +23,43 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded}) => {
     const [formData, setFormData] = useState({
         Title: '',
         OriginalTitle: '',
+        ISBN_13: '',
+        ISBN_10: '',
         Description: '',
         PublicationYear: '',
-        CoverImage: null,
-        AgeLimit: '',
-        AuthorId: '',
-        AuthorName: '',
-        AuthorImage: null,
-        AuthorDescription: '',
-        CategoryIds: [],
+        CoverImage: '',
+        AgeLimit: 0,
+        Authors: [], // Multiple authors
+        CategoryIds: [], // Multiple categories
+        coverImage: '', // Cover image file
+        authorImages: [], // Author images file(s)
     });
 
     const validateForm = () => {
         const errors = {};
-        const stringFields = ['Title', 'OriginalTitle', 'Description', 'AuthorName', 'AuthorDescription'];
 
+        const stringFields = ['Title', 'OriginalTitle'];
         stringFields.forEach(field => {
             if (!/^[A-Z]/.test(formData[field])) {
-                errors[field] = `${field} nên bắt đầu bằng chữ in hoa.`;
+                errors[field] = `${field} should start with an uppercase letter.`;
             }
         });
 
         const currentYear = new Date().getFullYear();
         if (!/^\d+$/.test(formData.PublicationYear) || formData.PublicationYear < 1000 || formData.PublicationYear > currentYear) {
-            errors.PublicationYear = `Publication Year là năm hợp lệ từ 1000 đến ${currentYear}.`;
+            errors.PublicationYear = `Publication Year must be a valid year between 1000 and ${currentYear}.`;
         }
 
         if (!/^\d+$/.test(formData.AgeLimit)) {
-            errors.AgeLimit = 'Age Limit là chữ số.';
+            errors.AgeLimit = 'Age Limit must be a number.';
+        }
+
+        if (formData.Authors.length === 0) {
+            errors.Authors = 'Please select at least one author.';
+        }
+
+        if (formData.CategoryIds.length === 0) {
+            errors.CategoryIds = 'Please select at least one category.';
         }
 
         return errors;
@@ -57,25 +67,26 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded}) => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-
-        if (name === 'AuthorId') {
-            const selectedAuthor = authors.find(author => author.id === value);
+    
+        if (name === 'Authors') {
+            // Tìm tác giả từ danh sách tác giả đã fetch và lưu đối tượng tác giả vào formData
+            const selectedAuthors = value.map(id => authors.find(author => author.id === id));
             setFormData(prev => ({
                 ...prev,
-                [name]: value,
-                AuthorName: selectedAuthor ? selectedAuthor.name : '',
+                Authors: selectedAuthors, // Lưu các đối tượng tác giả
             }));
-        } else if (name === 'CategoryIds') {
-            setFormData(prev => ({ ...prev, [name]: value }));
         } else {
             setFormData(prev => ({ ...prev, [name]: value }));
         }
-    };
+    };    
 
     const handleFileChange = (e) => {
         const { name } = e.target;
         const file = e.target.files[0];
-        setFormData(prev => ({ ...prev, [name]: file }));
+        setFormData(prev => ({
+            ...prev,
+            [name]: file,
+        }));
     };
 
     useEffect(() => {
@@ -111,33 +122,35 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded}) => {
         try {
             const formDataToSend = new FormData();
             for (const key in formData) {
-                if (key === "CategoryIds") {
+                if (key === "CategoryIds" || key === "Authors") {
                     formData[key].forEach((id) => formDataToSend.append(key, id));
                 } else {
                     formDataToSend.append(key, formData[key]);
-                }                
+                }
             }
+
             await api.post('/api/book/createbook', formDataToSend);
-            onBookAdded();
-            onClose();
+            onBookAdded(); // Trigger callback to refresh the book list
+            onClose(); // Close the modal after successful submission
         } catch (error) {
+            alert("Tạo mới sách thất bại");
             console.error('Error adding book', error);
         }
     };
 
     return (
         <Dialog open={isOpen} onClose={onClose} fullWidth maxWidth="md">
-            <DialogTitle>Thêm mới cuốn sách</DialogTitle>
+            <DialogTitle>Add New Book</DialogTitle>
             <DialogContent>
                 <Box component="form" noValidate autoComplete="off" sx={{ mt: 2 }}>
                     {[
-                        { name: 'Title', label: 'Tên sách' },
-                        { name: 'OriginalTitle', label: 'Tên gốc' },
-                        { name: 'Description', label: 'Mô tả', multiline: true, rows: 4 },
-                        { name: 'PublicationYear', label: 'Năm xuất bản' },
-                        { name: 'AgeLimit', label: 'Độ tuổi' },
-                        { name: 'AuthorName', label: 'Tên tác giả' },
-                        { name: 'AuthorDescription', label: 'Mô tả tác giả' },
+                        { name: 'Title', label: 'Book Title' },
+                        { name: 'OriginalTitle', label: 'Original Title' },
+                        { name: 'ISBN_13', label: 'ISBN_13' },
+                        { name: 'ISBN_10', label: 'ISBN_10' },
+                        { name: 'Description', label: 'Description', multiline: true, rows: 4 },
+                        { name: 'PublicationYear', label: 'Publication Year' },
+                        { name: 'AgeLimit', label: 'Age Limit' },
                     ].map(field => (
                         <TextField
                             key={field.name}
@@ -153,53 +166,67 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded}) => {
                             rows={field.rows}
                         />
                     ))}
+
+                    {/* Multiple Author selection */}
                     <FormControl fullWidth margin="normal">
-                        <InputLabel>Tác giả</InputLabel>
-                        <Select
-                            name="AuthorId"
-                            value={formData.AuthorId}
-                            onChange={handleInputChange}
-                            error={!!errors.AuthorId}
-                        >
-                            {authors.map(author => (
-                                <MenuItem key={author.id} value={author.id}>
-                                    {author.name}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                    <FormControl fullWidth margin="normal">
-                        <InputLabel>Thể loại</InputLabel>
-                        <Select
+                        
+                        <Autocomplete
                             multiple
-                            name="CategoryIds"
-                            value={formData.CategoryIds}
-                            onChange={(e) => handleInputChange({ target: { name: 'CategoryIds', value: e.target.value } })}
-                            renderValue={selected =>
-                                selected.map(id => categories.find(category => category.id === id)?.name).join(', ')
-                            }
-                        >
-                            {categories.map(category => (
-                                <MenuItem key={category.id} value={category.id}>
-                                    {category.name}
-                                </MenuItem>
-                            ))}
-                        </Select>
+                            id="authors"
+                            options={authors}
+                            getOptionLabel={(option) => option.name} // Lấy tên tác giả để hiển thị
+                            value={formData.Authors} // Giá trị đang chọn
+                            onChange={(event, newValue) => {
+                                setFormData(prev => ({
+                                    ...prev,
+                                    Authors: newValue,
+                                }));
+                            }}
+                            renderInput={(params) => (
+                                <TextField {...params} label="Select Authors" variant="outlined" />
+                            )}
+                            isOptionEqualToValue={(option, value) => option.id === value.id}
+                        />
                     </FormControl>
+                    {errors.Authors && <p style={{ color: 'red' }}>{errors.Authors}</p>}
+
+                    {/* Multiple Category selection */}
+                    <FormControl fullWidth margin="normal">
+                        <Autocomplete
+                            multiple
+                            id="categories"
+                            options={categories}
+                            getOptionLabel={(option) => option.name}
+                            value={categories.filter((category) => formData.CategoryIds.includes(category.id))}
+                            onChange={(event, newValue) => {
+                                setFormData(prev => ({
+                                    ...prev,
+                                    CategoryIds: newValue.map((category) => category.id),
+                                }));
+                            }}
+                            renderInput={(params) => (
+                                <TextField {...params} label="Select Categories" variant="outlined" />
+                            )}
+                            isOptionEqualToValue={(option, value) => option.id === value.id}
+                        />
+                    </FormControl>
+                    {errors.CategoryIds && <p style={{ color: 'red' }}>{errors.CategoryIds}</p>}
+
+                    {/* File inputs */}
                     <Button variant="contained" component="label" sx={{ mt: 2 }}>
-                        Chọn ảnh bìa sách
-                        <input type="file" name="CoverImage" hidden onChange={handleFileChange} />
+                        Choose Cover Image
+                        <input type="file" name="coverImage" hidden onChange={handleFileChange} />
                     </Button>
                     <Button variant="contained" component="label" sx={{ mt: 2, ml: 2 }}>
-                        Chọn ảnh tác giả
-                        <input type="file" name="AuthorImage" hidden onChange={handleFileChange} />
+                        Choose Author Image
+                        <input type="file" name="authorImages" hidden onChange={handleFileChange} />
                     </Button>
                 </Box>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>Hủy</Button>
+                <Button onClick={onClose}>Cancel</Button>
                 <Button onClick={handleSubmit} variant="contained" color="primary">
-                    Lưu
+                    Save
                 </Button>
             </DialogActions>
         </Dialog>

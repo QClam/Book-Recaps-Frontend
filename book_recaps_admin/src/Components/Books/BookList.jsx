@@ -46,6 +46,7 @@ function BookList() {
     const [modalIsOpen, setModalIsOpen] = useState(false); // Modal visibility state
     const [loading, setLoading] = useState(true);
     const [contracts, setContracts] = useState([]);
+    const [isHover, setIsHover] = useState(false);
 
     const navigate = useNavigate();
 
@@ -108,6 +109,14 @@ function BookList() {
         navigate(`/book/${id}`)
     }
 
+    const handleMouseEnter = () => {
+        setIsHover(true);
+    }
+
+    const handleMouseLeave = () => {
+        setIsHover(false);
+    }
+
     if (loading) {
         return (
             <Box display="flex" justifyContent="center" width="80vw">
@@ -134,7 +143,13 @@ function BookList() {
                     size="small"
                     sx={{ width: '40%' }}
                 />
-                <Chip label="Tạo mới cuốn sách" variant="outlined" color="primary" onClick={() => setModalIsOpen(true)} />
+                <Chip label="Tạo mới cuốn sách"
+                    variant={isHover ? "contained" : "outlined"}
+                    color="primary"
+                    onClick={() => setModalIsOpen(true)} 
+                    onMouseEnter={handleMouseEnter}
+                    onMouseLeave={handleMouseLeave}
+                    />
             </Box>
 
             <TableContainer component={Paper}>
@@ -142,13 +157,13 @@ function BookList() {
                     <TableHead>
                         <TableRow>
                             <TableCell></TableCell>
-                            <TableCell><strong>Hợp đồng kèm theo</strong></TableCell>
                             <TableCell><strong>Tên Sách</strong></TableCell>
                             <TableCell><strong>Tên Gốc</strong></TableCell>
                             <TableCell><strong>Mã ISBN</strong></TableCell>
                             <TableCell><strong>Xuất bản</strong></TableCell>
                             <TableCell><strong>Tác giả</strong></TableCell>
                             <TableCell><strong>Độ tuổi</strong></TableCell>
+                            <TableCell><strong>Hợp đồng kèm theo</strong></TableCell>
                             <TableCell></TableCell>
                         </TableRow>
                     </TableHead>
@@ -164,22 +179,6 @@ function BookList() {
                                         e.currentTarget.src = empty_image; // Đặt lại ảnh nếu lỗi
                                     }}
                                 /></TableCell>
-                                <TableCell>
-                                    {book.contracts?.$values?.length > 0 ? (
-                                        book.contracts.$values.map((contract) => (
-                                            <Button
-                                                key={contract.id}
-                                                color="primary"
-                                                onClick={() => navigate(`/contract/${contract.id}`)}
-                                                style={{ marginRight: '8px', textTransform: 'none' }} // Thêm khoảng cách giữa các nút
-                                            >
-                                                Chi tiết hợp đồng {contract.publisher?.publisherName}
-                                            </Button>
-                                        ))
-                                    ) : (
-                                        <Typography>Chưa có hợp đồng</Typography>
-                                    )}
-                                </TableCell>
                                 <TableCell>{book.title}</TableCell>
                                 <TableCell>{book.originalTitle}</TableCell>
                                 <TableCell>
@@ -191,6 +190,23 @@ function BookList() {
                                 <TableCell>{book.publicationYear}</TableCell>
                                 <TableCell> {book.authors.$values ? book.authors.$values.map(author => author.name).join(", ") : "N/A"}</TableCell>
                                 <TableCell>{book.ageLimit} tuổi</TableCell>
+                                <TableCell>
+                                    {book.contracts?.$values?.length > 0 ? (
+                                        book.contracts.$values.map((contract) => (
+                                            <Button
+                                                key={contract.id}
+                                                color="primary"
+                                                onClick={() => navigate(`/contract/${contract.id}`)}
+                                                style={{ marginRight: '8px', textTransform: 'none' }}
+                                                sx={{ display: "flex", textAlign: 'start' }}
+                                            >
+                                                Hợp đồng {contract.publisher?.publisherName}
+                                            </Button>
+                                        ))
+                                    ) : (
+                                        <Typography>Chưa có hợp đồng</Typography>
+                                    )}
+                                </TableCell>
                                 <TableCell><Button onClick={() => detailBook(book.id)}><Visibility /></Button></TableCell>
                             </TableRow>
                         ))}
