@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { defer, json, useLoaderData, useNavigate, useParams } from 'react-router-dom';
 import { FaForward, FaPause, FaPlay, FaSyncAlt, FaUndo, FaVolumeDown, FaVolumeUp } from 'react-icons/fa';
 import './RecapNewTues.scss';
 import '../Transcript.scss';
@@ -13,115 +13,63 @@ import { axiosInstance } from "../../../../utils/axios";
 import { routes } from "../../../../routes";
 import Show from "../../../Show";
 import { handleFetchError } from "../../../../utils/handleFetchError";
+import SuspenseAwait from "../../../SuspenseAwait";
 
 // TODO:
-// - Create AudioTranscriptContext for audio and transcript state and ref management
-// - Check cases where user is not logged in -> no audio player, no like, no playlist, no view tracking, no report, no transcript highlighting, no context menu
-// - Only track view if user is logged in, if not, DO NOT create view tracking
+// - Style the UI of RecapInfoSection and Transcript Section
+// - Check cases where:
+//    Recap is Premium:
+//    - user is not logged in -> no audio player, no like, no playlist, no view tracking, no report, no transcript highlighting, no context menu
+//    - user is logged in but not premium -> no audio player, no transcript, no view tracking
+//    - user is logged in and premium -> everything
+//    Recap is Free:
+//    - user is not logged in -> no audio player, no like, no playlist, no view tracking, no report, no transcript highlighting, no context menu
+//    - user is logged in but not premium -> everything
+// - Add image tag for each keyidea
+
+// NOTE: Do all those TODOs first then style the audio player later (last)
+
+const getRecap = async (recapId, request) => {
+  try {
+    const response = await axiosInstance.get("/getrecapbyId/" + recapId, { signal: request.signal });
+    return resolveRefs(response.data.data);
+  } catch (e) {
+    const err = handleFetchError(e);
+    throw json({ error: err.error }, { status: err.status });
+  }
+}
+
+const getTranscript = async (transcriptUrl, request) => {
+  if (!transcriptUrl) return null;
+  try {
+    const response = await axios.get(transcriptUrl, { signal: request.signal });
+    return response.data;
+  } catch (e) {
+    const err = handleFetchError(e);
+    throw json({ error: err.error }, { status: err.status });
+  }
+}
+
+export const recapPlayerLoader = async ({ params, request }) => {
+  const recap = await getRecap(params.recapId, request);
+  const promisedTranscript = getTranscript(recap.currentVersion?.transcriptUrl, request);
+
+  return defer({ recap, promisedTranscript });
+}
 
 const RecapNewTues = () => {
-  const { recapId } = useParams();
-  const navigate = useNavigate();
-
-  const [ recap, setRecap ] = useState(null);
-  const [ transcript, setTranscript ] = useState(null);
-  const [ highlightedSentences, setHighlightedSentences ] = useState([]);
-
-  const [ isPlaying, setIsPlaying ] = useState(false);
-  const [ currentTime, setCurrentTime ] = useState(0);
-  const audioRef = useRef(null);
-
-  const { user } = useAuth();
-  const userId = user?.id;
-  const hasSubscription = user?.profileData.subscriptions.$values.some((sub) => sub.status === 0);
-
-  useEffect(() => {
-    const fetchRecapInfo = async () => {
-      try {
-        const response = await axiosInstance.get(`/getrecapbyId/${recapId}`);
-        const recapData = resolveRefs(response.data.data);
-        const currentVersion = recapData.currentVersion;
-
-        console.log("Recap data:", recapData);
-        setRecap(recapData);
-
-        if (currentVersion.transcriptUrl) {
-          const transcriptResponse = await axios.get(currentVersion.transcriptUrl);
-          setTranscript(transcriptResponse.data);
-        }
-      } catch (error) {
-        console.error("Error fetching recap info:", error);
-      }
-    };
-
-    fetchRecapInfo();
-  }, []);
-
-  // if (error) return <p>{error}</p>;
-  if (!recap) return <p>Loading...</p>;
-
-  const handleUpgradeToPremium = () => {
-    navigate(routes.billing);
-  };
-
-  const handleSentenceClick = async (startTime) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = parseFloat(startTime);
-      try {
-        await audioRef.current.play();
-        setIsPlaying(true);
-      } catch (error) {
-        console.error("Playback error on sentence click:", error);
-      }
-    }
-  };
-
   return (
     <div className="recap-wrapper-wrapper">
-      <RecapInfoSection recap={recap}/>
-
-      <div className="recap-right-section">
-        <h2>{recap.name}</h2>
-
-        <Show when={recap && recap.isPublished}>
-          <Show when={(recap.isPremium && hasSubscription) || !recap.isPremium} fallback={
-            <div className="premium-message">
-              This recap is premium. Please upgrade to a premium subscription.
-              <button onClick={handleUpgradeToPremium}>Upgrade</button>
-            </div>
-          }>
-            {transcript ? (
-              <Transcriptv2
-                transcriptData={transcript}
-                highlightedSentences={highlightedSentences}
-                setHighlightedSentences={setHighlightedSentences}
-                handleSentenceClick={handleSentenceClick}
-                userId={userId}
-                recapVersionId={recap?.currentVersion?.id}
-                currentTime={currentTime}
-                isGenAudio={recap?.currentVersion?.isGenAudio || false}
-              />
-            ) : (
-              <p>No transcript available or failed to load transcript.</p>
-            )}
-            <AudioPlayer
-              recap={recap}
-              audioRef={audioRef}
-              currentAudioTime={currentTime}
-              setCurrentAudioTime={setCurrentTime}
-              isPlaying={isPlaying}
-              setIsPlaying={setIsPlaying}
-            />
-          </Show>
-        </Show>
-      </div>
+      <RecapInfoSection/>
+      <AudioAndTranscriptSection/>
     </div>
   );
 };
 
 export default RecapNewTues;
 
-const RecapInfoSection = ({ recap }) => {
+const RecapInfoSection = () => {
+  const { recap } = useLoaderData();
   const { recapId } = useParams();
   const [ isPlaylistModalOpen, setIsPlaylistModalOpen ] = useState(false);
   const [ isReportModalOpen, setIsReportModalOpen ] = useState(false); // State for report modal
@@ -270,46 +218,37 @@ const RecapInfoSection = ({ recap }) => {
   )
 }
 
-const AudioPlayer = ({ recap, audioRef, currentAudioTime, setCurrentAudioTime, isPlaying, setIsPlaying }) => {
-  const { recapId } = useParams();
-  const [ volume, setVolume ] = useState(1);
-  const [ duration, setDuration ] = useState(0);
-  const [ isLooping, setIsLooping ] = useState(false);
-  const [ playbackRate, setPlaybackRate ] = useState(1);
+const AudioAndTranscriptSection = () => {
+  const { recap, promisedTranscript } = useLoaderData();
+  const navigate = useNavigate();
+
+  // Audio player state
+  const [ isPlaying, setIsPlaying ] = useState(false);
+  const [ currentTime, setCurrentTime ] = useState(0);
+  const audioRef = useRef(null);
 
   const { user } = useAuth();
-  const userId = user?.id;
+  const hasSubscription = user?.profileData.subscriptions.$values.some((sub) => sub.status === 0);
 
+  // Create view tracking after the transcript is loaded. Delayed by 3 seconds
   useEffect(() => {
-    const audio = audioRef.current;
-
-    const updateCurrentTime = () => setCurrentAudioTime(audio?.currentTime || 0);
-    audio?.addEventListener('timeupdate', updateCurrentTime);
+    let timeoutId;
+    if (recap && user?.id) {
+      promisedTranscript.then(() => {
+        timeoutId = setTimeout(() => {
+          createViewTracking();
+        }, 3000);
+      });
+    }
     return () => {
-      audio?.removeEventListener('timeupdate', updateCurrentTime);
-    };
+      if (timeoutId) clearTimeout(timeoutId);
+    }
   }, []);
 
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
-    }
-  }, [ volume ]);
-
-  const trackView = async () => {
-    if (!userId) {
-      console.warn('User ID not available. Cannot track view.');
-      return;
-    }
-
-    if (!recapId) {
-      console.warn('Missing required parameters:', { recapId });
-      return;
-    }
-
+  const createViewTracking = async () => {
     try {
       const deviceType = window.innerWidth <= 768 ? 0 : 1; // Mobile: 0, Desktop: 1
-      const response = await axiosInstance.post(`/api/viewtracking/createviewtracking?recapid=${recapId}&deviceType=${deviceType}`);
+      const response = await axiosInstance.post(`/api/viewtracking/createviewtracking?recapid=${recap.id}&deviceType=${deviceType}`);
       console.log('View tracking response:', response.data);
     } catch (error) {
       const err = handleFetchError(error);
@@ -317,19 +256,87 @@ const AudioPlayer = ({ recap, audioRef, currentAudioTime, setCurrentAudioTime, i
     }
   };
 
-  const handlePlayPause = async () => {
-    if (!userId) {
-      console.error('Cannot play audio without user ID');
-      return;
-    }
+  const handleUpgradeToPremium = () => {
+    navigate(routes.billing);
+  };
 
+  const handleSentenceClick = async (startTime) => {
+    if (audioRef.current) {
+      audioRef.current.currentTime = parseFloat(startTime);
+      try {
+        await audioRef.current.play();
+        setIsPlaying(true);
+      } catch (error) {
+        console.error("Playback error on sentence click:", error);
+      }
+    }
+  };
+
+  return (
+    <div className="recap-right-section">
+      <h2>{recap.name}</h2>
+
+      <Show when={recap && recap.isPublished}>
+        <Show when={(recap.isPremium && hasSubscription) || !recap.isPremium} fallback={
+          <div className="premium-message">
+            This recap is premium. Please upgrade to a premium subscription.
+            <button onClick={handleUpgradeToPremium}>Upgrade</button>
+          </div>
+        }>
+          <SuspenseAwait
+            resolve={promisedTranscript}
+            errorElement={<p>No transcript available or failed to load transcript.</p>}
+            fallback={<div>Loading transcript...</div>}
+          >
+            {(transcript) => (
+              <Transcriptv2
+                transcriptData={transcript}
+                handleSentenceClick={handleSentenceClick}
+                userId={user?.id}
+                recapVersionId={recap?.currentVersion?.id}
+                currentTime={currentTime}
+                isGenAudio={recap?.currentVersion?.isGenAudio || false}
+              />
+            )}
+          </SuspenseAwait>
+
+          <AudioPlayer
+            recap={recap}
+            audioRef={audioRef}
+            currentAudioTime={currentTime}
+            setCurrentAudioTime={setCurrentTime}
+            isPlaying={isPlaying}
+            setIsPlaying={setIsPlaying}
+          />
+        </Show>
+      </Show>
+    </div>
+  )
+}
+
+const AudioPlayer = ({ recap, audioRef, currentAudioTime, setCurrentAudioTime, isPlaying, setIsPlaying }) => {
+  const [ duration, setDuration ] = useState(0);
+  const [ isLooping, setIsLooping ] = useState(false);
+  const [ playbackRate, setPlaybackRate ] = useState(1);
+
+  useEffect(() => {
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    const updateCurrentTime = () => setCurrentAudioTime(audio.currentTime || 0);
+    audio.addEventListener('timeupdate', updateCurrentTime);
+    return () => {
+      audio.removeEventListener('timeupdate', updateCurrentTime);
+    };
+  }, []);
+
+  const handlePlayPause = async () => {
     if (audioRef.current) {
       try {
         if (isPlaying) {
           await audioRef.current.pause();
         } else {
           await audioRef.current.play();
-          trackView();
         }
         setIsPlaying(!isPlaying);
       } catch (error) {
@@ -340,14 +347,15 @@ const AudioPlayer = ({ recap, audioRef, currentAudioTime, setCurrentAudioTime, i
 
   const handleSeek = (e) => {
     if (audioRef.current) {
-      audioRef.current.currentTime = e.target.value;
-      setCurrentAudioTime(e.target.value);
+      const newTime = Number(e.target.value);
+      audioRef.current.currentTime = newTime;
+      setCurrentAudioTime(newTime);
     }
   };
 
   const handleTimeUpdate = () => {
     if (audioRef.current) {
-      setCurrentAudioTime(audioRef.current.currentTime);
+      setCurrentAudioTime(Number(audioRef.current.currentTime));
     }
   };
 
@@ -378,6 +386,12 @@ const AudioPlayer = ({ recap, audioRef, currentAudioTime, setCurrentAudioTime, i
     setPlaybackRate(newRate);
   };
 
+  const handleVolumeChange = (e) => {
+    if (audioRef.current) {
+      audioRef.current.volume = e.target.value;
+    }
+  }
+
   return (
     <div className="audio-player-container">
       {recap.currentVersion.audioURL && (
@@ -395,8 +409,9 @@ const AudioPlayer = ({ recap, audioRef, currentAudioTime, setCurrentAudioTime, i
               <input
                 type="range"
                 min="0"
-                max={duration || 0}
-                value={currentAudioTime}
+                max={duration.toFixed(2) || 0}
+                step="0.01"
+                value={currentAudioTime.toFixed(2)}
                 onChange={handleSeek}
               />
               <span>{new Date((duration - currentAudioTime) * 1000).toISOString().substr(14, 5)}</span>
@@ -422,8 +437,7 @@ const AudioPlayer = ({ recap, audioRef, currentAudioTime, setCurrentAudioTime, i
                 min="0"
                 max="1"
                 step="0.1"
-                value={volume}
-                onChange={(e) => setVolume(e.target.value)}
+                onChange={handleVolumeChange}
               />
               <FaVolumeUp className="volume-icon"/>
             </div>

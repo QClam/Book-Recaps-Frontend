@@ -1,18 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
-import axios from 'axios';
 import PropTypes from 'prop-types';
 import Modal from 'react-modal';
 import { axiosInstance } from "../../../../utils/axios";
 
 const Transcriptv2 = ({
                         transcriptData,
-                        highlightedSentences,
-                        setHighlightedSentences,
                         handleSentenceClick,
                         userId,
                         recapVersionId,
                         isGenAudio,
-                        transcriptUrl,
                         currentTime
                       }) => {
   const [ contextMenu, setContextMenu ] = useState({
@@ -22,16 +18,15 @@ const Transcriptv2 = ({
     sectionIndex: null,
     sentenceIndex: null,
   });
-  const [ transcriptContent, setTranscriptContent ] = useState(null);
   const [ activeSentence, setActiveSentence ] = useState(null);
 
+  const [ highlightedSentences, setHighlightedSentences ] = useState([]);
   const [ notes, setNotes ] = useState({});
   const [ isModalOpen, setIsModalOpen ] = useState(false);
   const [ currentNote, setCurrentNote ] = useState('');
   const [ currentSentenceId, setCurrentSentenceId ] = useState(null);
   const sentenceRefs = useRef({});
   const contextMenuRef = useRef(null);
-  const accessToken = localStorage.getItem("authToken");
 
   // Tải ghi chú từ localStorage khi component mount
   useEffect(() => {
@@ -46,42 +41,25 @@ const Transcriptv2 = ({
     }
   }, [ userId ]);
 
-  useEffect(() => {
-    const fetchTranscript = async () => {
-      try {
-        const response = await axios.get(transcriptUrl);
-        setTranscriptContent(response.data);
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    fetchTranscript();
-  }, [ transcriptUrl ]);
-
   // Function to handle highlighting
-
   useEffect(() => {
-    // console.log("Current time:", currentTime); // Log current time để kiểm tra
-    // console.log("isGenAudio:", isGenAudio);   // Log isGenAudio để đảm bảo nó đúng là true
-
+    // Tắt highlight nếu không phải là audio generate từ google
     if (!isGenAudio) {
       setActiveSentence(null);
       return;
     }
 
-    if (transcriptContent) {
+    // TODO: Filter ra sẵn sentencesInfo list đi, rồi so sánh currentTime với start và end của từng sentence.
+    // Nếu currentTime nằm trong khoảng thời gian của sentence thì highlight sentence đó.
+    // Chứ đâu cần phải loop qua từng section, từng sentence như thế này mỗi lần currentTime thay đổi.
+    if (transcriptData) {
       let found = false;
-      for (let section of transcriptContent.transcriptSections) {
+      for (let section of transcriptData.transcriptSections) {
         for (let sentence of section.transcriptSentences) {
           if (isFinite(sentence.start) && isFinite(sentence.end)) {
             if (currentTime >= sentence.start && currentTime <= sentence.end) {
-              setActiveSentence(sentence.sentence_index);
               console.log("Highlighting sentence index:", sentence.sentence_index); // Log câu được highlight
-
-              if (sentenceRefs.current[sentence.sentence_index]) {
-                sentenceRefs.current[sentence.sentence_index];
-              }
+              setActiveSentence(sentence.sentence_index);
               found = true;
               break;
             }
@@ -94,7 +72,7 @@ const Transcriptv2 = ({
         setActiveSentence(null);
       }
     }
-  }, [ currentTime, transcriptContent, isGenAudio ]);
+  }, [ currentTime, transcriptData, isGenAudio ]);
 
   // Function to get the storage key for the user's highlights
   const getUserHighlightsKey = (userId) => `highlightedSentences_${userId}`;
@@ -380,12 +358,11 @@ const Transcriptv2 = ({
 
 Transcriptv2.propTypes = {
   transcriptData: PropTypes.object.isRequired,
-  highlightedSentences: PropTypes.array.isRequired,
-  setHighlightedSentences: PropTypes.func.isRequired,
   handleSentenceClick: PropTypes.func.isRequired,
-  userId: PropTypes.string.isRequired,
+  userId: PropTypes.string,
   recapVersionId: PropTypes.string.isRequired,
-  accessToken: PropTypes.string.isRequired,
+  isGenAudio: PropTypes.bool.isRequired,
+  currentTime: PropTypes.number.isRequired,
 };
 
 export default Transcriptv2;

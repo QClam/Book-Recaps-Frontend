@@ -19,7 +19,7 @@ import OnboardingStepper from "./Components/Onboarding/OnboardML/Onboarding";
 import UsRecapDetail, {
   bookDetailLoader
 } from "./Components/ReadListenBook/UserRecap/UserRecapNewDetail/UsRecapDetail";
-import RecapNewTues from "./Components/ReadListenBook/UserRecap/UserRecapNewDetail/RecapNewTues";
+import RecapNewTues, { recapPlayerLoader } from "./Components/ReadListenBook/UserRecap/UserRecapNewDetail/RecapNewTues";
 import History from "./Components/History/History";
 import Homepage, { homepageLoader } from "./Components/Home/Homepage";
 import SubscriptionHistory from "./Components/Setting/SubcriptionHistory/SubcriptionHistory";
@@ -59,7 +59,7 @@ export const router = createBrowserRouter(createRoutesFromElements(
       <Route path={routes.books} element={<BookFree/>}/>
 
       {/* Recap detail - Audio player */}
-      <Route path={routes.recapPlayer} element={<RecapNewTues/>}/>
+      <Route path={routes.recapPlayer} element={<RecapNewTues/>} loader={recapPlayerLoader}/>
 
       <Route path={routes.billing} element={<Billing/>}/>
       <Route path={routes.billingResult} element={<Result/>}/>

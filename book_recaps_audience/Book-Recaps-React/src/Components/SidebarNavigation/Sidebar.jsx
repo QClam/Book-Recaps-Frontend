@@ -121,16 +121,6 @@ function Sidebar() {
                     })}>
                     Tìm sách
                   </NavLink>
-                  <Show when={isAuthenticated}>
-                    <NavLink
-                      to={routes.playlist}
-                      className={({ isActive }) => cn("grid place-items-center h-full mt-0.5 border-b-2 border-transparent px-3 py-2 text-sm font-medium", {
-                        "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,
-                        "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive
-                      })}>
-                      Danh sách phát
-                    </NavLink>
-                  </Show>
 
                   {/*<NavLink*/}
                   {/*  to={routes.books}*/}
@@ -146,7 +136,7 @@ function Sidebar() {
                       "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,
                       "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive
                     })}>
-                    Categories
+                    Thể loại
                   </NavLink>
                   <NavLink
                     to={routes.authors}
@@ -154,8 +144,19 @@ function Sidebar() {
                       "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,
                       "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive
                     })}>
-                    Authors
+                    Tác giả
                   </NavLink>
+
+                  <Show when={isAuthenticated}>
+                    <NavLink
+                      to={routes.playlist}
+                      className={({ isActive }) => cn("grid place-items-center h-full mt-0.5 border-b-2 border-transparent px-3 py-2 text-sm font-medium", {
+                        "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,
+                        "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive
+                      })}>
+                      Danh sách phát
+                    </NavLink>
+                  </Show>
                 </div>
               </div>
             </div>
