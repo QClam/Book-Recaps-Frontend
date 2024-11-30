@@ -45,7 +45,6 @@ export const router = createBrowserRouter(createRoutesFromElements(
       <Route path={routes.login} element={<Login/>}/>
       <Route path={routes.forgetPassword} element={<ForgetPassword/>}/>
 
-      {/* ko cần đăng nhập */}
       <Route path={routes.index} element={<Homepage/>} loader={homepageLoader}/>
       <Route path={routes.explore} element={<Explore/>}/>
 
@@ -59,7 +58,7 @@ export const router = createBrowserRouter(createRoutesFromElements(
       <Route path={routes.bookDetail} element={<UsRecapDetail/>} loader={bookDetailLoader}/>
       <Route path={routes.books} element={<BookFree/>}/>
 
-      {/* RecapVersion detail - Audio player */}
+      {/* Recap detail - Audio player */}
       <Route path={routes.recapPlayer} element={<RecapNewTues/>}/>
 
       <Route path={routes.billing} element={<Billing/>}/>
