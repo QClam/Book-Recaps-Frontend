@@ -65,8 +65,7 @@ const ForUser = ({ promisedRecaps, title, description, emptyMessageIdx }) => {
                        title={recap.book.authors.map((author) => author.name).join(", ")}>
                       Tác giả: <strong>{recap.book.authors.map((author) => author.name).join(", ")}</strong>
                     </p>
-                    <div className="border-t border-gray-300 mb-2">
-                    </div>
+                    <div className="border-t border-gray-300 mb-2"></div>
                     <p className="text-gray-700 text-xs mb-1 italic line-clamp-2"
                        title={recap.name || recap.book.title}>
                       Bài viết: <strong>{recap.name || `"${recap.book.title}"`}</strong>

@@ -4,7 +4,8 @@ import ReactPaginate from "react-paginate";
 import "./BookApi.scss";
 import { axiosInstance } from "../../../utils/axios";
 // import { resolveRefs } from "../../../utils/resolveRefs";
-import { routes } from "../../../routes"; // Import CSS cho styling
+import { routes } from "../../../routes";
+import Show from "../../Show"; // Import CSS cho styling
 
 const BookApi = () => {
   const [ books, setBooks ] = useState([]);
@@ -198,7 +199,7 @@ const BookApi = () => {
   };
 
   return (
-    <div className="book-api-container">
+    <div className="book-api-container container mx-auto max-w-screen-xl mb-4 pt-6 md:pt-12 md:px-12">
       {/* <h1 className="title">Danh Sách Sách</h1> */}
 
       {error && <p className="error">Lỗi: {error}</p>}
@@ -221,10 +222,14 @@ const BookApi = () => {
             className="search-input"
           />
         </div>
+      </div>
 
-        <div className="filter-section">
-          <div className="filter-group">
-            <h3>Thể loại</h3>
+      <div className="flex gap-5">
+        <div className="hidden lg:block max-w-fit">
+          <h3 className="mb-3 text-lg font-semibold">
+            Thể loại
+          </h3>
+          <div className="flex flex-col gap-1">
             {categories.map((category, i) => (
               <label key={category + i} className="filter-label">
                 <input
@@ -237,101 +242,110 @@ const BookApi = () => {
               </label>
             ))}
           </div>
+        </div>
+        <div className="flex-1 flex flex-col gap-5">
+          <div className="flex gap-5 justify-between w-full flex-wrap">
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold">Nhà xuất bản</h3>
+              <select
+                value={selectedPublisher}
+                onChange={handlePublisherChange}
+                className="w-full rounded border border-gray-300 p-2"
+              >
+                <option value="">Tất cả</option>
+                {publishers.map((publisher) => (
+                  <option key={publisher} value={publisher}>{publisher}</option>
+                ))}
+              </select>
+            </div>
 
-          <div className="filter-groupup">
-            <h3>Nhà xuất bản</h3>
-            <select value={selectedPublisher} onChange={handlePublisherChange} className="filter-select">
-              <option value="">Tất cả</option>
-              {publishers.map((publisher) => (
-                <option key={publisher} value={publisher}>{publisher}</option>
-              ))}
-            </select>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold">Giới hạn tuổi</h3>
+              <select
+                value={selectedAgeLimit}
+                onChange={handleAgeLimitChange}
+                className="w-full rounded border border-gray-300 p-2"
+              >
+                <option value="">Tất cả</option>
+                {ageLimits.map((age) => (
+                  <option key={age} value={age}>
+                    {age === 0 ? "Không giới hạn" : age}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold">Năm xuất bản</h3>
+              <select
+                value={selectedPublicationYear}
+                onChange={handlePublicationYearChange}
+                className="w-full rounded border border-gray-300 p-2"
+              >
+                <option value="">Tất cả</option>
+                {publicationYears.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          <div className="filter-groupup">
-            <h3>Giới hạn tuổi</h3>
-            <select
-              value={selectedAgeLimit}
-              onChange={handleAgeLimitChange}
-              className="filter-select"
-            >
-              <option value="">Tất cả</option>
-              {ageLimits.map((age) => (
-                <option key={age} value={age}>
-                  {age === 0 ? "Không giới hạn" : age}
-                </option>
+          {/* Danh sách sách */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+            <Show when={currentBooks.length > 0} fallback={<p className="text-center">Không tìm thấy sách nào.</p>}>
+              {currentBooks.map((book) => (
+                <div
+                  className="bg-white border border-gray-300 rounded-lg overflow-hidden flex flex-col transition-transform duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg"
+                  key={book.id}
+                  onClick={() => handleBookClick(book.id)}
+                >
+                  <div className="block bg-gray-200">
+                    <img
+                      src={book.coverImage || "/empty-image.jpg"}
+                      alt={book.title}
+                      className="block overflow-hidden shadow-md aspect-[3/4] object-cover w-full bg-gray-50"
+                    />
+                  </div>
+                  <div className="p-5 flex-1 flex flex-col items-start">
+                    <h2 className="text-lg mb-2 text-gray-800 font-bold line-clamp-2" title={book.title}>
+                      {book.title}
+                    </h2>
+                    <p className="text-sm text-gray-600 line-clamp-1 mb-2" title={book.originalTitle}>
+                      Tên gốc: <strong>{book.originalTitle}</strong>
+                    </p>
+                    {book.authors && book.authors.$values.length > 0 && (
+                      <p className="text-sm text-gray-600 mb-2"
+                         title={book.authors.$values.map((author) => author.name).join(", ")}>
+                        Tác giả: <strong>{book.authors.$values.map((author) => author.name).join(", ")}</strong>
+                      </p>
+                    )}
+                    <p className="text-sm text-gray-600 mb-2">
+                      Năm xuất bản: <strong>{book.publicationYear}</strong>
+                    </p>
+                  </div>
+                </div>
               ))}
-            </select>
+            </Show>
           </div>
 
-          <div className="filter-groupup">
-            <h3>Năm xuất bản</h3>
-            <select
-              value={selectedPublicationYear}
-              onChange={handlePublicationYearChange}
-              className="filter-select"
-            >
-              <option value="">Tất cả</option>
-              {publicationYears.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Phân trang */}
+          {filteredBooks.length > 0 && (
+            <ReactPaginate
+              previousLabel={"Trước"}
+              nextLabel={"Sau"}
+              breakLabel={"..."}
+              pageCount={pageCount}
+              marginPagesDisplayed={1}
+              pageRangeDisplayed={1}
+              onPageChange={handlePageClick}
+              containerClassName={"pagination"}
+              activeClassName={"active"}
+            />
+          )}
         </div>
       </div>
-
-      {/* Danh sách sách */}
-      <div className="book-list-stst">
-        {currentBooks.length > 0 ? (
-          currentBooks.map((book) => (
-            <div className="book-item-emem" key={book.id} onClick={() => handleBookClick(book.id)}>
-              {book.coverImage && (
-                <img
-                  src={book.coverImage}
-                  alt={book.title}
-                  className="book-cover"
-                />
-              )}
-              <div className="book-info">
-                <h2 className="book-title">{book.title}</h2>
-                {/* <h3 className="book-original-title">{book.originalTitle.length > 18 ? `${book.originalTitle.slice(0, 10)}\n${book.originalTitle.slice(25)}` : book.originalTitle}</h3> */}
-                <p className="book-publication-year">
-                  <strong>Năm xuất bản:</strong> {book.publicationYear}
-                </p>
-                {book.authors && book.authors.$values.length > 0 && (
-                  <p className="book-author">
-                    <strong>Tác giả:</strong>{" "}
-                    {book.authors.$values
-                      .map((author) => author.name)
-                      .filter(Boolean) // Loại bỏ các tên undefined/null
-                      .join(", ")}
-                  </p>
-                )}
-                {/* <p className="book-description">{book.description}</p> */}
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>Không tìm thấy sách nào.</p>
-        )}
-      </div>
-
-      {/* Phân trang */}
-      {filteredBooks.length > 0 && (
-        <ReactPaginate
-          previousLabel={"Trước"}
-          nextLabel={"Sau"}
-          breakLabel={"..."}
-          pageCount={pageCount}
-          marginPagesDisplayed={2}
-          pageRangeDisplayed={5}
-          onPageChange={handlePageClick}
-          containerClassName={"pagination"}
-          activeClassName={"active"}
-        />
-      )}
     </div>
   );
 };

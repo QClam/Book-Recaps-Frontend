@@ -122,8 +122,8 @@ const CategoryByBookApi = () => {
   return (
     <div className="custom-category-wrapper">
       <div className="custom-category-header">
-        <h2 className="custom-title">Categories</h2>
-        <p className="custom-subtitle">Explore all categories</p>
+        <h2 className="custom-title">Thể loại</h2>
+        {/*<p className="custom-subtitle">Explore all categories</p>*/}
         <div className="custom-category-buttons">
           <button
             className={`custom-button ${activeCategory === 'All' ? 'active' : ''}`}
@@ -145,29 +145,36 @@ const CategoryByBookApi = () => {
       </div>
 
       <div className="custom-books-grid">
-        {filteredBooks.map((book, index) => (
+        {filteredBooks.map((book) => (
           <div
+            className="bg-white border border-gray-300 rounded-lg overflow-hidden flex flex-col transition-transform duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg"
             key={book.id}
-            className="custom-book-card"
-            onClick={() => handleBookClick(book.id)} // Thêm sự kiện onClick
-            role="button" // Thêm role để tăng tính truy cập
-            tabIndex={0} // Thêm tabIndex để có thể focus
-            onKeyPress={(e) => {
-              if (e.key === 'Enter') handleBookClick(book.id);
-            }} // Thêm sự kiện onKeyPress để hỗ trợ keyboard
+            onClick={() => handleBookClick(book.id)}
           >
-            {book.coverImage ? (
-              <img src={book.coverImage} alt={book.title} className="custom-book-image"/>
-            ) : (
-              <div className="custom-book-placeholder">No Image</div>
-            )}
-            <div className="custom-book-details">
-              <h3 className="custom-book-title">{book.title}</h3>
-              <p className="custom-book-author">
-                {book.authors.$values && book.authors.$values.length > 0 ? book.authors.$values[0].name : 'Unknown'}
+            <div className="block bg-gray-200">
+              <img
+                src={book.coverImage || "/empty-image.jpg"}
+                alt={book.title}
+                className="block overflow-hidden shadow-md aspect-[3/4] object-cover w-full bg-gray-50"
+              />
+            </div>
+            <div className="p-5 flex-1 flex flex-col items-start">
+              <h2 className="text-lg mb-2 text-gray-800 font-bold line-clamp-2" title={book.title}>
+                {book.title}
+              </h2>
+              <p className="text-sm text-gray-600 line-clamp-1 mb-2" title={book.originalTitle}>
+                Tên gốc: <strong>{book.originalTitle}</strong>
+              </p>
+              {book.authors && book.authors.$values.length > 0 && (
+                <p className="text-sm text-gray-600 mb-2"
+                   title={book.authors.$values.map((author) => author.name).join(", ")}>
+                  Tác giả: <strong>{book.authors.$values.map((author) => author.name).join(", ")}</strong>
+                </p>
+              )}
+              <p className="text-sm text-gray-600 mb-2">
+                Năm xuất bản: <strong>{book.publicationYear}</strong>
               </p>
             </div>
-
           </div>
         ))}
       </div>

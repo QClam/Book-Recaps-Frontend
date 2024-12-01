@@ -10,21 +10,21 @@ import BookApi from './BookApi/BookApi';
 //import BookCarousel from '../ForYou/BookCarousel';
 
 const Explore = () => {
-    return (
-        <div>
-            {/* <SearchBook /> */}
-            <BookApi />
-            {/* <BookTrendingApi /> */}
-            {/* <BookApiCategory /> */}
-            {/* <BookTrending /> */}
-            {/* <Categories /> */}
-            {/* <LatestBook /> */}
-            {/* <Collection /> */}
-            {/* <ListCategory />
-            <CustomCategory /> */}
-            {/* <BookCarousel /> */}
-        </div>
-    );
+  return (
+    <div>
+      {/* <SearchBook /> */}
+      <BookApi/>
+      {/* <BookTrendingApi /> */}
+      {/* <BookApiCategory /> */}
+      {/* <BookTrending /> */}
+      {/* <Categories /> */}
+      {/* <LatestBook /> */}
+      {/* <Collection /> */}
+      {/*<ListCategory/>*/}
+      {/*<CustomCategory/>*/}
+      {/* <BookCarousel /> */}
+    </div>
+  );
 };
 
 export default Explore;
