@@ -4,6 +4,36 @@ import api from '../Auth/AxiosInterceptors';
 import { useNavigate } from 'react-router-dom';
 import { Hourglass } from 'react-loader-spinner';
 import { Visibility } from '@mui/icons-material';
+import dayjs from 'dayjs'
+
+const resolveRefs = (data) => {
+    const refMap = new Map();
+    const createRefMap = (obj) => {
+        if (typeof obj !== "object" || obj === null) return;
+        if (obj.$id) {
+            refMap.set(obj.$id, obj);
+        }
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                createRefMap(obj[key]);
+            }
+        }
+    };
+    const resolveRef = (obj) => {
+        if (typeof obj !== "object" || obj === null) return obj;
+        if (obj.$ref) {
+            return refMap.get(obj.$ref);
+        }
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key)) {
+                obj[key] = resolveRef(obj[key]);
+            }
+        }
+        return obj;
+    };
+    createRefMap(data);
+    return resolveRef(data);
+};
 
 function Recaps() {
 
@@ -27,8 +57,8 @@ function Recaps() {
 
     const fetchRecapVersions = async () => {
         try {
-            const response = await api.get('/api/recap/get-all-versionnotdraft');
-            const recapVersions = response.data.data.$values;
+            const response = await api.get('/api/recap/Getallrecap');
+            const recapVersions = resolveRefs(response.data.data.$values);
             setRecapVersions(recapVersions);
             setFilteredVersions(recapVersions); // Initialize filtered data
             setLoading(false);
@@ -141,23 +171,23 @@ function Recaps() {
                     </TableHead>
                     <TableBody>
                         {filteredVersions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
-                            <TableRow key={item.recapVersionId}>
-                                <TableCell>{item.versionName}</TableCell>
-                                <TableCell>{item.bookTitle}</TableCell>
-                                <TableCell>{item.contributorName}</TableCell>
-                                <TableCell>{new Date(item.createAt).toLocaleDateString()}</TableCell>
+                            <TableRow key={item.id}>
+                                <TableCell>{item.name}</TableCell>
+                                <TableCell>{item.book?.title}</TableCell>
+                                <TableCell>{item.contributor}</TableCell>
+                                <TableCell>{dayjs(item.createdAt).format("DD-MM-YYYY")}</TableCell>
                                 <TableCell>
-                                    {item.status === "Pending" ? (
+                                    {item.currentVersion?.status === 1 ? (
                                         <Typography color="primary">Đang xử lý</Typography>
-                                    ) : item.status === "Approved" ? (
+                                    ) : item.currentVersion?.status === 2 ? (
                                         <Typography color="success" >Đã Chấp thuận</Typography>
-                                    ) : item.status === "Rejected" ? (
+                                    ) : item.currentVersion?.status === 3 ? (
                                         <Typography color='error' >Đã Từ chối</Typography>
                                     ) : (
-                                        <Typography sx={{ color: "#bdbfbe" }} >Unknown</Typography>
+                                        <Typography color='warning' >Draft</Typography>
                                     )}
                                 </TableCell>
-                                <TableCell><Button onClick={() => detailRecap(item.recapVersionId)}><Visibility /></Button></TableCell>
+                                <TableCell><Button onClick={() => detailRecap(item.id)}><Visibility /></Button></TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

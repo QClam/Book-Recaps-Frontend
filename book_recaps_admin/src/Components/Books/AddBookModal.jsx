@@ -27,7 +27,7 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
         ISBN_10: '',
         Description: '',
         PublicationYear: '',
-        CoverImage: '',
+        CoverImage: null,
         AgeLimit: 0,
         Authors: [], // Multiple authors
         CategoryIds: [], // Multiple categories
@@ -113,30 +113,36 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
     }, []);
 
     const handleSubmit = async () => {
-        const validationErrors = validateForm();
-        if (Object.keys(validationErrors).length > 0) {
-            setErrors(validationErrors);
-            return;
-        }
-
         try {
             const formDataToSend = new FormData();
+    
+            // Thêm các trường thông thường vào form-data
             for (const key in formData) {
-                if (key === "CategoryIds" || key === "Authors") {
-                    formData[key].forEach((id) => formDataToSend.append(key, id));
+                if (key === 'Authors') continue; // Bỏ qua Authors
+                if (Array.isArray(formData[key])) {
+                    formData[key].forEach((value) => formDataToSend.append(key, value));
                 } else {
                     formDataToSend.append(key, formData[key]);
                 }
             }
-
-            await api.post('/api/book/createbook', formDataToSend);
-            onBookAdded(); // Trigger callback to refresh the book list
-            onClose(); // Close the modal after successful submission
+    
+            // Convert Authors thành chuỗi JSON
+            formDataToSend.append('Authors', JSON.stringify(formData.Authors));
+    
+            // Gửi dữ liệu
+            await api.post('/api/book/createbook', formDataToSend, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+    
+            alert("Thêm sách thành công")
+            onBookAdded();
+            onClose();
         } catch (error) {
-            alert("Tạo mới sách thất bại");
-            console.error('Error adding book', error);
+            alert("Thêm sách thất bại")
+            console.error('Error adding book:', error);
         }
     };
+    
 
     return (
         <Dialog open={isOpen} onClose={onClose} fullWidth maxWidth="md">

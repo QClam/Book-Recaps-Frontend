@@ -29,6 +29,7 @@ import ContractsList from './Components/Contracts/ContractsList';
 import ContractDetail from './Components/Contracts/ContractDetail';
 import CreateContract from './Components/Contracts/CreateContract';
 import Users from './Components/Users/Users';
+import TestGetAvaliableBook from './Components/Books/TestGetAvaliableBook';
 
 function App() {
 
@@ -68,6 +69,8 @@ function App() {
 
                 <Route path="/auth" element={<Login />} />
                 <Route path="/auth/confirm-email" element={<ConfirmEmail />} />
+
+                <Route path="/test" element={<TestGetAvaliableBook />} />
             </Routes>
         </main>
     )

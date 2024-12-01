@@ -45,7 +45,6 @@ function BookList() {
     const [searchTerm, setSearchTerm] = useState(""); // Nhập input ô search
     const [modalIsOpen, setModalIsOpen] = useState(false); // Modal visibility state
     const [loading, setLoading] = useState(true);
-    const [contracts, setContracts] = useState([]);
     const [isHover, setIsHover] = useState(false);
 
     const navigate = useNavigate();
@@ -56,11 +55,12 @@ function BookList() {
             const response = await api.get('/api/book/getallbooks')
             const books = resolveRefs(response.data.data.$values);
             const contracts = books.map((book) => book.contracts?.$values || []);
+            const categories = books.map((book) => book.categories?.$values || [])
             console.log("Books: ", books);
             console.log("Contracts: ", contracts);
+            console.log("Cate: ", categories);
             setBooks(books);
             setFilteredBooks(books);
-            setContracts(contracts);
             setLoading(false);
         } catch (error) {
             console.error("Error fetching books", error);
@@ -146,10 +146,10 @@ function BookList() {
                 <Chip label="Tạo mới cuốn sách"
                     variant={isHover ? "contained" : "outlined"}
                     color="primary"
-                    onClick={() => setModalIsOpen(true)} 
+                    onClick={() => setModalIsOpen(true)}
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
-                    />
+                />
             </Box>
 
             <TableContainer component={Paper}>
@@ -159,6 +159,7 @@ function BookList() {
                             <TableCell></TableCell>
                             <TableCell><strong>Tên Sách</strong></TableCell>
                             <TableCell><strong>Tên Gốc</strong></TableCell>
+                            <TableCell><strong>Thể loại</strong></TableCell>
                             <TableCell><strong>Mã ISBN</strong></TableCell>
                             <TableCell><strong>Xuất bản</strong></TableCell>
                             <TableCell><strong>Tác giả</strong></TableCell>
@@ -181,6 +182,11 @@ function BookList() {
                                 /></TableCell>
                                 <TableCell>{book.title}</TableCell>
                                 <TableCell>{book.originalTitle}</TableCell>
+                                <TableCell>
+                                    {book.categories.$values.map((cate) => (
+                                        <Typography>{cate.name}</Typography>
+                                    ))}
+                                </TableCell>
                                 <TableCell>
                                     <Box>
                                         <Typography>ISBN_10: {book.isbN_10 || "Hệ thống chưa gắn mã ISBN"}</Typography>
