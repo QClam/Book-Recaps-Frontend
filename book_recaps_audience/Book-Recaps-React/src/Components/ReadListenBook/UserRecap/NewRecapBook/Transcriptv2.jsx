@@ -5,6 +5,7 @@ import { axiosInstance } from "../../../../utils/axios";
 import { cn } from "../../../../utils/cn";
 import { Image } from "primereact/image";
 import { useAuth } from "../../../../contexts/Auth";
+import { MediaActionTypes, useMediaDispatch, useMediaSelector } from "media-chrome/react/media-store";
 
 const initialContextMenu = {
   selectedText: '',
@@ -12,8 +13,11 @@ const initialContextMenu = {
   isHighlighted: false,
 }
 
-const Transcriptv2 = ({ transcriptData, handleSentenceClick, userId, recapVersionId, isGenAudio, currentTime }) => {
+const Transcriptv2 = ({ transcriptData, userId, recapVersionId, isGenAudio }) => {
   const { isAuthenticated } = useAuth();
+  const dispatch = useMediaDispatch();
+  const currentTime = useMediaSelector(state => state.mediaCurrentTime);
+
   const [ contextMenu, setContextMenu ] = useState(initialContextMenu);
   const [ activeSentenceIndex, setActiveSentenceIndex ] = useState(null);
   const [ highlightedSentences, setHighlightedSentences ] = useState([]);
@@ -53,6 +57,7 @@ const Transcriptv2 = ({ transcriptData, handleSentenceClick, userId, recapVersio
         isFinite(sentence.start) && isFinite(sentence.end) &&
         currentTime >= sentence.start && currentTime <= sentence.end
       ) {
+        console.log("Highlighting sentence:", currentTime);
         if (activeSentenceIndex !== String(sentence.sentence_index)) setActiveSentenceIndex(String(sentence.sentence_index));
         found = true;
         break;
@@ -71,6 +76,10 @@ const Transcriptv2 = ({ transcriptData, handleSentenceClick, userId, recapVersio
     })
     return sents;
   }, [ transcriptData ])
+
+  const handleSentenceClick = (startTime) => {
+    dispatch({ type: MediaActionTypes.MEDIA_SEEK_REQUEST, detail: parseFloat(startTime) });
+  };
 
   const handleHighlight = async () => {
     const { sentenceIndex, selectedText } = contextMenu;
@@ -205,11 +214,11 @@ const Transcriptv2 = ({ transcriptData, handleSentenceClick, userId, recapVersio
 
 Transcriptv2.propTypes = {
   transcriptData: PropTypes.object.isRequired,
-  handleSentenceClick: PropTypes.func.isRequired,
+  // handleSentenceClick: PropTypes.func.isRequired,
   userId: PropTypes.string,
   recapVersionId: PropTypes.string.isRequired,
   isGenAudio: PropTypes.bool.isRequired,
-  currentTime: PropTypes.number.isRequired,
+  // currentTime: PropTypes.number.isRequired,
 };
 
 export default Transcriptv2;

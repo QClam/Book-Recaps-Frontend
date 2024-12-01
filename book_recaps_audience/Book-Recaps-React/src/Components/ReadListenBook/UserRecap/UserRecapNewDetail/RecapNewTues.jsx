@@ -1,6 +1,5 @@
-import { useEffect, useRef, useState } from 'react';
-import { defer, json, useLoaderData, useNavigate, useParams } from 'react-router-dom';
-import { FaForward, FaPause, FaPlay, FaSyncAlt, FaUndo, FaVolumeDown, FaVolumeUp } from 'react-icons/fa';
+import { useEffect, useState } from 'react';
+import { defer, json, Link, useLoaderData, useParams } from 'react-router-dom';
 import './RecapNewTues.scss';
 import '../Transcript.scss';
 import CreatePlaylistModal from '../PlaylistModal/CreatePlaylistModal';
@@ -20,9 +19,21 @@ import { cn } from "../../../../utils/cn";
 import { HiBookmark, HiOutlineBookmark } from "react-icons/hi";
 import { TbFlag } from "react-icons/tb";
 import { getCurrentUserInfo } from "../../../../utils/getCurrentUserInfo";
-
-// TODO:
-// NOTE: Do all those TODOs first then style the audio player later (last)
+import {
+  MediaControlBar,
+  MediaController,
+  MediaDurationDisplay,
+  MediaMuteButton,
+  MediaPlayButton,
+  MediaPreviewTimeDisplay,
+  MediaSeekBackwardButton,
+  MediaSeekForwardButton,
+  MediaTimeDisplay,
+  MediaTimeRange,
+  MediaVolumeRange
+} from "media-chrome/react";
+import { MediaProvider, useMediaRef } from "media-chrome/react/media-store";
+import { MediaPlaybackRateMenu, MediaPlaybackRateMenuButton } from "media-chrome/react/menu";
 
 const getRecap = async (recapId, request) => {
   try {
@@ -275,12 +286,6 @@ const RecapInfoSection = () => {
 
 const AudioAndTranscriptSection = () => {
   const { recap, promisedTranscript } = useLoaderData();
-  const navigate = useNavigate();
-
-  // Audio player state
-  const [ isPlaying, setIsPlaying ] = useState(false);
-  const [ currentTime, setCurrentTime ] = useState(0);
-  const audioRef = useRef(null);
 
   const { user } = useAuth();
   const hasSubscription = user?.profileData.subscriptions.$values.some((sub) => sub.status === 0);
@@ -314,216 +319,244 @@ const AudioAndTranscriptSection = () => {
     }
   };
 
-  const handleUpgradeToPremium = () => {
-    navigate(routes.billing);
-  };
-
-  const handleSentenceClick = async (startTime) => {
-    if (audioRef.current) {
-      audioRef.current.currentTime = parseFloat(startTime);
-      try {
-        await audioRef.current.play();
-        setIsPlaying(true);
-      } catch (error) {
-        console.error("Playback error on sentence click:", error);
-      }
-    }
-  };
-
   return (
-    <div className="flex-1">
-      <Show when={recap && recap.isPublished} fallback={
-        <div className="rounded-lg bg-white p-5 shadow-[0px_0px_8px_rgba(0,0,0,0.1)]">
-          <div className="premium-message">
-            This recap is not published yet. Please wait for the author to publish it.
-          </div>
-        </div>
-      }>
-        <Show when={(recap.isPremium && hasSubscription) || !recap.isPremium} fallback={
+    <MediaProvider>
+      <div className="flex-1">
+        <Show when={recap && recap.isPublished} fallback={
           <div className="rounded-lg bg-white p-5 shadow-[0px_0px_8px_rgba(0,0,0,0.1)]">
             <div className="premium-message">
-              This recap is premium. Please upgrade to a premium subscription.
-              <button onClick={handleUpgradeToPremium}>Upgrade</button>
+              This recap is not published yet. Please wait for the author to publish it.
             </div>
           </div>
         }>
-          <SuspenseAwait
-            resolve={promisedTranscript}
-            errorElement={<p>No transcript available or failed to load transcript.</p>}
-            useDefaultLoading={true}
-            defaultLoadingMessage="Loading transcript..."
-          >
-            {(transcript) => (
-              <Transcriptv2
-                transcriptData={transcript}
-                handleSentenceClick={handleSentenceClick}
-                userId={user?.id}
-                recapVersionId={recap?.currentVersion?.id}
-                currentTime={currentTime}
-                isGenAudio={recap?.currentVersion?.isGenAudio || false}
-              />
-            )}
-          </SuspenseAwait>
+          <Show when={(recap.isPremium && hasSubscription) || !recap.isPremium} fallback={
+            <div className="rounded-lg bg-white p-5 shadow-[0px_0px_8px_rgba(0,0,0,0.1)]">
+              <div className="premium-message">
+                This recap is premium. Please upgrade to a premium subscription.
+                <Link to={routes.billing}>Upgrade</Link>
+              </div>
+            </div>
+          }>
+            <SuspenseAwait
+              resolve={promisedTranscript}
+              errorElement={<p>No transcript available or failed to load transcript.</p>}
+              useDefaultLoading={true}
+              defaultLoadingMessage="Loading transcript..."
+            >
+              {(transcript) => (
+                <Transcriptv2
+                  transcriptData={transcript}
+                  // handleSentenceClick={handleSentenceClick}
+                  userId={user?.id}
+                  recapVersionId={recap?.currentVersion?.id}
+                  // currentTime={currentTime}
+                  isGenAudio={recap?.currentVersion?.isGenAudio || false}
+                />
+              )}
+            </SuspenseAwait>
 
-          <AudioPlayer
-            recap={recap}
-            audioRef={audioRef}
-            currentAudioTime={currentTime}
-            setCurrentAudioTime={setCurrentTime}
-            isPlaying={isPlaying}
-            setIsPlaying={setIsPlaying}
-          />
+            <AudioPlayer
+              recap={recap}
+              // audioRef={audioRef}
+              // currentAudioTime={currentTime}
+              // setCurrentAudioTime={setCurrentTime}
+              // isPlaying={isPlaying}
+              // setIsPlaying={setIsPlaying}
+            />
+          </Show>
         </Show>
-      </Show>
-    </div>
+      </div>
+    </MediaProvider>
   )
 }
 
-const AudioPlayer = ({ recap, audioRef, currentAudioTime, setCurrentAudioTime, isPlaying, setIsPlaying }) => {
-  const [ duration, setDuration ] = useState(0);
-  const [ isLooping, setIsLooping ] = useState(false);
-  const [ playbackRate, setPlaybackRate ] = useState(1);
-
-  useEffect(() => {
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    const updateCurrentTime = () => setCurrentAudioTime(audio.currentTime || 0);
-    audio.addEventListener('timeupdate', updateCurrentTime);
-    return () => {
-      audio.removeEventListener('timeupdate', updateCurrentTime);
-    };
-  }, []);
-
-  const handlePlayPause = async () => {
-    if (audioRef.current) {
-      try {
-        if (isPlaying) {
-          await audioRef.current.pause();
-        } else {
-          await audioRef.current.play();
-        }
-        setIsPlaying(!isPlaying);
-      } catch (error) {
-        console.error('Playback error:', error);
-      }
-    }
-  };
-
-  const handleSeek = (e) => {
-    if (audioRef.current) {
-      const newTime = Number(e.target.value);
-      audioRef.current.currentTime = newTime;
-      setCurrentAudioTime(newTime);
-    }
-  };
-
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      setCurrentAudioTime(Number(audioRef.current.currentTime));
-    }
-  };
-
-  const handleLoadedMetadata = () => {
-    if (audioRef.current) {
-      setDuration(audioRef.current.duration);
-    }
-  };
-
-  const toggleLoop = () => {
-    setIsLooping(!isLooping);
-  };
-
-  const handleAudioEnded = () => {
-    if (isLooping) {
-      audioRef.current.currentTime = 0;
-      audioRef.current.play();
-    } else {
-      setIsPlaying(false);
-    }
-  };
-
-  const handlePlaybackRateChange = (e) => {
-    const newRate = parseFloat(e.target.value);
-    if (audioRef.current) {
-      audioRef.current.playbackRate = newRate;
-    }
-    setPlaybackRate(newRate);
-  };
-
-  const handleVolumeChange = (e) => {
-    if (audioRef.current) {
-      audioRef.current.volume = e.target.value;
-    }
-  }
-
+const AudioPlayer = ({ recap }) => {
+  const mediaRef = useMediaRef();
   return (
-    <div className="audio-player-container">
+    <div>
       {recap.currentVersion.audioURL && (
         <div className="recap-audio-player">
-          <audio
-            ref={audioRef}
-            src={recap.currentVersion.audioURL}
-            onLoadedMetadata={handleLoadedMetadata} // This will set the duration
-            onTimeUpdate={handleTimeUpdate}         // This will update currentTime
-            onEnded={handleAudioEnded}              // Handles end of playback
-          />
-          <div className="audio-controls">
-            <div className="progress-bar">
-              <span>{new Date(currentAudioTime * 1000).toISOString().substr(14, 5)}</span>
-              <input
-                type="range"
-                min="0"
-                max={duration.toFixed(2) || 0}
-                step="0.01"
-                value={currentAudioTime.toFixed(2)}
-                onChange={handleSeek}
+          <SvgIcons/>
+          <MediaController
+            audio
+            className="@container block max-w-screen-md mx-auto px-5"
+            style={{
+              "--media-background-color": "transparent",
+              "--media-control-background": "transparent",
+              "--media-control-hover-background": "transparent"
+            }}
+          >
+            <audio
+              slot="media"
+              ref={mediaRef}
+              src={recap.currentVersion.audioURL}
+            />
+            <div className="flex gap-2 items-center">
+              <MediaTimeDisplay
+                className="block p-2 text-slate-500 text-sm rounded-md focus:outline-none focus:ring-slate-700 focus:ring-2"/>
+
+              <MediaTimeRange
+                className="block w-full h-2 min-h-0 p-0 bg-slate-50 focus-visible:ring-slate-700 focus-visible:ring-2">
+                <MediaPreviewTimeDisplay slot="preview" className="text-slate-600 text-xs"/>
+              </MediaTimeRange>
+
+              <MediaDurationDisplay className="block p-2 text-slate-500 text-sm"/>
+            </div>
+
+            <MediaControlBar
+              className="h-14 px-4 w-full flex items-center justify-between">
+              <div className="relative group">
+                <MediaMuteButton
+                  noTooltip
+                  className="order-first @md:order-none rounded-md focus:outline-none focus-visible:ring-slate-700 focus-visible:ring-2">
+                  <svg slot="high" aria-hidden="true" className="h-5 w-5 fill-slate-500">
+                    <use href="#high"/>
+                  </svg>
+                  <svg slot="medium" aria-hidden="true" className="h-5 w-5 fill-slate-500">
+                    <use href="#high"/>
+                  </svg>
+                  <svg slot="low" aria-hidden="true" className="h-5 w-5 fill-slate-500">
+                    <use href="#high"/>
+                  </svg>
+                  <svg slot="off" aria-hidden="true" className="h-5 w-5 fill-slate-500">
+                    <use href="#off"/>
+                  </svg>
+                </MediaMuteButton>
+                <MediaVolumeRange
+                  className="group-hover:block hidden absolute bg-slate-800 border border-gray-700 rounded-lg shadow-lg mt-2 w-40 z-10 p-4 bottom-full left-0"
+                />
+              </div>
+              <MediaSeekBackwardButton
+                className="w-8 h-8 p-0 group rounded-full focus:outline-none focus-visible:ring-slate-700 focus-visible:ring-2"
+                seekOffset={15}>
+                <svg
+                  slot="icon"
+                  aria-hidden="true"
+                  className="w-7 h-7 fill-none stroke-slate-500"
+                >
+                  <use href="#backward"/>
+                </svg>
+              </MediaSeekBackwardButton>
+              <MediaPlayButton
+                className="h-10 w-10 p-2 mx-3 rounded-full bg-slate-700 hover:bg-slate-900 focus:outline-none focus:ring-slate-700 focus:ring-2 focus:ring-offset-2">
+                <svg slot="play" aria-hidden="true" className="relative left-px">
+                  <use href="#play"/>
+                </svg>
+                <svg slot="pause" aria-hidden="true">
+                  <use href="#pause"/>
+                </svg>
+              </MediaPlayButton>
+              <MediaSeekForwardButton
+                className="w-8 h-8 p-0 group relative rounded-full focus:outline-none focus-visible:ring-slate-700 focus-visible:ring-2"
+                seekOffset={15}>
+                <svg
+                  slot="icon"
+                  aria-hidden="true"
+                  className="w-7 h-7 fill-none stroke-slate-500"
+                >
+                  <use href="#forward"/>
+                </svg>
+              </MediaSeekForwardButton>
+              <MediaPlaybackRateMenuButton
+                className="text-slate-500 rounded-md focus:outline-none focus-visible:ring-slate-700 focus-visible:ring-2 select-none"
+                id="menu-button"
+                invoketarget="menu1"
               />
-              <span>{new Date((duration - currentAudioTime) * 1000).toISOString().substr(14, 5)}</span>
-            </div>
-            <div className="audio-control-buttons">
-              <button onClick={() => handleSeek({ target: { value: currentAudioTime - 15 } })}>
-                <FaUndo/> 15
-              </button>
-              <button onClick={handlePlayPause} className="play-pause-button">
-                {isPlaying ? <FaPause/> : <FaPlay/>}
-              </button>
-              <button onClick={() => handleSeek({ target: { value: currentAudioTime + 15 } })}>
-                <FaForward/> 15
-              </button>
-              <button onClick={toggleLoop}>
-                <FaSyncAlt color={isLooping ? 'grey' : 'black'}/>
-              </button>
-            </div>
-            <div className="volume-controls">
-              <FaVolumeDown className="volume-icon"/>
-              <input
-                type="range"
-                min="0"
-                max="1"
-                step="0.1"
-                onChange={handleVolumeChange}
+              <MediaPlaybackRateMenu
+                hidden
+                id="menu1"
+                anchor="menu-button"
+                rates={[ 2, 1.5, 1.25, 1, 0.75 ]}
+                className="z-10"
               />
-              <FaVolumeUp className="volume-icon"/>
-            </div>
-            <div className="playback-speed-controls">
-              <select
-                id="playbackRate"
-                value={playbackRate}
-                onChange={handlePlaybackRateChange}
-              >
-                <option value="0.5">0.5x</option>
-                <option value="0.75">0.75x</option>
-                <option value="1">1x</option>
-                <option value="1.25">1.25x</option>
-                <option value="1.5">1.5x</option>
-                <option value="1.75">1.75x</option>
-                <option value="2">2x</option>
-              </select>
-            </div>
-          </div>
+            </MediaControlBar>
+          </MediaController>
         </div>
       )}
     </div>
   )
 }
+
+const SvgIcons = () => (
+  <svg className="hidden">
+    <symbol
+      id="backward"
+      viewBox="0 0 24 24"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path
+        d="M8 5L5 8M5 8L8 11M5 8H13.5C16.5376 8 19 10.4624 19 13.5C19 15.4826 18.148 17.2202 17 18.188"
+      ></path>
+      <path d="M5 15V19"></path>
+      <path
+        d="M8 18V16C8 15.4477 8.44772 15 9 15H10C10.5523 15 11 15.4477 11 16V18C11 18.5523
+            10.5523 19 10 19H9C8.44772 19 8 18.5523 8 18Z"
+      ></path>
+    </symbol>
+
+    <symbol id="play" viewBox="0 0 24 24">
+      <path
+        fillRule="evenodd"
+        d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0
+            3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z"
+        clipRule="evenodd"
+      />
+    </symbol>
+
+    <symbol id="pause" viewBox="0 0 24 24">
+      <path
+        fillRule="evenodd"
+        d="M6.75 5.25a.75.75 0 01.75-.75H9a.75.75 0 01.75.75v13.5a.75.75 0
+          01-.75.75H7.5a.75.75 0 01-.75-.75V5.25zm7.5 0A.75.75 0 0115 4.5h1.5a.75.75 0 01.75.75v13.5a.75.75 0
+          01-.75.75H15a.75.75 0 01-.75-.75V5.25z"
+        clipRule="evenodd"
+      />
+    </symbol>
+
+    <symbol id="forward" viewBox="0 0 24 24">
+      <path
+        d="M16 5L19 8M19 8L16 11M19 8H10.5C7.46243 8 5 10.4624 5 13.5C5 15.4826 5.85204 17.2202 7 18.188"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></path>
+      <path
+        d="M13 15V19"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></path>
+      <path
+        d="M16 18V16C16 15.4477 16.4477 15 17 15H18C18.5523 15 19 15.4477 19 16V18C19 18.5523 18.5523 19 18
+          19H17C16.4477 19 16 18.5523 16 18Z"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></path>
+    </symbol>
+
+    <symbol id="high" viewBox="0 0 24 24">
+      <path
+        d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0
+          001.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276
+          2.561-1.06V4.06zM18.584 5.106a.75.75 0 011.06 0c3.808 3.807 3.808 9.98 0 13.788a.75.75 0 11-1.06-1.06
+          8.25 8.25 0 000-11.668.75.75 0 010-1.06z"
+      ></path>
+      <path
+        d="M15.932 7.757a.75.75 0 011.061 0 6 6 0 010 8.486.75.75 0 01-1.06-1.061 4.5 4.5 0 000-6.364.75.75 0
+          010-1.06z"
+      ></path>
+    </symbol>
+
+    <symbol id="off" viewBox="0 0 24 24">
+      <path
+        d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0
+          001.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276
+          2.561-1.06V4.06zM17.78 9.22a.75.75 0 10-1.06 1.06L18.44 12l-1.72 1.72a.75.75 0 001.06 1.06l1.72-1.72 1.72
+          1.72a.75.75 0 101.06-1.06L20.56 12l1.72-1.72a.75.75 0 00-1.06-1.06l-1.72 1.72-1.72-1.72z"
+      />
+    </symbol>
+  </svg>
+)
