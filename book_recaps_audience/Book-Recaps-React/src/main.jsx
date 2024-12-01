@@ -17,7 +17,7 @@ createRoot(document.getElementById('root')).render(
   <PrimeReactProvider value={{ unstyled: true, pt: primeStyling }}>
     <GoogleReCaptchaProvider reCaptchaKey={recaptchaKey}>
       <RouterProvider router={router}/>
-      <ToastContainer/>
+      <ToastContainer position="top-center" autoClose={2500} theme="colored" closeOnClick={true}/>
     </GoogleReCaptchaProvider>
   </PrimeReactProvider>,
   // </StrictMode>,

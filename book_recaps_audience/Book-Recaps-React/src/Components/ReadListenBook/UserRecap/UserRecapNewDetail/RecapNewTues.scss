@@ -171,7 +171,13 @@
 }
 
 .premium-message {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+
   button, a {
+    display: block;
     background-color: #ff6600; /* Màu cam nổi bật */
     color: white;
     padding: 10px 20px;
@@ -182,22 +188,16 @@
     transition: background-color 0.3s ease, transform 0.3s ease;
     margin-top: 10px;
   }
-}
 
-.premium-message {
   button:hover, a:hover {
     background-color: #e65c00; /* Màu cam đậm hơn khi hover */
     transform: scale(1.05); /* Phóng to nút một chút khi hover */
   }
-}
 
-.premium-message {
   button:focus, a:focus {
     outline: none;
   }
-}
 
-.premium-message {
   button:active, a:active {
     background-color: #b44d00; /* Màu cam khi nhấn */
   }
@@ -211,6 +211,12 @@
   background-color: white; /* Màu nền có thể điều chỉnh theo ý thích */
   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
   //padding: 10px;
+}
+
+media-controller {
+  --media-background-color: transparent;
+  --media-control-background: transparent;
+  --media-control-hover-background: transparent;
 }
 
 media-playback-rate-menu {

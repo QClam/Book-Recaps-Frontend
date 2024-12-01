@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import './CreatePlaylistModal.scss';
 import { axiosInstance } from "../../../../utils/axios";
 import { useAuth } from "../../../../contexts/Auth";
+import { toast } from "react-toastify";
 
 const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId, savedPlayListIds, setSavedPlayListIds }) => {
   const { isAuthenticated } = useAuth();
@@ -31,7 +32,7 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId, savedPlayListId
   // Function to handle creating a new playlist
   const handleCreatePlaylist = async () => {
     if (!playlistName) {
-      alert('Please enter a playlist name');
+      toast.warning('Please enter a playlist name');
       return;
     }
 
@@ -47,12 +48,12 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId, savedPlayListId
       await axiosInstance.post(`/api/playlists/${playlistId}/add-recap/${recapId}`);
       setSavedPlayListIds([ ...savedPlayListIds, playlistId ]);
 
-      alert('Playlist created and recap added!');
+      toast.success('Playlist created and recap added!');
       setIsLoading(false);
       onClose();
     } catch (error) {
       console.error('Error creating playlist:', error);
-      alert('Error creating playlist');
+      toast.error('Error creating playlist');
       setIsLoading(false);
     }
   };
@@ -69,10 +70,11 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId, savedPlayListId
       }
       setSavedPlayListIds([ ...savedPlayListIds, ...newSelectedPlaylistIds ]); // Update saved playlist IDs
       setIsLoading(false);
-      alert('Playlists updated!');
+      toast.success('Recap added to selected playlists!');
       onClose(); // Close the modal after saving
     } catch (error) {
       console.error('Error adding recap to playlists:', error);
+      toast.error('Error adding recap to playlists');
       setIsLoading(false);
     }
   };

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import './ReportIssueModal.scss';
 import { axiosInstance } from "../../../../utils/axios";
+import { toast } from "react-toastify";
 
 const ReportIssueModal = ({ isOpen, onClose, recapId, userId }) => {
   const [ category, setCategory ] = useState('');
@@ -18,8 +19,10 @@ const ReportIssueModal = ({ isOpen, onClose, recapId, userId }) => {
         userId: userId
       });
       console.log('Report response:', response.data);
+      toast.success('Issue reported successfully!');
     } catch (error) {
       console.error('Error reporting issue:', error);
+      toast.error('Failed to report issue.');
     }
     onClose();
   };

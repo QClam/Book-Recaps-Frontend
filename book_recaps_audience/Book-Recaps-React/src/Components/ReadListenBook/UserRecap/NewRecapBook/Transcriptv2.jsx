@@ -6,6 +6,7 @@ import { cn } from "../../../../utils/cn";
 import { Image } from "primereact/image";
 import { useAuth } from "../../../../contexts/Auth";
 import { MediaActionTypes, useMediaDispatch, useMediaSelector } from "media-chrome/react/media-store";
+import { toast } from "react-toastify";
 
 const initialContextMenu = {
   selectedText: '',
@@ -98,10 +99,10 @@ const Transcriptv2 = ({ transcriptData, userId, recapVersionId, isGenAudio }) =>
 
         const updatedHighlights = highlightedSentences.filter(item => item.id !== highlightedSent[0].id);
         setHighlightedSentences(updatedHighlights);
-        alert("Highlight removed successfully!");
+        toast.success("Highlight removed successfully!");
       } catch (error) {
         console.error('Error deleting highlight:', error.response ? error.response.data : error);
-        alert("Failed to remove highlight.");
+        toast.error("Failed to remove highlight.");
       }
 
     } else {
@@ -119,10 +120,10 @@ const Transcriptv2 = ({ transcriptData, userId, recapVersionId, isGenAudio }) =>
 
         const response = await axiosInstance.post('/api/highlight/createhighlight', requestBody);
         setHighlightedSentences([ ...highlightedSentences, response.data.data ]);
-        alert("Highlight saved successfully!");
+        toast.success("Highlight saved successfully!");
       } catch (error) {
         console.error('Error saving highlight:', error.response ? error.response.data : error);
-        alert("Failed to save highlight.");
+        toast.error("Failed to save highlight.");
       }
     }
   };
@@ -139,11 +140,11 @@ const Transcriptv2 = ({ transcriptData, userId, recapVersionId, isGenAudio }) =>
     const { selectedText } = contextMenu;
     navigator.clipboard.writeText(selectedText)
       .then(() => {
-        alert("Copied to clipboard!");
+        toast.success("Text copied to clipboard!");
       })
       .catch((err) => {
         console.error("Failed to copy text: ", err);
-        alert("Failed to copy text.");
+        toast.error("Failed to copy text to clipboard.");
       });
   };
 

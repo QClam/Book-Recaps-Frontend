@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { defer, json, Link, useLoaderData, useParams } from 'react-router-dom';
 import './RecapNewTues.scss';
 import '../Transcript.scss';
@@ -34,6 +34,7 @@ import {
 } from "media-chrome/react";
 import { MediaProvider, useMediaRef } from "media-chrome/react/media-store";
 import { MediaPlaybackRateMenu, MediaPlaybackRateMenuButton } from "media-chrome/react/menu";
+import { toast } from "react-toastify";
 
 const getRecap = async (recapId, request) => {
   try {
@@ -109,11 +110,11 @@ const RecapInfoSection = () => {
     };
 
     fetchLikeCount();
-  }, [ recapId, userId ]);
+  }, []);
 
   const handleLikeClick = async () => {
     if (!isAuthenticated) {
-      alert('Vui lòng đăng nhập để thích bài viết này.');
+      toast.warning("Vui lòng đăng nhập để thích bài viết.");
       return;
     }
 
@@ -146,22 +147,6 @@ const RecapInfoSection = () => {
     } catch (error) {
       console.error('Error handling like action:', error.response?.data || error.message);
     }
-  };
-
-  const closePlaylistModal = () => {
-    setIsPlaylistModalOpen(false);
-  };
-
-  const openPlaylistModal = () => {
-    setIsPlaylistModalOpen(true);
-  };
-
-  const openReportModal = () => {
-    setIsReportModalOpen(true);
-  };
-
-  const closeReportModal = () => {
-    setIsReportModalOpen(false);
   };
 
   const authors = recap.book.authors?.$values?.map((author) => author.name).join(' · ');
@@ -246,7 +231,7 @@ const RecapInfoSection = () => {
               <Show when={!(recap.isPremium && !hasSubscription)}>
                 <button
                   className="flex gap-1 items-center px-2 py-1 border border-gray-300 bg-white rounded"
-                  onClick={openReportModal}
+                  onClick={() => setIsReportModalOpen(true)}
                 >
                   <TbFlag/> <span>Báo cáo</span>
                 </button>
@@ -255,7 +240,7 @@ const RecapInfoSection = () => {
                 className={cn("flex gap-1 items-center px-2 py-1 border border-gray-300 bg-white rounded", {
                   "text-[#FF6F61]": savedPlayListIds.length > 0
                 })}
-                onClick={openPlaylistModal}
+                onClick={() => setIsPlaylistModalOpen(true)}
               >
                 {savedPlayListIds.length > 0 ? <HiBookmark/> : <HiOutlineBookmark/>} <span>Lưu</span>
               </button>
@@ -269,55 +254,33 @@ const RecapInfoSection = () => {
             </div>
           </Show>
         </div>
-
       </div>
       <CreatePlaylistModal
         isOpen={isPlaylistModalOpen}
-        onClose={closePlaylistModal}
+        onClose={() => setIsPlaylistModalOpen(false)}
         recapId={recapId}
         userId={userId}
         savedPlayListIds={savedPlayListIds}
         setSavedPlayListIds={setSavedPlayListIds}
       />
-      <ReportIssueModal isOpen={isReportModalOpen} onClose={closeReportModal} userId={userId} recapId={recapId}/>
+      <ReportIssueModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        userId={userId}
+        recapId={recapId}
+      />
     </>
   )
 }
 
 const AudioAndTranscriptSection = () => {
   const { recap, promisedTranscript } = useLoaderData();
-
   const { user } = useAuth();
+
+  // Create view tracking when the transcript is loaded. Delayed by 3 seconds
+  useViewTracking(recap.id, user?.id, promisedTranscript);
+
   const hasSubscription = user?.profileData.subscriptions.$values.some((sub) => sub.status === 0);
-
-  // Create view tracking after the transcript is loaded. Delayed by 3 seconds
-  useEffect(() => {
-    let timeoutId;
-    if (
-      recap && user?.id &&
-      ((recap.isPremium && hasSubscription) || !recap.isPremium)
-    ) {
-      promisedTranscript.then(() => {
-        timeoutId = setTimeout(() => {
-          createViewTracking();
-        }, 3000);
-      });
-    }
-    return () => {
-      if (timeoutId) clearTimeout(timeoutId);
-    }
-  }, []);
-
-  const createViewTracking = async () => {
-    try {
-      const deviceType = window.innerWidth <= 768 ? 0 : 1; // Mobile: 0, Desktop: 1
-      const response = await axiosInstance.post(`/api/viewtracking/createviewtracking?recapid=${recap.id}&deviceType=${deviceType}`);
-      console.log('View tracking response:', response.data);
-    } catch (error) {
-      const err = handleFetchError(error);
-      console.log('Error tracking view:', err);
-    }
-  };
 
   return (
     <MediaProvider>
@@ -355,14 +318,7 @@ const AudioAndTranscriptSection = () => {
               )}
             </SuspenseAwait>
 
-            <AudioPlayer
-              recap={recap}
-              // audioRef={audioRef}
-              // currentAudioTime={currentTime}
-              // setCurrentAudioTime={setCurrentTime}
-              // isPlaying={isPlaying}
-              // setIsPlaying={setIsPlaying}
-            />
+            <AudioPlayer audioURL={recap.currentVersion?.audioURL}/>
           </Show>
         </Show>
       </div>
@@ -370,27 +326,15 @@ const AudioAndTranscriptSection = () => {
   )
 }
 
-const AudioPlayer = ({ recap }) => {
+const AudioPlayer = ({ audioURL }) => {
   const mediaRef = useMediaRef();
   return (
     <div>
-      {recap.currentVersion.audioURL && (
+      {audioURL && (
         <div className="recap-audio-player">
           <SvgIcons/>
-          <MediaController
-            audio
-            className="@container block max-w-screen-md mx-auto px-5"
-            style={{
-              "--media-background-color": "transparent",
-              "--media-control-background": "transparent",
-              "--media-control-hover-background": "transparent"
-            }}
-          >
-            <audio
-              slot="media"
-              ref={mediaRef}
-              src={recap.currentVersion.audioURL}
-            />
+          <MediaController audio className="@container block max-w-screen-md mx-auto px-5">
+            <audio slot="media" ref={mediaRef} src={audioURL}/>
             <div className="flex gap-2 items-center">
               <MediaTimeDisplay
                 className="block p-2 text-slate-500 text-sm rounded-md focus:outline-none focus:ring-slate-700 focus:ring-2"/>
@@ -403,8 +347,7 @@ const AudioPlayer = ({ recap }) => {
               <MediaDurationDisplay className="block p-2 text-slate-500 text-sm"/>
             </div>
 
-            <MediaControlBar
-              className="h-14 px-4 w-full flex items-center justify-between">
+            <MediaControlBar className="h-14 px-4 w-full flex items-center justify-between">
               <div className="relative group">
                 <MediaMuteButton
                   noTooltip
@@ -428,7 +371,7 @@ const AudioPlayer = ({ recap }) => {
               </div>
               <MediaSeekBackwardButton
                 className="w-8 h-8 p-0 group rounded-full focus:outline-none focus-visible:ring-slate-700 focus-visible:ring-2"
-                seekOffset={15}>
+                seekOffset={10}>
                 <svg
                   slot="icon"
                   aria-hidden="true"
@@ -448,7 +391,7 @@ const AudioPlayer = ({ recap }) => {
               </MediaPlayButton>
               <MediaSeekForwardButton
                 className="w-8 h-8 p-0 group relative rounded-full focus:outline-none focus-visible:ring-slate-700 focus-visible:ring-2"
-                seekOffset={15}>
+                seekOffset={10}>
                 <svg
                   slot="icon"
                   aria-hidden="true"
@@ -560,3 +503,64 @@ const SvgIcons = () => (
     </symbol>
   </svg>
 )
+
+const useViewTracking = (recapId, userId, promisedTranscript) => {
+  const currentViewTrackingId = useRef(null);
+  const startTime = useRef(new Date().getTime());
+
+  useEffect(() => {
+    let timeoutId;
+    const controller = new AbortController();
+
+    // Create view tracking after the transcript is loaded. Delayed by 3 seconds
+    if (recapId && userId) {
+      promisedTranscript.then(() => {
+        timeoutId = setTimeout(() => {
+          createViewTracking(controller);
+        }, 3000);
+      });
+    }
+
+    // Update view tracking duration when the component is unmounted
+    return () => {
+      controller.abort();
+      if (timeoutId) clearTimeout(timeoutId);
+      if (currentViewTrackingId.current) {
+        const endTime = new Date().getTime();
+        const duration = (endTime - startTime.current) / 1000;
+        updateViewTracking(currentViewTrackingId.current, duration);
+      }
+    }
+  }, []);
+
+  const createViewTracking = async (request) => {
+    try {
+      const deviceType = window.innerWidth <= 768 ? 0 : 1; // Mobile: 0, Desktop: 1
+      const response = await axiosInstance.post("/api/viewtracking/createviewtracking", {}, {
+        signal: request.signal,
+        params: {
+          recapid: recapId,
+          deviceType
+        }
+      });
+      // console.log('View tracking response:', response.data.data);
+
+      currentViewTrackingId.current = response.data.data.id;
+    } catch (error) {
+      const err = handleFetchError(error);
+      console.log('Error tracking view:', err);
+    }
+  };
+
+  const updateViewTracking = (id, duration) => {
+    if (!id || !duration) return;
+    duration = Math.round(duration);
+
+    axiosInstance.put("/api/viewtracking/updateduration/" + id, {}, { params: { duration } }).then(response => {
+      console.log('Update View tracking response:', response.data);
+    }).catch(error => {
+      const err = handleFetchError(error);
+      console.log('Error tracking view:', err);
+    })
+  };
+}
