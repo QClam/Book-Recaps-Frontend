@@ -1,6 +1,53 @@
 import { cn } from "./utils/cn";
 
 export const primeStyling = {
+  global: {
+    css: `
+        .progress-spinner-circle {
+            stroke-dasharray: 89, 200;
+            stroke-dashoffset: 0;
+            animation: p-progress-spinner-dash 0.9s ease-in-out infinite, p-progress-spinner-color 6s ease-in-out infinite;
+            stroke-linecap: round;
+        }
+
+        @keyframes p-progress-spinner-dash{
+            0% {
+                stroke-dasharray: 1, 200;
+                stroke-dashoffset: 0;
+            }
+            
+            50% {
+                stroke-dasharray: 89, 200;
+                stroke-dashoffset: -35px;
+            }
+            100% {
+                stroke-dasharray: 89, 200;
+                stroke-dashoffset: -124px;
+            }
+        }
+        @keyframes p-progress-spinner-color {
+            100%, 0% {
+                stroke: #ff5757;
+            }
+            40% {
+                stroke: #696cff;
+            }
+            66% {
+                stroke: #1ea97c;
+            }
+            80%, 90% {
+                stroke: #cc8925;
+            }
+        }
+    `
+  },
+  progressspinner: {
+    root: {
+      className: cn('relative mx-auto w-28 h-28 inline-block', 'before:block before:pt-full')
+    },
+    spinner: 'absolute top-0 bottom-0 left-0 right-0 m-auto w-full h-full transform origin-center animate-spin',
+    circle: 'text-red-500 progress-spinner-circle'
+  },
   image: {
     root: 'relative inline-block',
     button: {
@@ -21,7 +68,7 @@ export const primeStyling = {
         'flex justify-center items-center',
         'text-white bg-transparent w-12 h-12 rounded-full transition duration-200 ease-in-out mr-2',
         'hover:text-white hover:bg-white/10',
-        'focus:outline-none focus:outline-offset-0 focus:shadow-[0_0_0_0.2rem_rgba(191,219,254,1)]'
+        'focus:outline-none focus:outline-offset-0'
       )
     },
     rotaterighticon: 'w-6 h-6',
@@ -30,7 +77,7 @@ export const primeStyling = {
         'flex justify-center items-center',
         'text-white bg-transparent w-12 h-12 rounded-full transition duration-200 ease-in-out mr-2',
         'hover:text-white hover:bg-white/10',
-        'focus:outline-none focus:outline-offset-0 focus:shadow-[0_0_0_0.2rem_rgba(191,219,254,1)]'
+        'focus:outline-none focus:outline-offset-0'
       )
     },
     rotatelefticon: 'w-6 h-6',
@@ -39,7 +86,7 @@ export const primeStyling = {
         'flex justify-center items-center',
         'text-white bg-transparent w-12 h-12 rounded-full transition duration-200 ease-in-out mr-2',
         'hover:text-white hover:bg-white/10',
-        'focus:outline-none focus:outline-offset-0 focus:shadow-[0_0_0_0.2rem_rgba(191,219,254,1)]'
+        'focus:outline-none focus:outline-offset-0'
       )
     },
     zoomouticon: 'w-6 h-6',
@@ -48,7 +95,7 @@ export const primeStyling = {
         'flex justify-center items-center',
         'text-white bg-transparent w-12 h-12 rounded-full transition duration-200 ease-in-out mr-2',
         'hover:text-white hover:bg-white/10',
-        'focus:outline-none focus:outline-offset-0 focus:shadow-[0_0_0_0.2rem_rgba(191,219,254,1)]'
+        'focus:outline-none focus:outline-offset-0'
       )
     },
     zoominicon: 'w-6 h-6',
@@ -57,7 +104,7 @@ export const primeStyling = {
         'flex justify-center items-center',
         'text-white bg-transparent w-12 h-12 rounded-full transition duration-200 ease-in-out mr-2',
         'hover:text-white hover:bg-white/10',
-        'focus:outline-none focus:outline-offset-0 focus:shadow-[0_0_0_0.2rem_rgba(191,219,254,1)]'
+        'focus:outline-none focus:outline-offset-0'
       )
     },
     closeicon: 'w-6 h-6',
@@ -85,5 +132,36 @@ export const primeStyling = {
       )
     }),
     content: 'px-1 bg-white z-10' // Padding and background color.
+  },
+  contextmenu: {
+    root: 'py-1 bg-white text-gray-700 border-none shadow-md rounded-lg w-52',
+    menu: {
+      className: cn('m-0 p-0 list-none', 'outline-none')
+    },
+    menuitem: 'relative',
+    content: ({ context }) => ({
+      className: cn(
+        'transition-shadow duration-200 rounded-none',
+        'hover:text-gray-700 hover:bg-gray-200', // Hover
+        {
+          'text-gray-700': !context.focused && !context.active,
+          'bg-gray-300 text-gray-700': context.focused && !context.active,
+          'bg-blue-500 text-blue-700': context.focused && context.active,
+          'bg-blue-50 text-blue-700': !context.focused && context.active
+        }
+      )
+    }),
+    action: {
+      className: cn('cursor-pointer flex items-center no-underline overflow-hidden relative', 'text-gray-700 py-3 px-5 select-none')
+    },
+    icon: 'text-gray-600 mr-2',
+    label: 'text-gray-600',
+    transition: {
+      timeout: { enter: 250 },
+      classNames: {
+        enter: 'opacity-0',
+        enterActive: '!opacity-100 transition-opacity duration-250'
+      }
+    }
   }
 }

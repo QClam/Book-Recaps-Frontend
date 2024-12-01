@@ -1,7 +1,6 @@
 import { defer, generatePath, json, Link, useLoaderData } from 'react-router-dom';
 import "./UsRecapDetail.scss";
 import { axiosInstance } from "../../../../utils/axios";
-import { resolveRefs } from "../../../../utils/resolveRefs";
 import { routes } from "../../../../routes";
 import { Image } from "primereact/image";
 import { handleFetchError } from "../../../../utils/handleFetchError";
@@ -14,7 +13,7 @@ const getBookDetail = async (bookId, request) => {
     const response = await axiosInstance.get(`/api/book/getbookbyid/${bookId}`, {
       signal: request.signal
     });
-    return resolveRefs(response.data.data);
+    return response.data.data;
   } catch (e) {
     const err = handleFetchError(e);
     throw json({ error: err.error }, { status: err.status });
@@ -128,7 +127,7 @@ const UserRecapDetail = () => {
                     )}
 
                     <p className="text-gray-700 mb-2 italic line-clamp-2" title={recap.name || book.title}>
-                      Bài viết: <strong>{recap.name || `"${recap.book.title}"`}</strong>
+                      Bài viết: <strong>{recap.name || `"${book.title}"`}</strong>
                     </p>
 
                     {/* Views, Likes, Audio length*/}

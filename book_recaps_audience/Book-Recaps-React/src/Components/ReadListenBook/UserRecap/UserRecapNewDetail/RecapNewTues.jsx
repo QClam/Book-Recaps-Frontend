@@ -6,7 +6,6 @@ import '../Transcript.scss';
 import CreatePlaylistModal from '../PlaylistModal/CreatePlaylistModal';
 import ReportIssueModal from '../ReportIssueModal/ReportIssueModal';
 import Transcriptv2 from '../NewRecapBook/Transcriptv2';
-import { resolveRefs } from "../../../../utils/resolveRefs";
 import { useAuth } from "../../../../contexts/Auth";
 import axios from 'axios';
 import { axiosInstance } from "../../../../utils/axios";
@@ -14,9 +13,15 @@ import { routes } from "../../../../routes";
 import Show from "../../../Show";
 import { handleFetchError } from "../../../../utils/handleFetchError";
 import SuspenseAwait from "../../../SuspenseAwait";
+import { Image } from "primereact/image";
+import { Divider } from "primereact/divider";
+import { RiEyeLine, RiHeadphoneLine, RiThumbUpFill, RiThumbUpLine } from "react-icons/ri";
+import { cn } from "../../../../utils/cn";
+import { HiBookmark, HiOutlineBookmark } from "react-icons/hi";
+import { TbFlag } from "react-icons/tb";
+import { getCurrentUserInfo } from "../../../../utils/getCurrentUserInfo";
 
 // TODO:
-// - Style the UI of RecapInfoSection and Transcript Section
 // - Check cases where:
 //    Recap is Premium:
 //    - user is not logged in -> no audio player, no like, no playlist, no view tracking, no report, no transcript highlighting, no context menu
@@ -25,14 +30,19 @@ import SuspenseAwait from "../../../SuspenseAwait";
 //    Recap is Free:
 //    - user is not logged in -> no audio player, no like, no playlist, no view tracking, no report, no transcript highlighting, no context menu
 //    - user is logged in but not premium -> everything
-// - Add image tag for each keyidea
 
 // NOTE: Do all those TODOs first then style the audio player later (last)
 
 const getRecap = async (recapId, request) => {
   try {
-    const response = await axiosInstance.get("/getrecapbyId/" + recapId, { signal: request.signal });
-    return resolveRefs(response.data.data);
+    const user = getCurrentUserInfo();
+    const response = await axiosInstance.get("/getrecapbyId/" + recapId, {
+      params: {
+        userid: user?.id
+      },
+      signal: request.signal,
+    });
+    return { ...response.data.data, ...response.data.data2 };
   } catch (e) {
     const err = handleFetchError(e);
     throw json({ error: err.error }, { status: err.status });
@@ -40,7 +50,7 @@ const getRecap = async (recapId, request) => {
 }
 
 const getTranscript = async (transcriptUrl, request) => {
-  if (!transcriptUrl) return null;
+  if (!transcriptUrl) throw json({ error: 'Transcript URL is not available' }, { status: 404 });
   try {
     const response = await axios.get(transcriptUrl, { signal: request.signal });
     return response.data;
@@ -52,6 +62,7 @@ const getTranscript = async (transcriptUrl, request) => {
 
 export const recapPlayerLoader = async ({ params, request }) => {
   const recap = await getRecap(params.recapId, request);
+  console.log('Recap:', recap);
   const promisedTranscript = getTranscript(recap.currentVersion?.transcriptUrl, request);
 
   return defer({ recap, promisedTranscript });
@@ -59,7 +70,7 @@ export const recapPlayerLoader = async ({ params, request }) => {
 
 const RecapNewTues = () => {
   return (
-    <div className="recap-wrapper-wrapper">
+    <div className="max-w-screen-lg mx-auto mt-10 mb-[72px] px-5 flex gap-4 flex-col md:flex-row">
       <RecapInfoSection/>
       <AudioAndTranscriptSection/>
     </div>
@@ -73,26 +84,21 @@ const RecapInfoSection = () => {
   const { recapId } = useParams();
   const [ isPlaylistModalOpen, setIsPlaylistModalOpen ] = useState(false);
   const [ isReportModalOpen, setIsReportModalOpen ] = useState(false); // State for report modal
-  const [ likeCount, setLikeCount ] = useState(0); // State to store the number of likes
-  const [ liked, setLiked ] = useState(false);
+  const [ likeCount, setLikeCount ] = useState(recap.likesCount || 0);
+  const [ liked, setLiked ] = useState(recap.isLiked);
 
-  const { user } = useAuth();
+  const [ savedPlayListIds, setSavedPlayListIds ] = useState(recap.playListItems.$values.map((item) => item.playListId));
+
+  const { user, isAuthenticated } = useAuth();
   const userId = user?.id;
 
-  // 1. Lấy số lượng like và trạng thái like từ API khi component được render lần đầu tiên
   useEffect(() => {
-    // Kiểm tra trạng thái like từ localStorage khi người dùng đã like trước đó
-    const savedLikedState = localStorage.getItem(`liked_${userId}_${recapId}`);
-    if (savedLikedState) {
-      setLiked(JSON.parse(savedLikedState)); // Cập nhật trạng thái like từ localStorage
-    }
-
     const fetchLikeCount = async () => {
       try {
         const response = await axiosInstance.get(`/api/likes/count/${recapId}`);
 
         if (response.status === 200) {
-          setLikeCount(response.data.data); // Cập nhật số lượng like từ API
+          setLikeCount(response.data.data);
         } else {
           console.error('Error fetching like count:', response.data);
         }
@@ -101,11 +107,15 @@ const RecapInfoSection = () => {
       }
     };
 
-    fetchLikeCount(); // Gọi API để lấy số lượng like khi component mount
+    fetchLikeCount();
   }, [ recapId, userId ]);
 
-  // 2. Hàm xử lý khi người dùng nhấn like hoặc hủy like
   const handleLikeClick = async () => {
+    if (!isAuthenticated) {
+      alert('Vui lòng đăng nhập để thích bài viết này.');
+      return;
+    }
+
     try {
       let response;
       if (liked) {
@@ -113,11 +123,8 @@ const RecapInfoSection = () => {
         response = await axiosInstance.delete(`/api/likes/remove/${recapId}`);
 
         if (response.status === 200) {
-          const newLikedState = false;
-          setLiked(newLikedState); // Cập nhật trạng thái like
-          localStorage.setItem(`liked_${userId}_${recapId}`, JSON.stringify(newLikedState)); // Lưu trạng thái like vào localStorage cho người dùng cụ thể
-          // Cập nhật số lượng like ngay lập tức sau khi hủy like
-          setLikeCount(likeCount - 1); // Giảm số lượng like
+          setLiked(false);
+          setLikeCount(likeCount - 1);
         } else {
           console.error('Error removing like:', response.data);
         }
@@ -129,32 +136,14 @@ const RecapInfoSection = () => {
         });
 
         if (response.status === 200) {
-          const newLikedState = true;
-          setLiked(newLikedState); // Cập nhật trạng thái like
-          localStorage.setItem(`liked_${userId}_${recapId}`, JSON.stringify(newLikedState)); // Lưu trạng thái like vào localStorage cho người dùng cụ thể
-          // Cập nhật số lượng like ngay lập tức sau khi like
-          setLikeCount(likeCount + 1); // Tăng số lượng like
+          setLiked(true);
+          setLikeCount(likeCount + 1);
         } else {
           console.error('Error liking recap:', response.data);
         }
       }
     } catch (error) {
       console.error('Error handling like action:', error.response?.data || error.message);
-    }
-  };
-
-  const handleReportSubmit = async (reportData) => {
-    try {
-      const response = await axiosInstance.post('/api/supportticket/create', {
-        category: reportData.category,
-        description: reportData.description,
-        status: 0,
-        recapId: recapId,
-        userId: userId
-      });
-      console.log('Report response:', response.data);
-    } catch (error) {
-      console.error('Error reporting issue:', error);
     }
   };
 
@@ -174,47 +163,116 @@ const RecapInfoSection = () => {
     setIsReportModalOpen(false);
   };
 
+  const authors = recap.book.authors?.$values?.map((author) => author.name).join(' · ');
+  const categories = recap.book.categories?.$values?.map((category) => category.name).join(' · ');
+
   return (
-    <div className="recap-left-section">
-      {/* <h2>{recap.name}</h2> */}
-      <div className="recap-book-details">
-        <img src={recap.book?.coverImage} alt={recap.book?.title}/>
-        <h4>{recap.book?.title}</h4>
-        <p>Original Title: {recap.book?.originalTitle}</p>
-        <p>{recap.book?.description}</p>
-        <p>Year: {recap.book?.publicationYear}</p>
-        <p>Age Limit: {recap.book?.ageLimit}</p>
+    <>
+      <div className="w-full md:w-1/3 md:sticky h-fit top-28">
+        <div className="md:px-5">
+          {/* Book info */}
+          <div className="flex items-center md:items-start md:flex-col gap-5 md:gap-1">
+            <div className="w-2/5">
+              <Image
+                src={recap.book.coverImage || "/empty-image.jpg"}
+                alt={recap.book.title + " (" + recap.book.publicationYear + ")"}
+                className="block overflow-hidden rounded-md shadow-md w-full"
+                imageClassName="aspect-[3/4] object-cover w-full bg-white"
+                preview
+              />
+            </div>
+            <div className="flex-1">
+              <h1 className="text-xl font-bold">{recap.book.title} ({recap.book.publicationYear})</h1>
+              {recap.book.originalTitle && (
+                <h2 className="text-gray-700 italic md:text-sm">
+                  Tên gốc: <strong>{recap.book.originalTitle}</strong>
+                </h2>
+              )}
+              {authors && (
+                <p className="mt-2 md:text-sm text-gray-700 line-clamp-1" title={authors}>
+                  <span className="text-gray-500">Của: </span>
+                  <strong>{authors}</strong>
+                </p>
+              )}
+              {categories && (
+                <p className="mt-2 md:text-sm text-gray-500 line-clamp-1" title={categories}>{categories}</p>
+              )}
+            </div>
+          </div>
 
-        <div className="book-saved">
-              <span className="saved-label" onClick={openPlaylistModal}>
-                🔖 Save in My Playlist
-              </span>
+          <Divider/>
 
-          <span
-            className={`saved-like ${liked ? 'liked' : 'not-liked'}`}
-            onClick={handleLikeClick}
-            style={{ color: liked ? 'red' : 'black' }} // Đổi màu trái tim khi liked
-          >
-                {liked ? '❤️ Liked' : '🤍 Like'}
-              </span>
-          <h3>{likeCount} Likes</h3>
+          {recap.contributor && (
+            <div className="flex gap-2 items-center text-sm mb-2">
+              <div className="w-8 h-8">
+                <img
+                  src={recap.contributor.imageUrl?.replace("Files/Image/jpg/ad.jpg", "") || '/avatar-placeholder.png'}
+                  alt="User Avatar" className="w-full h-full object-cover rounded-full"/>
+              </div>
+              <p className="font-semibold line-clamp-2">{recap.contributor.fullName}</p>
+            </div>
+          )}
+
+          <p className="mb-2 text-gray-700 italic line-clamp-2 flex-1" title={recap.name || recap.book.title}>
+            Bài viết: <strong>{recap.name || `"${recap.book.title}"`}</strong>
+          </p>
+
+          {/* Views, Likes, Audio length*/}
+          <div className="flex gap-2 items-center text-sm text-gray-500 flex-wrap">
+            <p className="flex items-center gap-2">
+              <span className="bg-green-100 p-1 rounded"><RiEyeLine size={17}/></span>
+              <span>{recap.viewsCount || 0} Lượt xem</span>
+            </p>
+            <p>·</p>
+            <p className="flex items-center gap-2">
+              <span className="bg-green-100 p-1 rounded"><RiThumbUpLine size={17}/></span>
+              <span>{likeCount || 0} Lượt thích</span>
+            </p>
+            <p>·</p>
+            <p className="flex items-center gap-2">
+              <span className="bg-green-100 p-1 rounded"><RiHeadphoneLine size={17}/></span>
+              <span>{Number((recap.currentVersion?.audioLength || 0) / 60).toFixed(0)} phút</span>
+            </p>
+            <p>·</p>
+            <p className="text-black bg-yellow-400 text-xs rounded px-2 py-1">Premium</p>
+          </div>
+
+          <div className="mt-2 flex items-center gap-2 text-sm">
+            <button
+              className="flex gap-1 items-center px-2 py-1 border border-gray-300 bg-white rounded"
+              onClick={openReportModal}
+            >
+              <TbFlag/> <span>Báo cáo</span>
+            </button>
+            <button
+              className={cn("flex gap-1 items-center px-2 py-1 border border-gray-300 bg-white rounded", {
+                "text-[#FF6F61]": savedPlayListIds.length > 0
+              })}
+              onClick={openPlaylistModal}
+            >
+              {savedPlayListIds.length > 0 ? <HiBookmark/> : <HiOutlineBookmark/>} <span>Lưu</span>
+            </button>
+            <button
+              className={cn("flex gap-1 items-center px-2 py-1 border border-gray-300 bg-white rounded", { "text-[#FF6F61]": liked })}
+              onClick={handleLikeClick}
+            >
+              {liked ? <><RiThumbUpFill size={17}/> <span>Liked</span></> :
+                <><RiThumbUpLine size={17}/><span>Like</span></>}
+            </button>
+          </div>
         </div>
-      </div>
 
+      </div>
       <CreatePlaylistModal
         isOpen={isPlaylistModalOpen}
         onClose={closePlaylistModal}
-        recapId={recapId} // Use dynamic recap ID
-        userId={userId} // Use dynamic user ID
+        recapId={recapId}
+        userId={userId}
+        savedPlayListIds={savedPlayListIds}
+        setSavedPlayListIds={setSavedPlayListIds}
       />
-
-      <div className="report-issue">
-        <span onClick={openReportModal} style={{ cursor: "pointer", color: "blue" }}>
-          🏳️ Report an issue
-        </span>
-      </div>
-      <ReportIssueModal isOpen={isReportModalOpen} onClose={closeReportModal} onSubmit={handleReportSubmit}/>
-    </div>
+      <ReportIssueModal isOpen={isReportModalOpen} onClose={closeReportModal} userId={userId} recapId={recapId}/>
+    </>
   )
 }
 
@@ -273,20 +331,21 @@ const AudioAndTranscriptSection = () => {
   };
 
   return (
-    <div className="recap-right-section">
-      <h2>{recap.name}</h2>
-
+    <div className="flex-1">
       <Show when={recap && recap.isPublished}>
         <Show when={(recap.isPremium && hasSubscription) || !recap.isPremium} fallback={
-          <div className="premium-message">
-            This recap is premium. Please upgrade to a premium subscription.
-            <button onClick={handleUpgradeToPremium}>Upgrade</button>
+          <div className="rounded-lg bg-white p-5 shadow-[0px_0px_8px_rgba(0,0,0,0.1)]">
+            <div className="premium-message">
+              This recap is premium. Please upgrade to a premium subscription.
+              <button onClick={handleUpgradeToPremium}>Upgrade</button>
+            </div>
           </div>
         }>
           <SuspenseAwait
             resolve={promisedTranscript}
             errorElement={<p>No transcript available or failed to load transcript.</p>}
-            fallback={<div>Loading transcript...</div>}
+            useDefaultLoading={true}
+            defaultLoadingMessage="Loading transcript..."
           >
             {(transcript) => (
               <Transcriptv2

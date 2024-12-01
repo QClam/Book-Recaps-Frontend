@@ -3,7 +3,7 @@ import { generatePath, useNavigate } from 'react-router-dom';
 import ReactPaginate from "react-paginate";
 import "./BookApi.scss";
 import { axiosInstance } from "../../../utils/axios";
-import { resolveRefs } from "../../../utils/resolveRefs";
+// import { resolveRefs } from "../../../utils/resolveRefs";
 import { routes } from "../../../routes"; // Import CSS cho styling
 
 const BookApi = () => {
@@ -35,7 +35,8 @@ const BookApi = () => {
         // Fetch books data from the API
         const response = await axiosInstance.get("/api/book/getallbooks");
 
-        const data = resolveRefs(response.data);
+        // const data = resolveRefs(response.data);
+        const data = response.data;
         // console.log("Fetched Books Data:", data); // Kiểm tra dữ liệu
 
         if (data && data.data && Array.isArray(data.data.$values)) {
@@ -224,8 +225,8 @@ const BookApi = () => {
         <div className="filter-section">
           <div className="filter-group">
             <h3>Thể loại</h3>
-            {categories.map((category) => (
-              <label key={category} className="filter-label">
+            {categories.map((category, i) => (
+              <label key={category + i} className="filter-label">
                 <input
                   type="checkbox"
                   value={category}

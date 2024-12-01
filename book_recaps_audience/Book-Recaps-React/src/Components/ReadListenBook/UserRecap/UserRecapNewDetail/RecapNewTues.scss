@@ -1,222 +1,206 @@
 .recap-wrapper-wrapper {
-    display: flex;
-    padding: 20px;
-    background-color: #f9f9f9;
+  display: flex;
+  padding: 20px;
+  background-color: #f9f9f9;
+}
+
+
+.recap-left-section {
+  flex: 1;
+  margin-right: 20px;
+
+  h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
   }
-  
-  .recap-left-section {
-    flex: 1;
-    margin-right: 20px;
-  
-    h2 {
-      font-size: 24px;
-      margin-bottom: 15px;
-    }
-  
-    .recap-book-details {
-      img {
-        width: 100%;
-        max-width: 200px;
-        margin-bottom: 10px;
-      }
-  
-      h4 {
-        font-size: 20px;
-        margin-bottom: 5px;
-      }
-  
-      p {
-        margin-bottom: 5px;
-      }
-    }
-  }
-  
-  .recap-right-section {
-    flex: 2;
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);
-  
-    .recap-transcript {
-      max-height: 400px;
-      overflow-y: auto;
-      margin-bottom: 20px;
-  
-      p {
-        margin: 5px 0;
-        cursor: pointer;
-      }
-  
-      .highlighted {
-        background-color: #ffeb3b;
-      }
-    }
-  }
-  
-  .recap-list-item { 
-    margin-bottom: 20px;    
-    margin-top: 10px;
-    margin-left: 20px;
-  }
-  
-  .audio-controllerer {
-     width: calc(100% - 2cm); /* Reduced by 2cm for a total reduction of 6cm */
-    margin-right: 8px; /* Space between the audio and the button */
-    margin-top: 10px;
-    margin-left: 40px;
-  }
-  
-  .loop-buttonon {
-    display: flex; /* Ensure the button is a flex item */
-    align-items: center; /* Center the icon vertically */
-    justify-content: center; /* Center the icon horizontally */
-    background-color: transparent; /* Make button background transparent */
-    border: none; /* Remove border */
-    cursor: pointer; /* Change cursor on hover */
-    padding: 5px; /* Add some padding for better click area */
-    
-    /* Adjust margins as necessary */
-    margin-top: -45px; /* Adjust as needed */
-    margin-left: -2px; /* Adjust as needed */
-    
-    &:hover {
-      opacity: 0.8; /* Add a hover effect for better UX */
-    }
-  }
-  
-  
-  // .audio-player-container {
-  //   //position: fixed; //ĐOAN NAY LA SE XUAT HIEN NHIU RECAP NE
-  //   bottom: 0;
-  //   left: 0;
-  //   right: 0;
-  //   background-color: white; /* Màu nền có thể điều chỉnh theo ý thích */
-  //   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-  //   padding: 10px;
-  // }
-  
-  .audio-controls {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 10px;
-  }
-  
-  .progress-bar {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    margin: 0 10px;
-  }
-  
-  .progress-bar input {
-    flex: 1;
-    margin: 0 10px;
+}
+
+.recap-right-section {
+  flex: 2;
+  background-color: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);
+
+}
+
+.recap-transcript {
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+
+  p {
+    margin: 5px 0;
     cursor: pointer;
-    -webkit-appearance: none; /* Remove default styling */
-    background: #131212; /* Light track background */
-    height: 5px;
-    border-radius: 5px;
   }
-  
-  .progress-bar input::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #ff0000; /* Red thumb */
+
+  .highlighted {
+    background-color: #ffeb3b;
   }
-  
-  .audio-control-buttons {
-    display: flex;
-    align-items: center;
+}
+
+.recap-list-item {
+  margin-bottom: 20px;
+  margin-top: 10px;
+  margin-left: 20px;
+}
+
+.audio-controllerer {
+  width: calc(100% - 2cm); /* Reduced by 2cm for a total reduction of 6cm */
+  margin-right: 8px; /* Space between the audio and the button */
+  margin-top: 10px;
+  margin-left: 40px;
+}
+
+.loop-buttonon {
+  display: flex; /* Ensure the button is a flex item */
+  align-items: center; /* Center the icon vertically */
+  justify-content: center; /* Center the icon horizontally */
+  background-color: transparent; /* Make button background transparent */
+  border: none; /* Remove border */
+  cursor: pointer; /* Change cursor on hover */
+  padding: 5px; /* Add some padding for better click area */
+
+  /* Adjust margins as necessary */
+  margin-top: -45px; /* Adjust as needed */
+  margin-left: -2px; /* Adjust as needed */
+
+  &:hover {
+    opacity: 0.8; /* Add a hover effect for better UX */
   }
-  
-  .audio-control-buttons button {
-    background: none;
-    border: none;
-    color: #121010; /* Button text color */
-    font-size: 20px;
-    cursor: pointer;
-    margin: 0 5px;
-    transition: color 0.3s;
-  }
-  
-  .audio-control-buttons button:hover {
-    color: #ff0000; /* Change color on hover */
-  }
-  
-  .volume-controls {
-    display: flex;
-    align-items: center;
-  }
-  
-  .volume-controls .volume-slider {
-    margin: 0 10px;
-    -webkit-appearance: none;
-    background: #161616;
-    height: 5px;
-  }
-  
-  .volume-controls .volume-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: #ff0000; /* Red thumb */
-  }
-  
-  .playback-speed-controls select {
-    background-color: #e0dbdb; /* Dark background for select */
-    color: #161515; /* Text color */
-    border: none;
-    border-radius: 4px;
-    padding: 5px;
-  }
-  
-  .premium-message {
-    background-color: #f9f9f9;
-    padding: 20px;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    text-align: center;
-    margin-top: 20px;
-    font-family: Arial, sans-serif;
-  }
-  
-  .premium-message button {
-    background-color: #ff6600; /* Màu cam nổi bật */
-    color: white;
-    padding: 10px 20px;
-    font-size: 16px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.3s ease;
-  }
-  
-  .premium-message button:hover {
-    background-color: #e65c00; /* Màu cam đậm hơn khi hover */
-    transform: scale(1.05); /* Phóng to nút một chút khi hover */
-  }
-  
-  .premium-message button:focus {
-    outline: none;
-  }
-  
-  .premium-message button:active {
-    background-color: #b44d00; /* Màu cam khi nhấn */
-  }
-  
-  .recap-audio-player {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background-color: white; /* Màu nền có thể điều chỉnh theo ý thích */
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-    padding: 10px;
-  }
+}
+
+// .audio-player-container {
+//   //position: fixed; //ĐOAN NAY LA SE XUAT HIEN NHIU RECAP NE
+//   bottom: 0;
+//   left: 0;
+//   right: 0;
+//   background-color: white; /* Màu nền có thể điều chỉnh theo ý thích */
+//   box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+//   padding: 10px;
+// }
+
+.audio-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 10px;
+}
+
+.progress-bar {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  margin: 0 10px;
+}
+
+.progress-bar input {
+  flex: 1;
+  margin: 0 10px;
+  cursor: pointer;
+  -webkit-appearance: none; /* Remove default styling */
+  background: #131212; /* Light track background */
+  height: 5px;
+  border-radius: 5px;
+}
+
+.progress-bar input::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ff0000; /* Red thumb */
+}
+
+.audio-control-buttons {
+  display: flex;
+  align-items: center;
+}
+
+.audio-control-buttons button {
+  background: none;
+  border: none;
+  color: #121010; /* Button text color */
+  font-size: 20px;
+  cursor: pointer;
+  margin: 0 5px;
+  transition: color 0.3s;
+}
+
+.audio-control-buttons button:hover {
+  color: #ff0000; /* Change color on hover */
+}
+
+.volume-controls {
+  display: flex;
+  align-items: center;
+}
+
+.volume-controls .volume-slider {
+  margin: 0 10px;
+  -webkit-appearance: none;
+  background: #161616;
+  height: 5px;
+}
+
+.volume-controls .volume-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #ff0000; /* Red thumb */
+}
+
+.playback-speed-controls select {
+  background-color: #e0dbdb; /* Dark background for select */
+  color: #161515; /* Text color */
+  border: none;
+  border-radius: 4px;
+  padding: 5px;
+}
+
+.premium-message {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+.premium-message button {
+  background-color: #ff6600; /* Màu cam nổi bật */
+  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+  margin-top: 10px;
+}
+
+.premium-message button:hover {
+  background-color: #e65c00; /* Màu cam đậm hơn khi hover */
+  transform: scale(1.05); /* Phóng to nút một chút khi hover */
+}
+
+.premium-message button:focus {
+  outline: none;
+}
+
+.premium-message button:active {
+  background-color: #b44d00; /* Màu cam khi nhấn */
+}
+
+.recap-audio-player {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: white; /* Màu nền có thể điều chỉnh theo ý thích */
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  padding: 10px;
+}
