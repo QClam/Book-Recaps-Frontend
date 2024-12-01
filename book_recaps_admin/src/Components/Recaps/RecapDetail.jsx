@@ -181,7 +181,7 @@ function RecapDetail() {
                                 <Grid container direction="column" spacing={1}>
                                     <Grid item>
                                         <Typography variant="h6" textAlign="center">
-                                            {totalViews}
+                                            {totalViews} Giây
                                         </Typography>
                                     </Grid>
                                 </Grid>
