@@ -4,6 +4,7 @@ import { ContextMenu } from "primereact/contextmenu";
 import { axiosInstance } from "../../../../utils/axios";
 import { cn } from "../../../../utils/cn";
 import { Image } from "primereact/image";
+import { useAuth } from "../../../../contexts/Auth";
 
 const initialContextMenu = {
   selectedText: '',
@@ -12,6 +13,7 @@ const initialContextMenu = {
 }
 
 const Transcriptv2 = ({ transcriptData, handleSentenceClick, userId, recapVersionId, isGenAudio, currentTime }) => {
+  const { isAuthenticated } = useAuth();
   const [ contextMenu, setContextMenu ] = useState(initialContextMenu);
   const [ activeSentenceIndex, setActiveSentenceIndex ] = useState(null);
   const [ highlightedSentences, setHighlightedSentences ] = useState([]);
@@ -21,8 +23,9 @@ const Transcriptv2 = ({ transcriptData, handleSentenceClick, userId, recapVersio
 
   useEffect(() => {
     const fetchUserHighlights = async () => {
+      if (!isAuthenticated) return;
       try {
-        const response = await axiosInstance.get(`/api/highlight/gethighlightbyrecapid/${recapVersionId}?userId=${userId}`);
+        const response = await axiosInstance.get(`/api/highlight/gethighlightbyrecapid/${recapVersionId}?userid=${userId}`);
         console.log("Highlights response:", response.data);
 
         if (response.data && response.data.data && response.data.data.$values) {
@@ -116,6 +119,7 @@ const Transcriptv2 = ({ transcriptData, handleSentenceClick, userId, recapVersio
   };
 
   const handleContextMenu = (event, sentenceIndex, selectedText, isHighlighted) => {
+    if (!isAuthenticated) return;
     if (cm.current) {
       setContextMenu({ selectedText, sentenceIndex, isHighlighted });
       cm.current.show(event);

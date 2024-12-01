@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react';
 import './CreatePlaylistModal.scss';
 import { axiosInstance } from "../../../../utils/axios";
+import { useAuth } from "../../../../contexts/Auth";
 
 const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId, savedPlayListIds, setSavedPlayListIds }) => {
+  const { isAuthenticated } = useAuth();
   const [ playlistName, setPlaylistName ] = useState('');
   const [ existingPlaylists, setExistingPlaylists ] = useState([]);
   const [ selectedPlaylistIds, setSelectedPlaylistIds ] = useState(savedPlayListIds);
@@ -11,6 +13,7 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId, savedPlayListId
   // Fetch existing playlists
   useEffect(() => {
     const fetchPlaylists = async () => {
+      if (!isAuthenticated) return;
       try {
         const response = await axiosInstance.get('/api/playlists/my-playlists');
         setExistingPlaylists(response.data.data.$values);
@@ -41,7 +44,6 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId, savedPlayListId
       });
 
       const { id: playlistId } = createPlaylistResponse.data.data;
-
       await axiosInstance.post(`/api/playlists/${playlistId}/add-recap/${recapId}`);
       setSavedPlayListIds([ ...savedPlayListIds, playlistId ]);
 
@@ -56,7 +58,6 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId, savedPlayListId
   };
 
   // Handle existing playlist selection and adding recap
-// Handle existing playlist selection and adding recap
   const handleSaveInSelectedPlaylists = async () => {
     try {
       setIsLoading(true);
@@ -64,12 +65,11 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId, savedPlayListId
 
       // Loop through each selected playlist and add recap
       for (const playlistId of newSelectedPlaylistIds) {
-        // API call to add recap to each playlist
         await axiosInstance.post(`/api/playlists/${playlistId}/add-recap/${recapId}`);
       }
       setSavedPlayListIds([ ...savedPlayListIds, ...newSelectedPlaylistIds ]); // Update saved playlist IDs
       setIsLoading(false);
-      alert('Playlists updated!'); // Success message
+      alert('Playlists updated!');
       onClose(); // Close the modal after saving
     } catch (error) {
       console.error('Error adding recap to playlists:', error);
@@ -77,7 +77,6 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId, savedPlayListId
     }
   };
 
-  // Handle checkbox selection
   const handleCheckboxChange = (playlistId) => {
     if (selectedPlaylistIds.includes(playlistId)) {
       setSelectedPlaylistIds(selectedPlaylistIds.filter(id => id !== playlistId));
@@ -128,7 +127,7 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId, savedPlayListId
         <div className="modal-buttons">
           <button onClick={onClose}>Cancel</button>
           <button onClick={handleSaveInSelectedPlaylists} disabled={isLoading}>
-            {isLoading ? 'Saving...' : 'Save in Selected Playlists'}
+            {isLoading ? 'Saving...' : 'Save'}
           </button>
           <button onClick={handleCreatePlaylist} disabled={isLoading || !playlistName}>
             {isLoading ? 'Creating...' : 'Create New Playlist'}

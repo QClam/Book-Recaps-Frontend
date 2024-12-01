@@ -203,6 +203,7 @@ function Sidebar() {
                   <div className="flex items-center gap-4">
                     <Link
                       to={routes.login}
+                      state={{ from: location.pathname }}
                       className="block w-max p-2 border border-[#FF6F61] rounded-md text-sm font-semibold text-[#FF6F61] hover:text-[#FF6F61]/80">
                       Đăng nhập
                     </Link>
@@ -244,7 +245,8 @@ function Sidebar() {
                     </Link>
                     <Link
                       className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20"
-                      to={routes.logout}>
+                      to={routes.logout}
+                      state={{ from: location.pathname }}>
                       Logout
                     </Link>
                   </div>
@@ -263,6 +265,7 @@ function Sidebar() {
 export default Sidebar;
 
 const MobileMenu = ({ isOpen, setIsOpen }) => {
+  const location = useLocation();
   const menuRef = useRef(null);
   const { isAuthenticated } = useAuth();
 
@@ -292,6 +295,7 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
             <Link
               to={routes.login}
               className="text-gray-700 block rounded-md px-3 py-2 text-base font-medium hover:bg-[#FF6F61]/30"
+              state={{ from: location.pathname }}
             >
               Đăng nhập
             </Link>
@@ -328,6 +332,7 @@ const MobileMenu = ({ isOpen, setIsOpen }) => {
           <Link
             to={routes.logout}
             className="text-gray-700 block rounded-md px-3 py-2 text-base font-medium hover:bg-[#FF6F61]/30"
+            state={{ from: location.pathname }}
           >
             Đăng xuất
           </Link>

@@ -22,15 +22,6 @@ import { TbFlag } from "react-icons/tb";
 import { getCurrentUserInfo } from "../../../../utils/getCurrentUserInfo";
 
 // TODO:
-// - Check cases where:
-//    Recap is Premium:
-//    - user is not logged in -> no audio player, no like, no playlist, no view tracking, no report, no transcript highlighting, no context menu
-//    - user is logged in but not premium -> no audio player, no transcript, no view tracking
-//    - user is logged in and premium -> everything
-//    Recap is Free:
-//    - user is not logged in -> no audio player, no like, no playlist, no view tracking, no report, no transcript highlighting, no context menu
-//    - user is logged in but not premium -> everything
-
 // NOTE: Do all those TODOs first then style the audio player later (last)
 
 const getRecap = async (recapId, request) => {
@@ -62,7 +53,6 @@ const getTranscript = async (transcriptUrl, request) => {
 
 export const recapPlayerLoader = async ({ params, request }) => {
   const recap = await getRecap(params.recapId, request);
-  console.log('Recap:', recap);
   const promisedTranscript = getTranscript(recap.currentVersion?.transcriptUrl, request);
 
   return defer({ recap, promisedTranscript });
@@ -165,6 +155,7 @@ const RecapInfoSection = () => {
 
   const authors = recap.book.authors?.$values?.map((author) => author.name).join(' · ');
   const categories = recap.book.categories?.$values?.map((category) => category.name).join(' · ');
+  const hasSubscription = user?.profileData.subscriptions.$values.some((sub) => sub.status === 0);
 
   return (
     <>
@@ -234,32 +225,38 @@ const RecapInfoSection = () => {
               <span>{Number((recap.currentVersion?.audioLength || 0) / 60).toFixed(0)} phút</span>
             </p>
             <p>·</p>
-            <p className="text-black bg-yellow-400 text-xs rounded px-2 py-1">Premium</p>
+            <Show when={recap.isPremium}>
+              <p className="text-black bg-yellow-400 text-xs rounded px-2 py-1">Premium</p>
+            </Show>
           </div>
 
-          <div className="mt-2 flex items-center gap-2 text-sm">
-            <button
-              className="flex gap-1 items-center px-2 py-1 border border-gray-300 bg-white rounded"
-              onClick={openReportModal}
-            >
-              <TbFlag/> <span>Báo cáo</span>
-            </button>
-            <button
-              className={cn("flex gap-1 items-center px-2 py-1 border border-gray-300 bg-white rounded", {
-                "text-[#FF6F61]": savedPlayListIds.length > 0
-              })}
-              onClick={openPlaylistModal}
-            >
-              {savedPlayListIds.length > 0 ? <HiBookmark/> : <HiOutlineBookmark/>} <span>Lưu</span>
-            </button>
-            <button
-              className={cn("flex gap-1 items-center px-2 py-1 border border-gray-300 bg-white rounded", { "text-[#FF6F61]": liked })}
-              onClick={handleLikeClick}
-            >
-              {liked ? <><RiThumbUpFill size={17}/> <span>Liked</span></> :
-                <><RiThumbUpLine size={17}/><span>Like</span></>}
-            </button>
-          </div>
+          <Show when={isAuthenticated}>
+            <div className="mt-2 flex items-center gap-2 text-sm">
+              <Show when={!(recap.isPremium && !hasSubscription)}>
+                <button
+                  className="flex gap-1 items-center px-2 py-1 border border-gray-300 bg-white rounded"
+                  onClick={openReportModal}
+                >
+                  <TbFlag/> <span>Báo cáo</span>
+                </button>
+              </Show>
+              <button
+                className={cn("flex gap-1 items-center px-2 py-1 border border-gray-300 bg-white rounded", {
+                  "text-[#FF6F61]": savedPlayListIds.length > 0
+                })}
+                onClick={openPlaylistModal}
+              >
+                {savedPlayListIds.length > 0 ? <HiBookmark/> : <HiOutlineBookmark/>} <span>Lưu</span>
+              </button>
+              <button
+                className={cn("flex gap-1 items-center px-2 py-1 border border-gray-300 bg-white rounded", { "text-[#FF6F61]": liked })}
+                onClick={handleLikeClick}
+              >
+                {liked ? <><RiThumbUpFill size={17}/> <span>Liked</span></> :
+                  <><RiThumbUpLine size={17}/><span>Like</span></>}
+              </button>
+            </div>
+          </Show>
         </div>
 
       </div>
@@ -291,7 +288,10 @@ const AudioAndTranscriptSection = () => {
   // Create view tracking after the transcript is loaded. Delayed by 3 seconds
   useEffect(() => {
     let timeoutId;
-    if (recap && user?.id) {
+    if (
+      recap && user?.id &&
+      ((recap.isPremium && hasSubscription) || !recap.isPremium)
+    ) {
       promisedTranscript.then(() => {
         timeoutId = setTimeout(() => {
           createViewTracking();
@@ -332,7 +332,13 @@ const AudioAndTranscriptSection = () => {
 
   return (
     <div className="flex-1">
-      <Show when={recap && recap.isPublished}>
+      <Show when={recap && recap.isPublished} fallback={
+        <div className="rounded-lg bg-white p-5 shadow-[0px_0px_8px_rgba(0,0,0,0.1)]">
+          <div className="premium-message">
+            This recap is not published yet. Please wait for the author to publish it.
+          </div>
+        </div>
+      }>
         <Show when={(recap.isPremium && hasSubscription) || !recap.isPremium} fallback={
           <div className="rounded-lg bg-white p-5 shadow-[0px_0px_8px_rgba(0,0,0,0.1)]">
             <div className="premium-message">
