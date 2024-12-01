@@ -60,7 +60,6 @@ const PlaylistBook = () => {
   };
 
   const handleDelete = async (playlistItemId) => {
-
     try {
       await axiosInstance.delete(`/api/playlists/deleteplaylistitem/${playlistItemId}`);
       // Sau khi xóa, gọi lại hàm fetchPlaylists để cập nhật danh sách
@@ -129,12 +128,11 @@ const PlaylistBook = () => {
                   const book = books.find(book =>
                     book.recaps.$values.some(recap => recap.id === item.recapId)
                   );
-
                   return (
                     <div
                       key={item.id}
                       className="book-item-item"
-                      onDoubleClick={() => handleBookClick(book)} // Add onClick event
+                      onClick={() => handleBookClick(book)} // Add onClick event
                       style={{ cursor: 'pointer' }} // Optional: Style to indicate clickable
                     >
                       {book ? (
@@ -147,15 +145,20 @@ const PlaylistBook = () => {
                           {/* Three-dots menu for delete */}
                           {/* Dấu ba chấm */}
                           <div className="options-menu">
-                            <span onContextMenu={(event) => toggleOptions(item.id, event)}>⋮</span>
+                            <span onClick={(event) => {
+                              event.stopPropagation();
+                              toggleOptions(item.id, event)
+                            }}>⋮</span>
                             {showOptions === item.id && (
                               <div className="dropdown-options">
-                                <button onClick={() => handleDelete(item.id)}>Delete</button>
+                                <button onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDelete(item.id)
+                                }}>Delete
+                                </button>
                               </div>
                             )}
                           </div>
-
-
                         </>
                       ) : (
                         <p>No book information available.</p>

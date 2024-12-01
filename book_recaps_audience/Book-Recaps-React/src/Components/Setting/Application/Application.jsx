@@ -59,7 +59,7 @@ const Application = () => {
   };
 
   return (
-    <div className="support-tickets-container">
+    <div className="container mx-auto max-w-screen-xl p-5">
       {errorMessage && <p className="error-notice">{errorMessage}</p>}
 
       <div className="tabs">

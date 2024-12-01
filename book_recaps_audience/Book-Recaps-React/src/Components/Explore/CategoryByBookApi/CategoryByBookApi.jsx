@@ -18,7 +18,8 @@ const CategoryByBookApi = () => {
       try {
         const response = await axiosInstance.get('/api/category/getallcategory');
 
-        const data = resolveRefs(response.data);
+        // const data = resolveRefs(response.data);
+        const data = response.data;
         if (data && data.succeeded) {
           setCategories(data.data.$values);
         } else {
@@ -36,6 +37,7 @@ const CategoryByBookApi = () => {
         const response = await axiosInstance.get('https://bookrecaps.cloud/api/book/getallbooks');
 
         const data = resolveRefs(response.data);
+        // const data = response.data;
         if (data && data.succeeded) {
           setAllBooks(data.data.$values);
         }

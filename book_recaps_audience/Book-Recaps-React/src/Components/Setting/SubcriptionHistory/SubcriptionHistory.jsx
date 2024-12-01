@@ -29,58 +29,60 @@ const SubscriptionHistory = () => {
   if (error) return <div className="error"> {error}</div>;
 
   return (
-    <div className="subscription-history">
-      <h1 className="title">Subscription History</h1>
+    <div className="container mx-auto max-w-screen-xl p-5">
+      <div className="subscription-history">
+        <h1 className="title">Subscription History</h1>
 
-      {/* Hiển thị gói hiện tại */}
-      {subscriptionData?.currentSubscription && (
-        <div className="current-subscription">
-          <h2>Current Subscription</h2>
-          <div className="subscription-details">
-            <div>
-              <p><strong>Package Name:</strong> {subscriptionData.currentSubscription.packageName}</p>
-              <p><strong>Start Date:</strong> {subscriptionData.currentSubscription.startDate}</p>
-              <p><strong>End Date:</strong> {subscriptionData.currentSubscription.endDate}</p>
-            </div>
-            <div>
-              <p><strong>Price:</strong> {subscriptionData.currentSubscription.price} VND</p>
-              <p><strong>Expected Views:</strong> {subscriptionData.currentSubscription.expectedViewsCount}</p>
-              <p><strong>Actual Views:</strong> {subscriptionData.currentSubscription.actualViewsCount}</p>
+        {/* Hiển thị gói hiện tại */}
+        {subscriptionData?.currentSubscription && (
+          <div className="current-subscription">
+            <h2>Current Subscription</h2>
+            <div className="subscription-details">
+              <div>
+                <p><strong>Package Name:</strong> {subscriptionData.currentSubscription.packageName}</p>
+                <p><strong>Start Date:</strong> {subscriptionData.currentSubscription.startDate}</p>
+                <p><strong>End Date:</strong> {subscriptionData.currentSubscription.endDate}</p>
+              </div>
+              <div>
+                <p><strong>Price:</strong> {subscriptionData.currentSubscription.price} VND</p>
+                <p><strong>Expected Views:</strong> {subscriptionData.currentSubscription.expectedViewsCount}</p>
+                <p><strong>Actual Views:</strong> {subscriptionData.currentSubscription.actualViewsCount}</p>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        )}
 
-      {/* Hiển thị lịch sử subscription */}
-      <h2 className="history-title">History Subscriptions</h2>
-      {subscriptionData?.historySubscriptions?.$values.length > 0 ? (
-        <table className="history-table">
-          <thead>
-          <tr>
-            <th>Package Name</th>
-            <th>Start Date</th>
-            <th>End Date</th>
-            <th>Price (VND)</th>
-            <th>Expected Views</th>
-            <th>Actual Views</th>
-          </tr>
-          </thead>
-          <tbody>
-          {subscriptionData.historySubscriptions.$values.map((history, index) => (
-            <tr key={index}>
-              <td>{history.packageName}</td>
-              <td>{history.startDate}</td>
-              <td>{history.endDate}</td>
-              <td>{history.price}</td>
-              <td>{history.expectedViewsCount}</td>
-              <td>{history.actualViewsCount}</td>
+        {/* Hiển thị lịch sử subscription */}
+        <h2 className="history-title">History Subscriptions</h2>
+        {subscriptionData?.historySubscriptions?.$values.length > 0 ? (
+          <table className="history-table">
+            <thead>
+            <tr>
+              <th>Package Name</th>
+              <th>Start Date</th>
+              <th>End Date</th>
+              <th>Price (VND)</th>
+              <th>Expected Views</th>
+              <th>Actual Views</th>
             </tr>
-          ))}
-          </tbody>
-        </table>
-      ) : (
-        <p>No history subscriptions available.</p>
-      )}
+            </thead>
+            <tbody>
+            {subscriptionData.historySubscriptions.$values.map((history, index) => (
+              <tr key={index}>
+                <td>{history.packageName}</td>
+                <td>{history.startDate}</td>
+                <td>{history.endDate}</td>
+                <td>{history.price}</td>
+                <td>{history.expectedViewsCount}</td>
+                <td>{history.actualViewsCount}</td>
+              </tr>
+            ))}
+            </tbody>
+          </table>
+        ) : (
+          <p>No history subscriptions available.</p>
+        )}
+      </div>
     </div>
   );
 };
