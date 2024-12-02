@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Platform, Dimensions, Animated, Modal} from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Platform, Dimensions   } from 'react-native';
 import api from '../../utils/AxiosInterceptors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -60,45 +60,28 @@ const RecapItemDetail = ({ route }) => {
     const [playbackStatus, setPlaybackStatus] = useState(null);
     const [currentPosition, setCurrentPosition] = useState(0);
     const [duration, setDuration] = useState(0);
-    const [textSize, setTextSize] = useState(16); // Default text size
-    //const [selectedFont, setSelectedFont] = useState('Helvetica'); // Default font
-    const [theme, setTheme] = useState('white'); // Default theme
-    const [modalVisible, setModalVisible] = useState(false); // Toggle for popup visibility
-
-    const togglePopup = () => {
-        setModalVisible(!modalVisible); // Toggle the popup
-    };
-
-
-    const handleFontSelect = (font) => {
-        setSelectedFont(font);
-    };
-
-    const handleThemeSelect = (color) => {
-        setTheme(color);
-    };
-
+    
     useEffect(() => {
         const fetchUserProfile = async () => {
-          try {
-            const response = await api.get('/api/personal/profile');  // Use your custom API call here
-            
-            if (response.data) {
-              // Get user ID from the API response directly
-              setUserId(response.data.id); // Ensure to set the ID correctly
-            } else {
-              setErrorMessage('Failed to fetch user profile');
+            try {
+                const response = await api.get('/api/personal/profile');  // Use your custom API call here
+
+                if (response.data) {
+                    // Get user ID from the API response directly
+                    setUserId(response.data.id); // Ensure to set the ID correctly
+                } else {
+                    setErrorMessage('Failed to fetch user profile');
+                }
+            } catch (error) {
+                console.error('Error fetching user profile:', error);
+                setErrorMessage('Failed to fetch user profile'); // Update error message
             }
-          } catch (error) {
-            console.error('Error fetching user profile:', error);
-            setErrorMessage('Failed to fetch user profile'); // Update error message
-          }
         };
         fetchUserProfile();
-      }, []);
-     
-       // Track view event inside useEffect to avoid hook errors
-       useEffect(() => {
+    }, []);
+
+    // Track view event inside useEffect to avoid hook errors
+    useEffect(() => {
         const trackViewEvent = async () => {
             try {
                 const deviceType = Platform.OS === 'ios' || Platform.OS === 'android' ? 0 : 1;
@@ -122,72 +105,72 @@ const RecapItemDetail = ({ route }) => {
         }
     }, [recapId, userId]);
 
-// Kiểm tra trạng thái liked từ AsyncStorage khi component render lại
-useEffect(() => {
-    const fetchLikeStatus = async () => {
-      try {
-        // Lấy trạng thái liked đã lưu trong AsyncStorage
-        const storedLikedStatus = await AsyncStorage.getItem(`liked_${userId}_${recapId}`);
-        if (storedLikedStatus !== null) {
-          setLiked(JSON.parse(storedLikedStatus));  // Thiết lập lại trạng thái liked từ AsyncStorage
+    // Kiểm tra trạng thái liked từ AsyncStorage khi component render lại
+    useEffect(() => {
+        const fetchLikeStatus = async () => {
+            try {
+                // Lấy trạng thái liked đã lưu trong AsyncStorage
+                const storedLikedStatus = await AsyncStorage.getItem(`liked_${userId}_${recapId}`);
+                if (storedLikedStatus !== null) {
+                    setLiked(JSON.parse(storedLikedStatus));  // Thiết lập lại trạng thái liked từ AsyncStorage
+                }
+            } catch (error) {
+                console.error('Error fetching like status:', error);
+            }
+        };
+
+        if (userId) {
+            fetchLikeStatus();  // Lấy trạng thái liked khi component được render lại
         }
-      } catch (error) {
-        console.error('Error fetching like status:', error);
-      }
+    }, [userId, recapId]);
+
+    // Xử lý khi người dùng nhấn vào nút like
+    const handleLikeClick = async () => {
+        if (!userId) {
+            setErrorMessage('User not authenticated');
+            return;
+        }
+
+        try {
+            let response;
+
+            if (liked) {
+                // Nếu đã like, gọi API để bỏ like
+                response = await api.delete(`/api/likes/remove/${recapId}`);
+                if (response.status === 200) {
+                    setLiked(false);  // Cập nhật trạng thái liked thành false
+                    AsyncStorage.setItem(`liked_${userId}_${recapId}`, JSON.stringify(false)); // Lưu trạng thái bỏ like vào AsyncStorage
+                    setLikeCount(likeCount - 1);  // Giảm số lượng like đi
+                }
+            } else {
+                // Nếu chưa like, gọi API để thêm like
+                response = await api.post(`/api/likes/createlike/${recapId}`, { recapId, userId });
+                if (response.status === 200) {
+                    setLiked(true);  // Cập nhật trạng thái liked thành true
+                    AsyncStorage.setItem(`liked_${userId}_${recapId}`, JSON.stringify(true)); // Lưu trạng thái like vào AsyncStorage
+                    setLikeCount(likeCount + 1);  // Tăng số lượng like lên
+                }
+            }
+        } catch (error) {
+            console.error('Error handling like action:', error);
+        }
     };
 
-    if (userId) {
-      fetchLikeStatus();  // Lấy trạng thái liked khi component được render lại
-    }
-  }, [userId, recapId]);
-
-  // Xử lý khi người dùng nhấn vào nút like
-  const handleLikeClick = async () => {
-    if (!userId) {
-      setErrorMessage('User not authenticated');
-      return;
-    }
-
-    try {
-      let response;
-
-      if (liked) {
-        // Nếu đã like, gọi API để bỏ like
-        response = await api.delete(`/api/likes/remove/${recapId}`);
-        if (response.status === 200) {
-          setLiked(false);  // Cập nhật trạng thái liked thành false
-          AsyncStorage.setItem(`liked_${userId}_${recapId}`, JSON.stringify(false)); // Lưu trạng thái bỏ like vào AsyncStorage
-          setLikeCount(likeCount - 1);  // Giảm số lượng like đi
-        }
-      } else {
-        // Nếu chưa like, gọi API để thêm like
-        response = await api.post(`/api/likes/createlike/${recapId}`, { recapId, userId });
-        if (response.status === 200) {
-          setLiked(true);  // Cập nhật trạng thái liked thành true
-          AsyncStorage.setItem(`liked_${userId}_${recapId}`, JSON.stringify(true)); // Lưu trạng thái like vào AsyncStorage
-          setLikeCount(likeCount + 1);  // Tăng số lượng like lên
-        }
-      }
-    } catch (error) {
-      console.error('Error handling like action:', error);
-    }
-  };
-    
-      useEffect(() => {
+    useEffect(() => {
         if (userId) {
-          const fetchLikeCount = async () => {
-            try {
-              const response = await api.get(`/api/likes/count/${recapId}`);  // Replace with your custom API
-              if (response.status === 200) {
-                setLikeCount(response.data.data);
-              }
-            } catch (error) {
-              console.error('Error fetching like count:', error);
-            }
-          };
-          fetchLikeCount();
+            const fetchLikeCount = async () => {
+                try {
+                    const response = await api.get(`/api/likes/count/${recapId}`);  // Replace with your custom API
+                    if (response.status === 200) {
+                        setLikeCount(response.data.data);
+                    }
+                } catch (error) {
+                    console.error('Error fetching like count:', error);
+                }
+            };
+            fetchLikeCount();
         }
-      }, [recapId, userId]);
+    }, [recapId, userId]);
 
 
     const fetchRecapDetail = async () => {
@@ -323,7 +306,11 @@ useEffect(() => {
     }
 
     if (!recapDetail) {
-        return <Text>Đang tải...</Text>;
+        return (
+            <View style={styles.loader}>
+                <ActivityIndicator size="large" color="#0000ff" />
+            </View>
+        );
     }
 
     const renderTranscript = () => {
@@ -367,15 +354,7 @@ useEffect(() => {
             {/* <Text style={styles.views}>Views: {recapDetail.viewsCount}</Text> */}
 
             <View style={styles.bookInfo}>
-            <Text
-                    style={[
-                        styles.bookTitle,
-                        { fontSize: textSize },
-                    ]}
-                >
-                    {recapDetail.book.title}
-                </Text>
-
+                <Text style={styles.bookTitle}>{book.title}</Text>
                 <Image source={{ uri: book.coverImage }} style={styles.bookImage} />
                 <Text style={styles.views}>{recapDetail.viewsCount} Views</Text>
                 <View style={styles.likeContainer}>
@@ -390,54 +369,55 @@ useEffect(() => {
 
                 </View>
             </View>
-              
+
+            <View style={styles.audioPlayerContainer}>
+                {/* Các nút điều khiển */}
+                <View style={styles.controlsRow}>
+                    {/* Nút Quay lại 15s */}
+                    <CircularButtonWithArrow
+                        direction="backward"
+                        onPress={async () => {
+                            if (sound) {
+                                const newPosition = Math.max(currentPosition - 15000, 0);
+                                await sound.setPositionAsync(newPosition);
+                                setCurrentPosition(newPosition);
+                            }
+                        }}
+                    />
+                    {/* Nút Play/Pause */}
+                    <TouchableOpacity onPress={togglePlayPause} style={styles.playPauseButton}>
+                        <Text style={styles.buttonIcon}>{isPlaying ? '⏸' : '▶️'}</Text>
+                    </TouchableOpacity>
+
+                    {/* Nút Tua tới 15s */}
+                    <CircularButtonWithArrow
+                        direction="forward"
+                        onPress={async () => {
+                            if (sound) {
+                                const newPosition = Math.min(currentPosition + 15000, duration);
+                                await sound.setPositionAsync(newPosition);
+                                setCurrentPosition(newPosition);
+                            }
+                        }}
+                    />
+                </View>
+                {/* Thanh tiến trình */}
+                <Slider
+                    style={styles.progressBar}
+                    minimumValue={0}
+                    maximumValue={duration}
+                    value={currentPosition}
+                    onSlidingComplete={handleSeek}
+                    minimumTrackTintColor="#FFD700"
+                    maximumTrackTintColor="#D3D3D3"
+                    thumbTintColor="#FFD700"
+                />
+            </View>
+
             <View style={styles.versionInfo}>
                 {renderTranscript()}
             </View>
 
-            <View style={styles.audioPlayerContainer}>
-                    {/* Các nút điều khiển */}
-                    <View style={styles.controlsRow}>
-                        {/* Nút Quay lại 15s */}
-                        <CircularButtonWithArrow
-                                    direction="backward"
-                                    onPress={async () => {
-                                        if (sound) {
-                                            const newPosition = Math.max(currentPosition - 15000, 0);
-                                            await sound.setPositionAsync(newPosition);
-                                            setCurrentPosition(newPosition);
-                                        }
-                                    }}
-                                />
-                        {/* Nút Play/Pause */}
-                        <TouchableOpacity onPress={togglePlayPause} style={styles.playPauseButton}>
-                            <Text style={styles.buttonIcon}>{isPlaying ? '⏸' : '▶️'}</Text>
-                        </TouchableOpacity>
-
-                        {/* Nút Tua tới 15s */}
-                        <CircularButtonWithArrow
-                                    direction="forward"
-                                    onPress={async () => {
-                                        if (sound) {
-                                            const newPosition = Math.min(currentPosition + 15000, duration);
-                                            await sound.setPositionAsync(newPosition);
-                                            setCurrentPosition(newPosition);
-                                        }
-                                    }}
-                                />
-                    </View>
-                    {/* Thanh tiến trình */}
-                    <Slider
-                        style={styles.progressBar}
-                        minimumValue={0}
-                        maximumValue={duration}
-                        value={currentPosition}
-                        onSlidingComplete={handleSeek}
-                        minimumTrackTintColor="#FFD700"
-                        maximumTrackTintColor="#D3D3D3"
-                        thumbTintColor="#FFD700"
-                    />
-                </View>
             {/* Create Playlist Modal */}
             <CreatePlaylistModal
                 isOpen={isModalOpen}
@@ -553,9 +533,9 @@ const styles = StyleSheet.create({
     bookInfo: {
         marginVertical: 20,
         alignItems: 'center',
-        
+        backgroundColor: 'white',
         borderRadius: 8,
-        padding: 16,
+        // padding: 16,
         shadowColor: '#000',
         shadowOpacity: 0.1,
         shadowRadius: 8,
@@ -576,8 +556,8 @@ const styles = StyleSheet.create({
     },
     versionInfo: {
         marginVertical: 20,
-        marginBottom: -18,
-        marginTop: -50,
+        // marginBottom: -18,
+        // marginTop: -50,
     },
     versionList: {
         marginVertical: 20,
@@ -658,86 +638,6 @@ const styles = StyleSheet.create({
         marginBottom: 15
     },
 
-    modalOverlay: {
-        flex: 1,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    settingsMenu: {
-        width: screenWidth * 0.9,
-        backgroundColor: '#fff',
-        padding: 16,
-        borderRadius: 8,
-        elevation: 5,
-    },
-    menuTitle: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        marginBottom: 16,
-    },
-    subMenuTitle: {
-        fontSize: 16,
-        fontWeight: '600',
-        marginTop: 16,
-    },
-    sliderContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginTop: 8,
-    },
-    slider: {
-        flex: 1,
-        marginHorizontal: 8,
-    },
-    sliderLabel: {
-        fontSize: 14,
-    },
-    // fontOptions: {
-    //     flexDirection: 'row',
-    //     justifyContent: 'space-around',
-    //     marginTop: 8,
-    // },
-    // fontOption: {
-    //     padding: 8,
-    //     borderWidth: 1,
-    //     borderColor: '#ddd',
-    //     borderRadius: 4,
-    // },
-    // selectedFontOption: {
-    //     borderColor: 'orange',
-    // },
-    // fontPreview: {
-    //     fontSize: 14,
-    //     // fontFamily: selectedFont,
-    // },
-    themeOptions: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        marginTop: 8,
-    },
-    themeCircle: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        borderWidth: 2,
-        borderColor: '#ddd',
-    },
-    selectedTheme: {
-        borderColor: 'orange',
-    },
-    closeButton: {
-        marginTop: 16,
-        padding: 12,
-        backgroundColor: 'orange',
-        borderRadius: 4,
-        alignItems: 'center',
-    },
-    closeButtonText: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
 });
 
 export default RecapItemDetail;
