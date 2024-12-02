@@ -28,7 +28,7 @@ const PlaylistBook = () => {
         }
       } catch (error) {
         console.log(error);
-        setError('Failed to fetch playlists.');
+        // setError('Failed to fetch playlists.');
       } finally {
         setIsLoading(false);
       }
