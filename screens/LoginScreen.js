@@ -6,7 +6,7 @@ import Login from "../components/Auth/Login";
 import Register from "../components/Auth/Register";
 
 const loginRoute = () => <Login />
-const registerRoute = () => <Register />
+// const registerRoute = () => <Register />
 
 const LoginScreen = () => {
 
@@ -14,12 +14,12 @@ const LoginScreen = () => {
     const [index, setIndex] = useState(0);
     const [routes] = useState([
         {key: 'login', title: 'Đăng nhập'},
-        {key: 'register', title: 'Đăng ký'}
+        // {key: 'register', title: 'Đăng ký'}
     ])
 
     const renderScene = SceneMap({
         login: loginRoute,
-        register: registerRoute
+        // register: registerRoute
     })
 
     const renderTabBar = props => (
