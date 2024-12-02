@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Platform, Dimensions   } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Platform, Dimensions, Animated, Modal} from 'react-native';
 import api from '../../utils/AxiosInterceptors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Icon from 'react-native-vector-icons/FontAwesome';
@@ -60,7 +60,24 @@ const RecapItemDetail = ({ route }) => {
     const [playbackStatus, setPlaybackStatus] = useState(null);
     const [currentPosition, setCurrentPosition] = useState(0);
     const [duration, setDuration] = useState(0);
-    
+    const [textSize, setTextSize] = useState(16); // Default text size
+    //const [selectedFont, setSelectedFont] = useState('Helvetica'); // Default font
+    const [theme, setTheme] = useState('white'); // Default theme
+    const [modalVisible, setModalVisible] = useState(false); // Toggle for popup visibility
+
+    const togglePopup = () => {
+        setModalVisible(!modalVisible); // Toggle the popup
+    };
+
+
+    const handleFontSelect = (font) => {
+        setSelectedFont(font);
+    };
+
+    const handleThemeSelect = (color) => {
+        setTheme(color);
+    };
+
     useEffect(() => {
         const fetchUserProfile = async () => {
           try {
@@ -326,15 +343,39 @@ useEffect(() => {
     const { book, currentVersion, recapVersions } = recapDetail;
 
     return (
-        <ScrollView style={styles.container}>
-            <Text style={styles.title}>{recapDetail.name}</Text>
+        <ScrollView
+        style={[
+            styles.container,
+            { backgroundColor: theme === 'white' ? '#fff' : theme },
+        ]}
+    >
+
+<View style={styles.header}>
+                <Text style={[styles.title, { fontSize: textSize }]}>
+                    {recapDetail.name}
+                </Text>
+                <TouchableOpacity onPress={togglePopup}>
+                    <Icon name="cog" size={24} color="#000" />
+                </TouchableOpacity>
+            </View>
+
+
+
             {/* <Text style={styles.status}>
         Published: {recapDetail.isPublished ? 'Yes' : 'No'} | Premium: {recapDetail.isPremium ? 'Yes' : 'No'}
       </Text> */}
             {/* <Text style={styles.views}>Views: {recapDetail.viewsCount}</Text> */}
 
             <View style={styles.bookInfo}>
-                <Text style={styles.bookTitle}>{book.title}</Text>
+            <Text
+                    style={[
+                        styles.bookTitle,
+                        { fontSize: textSize },
+                    ]}
+                >
+                    {recapDetail.book.title}
+                </Text>
+
                 <Image source={{ uri: book.coverImage }} style={styles.bookImage} />
                 <Text style={styles.views}>{recapDetail.viewsCount} Views</Text>
                 <View style={styles.likeContainer}>
@@ -404,6 +445,75 @@ useEffect(() => {
                 recapId={recapId} // Use dynamic recap ID
                 userId={userId}   // Use dynamic user ID
             />
+           {/* Popup for Customize Text Display */}
+           <Modal
+                animationType="slide"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={togglePopup}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={styles.settingsMenu}>
+                        <Text style={styles.menuTitle}>Customize Text Display</Text>
+
+                        {/* Text Size Adjustment */}
+                        <Text style={styles.subMenuTitle}>Text Size</Text>
+                        <View style={styles.sliderContainer}>
+                            <Text style={styles.sliderLabel}>Aa</Text>
+                            <Slider
+                                style={styles.slider}
+                                minimumValue={12}
+                                maximumValue={24}
+                                step={1}
+                                value={textSize}
+                                onValueChange={(value) => setTextSize(value)}
+                            />
+                            <Text style={styles.sliderLabel}>Aa</Text>
+                        </View>
+
+                        {/* Font Selection */}
+                        {/* <Text style={styles.subMenuTitle}>Font Style</Text> */}
+                        {/* <View style={styles.fontOptions}>
+                            {['Helvetica', 'Domine', 'Serif'].map((font) => (
+                                <TouchableOpacity
+                                    key={font}
+                                    style={[
+                                        styles.fontOption,
+                                        selectedFont === font && styles.selectedFontOption,
+                                    ]}
+                                    onPress={() => handleFontSelect(font)}
+                                >
+                                    <Text style={[styles.fontPreview, { fontFamily: font }]}>
+                                        {font}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </View> */}
+
+                        {/* Theme Selection */}
+                        <Text style={styles.subMenuTitle}>Theme</Text>
+                        <View style={styles.themeOptions}>
+                            {[ '#E4E5E7', '#F7A8B8', '#B8E6D1', '#f3ecd8'].map((color) => (
+                                <TouchableOpacity
+                                    key={color}
+                                    style={[
+                                        styles.themeCircle,
+                                        { backgroundColor: color },
+                                        theme === color && styles.selectedTheme,
+                                    ]}
+                                    onPress={() => handleThemeSelect(color)}
+                                />
+                            ))}
+                        </View>
+
+                        {/* Close Button */}
+                        <TouchableOpacity style={styles.closeButton} onPress={togglePopup}>
+                            <Text style={styles.closeButtonText}>Close</Text>
+                        </TouchableOpacity>
+                    </View>
+                </View>
+            </Modal>
+
 
         </ScrollView>
     );
@@ -416,6 +526,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#f5f5f5',
         marginTop: -29
     },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 16,
+    },
+
     title: {
         fontSize: 28,
         fontWeight: 'bold',
@@ -436,7 +553,7 @@ const styles = StyleSheet.create({
     bookInfo: {
         marginVertical: 20,
         alignItems: 'center',
-        backgroundColor: 'white',
+        
         borderRadius: 8,
         padding: 16,
         shadowColor: '#000',
@@ -541,6 +658,86 @@ const styles = StyleSheet.create({
         marginBottom: 15
     },
 
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    settingsMenu: {
+        width: screenWidth * 0.9,
+        backgroundColor: '#fff',
+        padding: 16,
+        borderRadius: 8,
+        elevation: 5,
+    },
+    menuTitle: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginBottom: 16,
+    },
+    subMenuTitle: {
+        fontSize: 16,
+        fontWeight: '600',
+        marginTop: 16,
+    },
+    sliderContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginTop: 8,
+    },
+    slider: {
+        flex: 1,
+        marginHorizontal: 8,
+    },
+    sliderLabel: {
+        fontSize: 14,
+    },
+    // fontOptions: {
+    //     flexDirection: 'row',
+    //     justifyContent: 'space-around',
+    //     marginTop: 8,
+    // },
+    // fontOption: {
+    //     padding: 8,
+    //     borderWidth: 1,
+    //     borderColor: '#ddd',
+    //     borderRadius: 4,
+    // },
+    // selectedFontOption: {
+    //     borderColor: 'orange',
+    // },
+    // fontPreview: {
+    //     fontSize: 14,
+    //     // fontFamily: selectedFont,
+    // },
+    themeOptions: {
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        marginTop: 8,
+    },
+    themeCircle: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        borderWidth: 2,
+        borderColor: '#ddd',
+    },
+    selectedTheme: {
+        borderColor: 'orange',
+    },
+    closeButton: {
+        marginTop: 16,
+        padding: 12,
+        backgroundColor: 'orange',
+        borderRadius: 4,
+        alignItems: 'center',
+    },
+    closeButtonText: {
+        color: '#fff',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
 });
 
 export default RecapItemDetail;

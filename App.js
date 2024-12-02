@@ -8,7 +8,6 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
 import { Ionicons } from '@expo/vector-icons'
-
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -77,7 +76,6 @@ const TabNavigator = () => {
 export default function App() {
     const [loading, setLoading] = useState(true);
     const [viewOnboarding, setViewOnboarding] = useState(false);
-
     const checkOnboarding = async () => {
         try {
             const value = await AsyncStorage.getItem("@viewedOnboarding");
