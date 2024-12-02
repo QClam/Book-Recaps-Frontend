@@ -192,11 +192,11 @@ const ContractDetail = () => {
         <table className="books-table">
           <thead>
             <tr>
-              <th>Title</th>
-              <th>Original Title</th>
-              <th>Description</th>
-              <th>Publication Year</th>
-              <th>Cover Image</th>
+            <th>Tên sách</th>
+            <th>Tên gốc</th>
+            <th>Mô tả</th>
+            <th>Năm xuất bản</th>
+            <th>Ảnh bìa</th>
             </tr>
           </thead>
           <tbody>

@@ -55,10 +55,12 @@ const PublisherPayout = () => {
         fetchPayoutDetail();
     }, [id]);
 
-    const handleBookClick = (bookId) => {
-        navigate(`/book-dashboard/${bookId}`); // Navigate to the book details page with the bookId
+    const handleBookClick = (bookId, earningAmount) => {
+        navigate(`/book-payout/${bookId}`, {
+            state: { earningAmount }, // Truyền earningAmount qua state
+        });
     };
-
+    
 
     return (
         <div className="thanhtoanv1">
@@ -107,7 +109,7 @@ const PublisherPayout = () => {
                             <tbody>
                             {detailedBooks?.map((book, index) => (
                                     <tr key={index}>
-                                         <td onClick={() => handleBookClick(book.bookId)} style={{ cursor: 'pointer', color: 'blue' }}>
+                                         <td onClick={() => handleBookClick(book.bookId, book.earningAmount)} style={{ cursor: 'pointer', color: 'blue' }}>
                                         {book.title}
                                     </td>
     

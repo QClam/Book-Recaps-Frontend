@@ -180,7 +180,7 @@ const FetchPublisherData = () => {
     
                                     <td>{payout.description}</td>
                                     <td className="earnings">
-                                        {new Intl.NumberFormat('vi-VN').format(payout.totalEarnings)} <span className="currency-symbol">₫</span>
+                                        {new Intl.NumberFormat('vi-VN').format(payout.totalEarnings || 0)} <span className="currency-symbol">₫</span>
                                     </td>
 
                                     <td>{payout.status}</td>

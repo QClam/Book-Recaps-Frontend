@@ -29,6 +29,7 @@
     flex-direction: column;
     gap: -15px;
     flex: 1;
+    margin-bottom: 150px;
     //width: 100%;
   }
   /* Phần biểu đồ */
@@ -38,6 +39,10 @@
     margin-top: -140px;
   }
 
+  .currency-dong {
+    font-size: 1.5em; /* Tăng kích thước chữ cho "₫" */
+    font-weight: bold; 
+  }
   /* Đảm bảo responsive */
   @media (max-width: 768px) {
     flex-direction: column; /* Khi màn hình nhỏ, xếp theo chiều dọc */

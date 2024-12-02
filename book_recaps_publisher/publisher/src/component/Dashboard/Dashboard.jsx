@@ -11,6 +11,9 @@ const Dashboard = ( ) => {
   const [views, setViews] = useState('--');
   const accessToken = localStorage.getItem('authToken');
   const navigate = useNavigate();
+  const [incomeLastMonth, setIncomeLastMonth] = useState('--');
+const [newPostsLastMonth, setNewPostsLastMonth] = useState('--');
+const [viewsLastMonth, setViewsLastMonth] = useState('--');
 
   const handleRowClick = (bookId, totalEarnings) => {
     navigate(`/book-dashboard/${bookId}`, { state: { totalEarnings } }); // Điều hướng kèm bookId
@@ -61,12 +64,21 @@ const Dashboard = ( ) => {
         const dashboardData = await dashboardResponse.json();
 
         // Cập nhật state
+        // const data = dashboardData?.data || {};
+        // setIncome(data.lastPayoutAmount || 0);
+        // setNewPosts(data.oldRecapsCount || 0);
+        // // setViews(data.newViewCount + data.oldViewCount || 0);
+        // setViews(data.oldViewCount || 0);
+        // setBooks(data.books?.$values || []);
         const data = dashboardData?.data || {};
-        setIncome(data.lastPayoutAmount || 0);
-        setNewPosts(data.oldRecapsCount || 0);
-        // setViews(data.newViewCount + data.oldViewCount || 0);
-        setViews(data.oldViewCount || 0);
-        setBooks(data.books?.$values || []);
+      setIncome(data.totalIncomeFromViewTracking || 0); // Thu nhập tháng này
+      setNewPosts(data.newRecapsCount || 0); // Số bài viết mới tháng này
+      setViews(data.newViewCount || 0);
+         // Lấy dữ liệu tháng trước
+      setIncomeLastMonth(data.lastPayoutAmount || 0); // Thu nhập tháng trước
+      setNewPostsLastMonth(data.oldRecapsCount || 0); // Bài viết tháng trước
+      setViewsLastMonth(data.oldViewCount || 0); // Lượt xem tháng trước
+      setBooks(data.books?.$values || []);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
       }
@@ -83,25 +95,48 @@ const Dashboard = ( ) => {
   return (
     <div className="dashboard">
       <div className="performance-overview">
-        <div className="overview-card">
-          <p>Thu nhập</p>
-          <h3>{income} VND</h3>
-          <span>Tháng trước</span>
-          <i className="icon-chart"></i>
-        </div>
-        <div className="overview-card">
-          <p>Số bài viết mới</p>
-          <h3>{newPosts}</h3>
-          <span>Tháng trước</span>
-          <i className="icon-posts"></i>
-        </div>
-        <div className="overview-card">
-          <p>Lượt xem</p>
-          <h3>{views}</h3>
-          <span>Tháng trước</span>
-          <i className="icon-views"></i>
-        </div>
-      </div>
+  <div className="overview-card">
+    <h3>Thu nhập chưa quyết toán</h3>
+    <div className="overview-data">
+      <h3>{income ? `${income.toLocaleString("vi-VN")} đ` : '0 đ'}</h3>
+     
+    </div>
+    <div className="overview-data">
+    <p>Quyết toán gần nhất</p>
+     <h4>{incomeLastMonth ? `${incomeLastMonth.toLocaleString("vi-VN")} đ` : '0 đ'}</h4>
+      
+    </div>
+    <i className="icon-chart"></i>
+  </div>
+
+  <div className="overview-card">
+    <h3>Số bài viết mới</h3>
+    <div className="overview-data">
+      <h3>{newPosts} bài viết</h3>
+     
+    </div>
+    <div className="overview-data">
+    <p>Tháng trước</p>
+      <h4>{newPostsLastMonth} bài viết</h4>
+     
+    </div>
+    <i className="icon-posts"></i>
+  </div>
+
+  <div className="overview-card">
+    <h3>Lượt xem</h3>
+    <div className="overview-data">
+      <h3>{views} views</h3>
+      
+    </div>
+    <div className="overview-data">
+    <p>Tháng trước</p>
+      <h4>{viewsLastMonth} views</h4>
+     
+    </div>
+    <i className="icon-views"></i>
+  </div>
+</div>
 
       <div className="books-section">
         <div className="books-header">
@@ -132,7 +167,11 @@ const Dashboard = ( ) => {
                 <td >{book.title}</td>
                 <td>{book.publicationYear}</td>
                 <td>{book.recapCount}</td>
-                <td>{book.totalEarnings}</td>
+                <td>
+                {book.totalEarnings 
+                  ? `${book.totalEarnings.toLocaleString("vi-VN")} đ` 
+                  : '0 đ'}
+              </td>
               </tr>
             ))}
           </tbody>

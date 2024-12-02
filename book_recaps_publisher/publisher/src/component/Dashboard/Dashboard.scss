@@ -7,53 +7,80 @@
   box-sizing: border-box;
   margin-left: 350px;
   font-size: 20px;
+  
 
   .performance-overview {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 30px;
-
-    .overview-card {
-      background-color: #ffffff;
-      border-radius: 10px;
-      box-shadow: 2px 2px 5px 5px rgba(0, 0, 0, 0.1);
-      padding: 20px;
-      width: 30%;
-      text-align: center;
-      margin-left: 20px;
-
-      p {
-        color: #7f8c8d;
-        margin-bottom: 10px;
-      }
-
-      h3 {
-        color: #3498db;
-        font-size: 24px;
-        margin-bottom: 10px;
-      }
-
-      span {
-        color: #95a5a6;
-        font-size: 14px;
-      }
-
-      .icon-chart,
-      .icon-posts,
-      .icon-views {
-        font-size: 30px;
-        color: #3498db;
-        margin-top: 10px;
-      }
-    }
+    gap: 16px;
+    margin: 20px;
   }
-
+  
+  .overview-card {
+    width: 30%;
+    background: #fff;
+    border: 1px solid #000;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: left;
+    position: relative;
+  }
+  .overview-card h3{
+    font-size: 23px;
+  }
+  .overview-card p {
+    font-size: 19px;
+    font-weight: bold;
+    margin-bottom: 12px;
+  }
+  
+  .overview-data {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .overview-data p {
+    font-size: 14px;
+    color: #555;
+    margin: 0;
+  }
+  
+  .overview-data h3 {
+    font-size: 23px;
+    font-weight: bold;
+    margin: 8px 0 0;
+  }
+  .overview-data h4 {
+    font-size: 20px;
+  }
+  .overview-card i {
+    font-size: 24px;
+    position: absolute;
+    bottom: 12px;
+    right: 12px;
+    opacity: 0.8;
+  }
+  
+  .icon-chart::before {
+    content: "📊";
+  }
+  
+  .icon-posts::before {
+    content: "📄";
+  }
+  
+  .icon-views::before {
+    content: "👁";
+  }
+  
   .books-section {
     background-color: #ffffff;
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-
+    width: 70vw;
     .books-header {
       display: flex;
       justify-content: space-between;

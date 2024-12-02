@@ -1,0 +1,60 @@
+.book-detail {
+    display: flex;
+    //gap: 10px;
+    align-items: flex-start;
+    //padding: 20px;
+    flex-wrap: wrap;
+    font-family: 'Arial', sans-serif;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 50px;
+    margin-left: 400px;
+    margin-top: -20px;
+    h1 {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+  
+    .book-img {
+      width: 200px; /* Đặt chiều rộng cố định */
+      height: 300px; /* Đặt chiều cao cố định */
+      object-fit: cover; /* Đảm bảo ảnh không bị méo, nếu cần cắt bớt phần ngoài */
+      border-radius: 8px;
+      margin-bottom: 20px;
+    }
+  
+    .book-info {
+      display: flex;
+      flex-direction: column;
+      gap: -15px;
+      flex: 1;
+      margin-bottom: 150px;
+      //width: 100%;
+    }
+    /* Phần biểu đồ */
+    .chart-container {
+      flex: 1; /* Biểu đồ chiếm phần còn lại */
+      width: 100%;
+      margin-top: -140px;
+    }
+  .thunhap {
+    font-size: 1.1rem;
+  }
+    .currency-dong {
+      font-size: 1.5em; /* Tăng kích thước chữ cho "₫" */
+      font-weight: bold; 
+    }
+    /* Đảm bảo responsive */
+    @media (max-width: 768px) {
+      flex-direction: column; /* Khi màn hình nhỏ, xếp theo chiều dọc */
+      align-items: center;
+      .book-info {
+        align-items: center; /* Căn giữa phần thông tin */
+        img {
+          margin-bottom: 15px; /* Khoảng cách giữa ảnh và thông tin */
+        }
+      }
+    }
+  }
+  

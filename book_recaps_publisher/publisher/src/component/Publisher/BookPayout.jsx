@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useParams, useLocation } from "react-router-dom";
-import "../Dashboard/DashboardDetail.scss";
+import "../Publisher/BookPayout.scss";
 import dayjs from "dayjs";
 import Chart from "chart.js/auto";
 import { Box, Typography, Paper, Card, CardContent } from "@mui/material";
@@ -8,7 +8,7 @@ import { DateRangePicker } from "rsuite";
 import axios from "axios";
 
 
-const DashboardDetail = () => {
+const BookPayout = () => {
   const { bookId } = useParams(); // Lấy bookId từ URL
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -28,7 +28,7 @@ const DashboardDetail = () => {
  
   const location = useLocation();
   const { totalEarnings } = location.state || {}; 
-
+  const earningAmount = location.state?.earningAmount;
 
   // Fetch thông tin sách
   const fetchBookDetail = async () => {
@@ -173,27 +173,20 @@ const DashboardDetail = () => {
       <p><strong>ISBN-10:</strong> {book.isbN_10 || "Not available"}</p>
       <p><strong>Giới hạn tuổi:</strong> {book.ageLimit}</p>
       <div>    
-      <p>
-  <strong>Tổng thu nhập:</strong> {totalEarnings ? 
-    `${new Intl.NumberFormat('vi-VN').format(totalEarnings)} đ` : 
-    'No earnings available'}
-</p>
+      <p className="thunhap">
+    <strong>Tổng thu nhập: </strong> 
+    {earningAmount ? (
+        <>
+        {`${new Intl.NumberFormat('vi-VN').format(earningAmount)}`} 
+        <span className="currency-dong">₫</span>
+        </>
+    ) : (
+        'Không có dữ liệu'
+    )}
+    </p>
+
 
     </div>
-      {/* <div className="recaps">
-        <p><strong>Số lượng recap:</strong> {book.recaps.$values.length}</p>
-        <p><strong>Tên recap:</strong> {book.recaps.$values.map((recap) => recap.name).join(', ')}</p>
-      </div> */}
-       {/* Hiển thị tổng thu nhập */}
-       {/* <div className="total-earnings">
-          <p><strong>Tổng thu nhập:</strong> {bookData.totalEarnings.toLocaleString("vi-VN")} VND</p>
-        </div> */}
-
-      {/* Hiển thị số lượng và tên các recap */}
-      {/* <div className="recaps">
-        <p><strong>Số lượng recap:</strong> {book.recaps.$values.length}</p>
-        <p><strong>Tên recap:</strong> {book.recaps.$values.map((recap) => recap.name).join(', ')}</p>
-      </div> */}
      
       </div>
       <div className="chart-container">
@@ -201,14 +194,7 @@ const DashboardDetail = () => {
         <Typography variant="h4" gutterBottom>
           Doanh thu của cuốn sách: {bookData.title}
         </Typography>
-        
-          {/* Hiển thị số tiền ngay trên biểu đồ */}
-      {/* <Box sx={{ position: "relative", textAlign: "center", marginBottom: 2 }}>
-      <Typography variant="h6" color="secondary" sx={{ marginTop: 1 }}>
-        <strong>Tổng thu nhập:</strong> {bookData.totalEarnings.toLocaleString("vi-VN")} VND
-      </Typography>
-     </Box> */}
-
+       
       <Box>
   <Typography textAlign="center" sx={{ marginBottom: 2 }}>
     Tổng thu nhập từ {dayjs(dateRange[0]).format("DD-MM-YYYY")} đến {dayjs(dateRange[1]).format("DD-MM-YYYY")}
@@ -233,4 +219,4 @@ const DashboardDetail = () => {
   );
 };
 
-export default DashboardDetail;
+export default BookPayout;

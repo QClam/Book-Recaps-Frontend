@@ -30,6 +30,7 @@ import BookDetail from '../../../book_recaps_audience/Book-Recaps-React/src/Comp
 import DashboardDetail from './component/Dashboard/DashboardDetail';
 import BookListDetail from './component/ListBook/BookList/BookListDetail';
 import 'rsuite/dist/rsuite.min.css';
+import BookPayout from './component/Publisher/BookPayout';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -80,6 +81,7 @@ const App = () => {
             <Route path="/publisher-payout-detail/:id" element={<PublisherPayout />} /> 
             {/* <Route path="/book-detail-tt/:id" element={<BookDetailbook />} /> */}
             <Route path="/book-dashboard/:bookId" element={<DashboardDetail />} />
+            <Route path="/book-payout/:bookId" element={<BookPayout />} />
             
             
             </Route>
