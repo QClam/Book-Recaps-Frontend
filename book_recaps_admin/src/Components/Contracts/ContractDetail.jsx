@@ -6,10 +6,10 @@ import {
     Button,
     Typography,
     Card,
-    CardContent, 
-    Grid,   
+    CardContent,
+    Grid,
     Select,
-    MenuItem, 
+    MenuItem,
     FormControlLabel,
     Checkbox,
 } from '@mui/material';
@@ -28,6 +28,7 @@ function ContractDetail() {
 
     const [contract, setContract] = useState([]);
     const [contractAttachments, setContractAttachments] = useState([]);
+    const [contractBooks, setContractBooks] = useState([]);
 
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
@@ -54,7 +55,10 @@ function ContractDetail() {
             if (result) {
                 setContract(result.contract);
                 setContractAttachments(result.contractAttachments);
+                setContractBooks(result.contractBooks);
                 console.log(result.contract);
+                console.log(result.contractAttachments);
+                console.log(result.contractBooks);
                 setLoading(false);
             }
         } catch (error) {
@@ -67,7 +71,7 @@ function ContractDetail() {
             const response = await api.get('/api/publisher/getallpublishers');
             const publishers = response.data.$values;
             setPublishsers(publishers);
-            console.log("Publishers: ", publishers);
+            // console.log("Publishers: ", publishers);
 
         } catch (error) {
             console.error("Error Fetching Publishers", error);
@@ -152,6 +156,20 @@ function ContractDetail() {
     }
 
     const handleSendContract = async () => {
+        await getContractDetail(); // Đảm bảo state cập nhật
+        console.log("Hợp đồng chuẩn bị gửi: ", contractAttachments);
+        console.log("Sách chuẩn bị gửi: ", contractBooks);
+
+        if (contractAttachments.length === 0 || contractBooks.length === 0) {
+            Swal.fire({
+                title: 'Thiếu thông tin',
+                text: 'Vui lòng thêm ít nhất một sách và một tệp đính kèm trước khi gửi hoặc kích hoạt.',
+                icon: 'warning',
+                confirmButtonText: 'OK',
+            });
+            return;
+        }
+
         const contractFormData = {
             status: isCheckbox ? 3 : 1,
         };
@@ -175,7 +193,7 @@ function ContractDetail() {
                 );
                 setContractForm(response.data);
                 console.log("Contract Form: ", response.data);
-                getContractDetail();
+                await getContractDetail();
                 Swal.fire('Thành công',
                     isCheckbox ? 'Hợp đồng đã được kích hoạt!' : 'Bản hợp đồng đã được gửi!',
                     'success');
@@ -315,7 +333,7 @@ function ContractDetail() {
                                             label="Kích hoạt ngay"
                                         />
                                         <Button
-                                            variant= "contained"
+                                            variant="contained"
                                             color="secondary"
                                             onClick={handleSendContract}
                                             disabled={!isCheckbox || disableUpdate}
@@ -358,9 +376,17 @@ function ContractDetail() {
                     </Card>
                 </Box>
 
-                <AddContractAttachment contractId={contractId} disableUpdate={disableUpdate} />
+                <AddContractAttachment
+                    contractId={contractId}
+                    disableUpdate={disableUpdate}
+                    onUpdateAttachments={setContractAttachments} // Truyền callback
+                />
 
-                <AddContractBooks contractId={contractId} disableUpdate={disableUpdate} />
+                <AddContractBooks
+                    contractId={contractId}
+                    disableUpdate={disableUpdate}
+                    onUpdateContractBooks={setContractBooks}
+                />
 
             </Box>
         </div>

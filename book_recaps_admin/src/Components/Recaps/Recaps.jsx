@@ -174,7 +174,7 @@ function Recaps() {
                             <TableRow key={item.id}>
                                 <TableCell>{item.name}</TableCell>
                                 <TableCell>{item.book?.title}</TableCell>
-                                <TableCell>{item.contributor}</TableCell>
+                                <TableCell>{item.contributor?.fullName}</TableCell>
                                 <TableCell>{dayjs(item.createdAt).format("DD-MM-YYYY")}</TableCell>
                                 <TableCell>
                                     {item.currentVersion?.status === 1 ? (

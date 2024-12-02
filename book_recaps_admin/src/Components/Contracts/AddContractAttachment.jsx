@@ -4,7 +4,7 @@ import api from '../Auth/AxiosInterceptors';
 import { Article } from '@mui/icons-material';
 import { fetchContractDetail } from './ContractServices';
 
-function AddContractAttachment({ contractId }) {
+function AddContractAttachment({ contractId, disableUpdate, onUpdateAttachments  }) {
 
     const [open, setOpen] = useState(false);
 
@@ -21,7 +21,7 @@ function AddContractAttachment({ contractId }) {
         file: null,
     });
 
-    const disableUpdate = contract.status === 1 || contract.status === 2 || contract.status === 3;
+    // const disableUpdate = contract.status === 1 || contract.status === 2 || contract.status === 3;
 
     const getContractDetail = async () => {
         try {
@@ -30,7 +30,7 @@ function AddContractAttachment({ contractId }) {
                 setContract(result.contract);
                 setContractAttachments(result.contractAttachments);
                 console.log(result.contract);
-                console.log("Hợp đồng đính kèm: ", result.contractAttachments);
+                // console.log("Hợp đồng đính kèm: ", result.contractAttachments);
             }
         } catch (error) {
             console.error("Error Fetching Contract Details", error);
@@ -67,11 +67,14 @@ function AddContractAttachment({ contractId }) {
                     "Content-Type": "multipart/form-data",
                 },
             });
-            const contractAttachment = response.data.data;
-            setContractAttachment(contractAttachment);
+            const newAttachment  = response.data.data;
+
+           // Cập nhật danh sách tài liệu đính kèm trong ContractDetail qua callback
+           onUpdateAttachments((prevAttachments) => [...prevAttachments, newAttachment]);
+
             console.log("Hàng đính kèm: ", contractAttachment);
             handleClose();
-            getContractDetail();
+            await getContractDetail(); // Gọi lại API để cập nhật contractBooks
         } catch (error) {
             console.error("Error Posting", error);
         }

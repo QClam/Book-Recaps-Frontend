@@ -18,6 +18,7 @@ function BookDetail() {
         title: '',
         dailyStats: [],
         lastPayout: { fromDate: '', toDate: '', amount: 0 },
+        unpaidEarning:  0,
     });
 
     const getBookData = async (fromDate, toDate) => {
@@ -35,6 +36,7 @@ function BookDetail() {
                 title: bookDetails.title || "Không có tiêu đề",
                 dailyStats,
                 lastPayout: bookDetails.lastPayout || { fromDate: '', toDate: '', amount: 0 },
+                unpaidEarning: bookDetails.unpaidEarning
             });
 
             updateChart(dailyStats);
@@ -131,15 +133,15 @@ function BookDetail() {
                                 borderRadius: "8px",
                             }}
                         >
-                            <Typography variant="subtitle1" color="textSecondary">
-                                Thu nhập gần nhất
+                            <Typography variant="h5" color="textSecondary">
+                                Thu nhập chưa quyết toán
                             </Typography>
                             <Typography variant="caption" display="block" color="textSecondary" gutterBottom>
-                                ({bookData.lastPayout?.fromDate ? dayjs(bookData.lastPayout.fromDate).format('DD-MM-YYYY') : 'N/A'} -
-                                {bookData.lastPayout?.toDate ? dayjs(bookData.lastPayout.toDate).format('DD-MM-YYYY') : 'N/A'})
+                                ({bookData.lastPayout?.toDate ? dayjs(bookData.lastPayout.toDate).format('DD-MM-YYYY') : 'N/A'} -
+                                {today})
                             </Typography>
                             <Typography variant="h6">
-                                {(bookData.lastPayout?.amount ?? 0).toLocaleString('vi-VN')} VND
+                                {(bookData.unpaidEarning ?? 0).toLocaleString('vi-VN')} VND
                             </Typography>
                         </Paper>
                     </Grid>
@@ -151,7 +153,7 @@ function BookDetail() {
                                 borderRadius: "8px",
                             }}
                         >
-                            <Typography variant="subtitle1" color="textSecondary">
+                            <Typography variant="h5" color="textSecondary">
                                 Quyết toán gần nhất
                             </Typography>
                             <Typography variant="caption" display="block" color="textSecondary" gutterBottom>
@@ -169,7 +171,7 @@ function BookDetail() {
                         {/* Lượt xem */}
                         <Grid item xs={4}>
                             <Paper elevation={3} style={{ padding: "16px", borderRadius: "8px" }}>
-                                <Typography variant="subtitle1" color="textSecondary" textAlign="center">
+                                <Typography variant="h5" color="textSecondary" textAlign="center">
                                     Lượt xem
                                 </Typography>
                                 <Typography variant="caption" display="block" color="textSecondary" textAlign="center">
@@ -190,7 +192,7 @@ function BookDetail() {
                         {/* Thời lượng xem */}
                         <Grid item xs={4}>
                             <Paper elevation={3} style={{ padding: "16px", borderRadius: "8px" }}>
-                                <Typography variant="subtitle1" color="textSecondary" textAlign="center">
+                                <Typography variant="h5" color="textSecondary" textAlign="center">
                                     Thời lượng xem
                                 </Typography>
                                 <Typography variant="caption" display="block" color="textSecondary" textAlign="center">
@@ -211,7 +213,7 @@ function BookDetail() {
                         {/* Thu nhập trong khoảng */}
                         <Grid item xs={4}>
                             <Paper elevation={3} style={{ padding: "16px", borderRadius: "8px" }}>
-                                <Typography variant="subtitle1" color="textSecondary" textAlign="center">
+                                <Typography variant="h5" color="textSecondary" textAlign="center">
                                     Thu nhập trong khoảng
                                 </Typography>
                                 <Typography variant="caption" display="block" color="textSecondary" textAlign="center">

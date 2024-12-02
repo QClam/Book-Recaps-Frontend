@@ -3,7 +3,7 @@ import { fetchContractDetail } from './ContractServices';
 import { Box, Button, Card, CardContent, Checkbox, Grid, Modal, TextField, Typography } from '@mui/material';
 import api from '../Auth/AxiosInterceptors';
 
-function AddContractBooks({ contractId }) {
+function AddContractBooks({ contractId, disableUpdate, onUpdateContractBooks }) {
 
     const [open, setOpen] = useState(false);
 
@@ -20,7 +20,7 @@ function AddContractBooks({ contractId }) {
     const [selectedBookIds, setSelectedBookIds] = useState([]);
     const [searchBook, setSearchBook] = useState("");
 
-    const disableUpdate = contract.status === 1 || contract.status === 2 || contract.status === 3;
+    // const disableUpdate = contract.status === 1 || contract.status === 2 || contract.status === 3;
 
     const getContractDetail = async () => {
         try {
@@ -51,9 +51,14 @@ function AddContractBooks({ contractId }) {
 
     const handleAddBook = async () => {
         try {
-            const response = await api.put(`/api/Contract/addbooktocontract/${contractId}`, { bookIds: selectedBookIds });           
-            setContractBooks([...contractBooks, ...selectedBookIds]);
-            getContractDetail();
+            const response = await api.put(`/api/Contract/addbooktocontract/${contractId}`, { bookIds: selectedBookIds });  
+            const updatedBooks = response.data.data;
+
+            onUpdateContractBooks((preBooks) => [...preBooks, updatedBooks]);
+
+            console.log("Sách đính kèm: ", updatedBooks);
+            
+            await getContractDetail(); // Gọi lại API để cập nhật contractBooks
             handleClose();
         } catch (error) {
             console.error("Error Adding", error);

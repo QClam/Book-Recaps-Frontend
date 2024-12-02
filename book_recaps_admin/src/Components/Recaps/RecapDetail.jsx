@@ -19,6 +19,7 @@ function RecapDetail() {
         recapName: '',
         dailyStats: [],
         lastPayout: { fromDate: '', toDate: '', amount: 0 },
+        unpaidEarning: 0
     });
 
     const handleDateChange = async (range) => {
@@ -62,7 +63,10 @@ function RecapDetail() {
                 recapName: recapDetails.recapName || "Không có tiêu đề",
                 dailyStats,
                 lastPayout: recapDetails.lastPayout || { fromDate: '', toDate: '', amount: 0 },
+                unpaidEarning: recapDetails.unpaidEarning
             })
+            console.log("DashBoard: ",recapDetails);
+            
 
             updateChart(dailyStats);
         } catch (error) {
@@ -133,14 +137,14 @@ function RecapDetail() {
                             }}
                         >
                             <Typography variant="h5" color="textSecondary">
-                                Thu nhập gần nhất
+                                Thu nhập chưa quyết toán
                             </Typography>
                             <Typography variant="caption" display="block" color="textSecondary" gutterBottom>
-                                ({recapData.lastPayout?.fromDate ? dayjs(recapData.lastPayout.fromDate).format('DD-MM-YYYY') : 'N/A'} -
-                                {recapData.lastPayout?.toDate ? dayjs(recapData.lastPayout.toDate).format('DD-MM-YYYY') : 'N/A'})
+                                ({recapData.lastPayout?.toDate ? dayjs(recapData.lastPayout.toDate).format('DD-MM-YYYY') : 'N/A'} -
+                                {today})
                             </Typography>
                             <Typography variant="h6">
-                                {(recapData.lastPayout?.amount ?? 0).toLocaleString('vi-VN')} VND
+                                {(recapData.unpaidEarning ?? 0).toLocaleString('vi-VN')} VND
                             </Typography>
                         </Paper>
                     </Grid>
@@ -181,7 +185,7 @@ function RecapDetail() {
                                 <Grid container direction="column" spacing={1}>
                                     <Grid item>
                                         <Typography variant="h6" textAlign="center">
-                                            {totalViews} Giây
+                                            {totalViews}
                                         </Typography>
                                     </Grid>
                                 </Grid>
@@ -202,7 +206,7 @@ function RecapDetail() {
                                 <Grid container direction="column" spacing={1}>
                                     <Grid item>
                                         <Typography variant="h6" textAlign="center">
-                                            {totalTime} Phút
+                                            {totalTime} Giây
                                         </Typography>
                                     </Grid>
                                 </Grid>

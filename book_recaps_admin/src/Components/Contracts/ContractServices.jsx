@@ -37,9 +37,9 @@ export const fetchContractDetail = async (contractId) => {
     try {
         const response = await api.get(`api/Contract/getcontractby/${contractId}`);
         const contract = resolveRefs(response.data.data);
-        const contractAttachments = contract.contractAttachments.$values;
+        const contractAttachments = contract.contractAttachments?.$values;
         const contractBooks = contract.books?.$values;
-        console.log("Contract Books: ", contractBooks);
+        // console.log("Contract Books: ", contractBooks);
         
         return { contract, contractAttachments, contractBooks };
     } catch (error) {
