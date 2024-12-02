@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { InfinitySpin } from "react-loader-spinner";
 import { useLocation, useNavigate } from "react-router-dom";
 import Swal from 'sweetalert2';
+import { routes } from "../../routes";
 
 function ConfirmEmail() {
   const location = useLocation();
@@ -32,7 +33,7 @@ function ConfirmEmail() {
 
   //       try {
   //         // Gửi yêu cầu xác nhận email tới API bằng phương thức GET
-  //         const response = await axios.get('https://160.25.80.100:7124/api/confirm-email', {
+  //         const response = await axios.get('https://bookrecaps.cloud/api/confirm-email', {
   //           params: {
   //             userId, // Truyền userId từ URL
   //             token,  // Truyền token từ URL
@@ -42,7 +43,7 @@ function ConfirmEmail() {
   //         if (response.status === 200) {
   //           setMessage('Xác nhận email thành công!');
   //           setTimeout(() => {
-  //             navigate('/login'); // Điều hướng về trang đăng nhập sau 3 giây
+  //             navigate(routes.login); // Điều hướng về trang đăng nhập sau 3 giây
   //           }, 3000);
   //         } else {
   //           setMessage('Xác nhận email thất bại. Vui lòng thử lại.');
@@ -77,7 +78,7 @@ function ConfirmEmail() {
         icon: "success",
         confirmButtonText: "OK",
       }).then(() => {
-        navigate("/login"); // Redirect after SweetAlert is confirmed
+        navigate(routes.login); // Redirect after SweetAlert is confirmed
       });
     }, 5000); // Delay of 5 seconds
   };

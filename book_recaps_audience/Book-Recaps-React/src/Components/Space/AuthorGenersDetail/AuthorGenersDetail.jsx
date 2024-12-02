@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import './AuthorGenersDetail.scss';
 import Crime from "../../../image/crime.jpg";
+import { routes } from "../../../routes";
 const AuthorGenersDetail = () => {
   const { genre } = useParams(); // Get genre from URL parameters
   const [searchTerm, setSearchTerm] = useState('');
@@ -71,7 +72,7 @@ const AuthorGenersDetail = () => {
 
   return (
     <div className="authors-detail-container">
-      <Link to="/" className="back-button">Back to Home</Link>
+      <Link to={routes.index} className="back-button">Back to Home</Link>
       <h1 className="genre-title">{genre ? genre : 'Genre'} Authors</h1>
       <div className="genre-info">
         <img 

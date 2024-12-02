@@ -12,7 +12,7 @@ const PlaylistBookList = () => {
   useEffect(() => {
     const fetchPlaylistBooks = async () => {
       try {
-        const response = await axios.get(`https://160.25.80.100:7124/api/playlists/${playlistId}`, {
+        const response = await axios.get(`https://bookrecaps.cloud/api/playlists/${playlistId}`, {
           headers: {
             Authorization: `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
@@ -35,7 +35,7 @@ const PlaylistBookList = () => {
 
     const fetchBooks = async (bookRecaps) => {
       try {
-        const response = await axios.get('https://160.25.80.100:7124/api/book/getallbooks', {
+        const response = await axios.get('https://bookrecaps.cloud/api/book/getallbooks', {
           headers: {
             Authorization: `Bearer ${accessToken}`, // Add token for book fetching
           },

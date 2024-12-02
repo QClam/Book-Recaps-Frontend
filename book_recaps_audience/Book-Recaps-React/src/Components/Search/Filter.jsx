@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch, faBell, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import Sidebar from '../SidebarNavigation/Sidebar';
-import '../Search/Filter.scss';
 import JKROW from "../../image/jkrow.jpg";
 
 const Filter = () => {

@@ -1,14 +1,29 @@
 // ReportIssueModal.js
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './ReportIssueModal.scss';
+import { axiosInstance } from "../../../../utils/axios";
+import { toast } from "react-toastify";
 
-const ReportIssueModal = ({ isOpen, onClose, onSubmit }) => {
-  const [category, setCategory] = useState('');
-  const [description, setDescription] = useState('');
+const ReportIssueModal = ({ isOpen, onClose, recapId, userId }) => {
+  const [ category, setCategory ] = useState('');
+  const [ description, setDescription ] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    onSubmit({ category, description });
+    try {
+      const response = await axiosInstance.post('/api/supportticket/create', {
+        category,
+        description,
+        status: 0,
+        recapId: recapId,
+        userId: userId
+      });
+      console.log('Report response:', response.data);
+      toast.success('Issue reported successfully!');
+    } catch (error) {
+      console.error('Error reporting issue:', error);
+      toast.error('Failed to report issue.');
+    }
     onClose();
   };
 

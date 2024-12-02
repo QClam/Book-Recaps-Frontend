@@ -21,7 +21,7 @@ const BookByList = () => {
     console.log("Recap ID:", recap.id); // Log recap ID
 
     try {
-      const response = await axios.get(`https://160.25.80.100:7124/getrecapbyId/${recap.id}`, {
+      const response = await axios.get(`https://bookrecaps.cloud/getrecapbyId/${recap.id}`, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
           'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ const BookByList = () => {
   // Handle token refresh
   const handleTokenRefresh = async () => {
     try {
-      const response = await axios.post("https://160.25.80.100:7124/api/tokens/refresh", {
+      const response = await axios.post("https://bookrecaps.cloud/api/tokens/refresh", {
         refreshToken,
       });
 

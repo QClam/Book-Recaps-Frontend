@@ -1,16 +1,14 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import { useEffect, useState } from 'react';
 import './Billing.scss';
-import { useNavigate, useLocation } from 'react-router-dom'; // Thêm useLocation
-import bookRecap from '../../../image/removeBR.png';
+import { useLocation, useNavigate } from 'react-router-dom'; // Thêm useLocation
+import { routes } from "../../../routes";
+import { axiosInstance } from "../../../utils/axios";
 
 const Billing = () => {
-  const [subscriptions, setSubscriptions] = useState([]);
-  const [error, setError] = useState(null);
+  const [ subscriptions, setSubscriptions ] = useState([]);
+  const [ error, setError ] = useState(null);
   const navigate = useNavigate();
   const location = useLocation(); // Lấy thông tin từ URL hiện tại
-  const accessToken = localStorage.getItem("authToken");
-  const refreshToken = localStorage.getItem("refreshToken");
 
   // Xử lý kết quả thanh toán từ URL
   useEffect(() => {
@@ -19,22 +17,14 @@ const Billing = () => {
     const status = params.get('status');
 
     if (code && status) {
-      navigate('/', { state: { code, status } }); // Điều hướng tới /result với trạng thái thanh toán
+      navigate('/result', { state: { code, status } }); // Điều hướng tới /result với trạng thái thanh toán
     }
-  }, [location, navigate]);
+  }, [ location, navigate ]);
 
   useEffect(() => {
     const fetchAllSubscriptionPackages = async () => {
       try {
-        const response = await axios.get(
-          'https://160.25.80.100:7124/api/subscriptionpackages/getallpackages',
-          {
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
+        const response = await axiosInstance.get('/api/subscriptionpackages/getallpackages');
 
         const subscriptionData = response.data?.data?.$values;
         if (subscriptionData && Array.isArray(subscriptionData)) {
@@ -43,47 +33,17 @@ const Billing = () => {
           setError("Không tìm thấy dữ liệu gói đăng ký.");
         }
       } catch (error) {
-        if (error.response && error.response.status === 401) {
-          await handleTokenRefresh();
-          fetchAllSubscriptionPackages(); // Retry after refreshing token
-        } else {
-          setError("Không thể lấy dữ liệu gói đăng ký.");
-          console.error("Lỗi khi lấy dữ liệu gói đăng ký:", error);
-        }
-      }
-    };
-
-    const handleTokenRefresh = async () => {
-      try {
-        const response = await axios.post("https://160.25.80.100:7124/api/tokens/refresh", {
-          refreshToken,
-        });
-
-        const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data.message.token;
-        localStorage.setItem("authToken", newAccessToken);
-        localStorage.setItem("refreshToken", newRefreshToken);
-        console.log("Token đã được làm mới thành công");
-      } catch (error) {
-        console.error("Lỗi khi làm mới token:", error);
-        setError("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
+        setError("Không thể lấy dữ liệu gói đăng ký.");
+        console.error("Lỗi khi lấy dữ liệu gói đăng ký:", error);
       }
     };
 
     fetchAllSubscriptionPackages();
-  }, [accessToken, refreshToken]);
+  }, []);
 
   const handlePayment = async (subscriptionPackageId) => {
     try {
-      const response = await axios.post(
-        `https://160.25.80.100:7124/api/transaction/create-transaction/${subscriptionPackageId}`,
-        {},
-        {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
+      const response = await axiosInstance.post(`/api/transaction/create-transaction/${subscriptionPackageId}`);
 
       if (response.data.success) {
         // Mở URL thanh toán trong một tab mới
@@ -99,23 +59,24 @@ const Billing = () => {
 
   // Hàm xử lý sự kiện nhấn vào logo
   const handleLogoClick = () => {
-    navigate('/explore'); // Điều hướng đến trang /explore
+    navigate(routes.explore);
   };
 
   return (
     <div className="billing-container">
-     <div className="logo-container">
-        <img 
-          src={bookRecap} 
-          alt="Logo" 
-          className="logobr" 
+      <div className="logo-container">
+        <img
+          src="/logo-transparent.png"
+          alt="Logo"
+          className="logobr"
           onClick={handleLogoClick} // Xử lý sự kiện nhấn vào logo
         />
       </div>
 
       <h1>Bắt đầu dùng thử ngay</h1>
       <p>
-        Nhận quyền truy cập đầy đủ vào BookRecaps. Bạn sẽ không bị tính phí cho đến khi kết thúc thời gian dùng thử miễn phí. Huỷ bất cứ lúc nào.
+        Nhận quyền truy cập đầy đủ vào BookRecaps. Bạn sẽ không bị tính phí cho đến khi kết thúc thời gian dùng thử miễn
+        phí. Huỷ bất cứ lúc nào.
       </p>
 
       <div className="billing-options">

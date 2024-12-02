@@ -8,26 +8,11 @@
   
   .transcript-sentence {
     cursor: pointer;
-    padding: -3px;
-    transition: background-color 0.3s;
+    padding: 1px;
+    transition: background-color 0.2s;
     font-size: 17px;
-   
-    
   }
-  
-  .transcript-sentence:hover {
-    background-color: #f0f0f0;
-  }
-  
-  .transcript-sentence.active {
-    background-color: #e8a966;
-  }
-  
-  
-  .transcript-sentence.user-highlighted {
-    background-color: #ffeeba; /* Màu vàng nhạt để highlight */
-  }
-  
+
   .context-menu-menu {
     position: absolute;
     background-color: #fff;

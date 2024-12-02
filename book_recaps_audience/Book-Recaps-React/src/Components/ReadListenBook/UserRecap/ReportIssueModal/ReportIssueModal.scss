@@ -9,7 +9,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1000; /* Đảm bảo modal hiển thị phía trên các phần khác */
+    z-index: 1002; /* Đảm bảo modal hiển thị phía trên các phần khác */
   }
   
   .content-container { /* Thay đổi từ modal-content */

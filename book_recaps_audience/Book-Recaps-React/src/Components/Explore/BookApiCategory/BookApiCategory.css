@@ -23,18 +23,13 @@
 }
 
 .category-icon {
-  width: 40px;
-  height: 40px;
-  margin-right: 10px;
   border-radius: 50%;
   background-color: #eaeaea;
   -o-object-fit: cover;
      object-fit: cover;
-  width: 50px;
-  height: 50px;
+  width: 30px;
+  height: 30px;
   margin-right: 15px;
-  border-radius: 50%;
-  background-color: #eaeaea;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -55,11 +50,10 @@
 }
 
 .categories-container {
-  margin-top: -90px;
-  padding: 20px;
+  /*padding: 20px;*/
 }
 .categories-container h2 {
-  font-size: 30px;
+  font-size: 20px;
   margin-bottom: 10px;
 }
 .categories-container p {

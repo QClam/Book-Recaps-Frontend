@@ -1,28 +1,25 @@
-import axios from 'axios'; 
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import "../Auth/ForgetPassword.scss";
+import { routes } from "../../routes";
+import { axiosInstance } from "../../utils/axios";
 
 function ForgetPassword() {
-  const [isActive, setIsActive] = useState(false);
+  const [ isActive, setIsActive ] = useState(false);
   const navigate = useNavigate();
-  const [registerForm, setRegisterForm] = useState({
+  const [ registerForm, setRegisterForm ] = useState({
     Email: "",
     NewPassword: "",
     ConfirmPassword: "",
   });
-  const [email, setEmail] = useState("");
-  const [error, setError] = useState(null);
+  const [ email, setEmail ] = useState("");
+  const [ error, setError ] = useState(null);
   const { executeRecaptcha } = useGoogleReCaptcha();
 
   const handleRegisterClick = () => {
     setIsActive(true);
     setRegisterForm({ ...registerForm, email });
-  };
-
-  const handleLoginClick = () => {
-    setIsActive(false);
   };
 
   const handleInputChange = (e) => {
@@ -65,7 +62,7 @@ function ForgetPassword() {
     try {
       const captchaToken = await executeRecaptcha("reset_password");
       const params = { email: email, captchaToken: captchaToken };
-      const response = await axios.post("https://160.25.80.100:7124/api/forget-password", null, { params });
+      const response = await axiosInstance.post("/api/forget-password", null, { params });
 
       const resetToken = response.data.message;
       localStorage.setItem("reset_token", resetToken);
@@ -97,16 +94,16 @@ function ForgetPassword() {
       const resetToken = localStorage.getItem("reset_token");
       const resetEmail = localStorage.getItem("reset_email");
 
-      const params = { 
-        Email: resetEmail, 
-        Token: resetToken, 
-        NewPassword: registerForm.NewPassword, 
-        ConfirmPassword: registerForm.ConfirmPassword, 
-        captchaToken: captchaToken 
+      const params = {
+        Email: resetEmail,
+        Token: resetToken,
+        NewPassword: registerForm.NewPassword,
+        ConfirmPassword: registerForm.ConfirmPassword,
+        captchaToken: captchaToken
       };
 
-      await axios.post("https://160.25.80.100:7124/api/reset-password", null, { params });
-      navigate("/login");
+      await axiosInstance.post("/api/reset-password", null, { params });
+      navigate(routes.login);
       setRegisterForm({ email: "", NewPassword: "", ConfirmPassword: "" });
       setError(null);
     } catch (error) {
@@ -117,10 +114,6 @@ function ForgetPassword() {
         setError("Đăng ký thất bại.");
       }
     }
-  };
-
-  const loginClick = () => {
-    navigate("/login");
   };
 
   return (
@@ -139,7 +132,7 @@ function ForgetPassword() {
               placeholder="Email dùng để đăng nhập"
             />
             <button type="submit" className="submit-btn">Gửi</button>
-            <a className="back-link" onClick={loginClick}>Quay trở lại đăng nhập</a>
+            <Link className="back-link" to={routes.login}>Quay trở lại đăng nhập</Link>
             {error && <p className="error-message">{error}</p>}
           </form>
         </div>
@@ -148,7 +141,7 @@ function ForgetPassword() {
         <div className="form-section reset-password">
           <form onSubmit={handleResetPassword}>
             <h1 className="form-title">Tạo mới mật khẩu</h1>
-          
+
             <span className="instruction">Nhập mật khẩu mới ở đây</span>
             <input
               required

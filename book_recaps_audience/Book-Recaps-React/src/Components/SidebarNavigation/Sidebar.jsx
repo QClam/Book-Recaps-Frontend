@@ -1,209 +1,343 @@
-import React, { useState, useEffect } from "react";  
-import { useNavigate } from "react-router-dom";
-import JKROW from "../../image/jkrow.jpg";
-import { SidebarItems } from "./SidebarItems";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { generatePath, Link, NavLink, useLocation } from "react-router-dom";
 import "../SidebarNavigation/css/Sidebar.scss";
-import bookRecap from '../../image/removeBR.png';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faBell } from '@fortawesome/free-solid-svg-icons';
-import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
+import { routes } from "../../routes";
+import Show from "../Show";
+import { useClickAway } from "react-use";
+import { useAuth } from "../../contexts/Auth";
+import { axiosInstance } from "../../utils/axios";
+import { CgClose, CgMenu } from "react-icons/cg";
+import { cn } from "../../utils/cn";
+import { TbSearch } from "react-icons/tb";
 
 function Sidebar() {
-  const navigate = useNavigate();
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filteredBooks, setFilteredBooks] = useState([]);
-  const [showLogout, setShowLogout] = useState(false); // State to manage logout option visibility
-  const [userName, setUserName] = useState(''); // State for user's name
-  const [imageUrl, setImageUrl] = useState(''); // State for user's avatar image URL
-  const [isLoggedIn, setIsLoggedIn] = useState(false); // State to manage login status
+  let location = useLocation();
+  const [ searchTerm, setSearchTerm ] = useState('');
+  const [ books, setBooks ] = useState([]);
+  const [ showProfileDropDown, setShowProfileDropDown ] = useState(false); // State to manage logout option visibility
+  const [ showSearchResultDropDown, setShowSearchResultDropDown ] = useState(false);
+  const [ showMobileMenu, setShowMobileMenu ] = useState(false);
+  const { user, isAuthenticated } = useAuth();
+  const profileDropdownEl = useRef(null);
+  const searchResultsDropdownEl = useRef(null);
 
-    // Check if user is logged in by checking if authToken exists
-    useEffect(() => {
-      const token = localStorage.getItem('authToken');
-      if (token) {
-        setIsLoggedIn(true); // Set logged in status if token exists
-      } else {
-        setIsLoggedIn(false); // Set logged out status if no token
-      }
-    }, []);
+  const userName = user?.profileData.userName || user?.profileData.fullName || '';
+  const imageUrl = user?.profileData.imageUrl?.replace("Files/Image/jpg/ad.jpg", "") || '/avatar-placeholder.png';
+  const isPremium = user?.profileData.subscriptions.$values.some((sub) => sub.status === 0);
 
-  const handleSearchChange = (e) => {
-    setSearchTerm(e.target.value);
-  };
+  useClickAway(profileDropdownEl, () => {
+    if (showProfileDropDown) setShowProfileDropDown(false);
+  });
 
-  const handleBookClick = (id) => {
-    // Navigate to the book detail page
-    navigate(`/user-recap-detail-item/${id}`);
-    setSearchTerm(''); // Clear search term
-    setFilteredBooks([]); // Clear filtered results
-  };
-
-  const handleLogout = () => {
-    // Perform logout logic here (e.g., clear tokens, redirect to login page)
-    localStorage.removeItem('authToken'); // Example: remove auth token
-    navigate('/login'); // Redirect to login page
-    console.log("Logout successful"); // Log success
-  };
-
-  const toggleLogout = () => {
-    setShowLogout(prev => !prev); // Toggle the visibility of the logout option
-  };
+  useClickAway(searchResultsDropdownEl, () => {
+    if (showSearchResultDropDown) setShowSearchResultDropDown(false);
+  });
 
   useEffect(() => {
-    const fetchUserProfile = async () => {
-      const accessToken = localStorage.getItem('authToken');
-      try {
-        const response = await fetch('https://160.25.80.100:7124/api/personal/profile', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        const data = await response.json();
-        // Update user name and image URL from the fetched data
-        setUserName(data.userName || data.fullName || ''); // Fallback to fullName if userName is not available
-        setImageUrl(data.imageUrl || JKROW); // Use the imageUrl or fallback to JKROW
-      } catch (error) {
-        console.error("Error fetching user profile:", error);
-      }
-    };
-
-    if (isLoggedIn) {
-      fetchUserProfile(); 
-    }
-  }, [isLoggedIn]);
-
+    if (showMobileMenu) setShowMobileMenu(false);
+    if (showProfileDropDown) setShowProfileDropDown(false);
+    if (showSearchResultDropDown) setShowSearchResultDropDown(false);
+  }, [ location ]);
 
   useEffect(() => {
     const fetchBooks = async () => {
-      const accessToken = localStorage.getItem('authToken');
       try {
-        const response = await fetch('https://160.25.80.100:7124/api/book/getallbooks', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        const data = await response.json();
-
-        if (searchTerm.trim()) {
-          const filtered = data.data.$values.filter((book) => {
-            const titleMatch = book.title && book.title.toLowerCase().includes(searchTerm.toLowerCase());
-            const authorMatch = book.authors.$values && book.authors.$values.some((author) =>
-              author.name && author.name.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-            return titleMatch || authorMatch;
-          });
-          setFilteredBooks(filtered);
-        } else {
-          setFilteredBooks([]);
-        }
+        const response = await axiosInstance.get('/api/book/getallbooks');
+        const data = response.data.data.$values;
+        setBooks(data || []);
       } catch (error) {
         console.error("Error fetching books:", error);
       }
     };
 
     fetchBooks();
-  }, [searchTerm]);
+  }, []);
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+    setShowSearchResultDropDown(true);
+  };
+
+  const toggleLogout = () => {
+    setShowProfileDropDown(prev => !prev); // Toggle the visibility of the logout option
+  };
+
+  const filteredBooks = useMemo(() => {
+    const searchStr = searchTerm.trim().toLowerCase();
+
+    return books.filter((book) => {
+      const titleMatch = book.title && book.title.toLowerCase().includes(searchStr);
+      const originalTitleMatch = book.originalTitle && book.originalTitle.toLowerCase().includes(searchStr);
+      const authorMatch = book.authors.$values && book.authors.$values.some((author) =>
+        author.name && author.name.toLowerCase().includes(searchStr)
+      );
+      return titleMatch || originalTitleMatch || authorMatch;
+    });
+  }, [ searchTerm ]);
 
   return (
-    <div className="Sidebar">
-      <div className="Sidebar-bar">
-        <div className="SidebarLogo">
-          <img src={bookRecap} alt="Logo" />
-        </div>
-
-        <ul className="SidebarList">
-          {SidebarItems.map((val, key) => (
-            <li
-              key={key}
-              onClick={() => navigate(val.link)}
-              className={`row ${window.location.pathname === val.link ? "active" : ""}`}
+    <nav className="relative py-2 border-b border-gray-300 z-10">
+      <div className="mx-auto max-w-screen-xl p-2 sm:px-6 lg:px-8">
+        <div className="relative flex items-stretch justify-between">
+          <div className="absolute inset-y-0 left-2 h-fit flex items-center sm:hidden">
+            {/* Mobile menu button */}
+            <button
+              type="button"
+              className="relative inline-flex items-center justify-center rounded-md p-2 text-gray-400 hover:bg-[#FF6F61]/20 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+              aria-controls="mobile-menu"
+              onClick={() => setShowMobileMenu(prev => !prev)}
             >
-              <div id="icon">{val.icon}</div>
-              <div id="title">{val.title}</div>
-            </li>
-          ))}
-        </ul>
-
-        <div className="filter-sectionme">
-          <form className="search-formme">
-            <input
-              type="text"
-              className="search-inputme"
-              placeholder="Tìm kiếm theo tác giả hoặc tiêu đề"
-              value={searchTerm}
-              onChange={handleSearchChange}
-            />
-            <button type="button" className="search-buttonme">
-              <FontAwesomeIcon icon={faSearch} />
+              <span className="sr-only">Open main menu</span>
+              <Show when={showMobileMenu} fallback={<CgMenu size={24}/>}>
+                <CgClose size={24}/>
+              </Show>
             </button>
-          </form>
-
-          {filteredBooks.length > 0 && (
-            <ul className="search-results">
-              {filteredBooks.map((book) => (
-                <li 
-                  key={book.id} 
-                  className="search-result-itemem"
-                  onClick={() => handleBookClick(book.id)}
-                >
-                  <div className="book-itemem">
-                    <img src={book.coverImage || "defaultCover.jpg"} alt="Book cover" className="book-cover" />
-                    <div className="book-info">
-                      <strong>{book.title}</strong>
-                      <p>By: {book.authors.$values.map((author) => author.name).join(', ')}</p>
-                    </div>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-
-            <div className="user-info">
-            <FontAwesomeIcon icon={faBell} className="iconHeader" />
-
-            {/* Chỉ hiển thị nút Login nếu chưa đăng nhập */}
-            {/* Thay vì dùng button, bạn dùng div hoặc span */}
-            {!isLoggedIn && ( 
-              <div onClick={() => navigate("/login")} className="login-button">
-                <FontAwesomeIcon icon={faSignInAlt} className="login-icon" /> {/* Sử dụng FontAwesome icon */}
-                <span>Login</span>
-              </div>
-            )}
-
-
-            {/* Hiển thị avatar và tên người dùng khi đã đăng nhập */}
-            {isLoggedIn && (
-              <div className="user-profile" onClick={toggleLogout}> 
-                <span className="user-name">{userName}</span> 
-                <img src={imageUrl} alt="User Avatar" className="user-avatar" />
-              </div>
-            )}
-
-            {showLogout && (
-              <div className="logout-option"> 
-                <button onClick={handleLogout}>Logout</button>
-              </div>
-            )}
           </div>
 
+          <div
+            className="h-[inherit] flex flex-1 items-center justify-center flex-col gap-4 lg:flex-row sm:items-stretch sm:justify-between">
+            <div className="flex items-center justify-center sm:items-stretch sm:justify-start">
+              <Link to={routes.index} className="flex flex-shrink-0 items-center gap-1">
+                <img className="h-10 w-auto" src="/logo-transparent.png" alt="Your Company"/>
+                <span className="sm:hidden md:inline text-[#FF6F61] font-medium text-lg">BookRecaps</span>
+              </Link>
+
+              {/* Nav Links */}
+              <div className="hidden sm:ml-7 sm:block -mt-2 -mb-[6px]">
+                <div className="flex h-full px-2">
+                  <NavLink
+                    to={routes.index}
+                    className={({ isActive }) => cn("grid place-items-center h-full mt-0.5 border-b-2 border-transparent px-3 py-2 text-sm font-medium", {
+                      "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,
+                      "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive
+                    })}>
+                    Trang chủ
+                  </NavLink>
+                  <NavLink
+                    to={routes.explore}
+                    className={({ isActive }) => cn("grid place-items-center h-full mt-0.5 border-b-2 border-transparent px-3 py-2 text-sm font-medium", {
+                      "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,
+                      "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive
+                    })}>
+                    Tìm sách
+                  </NavLink>
+
+                  {/*<NavLink*/}
+                  {/*  to={routes.books}*/}
+                  {/*  className={({ isActive }) => cn("grid place-items-center h-full mt-0.5 border-b-2 border-transparent px-3 py-2 text-sm font-medium", {*/}
+                  {/*    "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,*/}
+                  {/*    "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive*/}
+                  {/*  })}>*/}
+                  {/*  Books*/}
+                  {/*</NavLink>*/}
+                  <NavLink
+                    to={routes.categories}
+                    className={({ isActive }) => cn("grid place-items-center h-full mt-0.5 border-b-2 border-transparent px-3 py-2 text-sm font-medium", {
+                      "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,
+                      "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive
+                    })}>
+                    Thể loại
+                  </NavLink>
+                  {/*<NavLink*/}
+                  {/*  to={routes.authors}*/}
+                  {/*  className={({ isActive }) => cn("grid place-items-center h-full mt-0.5 border-b-2 border-transparent px-3 py-2 text-sm font-medium", {*/}
+                  {/*    "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,*/}
+                  {/*    "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive*/}
+                  {/*  })}>*/}
+                  {/*  Tác giả*/}
+                  {/*</NavLink>*/}
+
+                  <Show when={isAuthenticated}>
+                    <NavLink
+                      to={routes.playlist}
+                      className={({ isActive }) => cn("grid place-items-center h-full mt-0.5 border-b-2 border-transparent px-3 py-2 text-sm font-medium", {
+                        "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,
+                        "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive
+                      })}>
+                      Danh sách phát
+                    </NavLink>
+                  </Show>
+                </div>
+              </div>
+            </div>
+
+
+            <div className="filter-sectionme w-full lg:max-w-lg">
+              <div
+                className="relative flex items-center w-full rounded-xl border border-gray-300 px-1.5 py-0.5 mx-2"
+                ref={searchResultsDropdownEl}
+              >
+                <input
+                  type="search"
+                  className="search-inputme text-sm"
+                  placeholder="Tìm kiếm tác giả hoặc tiêu đề"
+                  autoComplete="off"
+                  value={searchTerm}
+                  onChange={handleSearchChange}
+                  onFocus={() => setShowSearchResultDropDown(true)}
+                />
+                <div className="search-buttonme text-gray-600">
+                  <TbSearch size={20}/>
+                </div>
+                <Show when={filteredBooks.length > 0 && showSearchResultDropDown}>
+                  <ul className="search-results">
+                    {filteredBooks.map((book) => (
+                      <li key={book.id}>
+                        <Link to={generatePath(routes.bookDetail, { id: book.id })} className="search-result-itemem">
+                          <div className="book-itemem">
+                            <img src={book.coverImage || "/empty-image.jpg"} alt="Book cover" className="book-cover"/>
+                            <div className="book-info">
+                              <strong>{book.title}</strong>
+                              <p>By: {book.authors.$values.map((author) => author.name).join(', ')}</p>
+                            </div>
+                          </div>
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                </Show>
+              </div>
+
+              <div className="relative items-center ml-2 hidden sm:flex" ref={profileDropdownEl}>
+                <Show when={isAuthenticated} fallback={
+                  <div className="flex items-center gap-4">
+                    <Link
+                      to={routes.login}
+                      state={{ from: location.pathname }}
+                      className="block w-max p-2 border border-[#FF6F61] rounded-md text-sm font-semibold text-[#FF6F61] hover:text-[#FF6F61]/80">
+                      Đăng nhập
+                    </Link>
+                    <Link
+                      to={routes.login}
+                      state={{ isRegister: true }}
+                      className="block w-max p-2 border border-[#FF6F61] rounded-md text-sm font-semibold text-white bg-[#FF6F61] hover:bg-[#FF6F61]/80">
+                      Đăng ký
+                    </Link>
+                  </div>
+                }>
+                  <div className="user-profile" onClick={toggleLogout}>
+                    <div className="text-sm">
+                      <p className="font-semibold">{userName}</p>
+                      <p className={cn("text-xs rounded-full px-2 py-0.5 w-max", {
+                        "bg-[#FF6F61] text-white": isPremium,
+                        "bg-gray-300 text-gray-700": !isPremium
+                      })}>
+                        {isPremium ? "Premium" : "Miễn phí"}
+                      </p>
+                    </div>
+                    <div className="w-10 h-10">
+                      <img src={imageUrl} alt="User Avatar" className="w-full h-full object-cover rounded-full"/>
+                    </div>
+                  </div>
+                </Show>
+
+                <Show when={showProfileDropDown}>
+                  <div className="logout-option rounded">
+                    <Link
+                      className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20"
+                      to={routes.profileSettings}>
+                      Profile settings
+                    </Link>
+                    <Link
+                      className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20"
+                      to={routes.viewHistory}>
+                      View history
+                    </Link>
+                    <Link
+                      className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20"
+                      to={routes.logout}
+                      state={{ from: location.pathname }}>
+                      Logout
+                    </Link>
+                  </div>
+                </Show>
+              </div>
+            </div>
+
+          </div>
         </div>
       </div>
-    </div>
+      <MobileMenu isOpen={showMobileMenu} setIsOpen={setShowMobileMenu}/>
+    </nav>
   );
 }
 
 export default Sidebar;
+
+const MobileMenu = ({ isOpen, setIsOpen }) => {
+  const location = useLocation();
+  const menuRef = useRef(null);
+  const { isAuthenticated } = useAuth();
+
+  useClickAway(menuRef, () => {
+    if (isOpen) setIsOpen(false);
+  });
+
+  return (
+    <div className={cn("sm:hidden", { "hidden": !isOpen })} ref={menuRef}>
+      <div className="space-y-1 px-2 pb-3 pt-2">
+        <NavLink
+          to={routes.index}
+          className={({ isActive }) => cn("text-gray-700 block rounded-md px-3 py-2 text-base font-medium",
+            isActive ? "bg-[#FF6F61]/30" : "hover:bg-[#FF6F61]/30")}
+        >
+          Trang chủ
+        </NavLink>
+        <NavLink
+          to={routes.explore}
+          className={({ isActive }) => cn("text-gray-700 block rounded-md px-3 py-2 text-base font-medium",
+            isActive ? "bg-[#FF6F61]/30" : "hover:bg-[#FF6F61]/30")}
+        >
+          Tìm sách
+        </NavLink>
+        <Show when={isAuthenticated} fallback={
+          <>
+            <Link
+              to={routes.login}
+              className="text-gray-700 block rounded-md px-3 py-2 text-base font-medium hover:bg-[#FF6F61]/30"
+              state={{ from: location.pathname }}
+            >
+              Đăng nhập
+            </Link>
+            <Link
+              to={routes.login}
+              state={{ isRegister: true }}
+              className="text-gray-700 block rounded-md px-3 py-2 text-base font-medium hover:bg-[#FF6F61]/30"
+            >
+              Đăng ký
+            </Link>
+          </>
+        }>
+          <NavLink
+            to={routes.playlist}
+            className={({ isActive }) => cn("text-gray-700 block rounded-md px-3 py-2 text-base font-medium",
+              isActive ? "bg-[#FF6F61]/30" : "hover:bg-[#FF6F61]/30")}
+          >
+            Danh sách phát
+          </NavLink>
+          <NavLink
+            to={routes.viewHistory}
+            className={({ isActive }) => cn("text-gray-700 block rounded-md px-3 py-2 text-base font-medium",
+              isActive ? "bg-[#FF6F61]/30" : "hover:bg-[#FF6F61]/30")}
+          >
+            Lịch sử xem
+          </NavLink>
+          <NavLink
+            to={routes.profileSettings}
+            className={({ isActive }) => cn("text-gray-700 block rounded-md px-3 py-2 text-base font-medium",
+              isActive ? "bg-[#FF6F61]/30" : "hover:bg-[#FF6F61]/30")}
+          >
+            Tài khoản
+          </NavLink>
+          <Link
+            to={routes.logout}
+            className="text-gray-700 block rounded-md px-3 py-2 text-base font-medium hover:bg-[#FF6F61]/30"
+            state={{ from: location.pathname }}
+          >
+            Đăng xuất
+          </Link>
+        </Show>
+      </div>
+    </div>
+  )
+}

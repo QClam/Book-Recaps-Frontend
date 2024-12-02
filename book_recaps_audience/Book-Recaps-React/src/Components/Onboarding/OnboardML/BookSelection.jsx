@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Button } from "@mui/material";
-import { axiosInstance } from "../api";
+import { axiosInstance2 } from "../../../utils/axios";
 
 const getBooks = async (categories, authors, controller) => {
   try {
-    const response = await axiosInstance.get("/ml/onboarding/books", {
+    const response = await axiosInstance2.get("/ml/onboarding/books", {
       params: {
         categories: categories.map(c => c.id).join(','),
         authors: authors.map(a => a.id).join(',')

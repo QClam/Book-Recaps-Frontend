@@ -50,7 +50,7 @@ const [transcriptUrl, setTranscriptUrl] = useState(null);
         }
   
         try {
-          const response = await axios.get('https://160.25.80.100:7124/api/personal/profile', {
+          const response = await axios.get('https://bookrecaps.cloud/api/personal/profile', {
             headers: {
               'Authorization': `Bearer ${accessToken}`,
               'Content-Type': 'application/json',
@@ -71,7 +71,7 @@ const [transcriptUrl, setTranscriptUrl] = useState(null);
       const fetchRecapDetails = async () => {
         console.log('Fetching recap details for recapId:', recapId); // Log recapId
         try {
-          const response = await axios.get(`https://160.25.80.100:7124/getrecapbyId/${recapId}`, {
+          const response = await axios.get(`https://bookrecaps.cloud/getrecapbyId/${recapId}`, {
             headers: {
               'Authorization': `Bearer ${accessToken}`,
               'Content-Type': 'application/json',
@@ -117,7 +117,7 @@ const [transcriptUrl, setTranscriptUrl] = useState(null);
       
     const fetchBookInfo = async () => {
       try {
-        const response = await axios.get(`https://160.25.80.100:7124/api/book/getbookbyid/${bookId}`, {
+        const response = await axios.get(`https://bookrecaps.cloud/api/book/getbookbyid/${bookId}`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
@@ -154,7 +154,7 @@ const [transcriptUrl, setTranscriptUrl] = useState(null);
   // Function to handle form submission to API for reporting issues
   const handleReportSubmit = async (reportData) => {
     try {
-      const response = await axios.post('https://160.25.80.100:7124/api/supportticket/create', {
+      const response = await axios.post('https://bookrecaps.cloud/api/supportticket/create', {
         category: reportData.category,
         description: reportData.description,
         status: 0,

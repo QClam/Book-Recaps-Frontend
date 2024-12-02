@@ -3,12 +3,11 @@ $secondary-color: #282828;
 $text-color: #333;
 $hover-color: #e6e6e6;
 $button-color: #0073e6;
-$border-radius: 4px;
+$border-radius: 8px;
 
 .playlist-container-container {
   padding: 20px;
-//   background-color: $primary-color;
-  margin-top: -100px;
+  //   background-color: $primary-color;
   h2 {
     font-size: 1.8rem;
     font-weight: 600;
@@ -23,9 +22,9 @@ $border-radius: 4px;
     margin-bottom: 20px;
     padding: 15px;
 
-    &:hover {
-      background-color: $hover-color;
-    }
+    //&:hover {
+    //  background-color: $hover-color;
+    //}
 
     h3 {
       font-size: 1.4rem;
@@ -50,12 +49,14 @@ $border-radius: 4px;
         align-items: center;
         background-color: #fff;
         padding: 10px;
+        border: 1px solid #e0e0e0;
         border-radius: $border-radius;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
         transition: background-color 0.3s;
 
         &:hover {
-          background-color: lighten($hover-color, 10%);
+          //background-color: lighten($hover-color, 10%);
+          background-color: $hover-color;
         }
 
         img {
@@ -69,7 +70,7 @@ $border-radius: 4px;
         .book-info {
           display: flex;
           flex-direction: column;
-          
+
           p {
             margin: 5px 0;
             font-size: 1rem;
@@ -101,46 +102,49 @@ $border-radius: 4px;
   position: relative;
   cursor: pointer;
   color: #211f1f;
-  margin-top: 40px;
+  padding: 5px;
+  margin-left: 40px;
   span {
     font-size: 20px;
   }
 }
-  .dropdown-options {
-    position: absolute;
-    top: 25px;
-    right: 0;
-     background: #eadbdb;
-    border: 1px solid #a42222;
-    //box-shadow: 0 2px 8px rgba(242, 8, 0.15);
-    z-index: 10;
 
-    button {
-      background: none;
-      border: none;
-      padding: 8px 12px;
-      cursor: pointer;
-      font-size: 14px;
-      color: red;
+.dropdown-options {
+  position: absolute;
+  top: 25px;
+  right: 0;
+  background: #eadbdb;
+  border: 1px solid #a42222;
+  //box-shadow: 0 2px 8px rgba(242, 8, 0.15);
+  z-index: 10;
+
+  button {
+    background: none;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    color: red;
+  }
+}
+
+.playlist-header {
+  display: flex; /* Sử dụng Flexbox */
+  justify-content: space-between; /* Để căn giữa khoảng cách giữa tiêu đề và dấu ba chấm */
+  align-items: center; /* Căn giữa theo chiều dọc */
+
+  h3 {
+    margin: 0; /* Để loại bỏ khoảng cách mặc định */
+    font-size: 1.4rem; /* Kích thước chữ */
+    color: $text-color; /* Màu chữ */
+  }
+
+  .options-menu {
+    cursor: pointer;
+
+    span {
+      font-size: 30px; /* Kích thước dấu ba chấm */
     }
   }
-  .playlist-header {
-    display: flex; /* Sử dụng Flexbox */
-    justify-content: space-between; /* Để căn giữa khoảng cách giữa tiêu đề và dấu ba chấm */
-    align-items: center; /* Căn giữa theo chiều dọc */
-    
-    h3 {
-      margin: 0; /* Để loại bỏ khoảng cách mặc định */
-      font-size: 1.4rem; /* Kích thước chữ */
-      color: $text-color; /* Màu chữ */
-    }
-  
-    .options-menu {
-      cursor: pointer; 
-     
-      span {
-        font-size: 30px; /* Kích thước dấu ba chấm */
-      }
-    }
-  }
+}
   

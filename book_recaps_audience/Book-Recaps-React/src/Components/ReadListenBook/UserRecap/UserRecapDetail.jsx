@@ -85,7 +85,7 @@ const UserRecapDetail = () => {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        const response = await axios.get('https://160.25.80.100:7124/api/personal/profile', {
+        const response = await axios.get('https://bookrecaps.cloud/api/personal/profile', {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
@@ -106,7 +106,7 @@ const UserRecapDetail = () => {
 
     const fetchBookInfo = async () => {
       try {
-        const response = await axios.get(`https://160.25.80.100:7124/api/book/getbookbyid/${id}`, {
+        const response = await axios.get(`https://bookrecaps.cloud/api/book/getbookbyid/${id}`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json',
@@ -139,7 +139,7 @@ const UserRecapDetail = () => {
       try {
         const detailsPromises = recaps.map(async (recap) => {
           try {
-            const recapResponse = await axios.get(`https://160.25.80.100:7124/getrecapbyId/${recap.id}`, {
+            const recapResponse = await axios.get(`https://bookrecaps.cloud/getrecapbyId/${recap.id}`, {
               headers: {
                 'Authorization': `Bearer ${accessToken}`,
                 'Content-Type': 'application/json',
@@ -197,7 +197,7 @@ const UserRecapDetail = () => {
   // Function to handle form submission to API
   const handleReportSubmit = async (reportData) => {
     try {
-      const response = await axios.post('https://160.25.80.100:7124/api/supportticket/create', {
+      const response = await axios.post('https://bookrecaps.cloud/api/supportticket/create', {
         category: reportData.category,
         description: reportData.description,
         status: 0,
@@ -234,7 +234,7 @@ const UserRecapDetail = () => {
       try {
         console.log("recapId:", recapId); 
         const response = await axios.get(
-          `https://160.25.80.100:7124/api/likes/count/${recapId}`,
+          `https://bookrecaps.cloud/api/likes/count/${recapId}`,
           {
             headers: {
               'Authorization': `Bearer ${accessToken}`,
@@ -263,7 +263,7 @@ const UserRecapDetail = () => {
       if (liked) {
         // Gửi yêu cầu DELETE để hủy like
         response = await axios.delete(
-          `https://160.25.80.100:7124/api/likes/remove/${recapId}`,
+          `https://bookrecaps.cloud/api/likes/remove/${recapId}`,
           {
             headers: {
               'Authorization': `Bearer ${accessToken}`,
@@ -283,7 +283,7 @@ const UserRecapDetail = () => {
       } else {
         // Gửi yêu cầu POST để thêm like
         response = await axios.post(
-          `https://160.25.80.100:7124/api/likes/createlike/${recapId}`,
+          `https://bookrecaps.cloud/api/likes/createlike/${recapId}`,
           {
             recapId: recapId, 
             userId: userId, 

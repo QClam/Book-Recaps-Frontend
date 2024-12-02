@@ -5,7 +5,6 @@
   padding: 20px;
   text-align: center;
   /* background-color: #f9f9f9; */
-  margin-top: -90px;
 }
 
 .title {
@@ -71,6 +70,7 @@
 
 .pagination li {
   margin: 0 5px;
+  user-select: none;
 }
 
 .pagination li a {
@@ -80,6 +80,7 @@
   color: #333;
   border: 1px solid #ddd;
   cursor: pointer;
+  user-select: none;
 }
 
 .pagination li.active a {

@@ -1,80 +1,25 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import { useEffect, useState } from 'react';
 import './CategoryByBookApi.scss';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-import { useParams, useNavigate } from 'react-router-dom';
-
-const resolveRefs = (data) => {
-  const refMap = new Map();
-  const createRefMap = (obj) => {
-    if (typeof obj !== "object" || obj === null) return;
-    if (obj.$id) {
-      refMap.set(obj.$id, obj);
-    }
-    for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        createRefMap(obj[key]);
-      }
-    }
-  };
-  const resolveRef = (obj) => {
-    if (typeof obj !== "object" || obj === null) return obj;
-    if (obj.$ref) {
-      return refMap.get(obj.$ref);
-    }
-    for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        obj[key] = resolveRef(obj[key]);
-      }
-    }
-    return obj;
-  };
-  createRefMap(data);
-  return resolveRef(data);
-};
-
+import { generatePath, useNavigate } from 'react-router-dom';
+import { axiosInstance } from "../../../utils/axios";
+import { resolveRefs } from "../../../utils/resolveRefs";
+import { routes } from "../../../routes";
 
 const CategoryByBookApi = () => {
-  const [categories, setCategories] = useState([]);
-  const [allBooks, setAllBooks] = useState([]);
-  const [activeCategory, setActiveCategory] = useState('All');
-  const [error, setError] = useState(null); // For error handling
+  const [ categories, setCategories ] = useState([]);
+  const [ allBooks, setAllBooks ] = useState([]);
+  const [ activeCategory, setActiveCategory ] = useState('All');
+  const [ error, setError ] = useState(null); // For error handling
   const navigate = useNavigate(); // Khởi tạo navigate
-  // Get accessToken and refreshToken from localStorage
-  const accessToken = localStorage.getItem("authToken");
-  const refreshToken = localStorage.getItem("refreshToken");
-
-  // Function to refresh token
-  const handleTokenRefresh = async () => {
-    try {
-      const response = await axios.post("https://160.25.80.100:7124/api/tokens/refresh", {
-        refreshToken,
-      });
-
-      const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data.message.token;
-
-      // Update localStorage with new tokens
-      localStorage.setItem("authToken", newAccessToken);
-      localStorage.setItem("refreshToken", newRefreshToken);
-
-      console.log("Token refreshed successfully");
-    } catch (error) {
-      console.error("Error refreshing token:", error);
-      setError("Session expired. Please log in again.");
-    }
-  };
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get('https://160.25.80.100:7124/api/category/getallcategory', {
-          headers: {
-            'accept': '*/*',
-            'Authorization': `Bearer ${accessToken}`,
-          }
-        });
+        const response = await axiosInstance.get('/api/category/getallcategory');
 
-        const data = resolveRefs(response.data);
+        // const data = resolveRefs(response.data);
+        const data = response.data;
         if (data && data.succeeded) {
           setCategories(data.data.$values);
         } else {
@@ -82,43 +27,28 @@ const CategoryByBookApi = () => {
         }
       } catch (error) {
         // If token is expired, try to refresh it
-        if (error.response && error.response.status === 401) {
-          await handleTokenRefresh();
-          fetchCategories(); // Retry fetching categories after refreshing the token
-        } else {
-          setError(error.message);
-          console.error('Error fetching categories:', error);
-        }
+        setError(error.message);
+        console.error('Error fetching categories:', error);
       }
     };
 
     const fetchBooks = async () => {
       try {
-        const response = await axios.get('https://160.25.80.100:7124/api/book/getallbooks', {
-          headers: {
-            'accept': '*/*',
-            'Authorization': `Bearer ${accessToken}`,
-          }
-        });
+        const response = await axiosInstance.get('https://bookrecaps.cloud/api/book/getallbooks');
 
         const data = resolveRefs(response.data);
+        // const data = response.data;
         if (data && data.succeeded) {
           setAllBooks(data.data.$values);
         }
       } catch (error) {
-        // If token is expired, try to refresh it
-        if (error.response && error.response.status === 401) {
-          await handleTokenRefresh();
-          fetchBooks(); // Retry fetching books after refreshing the token
-        } else {
-          console.log('Error fetching books:', error);
-        }
+        console.log('Error fetching books:', error);
       }
     };
 
     fetchCategories();
     fetchBooks();
-  }, [accessToken, refreshToken]);
+  }, []);
 
   const handleCategoryClick = (category) => {
     setActiveCategory(category);
@@ -178,25 +108,24 @@ const CategoryByBookApi = () => {
   // Lọc sách dựa trên danh mục đã chọn
   const filteredBooks = activeCategory === 'All'
     ? allBooks
-    : allBooks.filter(book => 
-        book.categories.$values.some(cat => cat.name === activeCategory)
-      );
+    : allBooks.filter(book =>
+      book.categories.$values.some(cat => cat.name === activeCategory)
+    );
 
-   // Hàm điều hướng khi click vào sách
+  // Hàm điều hướng khi click vào sách
   //  const handleBookClick = (id) => {
   //   navigate(`/user-recap-detail/${id}`); // Navigate to UserRecapDetail with the book ID
   // };
 
   const handleBookClick = (id) => {
-    navigate(`/user-recap-detail-item/${id}`); // Navigate to UserRecapDetail with the book ID
+    navigate(generatePath(routes.bookDetail, { id })); // Navigate to UserRecapDetail with the book ID
   };
-
 
   return (
     <div className="custom-category-wrapper">
       <div className="custom-category-header">
-        <h2 className="custom-title">Categories</h2>
-        <p className="custom-subtitle">Explore all categories</p>
+        <h2 className="custom-title">Thể loại</h2>
+        {/*<p className="custom-subtitle">Explore all categories</p>*/}
         <div className="custom-category-buttons">
           <button
             className={`custom-button ${activeCategory === 'All' ? 'active' : ''}`}
@@ -218,29 +147,36 @@ const CategoryByBookApi = () => {
       </div>
 
       <div className="custom-books-grid">
-        {filteredBooks.map((book, index) => (
-          <div 
-          key={book.id} 
-          className="custom-book-card" 
-          onClick={() => handleBookClick(book.id)} // Thêm sự kiện onClick
-          role="button" // Thêm role để tăng tính truy cập
-          tabIndex={0} // Thêm tabIndex để có thể focus
-          onKeyPress={(e) => {
-            if (e.key === 'Enter') handleBookClick(book.id);
-          }} // Thêm sự kiện onKeyPress để hỗ trợ keyboard
-        >
-            {book.coverImage ? (
-              <img src={book.coverImage} alt={book.title} className="custom-book-image" />
-            ) : (
-              <div className="custom-book-placeholder">No Image</div>
-            )}
-            <div className="custom-book-details">
-              <h3 className="custom-book-title">{book.title}</h3>
-              <p className="custom-book-author">
-                {book.authors.$values && book.authors.$values.length > 0 ? book.authors.$values[0].name : 'Unknown'}
+        {filteredBooks.map((book) => (
+          <div
+            className="bg-white border border-gray-300 rounded-lg overflow-hidden flex flex-col transition-transform duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg"
+            key={book.id}
+            onClick={() => handleBookClick(book.id)}
+          >
+            <div className="block bg-gray-200">
+              <img
+                src={book.coverImage || "/empty-image.jpg"}
+                alt={book.title}
+                className="block overflow-hidden shadow-md aspect-[3/4] object-cover w-full bg-gray-50"
+              />
+            </div>
+            <div className="p-5 flex-1 flex flex-col items-start">
+              <h2 className="text-lg mb-2 text-gray-800 font-bold line-clamp-2" title={book.title}>
+                {book.title}
+              </h2>
+              <p className="text-sm text-gray-600 line-clamp-1 mb-2" title={book.originalTitle}>
+                Tên gốc: <strong>{book.originalTitle}</strong>
+              </p>
+              {book.authors && book.authors.$values.length > 0 && (
+                <p className="text-sm text-gray-600 mb-2"
+                   title={book.authors.$values.map((author) => author.name).join(", ")}>
+                  Tác giả: <strong>{book.authors.$values.map((author) => author.name).join(", ")}</strong>
+                </p>
+              )}
+              <p className="text-sm text-gray-600 mb-2">
+                Năm xuất bản: <strong>{book.publicationYear}</strong>
               </p>
             </div>
-          
           </div>
         ))}
       </div>

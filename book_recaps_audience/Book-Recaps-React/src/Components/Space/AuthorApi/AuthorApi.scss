@@ -1,7 +1,5 @@
 /* Bố cục lưới cho danh sách các tác giả */
-.author-page {
-  margin-top: -70px;
-}
+
 .author-grid {
   display: grid;
   grid-template-columns: repeat(5, 1fr); /* Hiển thị 5 tác giả mỗi hàng */

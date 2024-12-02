@@ -17,8 +17,9 @@
 .Sidebar-bar {
   display: flex;
   align-items: center;
+  justify-content: center;
+  padding: 0 50px;
   flex: 1; /* Chiếm hết không gian còn lại */
-  
 }
 
 .SidebarLogo {
@@ -62,12 +63,13 @@
 .filter-sectionme {
   display: flex;
   align-items: center;
-  margin-left: 30px; /* Khoảng cách từ danh sách đến phần tìm kiếm và thông tin người dùng */
+  //margin-left: 30px; /* Khoảng cách từ danh sách đến phần tìm kiếm và thông tin người dùng */
   position: relative; /* Để chứa kết quả tìm kiếm với position absolute */
   /* width: 300px; */ /* Bỏ hoặc điều chỉnh lại nếu cần */
 }
 
 .search-formme {
+  position: relative;
   display: flex;
   align-items: center;
   width: 300px; /* Đặt lại width phù hợp */
@@ -79,7 +81,7 @@
 .search-inputme {
   background: transparent;
   border: none;
-  color: white;
+  //color: white;
   outline: none;
   padding: 7px;
   width: 100%; /* Đảm bảo input chiếm hết không gian */
@@ -88,19 +90,22 @@
 .search-buttonme {
   background: none;
   border: none;
-  color: white;
-  cursor: pointer;
+  //color: white;
+  //cursor: pointer;
 }
 
 .search-results {
   position: absolute;
   top: 100%; /* Hiển thị ngay dưới ô tìm kiếm */
   left: 0;
-  width: 100%;
+  //width: 100%;
   max-height: 450px; /* Giới hạn chiều cao */
-  overflow-y: hidden; /* Cuộn dọc nếu quá dài */
+  overflow-y: auto; /* Cuộn dọc nếu quá dài */
   margin-top: 5px;
   z-index: 1001; /* Đảm bảo kết quả tìm kiếm nằm trên các thành phần khác */
+  list-style-type: none;
+  padding: 8px;
+  background: white;
 }
 
 .search-result-itemem {
@@ -112,7 +117,6 @@
   border-radius: 5px;
   margin-bottom: 10px;
   width: 350px;
-  margin-left: -35px;
 }
 
 .book-itemem {
@@ -148,9 +152,9 @@
 // }
 
 .user-info {
-  display: flex;
+  //display: flex;
   align-items: center;
- 
+  position: relative;
 }
 
 .iconHeader {
@@ -164,6 +168,7 @@
   display: flex;
   align-items: center;
   margin-left: 20px;
+  gap: 10px;
 }
 
 .user-name {
@@ -180,20 +185,26 @@
 
 .logout-option {
   position: absolute; // Position it according to your layout
-  right: 10px; // Adjust as needed
-  background-color: rgb(244, 242, 241); // Background color
-  border: 1px solid #ccc; // Border
-  border-radius: 4px; // Rounded corners
-  padding: 5px; // Padding
+  right: 0; // Adjust as needed
+  top: 110%;
   z-index: 10; // Ensure it appears above other elements
-  margin-top: 70px;
-  margin-right: -40px;
+  display: flex;
+  flex-direction: column;
+  background-color: white; // Background color
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: max-content;
+  //border: 1px solid #ccc; // Border
+  //border-radius: 4px; // Rounded corners
+  padding: 5px; // Padding
+  //gap: 8px;
   
-  button {
+  button, a {
     background: none; // Remove default button styling
     border: none; // Remove border
     cursor: pointer; // Change cursor to pointer
-    color: rgb(240, 113, 50);
+    //color: rgb(240, 113, 50);
+    font-size: 15px;
+    text-decoration: underline;
   }
 }
 

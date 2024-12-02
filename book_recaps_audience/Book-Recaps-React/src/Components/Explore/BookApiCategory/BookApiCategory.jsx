@@ -1,34 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import '@fortawesome/fontawesome-free/css/all.min.css';
 import './BookApiCategory.scss';
-import axios from "axios";
-import { useNavigate } from 'react-router-dom';
+import { generatePath, useNavigate } from 'react-router-dom';
+import { routes } from "../../../routes";
+import { axiosInstance } from "../../../utils/axios";
 
 const BookApiCategory = () => {
-  const [categories, setCategories] = useState([]);
-  const [error, setError] = useState(null); // For error handling
+  const [ categories, setCategories ] = useState([]);
+  const [ error, setError ] = useState(null); // For error handling
   const navigate = useNavigate(); // Khởi tạo navigate
 
   const handleCategoryClick = (categoryId) => {
-    navigate(`/category/${categoryId}`); // Điều hướng tới trang danh sách sách theo category
+    navigate(generatePath(routes.categoryDetail, { categoryId })); // Điều hướng tới trang danh sách sách theo category
   };
-  //qua BookListCategory de nhin may cuon sach thuoc category nao
-  // Get accessToken and refreshToken from localStorage
-  const accessToken = localStorage.getItem("authToken");
-  const refreshToken = localStorage.getItem("refreshToken");
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(
-          "https://160.25.80.100:7124/api/category/getallcategory",
-          {
-            headers: {
-              'accept': '*/*',
-              'Authorization': `Bearer ${accessToken}`, // Use the access token
-            },
-          }
-        );
+        const response = await axiosInstance.get("/api/category/getallcategory");
 
         const data = response.data;
         if (data && data.succeeded) {
@@ -37,39 +26,13 @@ const BookApiCategory = () => {
           setCategories([]); // Set empty array if no categories are present
         }
       } catch (error) {
-        // If token is expired, try to refresh it
-        if (error.response && error.response.status === 401) {
-          await handleTokenRefresh();
-          fetchCategories(); // Retry fetching categories after refreshing the token
-        } else {
-          setError(error.message);
-          console.error('Error fetching categories:', error);
-        }
+        setError(error.message);
+        console.error('Error fetching categories:', error);
       }
     };
 
     fetchCategories();
-  }, [accessToken, refreshToken]); // Use both tokens in dependency array
-
-  // Token refresh function
-  const handleTokenRefresh = async () => {
-    try {
-      const response = await axios.post("https://160.25.80.100:7124/api/tokens/refresh", {
-        refreshToken,
-      });
-
-      const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data.message.token;
-
-      // Update localStorage with new tokens
-      localStorage.setItem("authToken", newAccessToken);
-      localStorage.setItem("refreshToken", newRefreshToken);
-
-      console.log("Token refreshed successfully");
-    } catch (error) {
-      console.error("Error refreshing token:", error);
-      setError("Session expired. Please log in again.");
-    }
-  };
+  }, []); // Use both tokens in dependency array
 
   const getIconClass = (categoryName) => {
     switch (categoryName) {
@@ -129,11 +92,11 @@ const BookApiCategory = () => {
       {error && <p className="error">{error}</p>}
       <div className="category-wrapper">
         {categories.map((category) => (
-         <div
-         key={category.id}
-         className="category-box"
-         onClick={() => handleCategoryClick(category.id)} // Gọi hàm khi bấm vào category
-       >
+          <div
+            key={category.id}
+            className="category-box"
+            onClick={() => handleCategoryClick(category.id)} // Gọi hàm khi bấm vào category
+          >
             <i className={`${getIconClass(category.name)} category-icon`} aria-hidden="true"></i>
             <p className="category-label">{category.name}</p>
           </div>

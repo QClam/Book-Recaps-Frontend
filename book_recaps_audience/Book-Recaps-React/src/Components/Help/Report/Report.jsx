@@ -1,12 +1,13 @@
 import React from 'react';
 import '../Report/Report.scss';
-import { useNavigate } from 'react-router-dom'; 
+import { useNavigate } from 'react-router-dom';
+import { routes } from "../../../routes";
 
 const Report = () => {
   const navigate = useNavigate(); // Khởi tạo hàm điều hướng
 
     const handleHomeClick = () => {
-      navigate('/explore'); // Điều hướng đến trang chủ
+      navigate(routes.explore); // Điều hướng đến trang chủ
     };
 
   return (

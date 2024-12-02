@@ -1,65 +1,21 @@
-import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useParams, useNavigate } from 'react-router-dom';
-import './BookListCategory.scss'; // Import file SCSS mới
-
-// Function to resolve $ref references in data
-const resolveRefs = (data) => {
-  const refMap = new Map();
-  
-  const createRefMap = (obj) => {
-    if (typeof obj !== "object" || obj === null) return;
-    if (obj.$id) {
-      refMap.set(obj.$id, obj);
-    }
-    for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        createRefMap(obj[key]);
-      }
-    }
-  };
-
-  const resolveRef = (obj) => {
-    if (typeof obj !== "object" || obj === null) return obj;
-    if (obj.$ref) {
-      return refMap.get(obj.$ref);
-    }
-    for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        obj[key] = resolveRef(obj[key]);
-      }
-    }
-    return obj;
-  };
-
-  createRefMap(data);
-  return resolveRef(data);
-};
-
+import { useEffect, useState } from 'react';
+import { generatePath, useNavigate, useParams } from 'react-router-dom';
+import './BookListCategory.scss';
+import { resolveRefs } from "../../../../utils/resolveRefs";
+import { axiosInstance } from "../../../../utils/axios";
+import { routes } from "../../../../routes"; // Import file SCSS mới
 
 const BookListCategory = () => {
   const { categoryId } = useParams(); // Lấy categoryId từ URL
-  const [books, setBooks] = useState([]); // Đặt giá trị khởi tạo là một mảng
-  const [error, setError] = useState(null);
-  const [categoryName, setCategoryName] = useState(''); // Để hiển thị tên category
+  const [ books, setBooks ] = useState([]); // Đặt giá trị khởi tạo là một mảng
+  const [ error, setError ] = useState(null);
+  const [ categoryName, setCategoryName ] = useState(''); // Để hiển thị tên category
   const navigate = useNavigate(); // Khởi tạo navigate
-
-  // Lấy accessToken và refreshToken từ localStorage
-  const accessToken = localStorage.getItem("authToken");
-  const refreshToken = localStorage.getItem("refreshToken");
 
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await axios.get(
-          `https://160.25.80.100:7124/api/book/getallbooks?categoryId=${categoryId}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${accessToken}`, // Sử dụng access token
-              'accept': '*/*',
-            },
-          }
-        );
+        const response = await axiosInstance.get(`/api/book/getallbooks?categoryId=${categoryId}`);
 
         console.log('Response Data:', response.data); // Debugging: Kiểm tra dữ liệu phản hồi
 
@@ -73,7 +29,6 @@ const BookListCategory = () => {
             book.categories.$values &&
             book.categories.$values.some(category => category.id === categoryId)
           );
-
 
           setBooks(filteredBooks); // Đặt mảng sách đã lọc vào state
 
@@ -90,39 +45,13 @@ const BookListCategory = () => {
           setBooks([]); // Thiết lập mảng rỗng nếu không phải
         }
       } catch (error) {
-        // Nếu token hết hạn, thử làm mới nó
-        if (error.response && error.response.status === 401) {
-          await handleTokenRefresh();
-          fetchBooks(); // Retry fetching books after refreshing the token
-        } else {
-          setError(error.message);
-          console.error('Error fetching books:', error);
-        }
+        setError(error.message);
+        console.error('Error fetching books:', error);
       }
     };
 
     fetchBooks();
-  }, [categoryId, accessToken, refreshToken]); // Cập nhật accessToken và refreshToken trong dependency array
-
-  // Hàm làm mới token
-  const handleTokenRefresh = async () => {
-    try {
-      const response = await axios.post("https://160.25.80.100:7124/api/tokens/refresh", {
-        refreshToken,
-      });
-
-      const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data.message.token;
-
-      // Cập nhật localStorage với token mới
-      localStorage.setItem("authToken", newAccessToken);
-      localStorage.setItem("refreshToken", newRefreshToken);
-
-      console.log("Token refreshed successfully");
-    } catch (error) {
-      console.error("Error refreshing token:", error);
-      setError("Session expired. Please log in again.");
-    }
-  };
+  }, [ categoryId ]); // Cập nhật accessToken và refreshToken trong dependency array
 
   // Hàm điều hướng khi click vào sách
   // const handleBookClick = (id) => {
@@ -134,7 +63,7 @@ const BookListCategory = () => {
   // };
 
   const handleBookClick = (id) => {
-    navigate(`/user-recap-detail-item/${id}`); // Navigate to UserRecapDetail with the book ID
+    navigate(generatePath(routes.bookDetail, { id })); // Navigate to UserRecapDetail with the book ID
   };
   //chạy qua class BookDetailBook qua tiep RecapDetail
 
@@ -146,9 +75,9 @@ const BookListCategory = () => {
         {/* Bảo vệ chống lỗi */}
         {Array.isArray(books) && books.length > 0 ? (
           books.map((book) => (
-            <div 
-              key={book.id} 
-              className="book-item" 
+            <div
+              key={book.id}
+              className="book-item"
               onClick={() => handleBookClick(book.id)} // Thêm sự kiện onClick
               role="button" // Thêm role để tăng tính truy cập
               tabIndex={0} // Thêm tabIndex để có thể focus
@@ -156,9 +85,10 @@ const BookListCategory = () => {
                 if (e.key === 'Enter') handleBookClick(book.id);
               }} // Thêm sự kiện onKeyPress để hỗ trợ keyboard
             >
-              <img src={book.coverImage} alt={book.title} className="book-cover" />
+              <img src={book.coverImage} alt={book.title} className="book-cover"/>
               <h3 className="book-title">{book.title}</h3>
-              <p className="book-author"><strong>Author:</strong> {book.authors?.$values?.map(author => author.name).join(', ')}</p>
+              <p className="book-author">
+                <strong>Author:</strong> {book.authors?.$values?.map(author => author.name).join(', ')}</p>
               {/* Bạn có thể thêm các thông tin khác nếu cần */}
             </div>
           ))

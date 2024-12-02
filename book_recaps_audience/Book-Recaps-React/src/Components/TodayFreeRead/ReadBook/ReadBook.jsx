@@ -5,6 +5,7 @@ import BookImage from "../../../image/library.jpg";
 import "./ReadBook.scss";
 import { FaSyncAlt } from "react-icons/fa";
 import { useNavigate } from 'react-router-dom';
+import { routes } from "../../../routes";
 
 const ReadBook = () => {
   const navigate = useNavigate();
@@ -216,7 +217,7 @@ const ReadBook = () => {
             <span className="icon">🏠</span>
             {!isSidebarCollapsed && <span className="label">For You</span>}
           </div>
-          <div className="sidebar-item" onClick={() => handleNavigation('/explore')}>
+          <div className="sidebar-item" onClick={() => handleNavigation(routes.explore)}>
             <span className="icon">🔍</span>
             {!isSidebarCollapsed && <span className="label">Explore</span>}
           </div>

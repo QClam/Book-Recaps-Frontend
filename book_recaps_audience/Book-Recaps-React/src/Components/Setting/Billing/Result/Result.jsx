@@ -1,24 +1,21 @@
-import React, { useEffect, useState } from 'react'; 
+import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import '../Result/Result.scss';
-import axios from 'axios';
+import { routes } from "../../../../routes";
+import { useAuth } from "../../../../contexts/Auth";
 
 const Result = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const [paymentResult, setPaymentResult] = useState({
+  const [ paymentResult, setPaymentResult ] = useState({
     code: null,
     id: null,
     cancel: null,
     status: null,
     orderCode: null,
   });
-  const [userName, setUserName] = useState('');
-  const [iconType, setIconType] = useState('');
-  const [error, setError] = useState(null);
-
-  const accessToken = localStorage.getItem("authToken");
-  const refreshToken = localStorage.getItem("refreshToken");
+  const [ iconType, setIconType ] = useState('');
+  const { user } = useAuth();
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -27,47 +24,11 @@ const Result = () => {
     const cancel = params.get('cancel') === 'true';
     const status = params.get('status');
     const orderCode = params.get('orderCode');
-    
+
     setPaymentResult({ code, id, cancel, status, orderCode });
     setIconType(status === 'PAID' && code === '00' && !cancel ? 'success' : 'fail');
 
-
-    const fetchUserData = async () => {
-      try {
-        const response = await axios.get('https://160.25.80.100:7124/api/personal/profile', {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-          },
-        });
-        setUserName(response.data.fullName || 'User');
-      } catch (error) {
-        if (error.response && error.response.status === 401) {
-          await handleTokenRefresh();
-          fetchUserData();
-        } else {
-          console.error('Failed to fetch user data:', error);
-          setError("Không thể lấy thông tin người dùng.");
-        }
-      }
-    };
-
-    fetchUserData();
-  }, [location.search, accessToken]);
-
-  const handleTokenRefresh = async () => {
-    try {
-      const response = await axios.post("https://160.25.80.100:7124/api/tokens/refresh", {
-        refreshToken,
-      });
-      const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data.message.token;
-      localStorage.setItem("authToken", newAccessToken);
-      localStorage.setItem("refreshToken", newRefreshToken);
-      console.log("Token đã được làm mới thành công");
-    } catch (error) {
-      console.error("Lỗi khi làm mới token:", error);
-      setError("Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.");
-    }
-  };
+  }, [ location.search ]);
 
   const renderMessage = () => {
     if (paymentResult.cancel) {
@@ -87,7 +48,7 @@ const Result = () => {
               <span className="x-icon">✗</span>
             )}
           </div> */}
-          <h1>{userName}</h1>
+          <h1>{user?.name}</h1>
           <h2>Payment Successfully Completed</h2>
         </div>
       );
@@ -132,10 +93,10 @@ const Result = () => {
           <p>{paymentResult.id}</p>
         </div>
       </div>
-      {error && <p className="error">{error}</p>}
+      {/*{error && <p className="error">{error}</p>}*/}
       <div className="button-group">
-        <button className="explore-button" onClick={() => navigate('/explore')}>Explore</button>
-        <button className="try-again-button" onClick={() => navigate('/billing')}>Try Again</button>
+        <button className="explore-button" onClick={() => navigate(routes.explore)}>Explore</button>
+        <button className="try-again-button" onClick={() => navigate(routes.billing)}>Try Again</button>
       </div>
     </div>
   );

@@ -1,25 +1,24 @@
-import React, { useState, useEffect } from 'react'; 
-import axios from 'axios';
-import './CreatePlaylistModal.scss'; // Import styles
+import { useEffect, useState } from 'react';
+import './CreatePlaylistModal.scss';
+import { axiosInstance } from "../../../../utils/axios";
+import { useAuth } from "../../../../contexts/Auth";
+import { toast } from "react-toastify";
 
-const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId }) => {
-  const [playlistName, setPlaylistName] = useState('');
-  const [existingPlaylists, setExistingPlaylists] = useState([]); // To store existing playlists
-  const [selectedPlaylists, setSelectedPlaylists] = useState([]); // To store selected playlists
-  const [isLoading, setIsLoading] = useState(false);
-  const accessToken = localStorage.getItem('authToken');
-  const refreshToken = localStorage.getItem('refreshToken');
+const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId, savedPlayListIds, setSavedPlayListIds }) => {
+  const { isAuthenticated } = useAuth();
+  const [ playlistName, setPlaylistName ] = useState('');
+  const [ existingPlaylists, setExistingPlaylists ] = useState([]);
+  const [ selectedPlaylistIds, setSelectedPlaylistIds ] = useState(savedPlayListIds);
+  const [ isLoading, setIsLoading ] = useState(false);
 
   // Fetch existing playlists
   useEffect(() => {
     const fetchPlaylists = async () => {
+      if (!isAuthenticated) return;
       try {
-        const response = await axios.get('https://160.25.80.100:7124/api/playlists/my-playlists', {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-        setExistingPlaylists(response.data.data.$values); // Update with playlists from API
+        const response = await axiosInstance.get('/api/playlists/my-playlists');
+        setExistingPlaylists(response.data.data.$values);
+        setSelectedPlaylistIds(savedPlayListIds);
       } catch (error) {
         console.error('Error fetching playlists:', error);
       }
@@ -28,111 +27,63 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId }) => {
     if (isOpen) {
       fetchPlaylists();
     }
-  }, [isOpen, accessToken]);
-
-  // Helper function to refresh the access token
-  const refreshAccessToken = async () => {
-    try {
-      const response = await axios.post('https://160.25.80.100:7124/api/auth/refresh', {
-        refreshToken,
-      });
-      const newAccessToken = response.data.accessToken;
-      localStorage.setItem('authToken', newAccessToken);
-      return newAccessToken;
-    } catch (error) {
-      console.error('Error refreshing access token:', error);
-      alert('Session expired, please login again.');
-      return null;
-    }
-  };
+  }, [ isOpen ]);
 
   // Function to handle creating a new playlist
   const handleCreatePlaylist = async () => {
     if (!playlistName) {
-      alert('Please enter a playlist name');
+      toast.warning('Please enter a playlist name');
       return;
     }
 
     try {
       setIsLoading(true);
-      let currentAccessToken = accessToken;
 
-      const createPlaylistResponse = await axios.post(
-        'https://160.25.80.100:7124/api/playlists/createPlaylist',
-        {
-          userId,
-          playListName: playlistName,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${currentAccessToken}`,
-          },
-        }
-      );
+      const createPlaylistResponse = await axiosInstance.post('/api/playlists/createPlaylist', {
+        userId,
+        playListName: playlistName,
+      });
 
       const { id: playlistId } = createPlaylistResponse.data.data;
+      await axiosInstance.post(`/api/playlists/${playlistId}/add-recap/${recapId}`);
+      setSavedPlayListIds([ ...savedPlayListIds, playlistId ]);
 
-      await axios.post(
-        `https://160.25.80.100:7124/api/playlists/${playlistId}/add-recap/${recapId}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${currentAccessToken}`,
-          },
-        }
-      );
-
-      alert('Playlist created and recap added!');
+      toast.success('Playlist created and recap added!');
       setIsLoading(false);
       onClose();
     } catch (error) {
-      if (error.response && error.response.status === 401) {
-        const newToken = await refreshAccessToken();
-        if (newToken) {
-          return handleCreatePlaylist();
-        }
-      } else {
-        console.error('Error creating playlist:', error);
-        alert('Error creating playlist');
-        setIsLoading(false);
-      }
+      console.error('Error creating playlist:', error);
+      toast.error('Error creating playlist');
+      setIsLoading(false);
     }
   };
 
   // Handle existing playlist selection and adding recap
-// Handle existing playlist selection and adding recap
-const handleSaveInSelectedPlaylists = async () => {
-  try {
-    setIsLoading(true); // Show loading indicator
-    // Loop through all selected playlists
-    for (const playlistId of selectedPlaylists) {
-      // API call to add recap to each playlist
-      await axios.post(
-        `https://160.25.80.100:7124/api/playlists/${playlistId}/add-recap/${recapId}`,
-        {},
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
+  const handleSaveInSelectedPlaylists = async () => {
+    try {
+      setIsLoading(true);
+      const newSelectedPlaylistIds = selectedPlaylistIds.filter(id => !savedPlayListIds.includes(id));
+
+      // Loop through each selected playlist and add recap
+      for (const playlistId of newSelectedPlaylistIds) {
+        await axiosInstance.post(`/api/playlists/${playlistId}/add-recap/${recapId}`);
+      }
+      setSavedPlayListIds([ ...savedPlayListIds, ...newSelectedPlaylistIds ]); // Update saved playlist IDs
+      setIsLoading(false);
+      toast.success('Recap added to selected playlists!');
+      onClose(); // Close the modal after saving
+    } catch (error) {
+      console.error('Error adding recap to playlists:', error);
+      toast.error('Error adding recap to playlists');
+      setIsLoading(false);
     }
-    alert('Recap added to selected playlists!'); // Success message
-    setIsLoading(false);
-    onClose(); // Close the modal after saving
-  } catch (error) {
-    console.error('Error adding recap to playlists:', error);
-    setIsLoading(false);
-  }
-};
+  };
 
-
-  // Handle checkbox selection
   const handleCheckboxChange = (playlistId) => {
-    if (selectedPlaylists.includes(playlistId)) {
-      setSelectedPlaylists(selectedPlaylists.filter(id => id !== playlistId));
+    if (selectedPlaylistIds.includes(playlistId)) {
+      setSelectedPlaylistIds(selectedPlaylistIds.filter(id => id !== playlistId));
     } else {
-      setSelectedPlaylists([...selectedPlaylists, playlistId]);
+      setSelectedPlaylistIds([ ...selectedPlaylistIds, playlistId ]);
     }
   };
 
@@ -142,7 +93,7 @@ const handleSaveInSelectedPlaylists = async () => {
     <div className="modal-overlay">
       <div className="modal-content">
         <h2>Save in My Library</h2>
-        
+
         {/* Display existing playlists with checkboxes */}
         <div>
           <h3>Select Existing Playlists</h3>
@@ -152,6 +103,7 @@ const handleSaveInSelectedPlaylists = async () => {
                 <input
                   type="checkbox"
                   value={playlist.id}
+                  checked={selectedPlaylistIds.includes(playlist.id)}
                   onChange={() => handleCheckboxChange(playlist.id)}
                 />
                 <label>{playlist.playListName}</label>
@@ -177,7 +129,7 @@ const handleSaveInSelectedPlaylists = async () => {
         <div className="modal-buttons">
           <button onClick={onClose}>Cancel</button>
           <button onClick={handleSaveInSelectedPlaylists} disabled={isLoading}>
-            {isLoading ? 'Saving...' : 'Save in Selected Playlists'}
+            {isLoading ? 'Saving...' : 'Save'}
           </button>
           <button onClick={handleCreatePlaylist} disabled={isLoading || !playlistName}>
             {isLoading ? 'Creating...' : 'Create New Playlist'}

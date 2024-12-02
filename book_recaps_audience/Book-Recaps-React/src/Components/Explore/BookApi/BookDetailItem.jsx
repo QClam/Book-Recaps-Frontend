@@ -17,7 +17,7 @@ const BookDetailItem = () => {
     const token = getToken(); // Get the accessToken
 
     try {
-      const response = await fetch(`https://160.25.80.100:7124/api/book/getbookbyid/${id}`, {
+      const response = await fetch(`https://bookrecaps.cloud/api/book/getbookbyid/${id}`, {
         method: 'GET',
         headers: {
           'accept': '*/*',
@@ -29,7 +29,7 @@ const BookDetailItem = () => {
         // Handle token expiration here
         if (response.status === 401) {
           const refreshToken = localStorage.getItem('refreshToken'); // Get refreshToken from local storage
-          const refreshResponse = await fetch('https://160.25.80.100:7124/api/auth/refresh', { // Update with your refresh token endpoint
+          const refreshResponse = await fetch('https://bookrecaps.cloud/api/auth/refresh', { // Update with your refresh token endpoint
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'

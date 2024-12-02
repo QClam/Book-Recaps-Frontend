@@ -1,80 +1,44 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from "react";
+import { generatePath, useNavigate } from 'react-router-dom';
 import ReactPaginate from "react-paginate";
-import axios from "axios";
-import "./BookApi.scss"; // Import CSS cho styling
-const resolveRefs = (data) => {
-  const refMap = new Map();
-  const createRefMap = (obj) => {
-    if (typeof obj !== "object" || obj === null) return;
-    if (obj.$id) {
-      refMap.set(obj.$id, obj);
-    }
-    for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        createRefMap(obj[key]);
-      }
-    }
-  };
-  const resolveRef = (obj) => {
-    if (typeof obj !== "object" || obj === null) return obj;
-    if (obj.$ref) {
-      return refMap.get(obj.$ref);
-    }
-    for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        obj[key] = resolveRef(obj[key]);
-      }
-    }
-    return obj;
-  };
-  createRefMap(data);
-  return resolveRef(data);
-};
+import "./BookApi.scss";
+import { axiosInstance } from "../../../utils/axios";
+// import { resolveRefs } from "../../../utils/resolveRefs";
+import { routes } from "../../../routes";
+import Show from "../../Show"; // Import CSS cho styling
 
 const BookApi = () => {
-  const [books, setBooks] = useState([]);
-  const [filteredBooks, setFilteredBooks] = useState([]);
-  const [currentPage, setCurrentPage] = useState(0);
-  const [error, setError] = useState(null); // For error handling
+  const [ books, setBooks ] = useState([]);
+  const [ filteredBooks, setFilteredBooks ] = useState([]);
+  const [ currentPage, setCurrentPage ] = useState(0);
+  const [ error, setError ] = useState(null); // For error handling
   const booksPerPage = 16; // Số lượng sách mỗi trang
   const navigate = useNavigate();
   // Trạng thái cho Search
-  const [searchTitle, setSearchTitle] = useState("");
-  const [searchAuthor, setSearchAuthor] = useState("");
+  const [ searchTitle, setSearchTitle ] = useState("");
+  const [ searchAuthor, setSearchAuthor ] = useState("");
 
   // Trạng thái cho Filter
-  const [categories, setCategories] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const [ageLimits, setAgeLimits] = useState([]);
-  const [selectedAgeLimit, setSelectedAgeLimit] = useState("");
-  const [publicationYears, setPublicationYears] = useState([]);
-  const [selectedPublicationYear, setSelectedPublicationYear] = useState("");
+  const [ categories, setCategories ] = useState([]);
+  const [ selectedCategories, setSelectedCategories ] = useState([]);
+  const [ ageLimits, setAgeLimits ] = useState([]);
+  const [ selectedAgeLimit, setSelectedAgeLimit ] = useState("");
+  const [ publicationYears, setPublicationYears ] = useState([]);
+  const [ selectedPublicationYear, setSelectedPublicationYear ] = useState("");
 
   // State for publisher filter
-  const [publishers, setPublishers] = useState([]);
-  const [selectedPublisher, setSelectedPublisher] = useState("");
-
-  // Lấy accessToken và refreshToken từ localStorage
-  const accessToken = localStorage.getItem("authToken");
-  const refreshToken = localStorage.getItem("refreshToken");
+  const [ publishers, setPublishers ] = useState([]);
+  const [ selectedPublisher, setSelectedPublisher ] = useState("");
 
   useEffect(() => {
     const fetchBooks = async () => {
       try {
         // Fetch books data from the API
-        const response = await axios.get(
-          "https://160.25.80.100:7124/api/book/getallbooks",
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
+        const response = await axiosInstance.get("/api/book/getallbooks");
 
-        const data = resolveRefs(response.data);
+        // const data = resolveRefs(response.data);
+        const data = response.data;
         // console.log("Fetched Books Data:", data); // Kiểm tra dữ liệu
-        
 
         if (data && data.data && Array.isArray(data.data.$values)) {
           setBooks(data.data.$values); // Giả sử dữ liệu sách nằm trong `data.$values`
@@ -86,44 +50,13 @@ const BookApi = () => {
         }
       } catch (error) {
         // Nếu token hết hạn, thử làm mới nó
-        if (error.response && error.response.status === 401) {
-          await handleTokenRefresh();
-          fetchBooks(); // Thử lại việc lấy sách sau khi làm mới token
-        } else {
-          setError(error.message);
-          console.error("Error fetching books:", error);
-        }
+        setError(error.message);
+        console.error("Error fetching books:", error);
       }
     };
 
     fetchBooks();
-  }, [accessToken]);
-
-  // Hàm làm mới token
-  const handleTokenRefresh = async () => {
-    try {
-      const response = await axios.post(
-        "https://160.25.80.100:7124/api/tokens/refresh",
-        {
-          refreshToken,
-        }
-      );
-
-      const {
-        accessToken: newAccessToken,
-        refreshToken: newRefreshToken,
-      } = response.data.message.token;
-
-      // Cập nhật localStorage với token mới
-      localStorage.setItem("authToken", newAccessToken);
-      localStorage.setItem("refreshToken", newRefreshToken);
-
-      console.log("Token refreshed successfully");
-    } catch (error) {
-      console.error("Error refreshing token:", error);
-      setError("Session expired. Please log in again.");
-    }
-  };
+  }, []);
 
   // Hàm để trích xuất các giá trị lọc từ dữ liệu sách
   const extractFilters = (booksData) => {
@@ -150,16 +83,16 @@ const BookApi = () => {
 
     });
 
-    setCategories([...categorySet]);
-    setAgeLimits([...ageLimitSet].sort((a, b) => a - b));
-    setPublicationYears([...publicationYearSet].sort((a, b) => b - a));
-    setPublishers([...publisherSet]);
+    setCategories([ ...categorySet ]);
+    setAgeLimits([ ...ageLimitSet ].sort((a, b) => a - b));
+    setPublicationYears([ ...publicationYearSet ].sort((a, b) => b - a));
+    setPublishers([ ...publisherSet ]);
 
   };
 
   // Hàm xử lý khi thay đổi Search hoặc Filter
   useEffect(() => {
-    let tempBooks = [...books];
+    let tempBooks = [ ...books ];
 
     // Apply Search by title
     if (searchTitle) {
@@ -240,7 +173,7 @@ const BookApi = () => {
   const handleCategoryChange = (e) => {
     const { value, checked } = e.target;
     if (checked) {
-      setSelectedCategories([...selectedCategories, value]);
+      setSelectedCategories([ ...selectedCategories, value ]);
     } else {
       setSelectedCategories(selectedCategories.filter((cat) => cat !== value));
     }
@@ -258,16 +191,15 @@ const BookApi = () => {
     setSelectedPublisher(e.target.value);
   };
 
-
   // const handleBookClick = (id) => {
   //   navigate(`/bookdetailbook/${id}`); // Use the book's id for navigation
   // };
   const handleBookClick = (id) => {
-    navigate(`/user-recap-detail-item/${id}`); // Navigate to UserRecapDetail with the book ID
+    navigate(generatePath(routes.bookDetail, { id })); // Navigate to UserRecapDetail with the book ID
   };
 
   return (
-    <div className="book-api-container">
+    <div className="book-api-container container mx-auto max-w-screen-xl mb-4 pt-6 md:pt-12 md:px-12">
       {/* <h1 className="title">Danh Sách Sách</h1> */}
 
       {error && <p className="error">Lỗi: {error}</p>}
@@ -290,12 +222,16 @@ const BookApi = () => {
             className="search-input"
           />
         </div>
+      </div>
 
-        <div className="filter-section">
-          <div className="filter-group">
-            <h3>Thể loại</h3>
-            {categories.map((category) => (
-              <label key={category} className="filter-label">
+      <div className="flex gap-5">
+        <div className="hidden lg:block max-w-fit">
+          <h3 className="mb-3 text-lg font-semibold">
+            Thể loại
+          </h3>
+          <div className="flex flex-col gap-1">
+            {categories.map((category, i) => (
+              <label key={category + i} className="filter-label">
                 <input
                   type="checkbox"
                   value={category}
@@ -306,101 +242,110 @@ const BookApi = () => {
               </label>
             ))}
           </div>
+        </div>
+        <div className="flex-1 flex flex-col gap-5">
+          <div className="flex gap-5 justify-between w-full flex-wrap">
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold">Nhà xuất bản</h3>
+              <select
+                value={selectedPublisher}
+                onChange={handlePublisherChange}
+                className="w-full rounded border border-gray-300 p-2"
+              >
+                <option value="">Tất cả</option>
+                {publishers.map((publisher) => (
+                  <option key={publisher} value={publisher}>{publisher}</option>
+                ))}
+              </select>
+            </div>
 
-          <div className="filter-groupup">
-            <h3>Nhà xuất bản</h3>
-            <select value={selectedPublisher} onChange={handlePublisherChange} className="filter-select">
-              <option value="">Tất cả</option>
-              {publishers.map((publisher) => (
-                <option key={publisher} value={publisher}>{publisher}</option>
-              ))}
-            </select>
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold">Giới hạn tuổi</h3>
+              <select
+                value={selectedAgeLimit}
+                onChange={handleAgeLimitChange}
+                className="w-full rounded border border-gray-300 p-2"
+              >
+                <option value="">Tất cả</option>
+                {ageLimits.map((age) => (
+                  <option key={age} value={age}>
+                    {age === 0 ? "Không giới hạn" : age}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex-1">
+              <h3 className="text-lg font-semibold">Năm xuất bản</h3>
+              <select
+                value={selectedPublicationYear}
+                onChange={handlePublicationYearChange}
+                className="w-full rounded border border-gray-300 p-2"
+              >
+                <option value="">Tất cả</option>
+                {publicationYears.map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          <div className="filter-groupup">
-            <h3>Giới hạn tuổi</h3>
-            <select
-              value={selectedAgeLimit}
-              onChange={handleAgeLimitChange}
-              className="filter-select"
-            >
-              <option value="">Tất cả</option>
-              {ageLimits.map((age) => (
-                <option key={age} value={age}>
-                  {age === 0 ? "Không giới hạn" : age}
-                </option>
+          {/* Danh sách sách */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
+            <Show when={currentBooks.length > 0} fallback={<p className="text-center">Không tìm thấy sách nào.</p>}>
+              {currentBooks.map((book) => (
+                <div
+                  className="bg-white border border-gray-300 rounded-lg overflow-hidden flex flex-col transition-transform duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg"
+                  key={book.id}
+                  onClick={() => handleBookClick(book.id)}
+                >
+                  <div className="block bg-gray-200">
+                    <img
+                      src={book.coverImage || "/empty-image.jpg"}
+                      alt={book.title}
+                      className="block overflow-hidden shadow-md aspect-[3/4] object-cover w-full bg-gray-50"
+                    />
+                  </div>
+                  <div className="p-5 flex-1 flex flex-col items-start">
+                    <h2 className="text-lg mb-2 text-gray-800 font-bold line-clamp-2" title={book.title}>
+                      {book.title}
+                    </h2>
+                    <p className="text-sm text-gray-600 line-clamp-1 mb-2" title={book.originalTitle}>
+                      Tên gốc: <strong>{book.originalTitle}</strong>
+                    </p>
+                    {book.authors && book.authors.$values.length > 0 && (
+                      <p className="text-sm text-gray-600 mb-2"
+                         title={book.authors.$values.map((author) => author.name).join(", ")}>
+                        Tác giả: <strong>{book.authors.$values.map((author) => author.name).join(", ")}</strong>
+                      </p>
+                    )}
+                    <p className="text-sm text-gray-600 mb-2">
+                      Năm xuất bản: <strong>{book.publicationYear}</strong>
+                    </p>
+                  </div>
+                </div>
               ))}
-            </select>
+            </Show>
           </div>
 
-          <div className="filter-groupup">
-            <h3>Năm xuất bản</h3>
-            <select
-              value={selectedPublicationYear}
-              onChange={handlePublicationYearChange}
-              className="filter-select"
-            >
-              <option value="">Tất cả</option>
-              {publicationYears.map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Phân trang */}
+          {filteredBooks.length > 0 && (
+            <ReactPaginate
+              previousLabel={"Trước"}
+              nextLabel={"Sau"}
+              breakLabel={"..."}
+              pageCount={pageCount}
+              marginPagesDisplayed={1}
+              pageRangeDisplayed={1}
+              onPageChange={handlePageClick}
+              containerClassName={"pagination"}
+              activeClassName={"active"}
+            />
+          )}
         </div>
       </div>
-
-      {/* Danh sách sách */}
-      <div className="book-list-stst">
-        {currentBooks.length > 0 ? (
-          currentBooks.map((book) => (
-            <div className="book-item-emem" key={book.id} onClick={() => handleBookClick(book.id)}>
-              {book.coverImage && (
-                <img
-                  src={book.coverImage}
-                  alt={book.title}
-                  className="book-cover"
-                />
-              )}
-              <div className="book-info">
-                <h2 className="book-title">{book.title}</h2>
-                {/* <h3 className="book-original-title">{book.originalTitle.length > 18 ? `${book.originalTitle.slice(0, 10)}\n${book.originalTitle.slice(25)}` : book.originalTitle}</h3> */}
-                <p className="book-publication-year">
-                  <strong>Năm xuất bản:</strong> {book.publicationYear}
-                </p>
-                {book.authors && book.authors.$values.length > 0 && (
-                  <p className="book-author">
-                    <strong>Tác giả:</strong>{" "}
-                    {book.authors.$values
-                      .map((author) => author.name)
-                      .filter(Boolean) // Loại bỏ các tên undefined/null
-                      .join(", ")}
-                  </p>
-                )}
-                {/* <p className="book-description">{book.description}</p> */}
-              </div>
-            </div>
-          ))
-        ) : (
-          <p>Không tìm thấy sách nào.</p>
-        )}
-      </div>
-
-      {/* Phân trang */}
-      {filteredBooks.length > 0 && (
-        <ReactPaginate
-          previousLabel={"Trước"}
-          nextLabel={"Sau"}
-          breakLabel={"..."}
-          pageCount={pageCount}
-          marginPagesDisplayed={2}
-          pageRangeDisplayed={5}
-          onPageChange={handlePageClick}
-          containerClassName={"pagination"}
-          activeClassName={"active"}
-        />
-      )}
     </div>
   );
 };

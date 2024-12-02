@@ -17,7 +17,7 @@ const BookDetailBook = () => {
   const [liked, setLiked] = useState(false);
   const fetchBookDetail = async () => {
     try {
-      const response = await axios.get(`https://160.25.80.100:7124/api/book/getbookbyid/${id}`, {
+      const response = await axios.get(`https://bookrecaps.cloud/api/book/getbookbyid/${id}`, {
         headers: {
           'Authorization': `Bearer ${accessToken}`,
         },

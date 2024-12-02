@@ -46,7 +46,7 @@ const RecapByContributor = () => {
   const fetchRecaps = async () => {
     try {
       const recapResponse = await axios.get(
-        'https://160.25.80.100:7124/api/recap/Getallrecap',
+        'https://bookrecaps.cloud/api/recap/Getallrecap',
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -95,7 +95,7 @@ const RecapByContributor = () => {
   const fetchContributorInfo = async (userId) => {
     try {
       const contributorResponse = await axios.get(
-        `https://160.25.80.100:7124/api/users/get-user-account-byID?userId=${userId}`,
+        `https://bookrecaps.cloud/api/users/get-user-account-byID?userId=${userId}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -124,7 +124,7 @@ const RecapByContributor = () => {
   // Handle token refresh
   const handleTokenRefresh = async () => {
     try {
-      const response = await axios.post("https://160.25.80.100:7124/api/tokens/refresh", {
+      const response = await axios.post("https://bookrecaps.cloud/api/tokens/refresh", {
         refreshToken,
       });
 
@@ -177,7 +177,7 @@ const handleBookClick = (book) => {
             <div className="recap-contributor">
               {recap.contributor ? (
                 <>
-                  <img src={`https://160.25.80.100:7124/${recap.contributor.imageUrl}`} alt={recap.contributor.fullName} className="contributor-image" />
+                  <img src={recap.contributor.imageUrl} alt={recap.contributor.fullName} className="contributor-image" />
                   <h3>{recap.contributor.fullName}</h3>
                 </>
               ) : (

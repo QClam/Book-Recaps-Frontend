@@ -30,7 +30,7 @@ const ListenPart = () => {
   // Token Refresh Handler
   const handleTokenRefresh = async () => {
     try {
-      const response = await axios.post("https://160.25.80.100:7124/api/tokens/refresh", {
+      const response = await axios.post("https://bookrecaps.cloud/api/tokens/refresh", {
         refreshToken,
       });
       const { accessToken: newAccessToken, refreshToken: newRefreshToken } = response.data.message.token;
@@ -47,7 +47,7 @@ const ListenPart = () => {
   // Fetch Recaps
   const fetchRecaps = async () => {
     try {
-      const response = await axios.get("https://160.25.80.100:7124/api/recap/get-all-recapsbycontributorId", {
+      const response = await axios.get("https://bookrecaps.cloud/api/recap/get-all-recapsbycontributorId", {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",
@@ -274,7 +274,7 @@ const ListenPart = () => {
   // Send Highlight to API
   const sendHighlightToAPI = async (highlightData) => {
     try {
-      await axios.post("https://160.25.80.100:7124/api/highlight", highlightData, {
+      await axios.post("https://bookrecaps.cloud/api/highlight", highlightData, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
           "Content-Type": "application/json",

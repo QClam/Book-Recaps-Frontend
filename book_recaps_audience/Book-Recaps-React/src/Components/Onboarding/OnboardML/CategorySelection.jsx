@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
-import { axiosInstance } from "../api";
+import { axiosInstance2 } from "../../../utils/axios";
 
 const getCategories = async (controller) => {
   try {
-    const response = await axiosInstance.get("/categories", {
+    const response = await axiosInstance2.get("/categories", {
       signal: controller.signal
     });
     return response.data;

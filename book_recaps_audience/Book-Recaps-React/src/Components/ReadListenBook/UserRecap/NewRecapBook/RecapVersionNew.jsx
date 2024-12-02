@@ -55,7 +55,7 @@ const RecapVersionNew = () => {
   useEffect(() => {
     const fetchVersionDetails = async () => {
       try {
-        const response = await axios.get(`https://160.25.80.100:7124/version/${versionId}`, {
+        const response = await axios.get(`https://bookrecaps.cloud/version/${versionId}`, {
           headers: {
             'Authorization': `Bearer ${accessToken}`,
             'Content-Type': 'application/json',

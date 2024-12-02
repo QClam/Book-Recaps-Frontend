@@ -3,6 +3,7 @@ import axios from "axios";
 import "./RecapDetails.scss";
 import { FaSyncAlt } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { routes } from "../../routes";
 
 const RecapDetails = () => {
   const [audioURL, setAudioURL] = useState("");
@@ -38,7 +39,7 @@ const RecapDetails = () => {
   const handleTokenRefresh = async () => {
     try {
       const response = await axios.post(
-        "https://160.25.80.100:7124/api/tokens/refresh",
+        "https://bookrecaps.cloud/api/tokens/refresh",
         {
           refreshToken,
         }
@@ -52,7 +53,7 @@ const RecapDetails = () => {
       return newAccessToken;
     } catch (error) {
       setError("Session expired. Please log in again.");
-      navigate("/login"); // Redirect to login page
+      navigate(routes.login); // Redirect to login page
       return null;
     }
   };
@@ -61,7 +62,7 @@ const RecapDetails = () => {
   const fetchRecaps = async () => {
     try {
       const response = await axios.get(
-        "https://160.25.80.100:7124/api/recap/get-all-recapsbycontributorId",
+        "https://bookrecaps.cloud/api/recap/get-all-recapsbycontributorId",
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -339,7 +340,7 @@ const sendHighlightRequest = async (highlightData) => {
 
   try {
       const response = await axios.post(
-          "https://160.25.80.100:7124/api/highlight/createhighlight",
+          "https://bookrecaps.cloud/api/highlight/createhighlight",
           highlightData,
           {
               headers: {
@@ -522,7 +523,7 @@ const sendHighlightRequest = async (highlightData) => {
           </div>
           <div
             className="sidebar-item"
-            onClick={() => handleNavigation("/explore")}
+            onClick={() => handleNavigation(routes.explore)}
           >
             <span className="icon">🔍</span>
             {!isSidebarCollapsed && <span className="label">Explore</span>}

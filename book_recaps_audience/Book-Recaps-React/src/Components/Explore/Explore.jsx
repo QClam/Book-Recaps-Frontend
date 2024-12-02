@@ -1,5 +1,3 @@
-
-import React from 'react';
 //import BookTrending from './BookTrending/BookTrending';
 //import Categories from './Categories/Categories';
 //import Collection from './Collection/Collection';
@@ -12,21 +10,21 @@ import BookApi from './BookApi/BookApi';
 //import BookCarousel from '../ForYou/BookCarousel';
 
 const Explore = () => {
-    return (
-        <div>
-            {/* <SearchBook /> */}
-            <BookApi />
-            {/* <BookTrendingApi /> */}
-            {/* <BookApiCategory /> */}
-            {/* <BookTrending /> */}
-            {/* <Categories /> */}
-            {/* <LatestBook /> */}
-            {/* <Collection /> */}
-            {/* <ListCategory />
-            <CustomCategory /> */}
-            {/* <BookCarousel /> */}
-        </div>
-    );
+  return (
+    <div>
+      {/* <SearchBook /> */}
+      <BookApi/>
+      {/* <BookTrendingApi /> */}
+      {/* <BookApiCategory /> */}
+      {/* <BookTrending /> */}
+      {/* <Categories /> */}
+      {/* <LatestBook /> */}
+      {/* <Collection /> */}
+      {/*<ListCategory/>*/}
+      {/*<CustomCategory/>*/}
+      {/* <BookCarousel /> */}
+    </div>
+  );
 };
 
 export default Explore;
