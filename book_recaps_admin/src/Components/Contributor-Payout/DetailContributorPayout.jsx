@@ -54,7 +54,12 @@ function DetailContributorPayout() {
     }
 
     const detailRecap = async (id) => {
-        navigate(`/recap/${id}`)
+        navigate(`/recap/${id}`,{
+            state: {
+                fromDate: payoutData.fromDate,
+                toDate: payoutData.toDate
+            }
+        })
     }
 
     return (

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Chart from 'chart.js/auto';
 import { Box, Typography, Card, CardContent, Grid, Button, Paper, Divider } from '@mui/material';
 import { DateRangePicker } from 'rsuite';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import api from '../Auth/AxiosInterceptors';
 import dayjs from 'dayjs';
 
@@ -11,9 +11,14 @@ function RecapDetail() {
     const { id } = useParams();
     const chartRef = useRef(null);
     const chartInstanceRef = useRef(null);
+    const location = useLocation();
+    const { fromDate, toDate } = location.state || {};
 
-    const today = dayjs().format("YYYY-MM-DD");
-    const [dateRange, setDateRange] = useState([today, today]);
+    const today = dayjs().format("DD-MM-YYYY");
+    const [dateRange, setDateRange] = useState([
+        fromDate || dayjs().format("YYYY-MM-DD"),
+        toDate || dayjs().format("YYYY-MM-DD"),
+    ]);
 
     const [recapData, setRecapData] = useState({
         recapName: '',
@@ -47,13 +52,13 @@ function RecapDetail() {
     };
 
     const getRecapData = async (fromDate, toDate) => {
-        if(!id) {
+        if (!id) {
             return;
         }
 
         try {
             const response = await api.get(`/api/dashboard/getrecapdetail/${id}`, {
-                params: {fromDate, toDate}
+                params: { fromDate, toDate }
             })
 
             const recapDetails = response.data.data || {};
@@ -65,8 +70,8 @@ function RecapDetail() {
                 lastPayout: recapDetails.lastPayout || { fromDate: '', toDate: '', amount: 0 },
                 unpaidEarning: recapDetails.unpaidEarning
             })
-            console.log("DashBoard: ",recapDetails);
-            
+            console.log("DashBoard: ", recapDetails);
+
 
             updateChart(dailyStats);
         } catch (error) {
@@ -77,7 +82,7 @@ function RecapDetail() {
     useEffect(() => {
         const [fromDate, toDate] = dateRange;
         getRecapData(fromDate, toDate);
-    },[dateRange])
+    }, [dateRange])
 
     useEffect(() => {
         if (chartRef.current) {
@@ -238,6 +243,7 @@ function RecapDetail() {
                 <Typography textAlign='center' sx={{ marginBottom: 2, marginTop: 2 }}>Hãy chọn khoảng thời gian để hiển thị số liệu</Typography>
                 <Box display='flex' justifyContent='center'>
                     <DateRangePicker
+                        value={[new Date(dateRange[0]), new Date(dateRange[1])]}
                         format="dd-MM-yyyy"
                         onChange={handleDateChange}
                     />

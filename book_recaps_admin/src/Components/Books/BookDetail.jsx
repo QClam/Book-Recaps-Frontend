@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Chart from 'chart.js/auto';
 import { Box, Typography, Card, CardContent, Grid, Button, Paper, Divider } from '@mui/material';
 import { DateRangePicker } from 'rsuite';
-import { useParams } from 'react-router-dom';
+import { useParams, useLocation } from 'react-router-dom';
 import api from '../Auth/AxiosInterceptors';
 import dayjs from 'dayjs';
 
@@ -10,15 +10,20 @@ function BookDetail() {
     const { id } = useParams();
     const chartRef = useRef(null);
     const chartInstanceRef = useRef(null);
+    const location = useLocation();
+    const { fromDate, toDate } = location.state || {};
 
-    const today = dayjs().format("YYYY-MM-DD");
-    const [dateRange, setDateRange] = useState([today, today]);
+    const today = dayjs().format("DD-MM-YYYY");
+    const [dateRange, setDateRange] = useState([
+        fromDate || dayjs().format("YYYY-MM-DD"),
+        toDate || dayjs().format("YYYY-MM-DD"),
+    ]);
 
     const [bookData, setBookData] = useState({
         title: '',
         dailyStats: [],
         lastPayout: { fromDate: '', toDate: '', amount: 0 },
-        unpaidEarning:  0,
+        unpaidEarning: 0,
     });
 
     const getBookData = async (fromDate, toDate) => {
@@ -235,6 +240,7 @@ function BookDetail() {
                 <Typography textAlign='center' sx={{ marginBottom: 2, marginTop: 2 }}>Hãy chọn khoảng thời gian để hiển thị số liệu</Typography>
                 <Box display='flex' justifyContent='center'>
                     <DateRangePicker
+                        value={[new Date(dateRange[0]), new Date(dateRange[1])]}
                         format="dd-MM-yyyy"
                         onChange={handleDateChange}
                     />

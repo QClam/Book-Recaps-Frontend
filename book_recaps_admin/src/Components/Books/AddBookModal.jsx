@@ -113,6 +113,13 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
     }, []);
 
     const handleSubmit = async () => {
+
+        const validationErrors = validateForm();
+        if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+        }
+
         try {
             const formDataToSend = new FormData();
     
@@ -150,13 +157,13 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
             <DialogContent>
                 <Box component="form" noValidate autoComplete="off" sx={{ mt: 2 }}>
                     {[
-                        { name: 'Title', label: 'Book Title' },
-                        { name: 'OriginalTitle', label: 'Original Title' },
+                        { name: 'Title', label: 'Tiêu đề sách' },
+                        { name: 'OriginalTitle', label: 'Tiêu đề gốc' },
                         { name: 'ISBN_13', label: 'ISBN_13' },
                         { name: 'ISBN_10', label: 'ISBN_10' },
-                        { name: 'Description', label: 'Description', multiline: true, rows: 4 },
-                        { name: 'PublicationYear', label: 'Publication Year' },
-                        { name: 'AgeLimit', label: 'Age Limit' },
+                        { name: 'Description', label: 'Mô tả', multiline: true, rows: 4 },
+                        { name: 'PublicationYear', label: 'Năm xuất bản' },
+                        { name: 'AgeLimit', label: 'Giới hạn tuổi' },
                     ].map(field => (
                         <TextField
                             key={field.name}
@@ -220,19 +227,19 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
 
                     {/* File inputs */}
                     <Button variant="contained" component="label" sx={{ mt: 2 }}>
-                        Choose Cover Image
+                        Chọn ảnh bìa sách
                         <input type="file" name="coverImage" hidden onChange={handleFileChange} />
                     </Button>
                     <Button variant="contained" component="label" sx={{ mt: 2, ml: 2 }}>
-                        Choose Author Image
+                        Chọn ảnh tác giả
                         <input type="file" name="authorImages" hidden onChange={handleFileChange} />
                     </Button>
                 </Box>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
+                <Button onClick={onClose} color='error'>Hủy</Button>
                 <Button onClick={handleSubmit} variant="contained" color="primary">
-                    Save
+                    Thêm
                 </Button>
             </DialogActions>
         </Dialog>

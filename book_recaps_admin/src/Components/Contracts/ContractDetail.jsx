@@ -12,6 +12,7 @@ import {
     MenuItem,
     FormControlLabel,
     Checkbox,
+    Tooltip
 } from '@mui/material';
 import Swal from 'sweetalert2';
 
@@ -343,9 +344,16 @@ function ContractDetail() {
                                         <Button variant="contained" color="primary" onClick={handleSendContract} disabled={disableUpdate || isCheckbox}>
                                             Gửi
                                         </Button>
-                                        <Button variant="contained" color="success" onClick={handleSaveContract} disabled={disableUpdate}>
-                                            Lưu chỉnh sửa
-                                        </Button>
+                                        <Tooltip title="Hãy nhấn Lưu chỉnh sửa mỗi khi thay đổi thông tin, thêm tài liệu hoặc sách">
+                                            <Button
+                                                variant="contained"
+                                                color="success"
+                                                onClick={handleSaveContract}
+                                                disabled={disableUpdate}
+                                            >
+                                                Lưu chỉnh sửa
+                                            </Button>
+                                        </Tooltip>
                                     </Box>
                                 </Grid>
 

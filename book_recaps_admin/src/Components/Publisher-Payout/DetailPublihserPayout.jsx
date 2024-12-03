@@ -37,7 +37,12 @@ function DetailPublihserPayout() {
    }, [])
 
    const detailBook = async (id) => {
-      navigate(`/book/${id}`)
+      navigate(`/book/${id}`, {
+         state: {
+            fromDate: payoutData.fromDate,
+            toDate: payoutData.toDate
+         }
+      })
   }
 
    const handleExportExcel = () => {
