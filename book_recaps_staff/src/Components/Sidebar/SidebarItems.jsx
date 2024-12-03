@@ -26,7 +26,7 @@ export const SidebarItems = [
     link: "/recaps",
   },
   {
-    title: "Quản lý người dùng",
+    title: "Giám sát người đóng góp",
     icon: <Groups />,
     link: "/users",
   },

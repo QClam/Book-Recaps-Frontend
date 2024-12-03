@@ -35,6 +35,10 @@
         overflow-y: auto;
         max-height: calc(100vh - 150px);
         padding: 15px;
+
+        .transcript-section {
+          margin-top: 20px;
+        }
       }
     }
   }

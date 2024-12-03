@@ -3,10 +3,12 @@ import { Hourglass } from 'react-loader-spinner';
 import api from '../Auth/AxiosInterceptors';
 import Pagination from '@mui/material/Pagination';
 
-import empty_image from "../../data/empty-image.png"
+import avatar from "../../data/avatar.png"
 import './UsersList.scss';
 import '../Loading.scss';
-import { Box, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
+import { Box, Button, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
+import { Visibility } from '@mui/icons-material';
+import UserDetail from './UserDetail';
 
 function UsersList() {
 
@@ -15,17 +17,19 @@ function UsersList() {
     const [page, setPage] = useState(0); // Trang hiện tại
     const [rowsPerPage, setRowsPerPage] = useState(4); // Dòng mỗi trang    
     const [searchTerm, setSearchTerm] = useState(""); // Nhập input ô search
-    const [loading, setLoading] = useState(true); // Start loading as true
-
+    const [loading, setLoading] = useState(true);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchUsers = async () => {
             try {
                 const response = await api.get('/api/users/getalluser');
-                const users = response.data.$values
-                setUsers(users);
-                setFilteredUsers(users);
-                console.log("Users: ", users);
+                const users = response.data.$values;
+                const filterdUsers = users.filter(user => user.roleType === 2);
+                setUsers(filterdUsers);
+                setFilteredUsers(filterdUsers);
+                console.log("Users: ", filterdUsers);
             } catch (error) {
                 console.log("Error fetching", error);
             } finally {
@@ -34,6 +38,17 @@ function UsersList() {
         };
         fetchUsers();
     }, []);
+
+    const detailUser = (userId) => {
+        const user = users.find(u => u.id === userId); // Lấy thông tin người dùng theo ID
+        setSelectedUser(user); // Lưu thông tin user vào state selectedUser
+        setIsModalOpen(true);
+    }
+
+    const handleCloseModal = () => {
+        setIsModalOpen(false);
+        setSelectedUser(null);
+    };
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -75,7 +90,7 @@ function UsersList() {
 
     return (
         <Box sx={{ width: "80vw" }}>
-            <Typography variant='h5' margin={1}>Danh sách Contributor và Audience</Typography>
+            <Typography variant='h5' margin={1}>Danh sách Người đóng góp</Typography>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
                 <TextField
                     label="Tìm kiếm theo tên"
@@ -92,27 +107,31 @@ function UsersList() {
                         <TableRow>
                             <TableCell><strong>Họ & Tên</strong></TableCell>
                             <TableCell><strong>Email</strong></TableCell>
-                            <TableCell><strong>Ảnh Đại Diện</strong></TableCell>
+                            {/* <TableCell><strong>Ảnh Đại Diện</strong></TableCell> */}
                             <TableCell><strong>Ngày Sinh</strong></TableCell>
                             <TableCell><strong>Số điện thoại</strong></TableCell>
+                            <TableCell></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((val) => (
-                            <TableRow key={val.id}>
-                                <TableCell>{val.fullName}</TableCell>
-                                <TableCell>{val.email}</TableCell>
-                                <TableCell><img src={val.imageUrl || empty_image}
-                                    alt='Avatar'
-                                    style={{ width: 80, height: 80, borderRadius: "50%" }}
-                                    onError={({ currentTarget }) => {
-                                        currentTarget.onerror = null;
-                                        currentTarget.src = empty_image
-                                    }} /></TableCell>
-                                <TableCell>{new Date(val.birthDate).toLocaleDateString()}</TableCell>
-                                <TableCell>{val.phoneNumber}</TableCell>
-                            </TableRow>
-                        ))}
+                        {filteredUsers
+                            .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                            .map((val) => (
+                                <TableRow key={val.id}>
+                                    <TableCell>{val.fullName}</TableCell>
+                                    <TableCell>{val.email}</TableCell>
+                                    {/* <TableCell><img src={val.imageUrl || avatar}
+                                        alt='Avatar'
+                                        style={{ width: 80, height: 80, borderRadius: "50%" }}
+                                        onError={({ currentTarget }) => {
+                                            currentTarget.onerror = null;
+                                            currentTarget.src = avatar
+                                        }} /></TableCell> */}
+                                    <TableCell>{new Date(val.birthDate).toLocaleDateString()}</TableCell>
+                                    <TableCell>{val.phoneNumber}</TableCell>
+                                    <TableCell><Button onClick={() => detailUser(val.id)}><Visibility /></Button></TableCell>
+                                </TableRow>
+                            ))}
                     </TableBody>
                     <TableFooter>
                         <TableRow>
@@ -132,6 +151,12 @@ function UsersList() {
                     </TableFooter>
                 </Table>
             </TableContainer>
+
+            <UserDetail
+                open={isModalOpen}
+                onClose={handleCloseModal}
+                selectedUser={selectedUser}
+            />
         </Box>
     );
 }

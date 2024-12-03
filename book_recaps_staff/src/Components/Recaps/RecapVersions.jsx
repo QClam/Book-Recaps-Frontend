@@ -181,18 +181,20 @@ function RecapVersions() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell><strong>Tên bản Recap</strong></TableCell>
-                            <TableCell><strong>Tên cuốn sách</strong></TableCell>
-                            <TableCell><strong>Tên Người đóng góp</strong></TableCell>
+                            <TableCell><strong>ID</strong></TableCell>
+                            <TableCell><strong>Bản Recap</strong></TableCell>
+                            <TableCell><strong>Cuốn sách</strong></TableCell>
+                            <TableCell sx={{width: 120}}><strong>Tên</strong></TableCell>
                             <TableCell><strong>Ngày</strong></TableCell>
-                            <TableCell><strong>Duyệt nội dung</strong></TableCell>
-                            <TableCell><strong>Chi tiết bản duyệt</strong></TableCell>
+                            <TableCell><strong>Duyệt</strong></TableCell>
+                            <TableCell><strong>Chi tiết</strong></TableCell>
                             <TableCell><strong>Trạng thái</strong></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {filteredVersions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
                             <TableRow key={item.recapVersionId}>
+                                <TableCell>{item.recapVersionId}</TableCell>
                                 <TableCell>{item.versionName}</TableCell>
                                 <TableCell>{item.bookTitle}</TableCell>
                                 <TableCell>{item.contributorName}</TableCell>

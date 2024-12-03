@@ -116,6 +116,15 @@ function WithdrawalRequest({ open, onClose, drawalId, onUpdate }) {
 
                             <Box display="flex" justifyContent="space-between">
                                 <Typography>
+                                    Số dư còn lại:
+                                </Typography>
+                                <Typography>
+                                    <strong>Thêm field nha HA</strong>
+                                </Typography>
+                            </Box>
+
+                            <Box display="flex" justifyContent="space-between">
+                                <Typography>
                                     Số tiền:
                                 </Typography>
                                 <Typography>

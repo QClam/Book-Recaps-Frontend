@@ -228,19 +228,19 @@ function ReportList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell><strong>Tên bản Recap</strong></TableCell>
-                            <TableCell><strong>Tên cuốn sách</strong></TableCell>
-                            <TableCell><strong>Tên Thính giả</strong></TableCell>
+                            <TableCell sx={{width: 120}}><strong>Bản Recap</strong></TableCell>
+                            <TableCell sx={{width: 120}}><strong>Cuốn sách</strong></TableCell>
+                            <TableCell><strong>Tên</strong></TableCell>
                             <TableCell><strong>Nội dung</strong></TableCell>
                             <TableCell><strong>Phản hồi từ Staff</strong></TableCell>
-                            <TableCell><strong>Ngày</strong></TableCell>
+                            <TableCell sx={{width: 150}}><strong>Ngày tạo</strong></TableCell>
+                            <TableCell sx={{width: 150}}><strong>Ngày Phản hồi</strong></TableCell>
                             <TableCell><strong>Phản hồi</strong></TableCell>
                             <TableCell><strong>Trạng Thái</strong></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {filteredReports.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                            .filter((val) => filterStatus === "" || val.status === filterStatus)
                             .map((val) => (
                                 <TableRow key={val.id}>
                                     <TableCell>{val.recaps?.name}</TableCell>
@@ -249,6 +249,9 @@ function ReportList() {
                                     <TableCell>{val.description}</TableCell>
                                     <TableCell>{val.response || "Chưa có phản hồi từ staff"}</TableCell>
                                     <TableCell>{new Date(val.createdAt).toLocaleDateString()}</TableCell>
+                                    <TableCell>{val.updatedAt === "0001-01-01T00:00:00" || !val.updatedAt
+                                        ? "Chưa phản hồi"
+                                        : new Date(val.updatedAt).toLocaleDateString()}</TableCell>
                                     <TableCell>
                                         <Chip onClick={() => openDialog(val)}
                                             disabled={val.status === 2}
@@ -288,6 +291,8 @@ function ReportList() {
                                 labelRowsPerPage="Số hàng mỗi trang"
                                 labelDisplayedRows={({ from, to, count }) =>
                                     `${from}–${to} trong tổng số ${count !== -1 ? count : `nhiều hơn ${to}`}`}
+                                showFirstButton
+                                showLastButton
                             />
                         </TableRow>
                     </TableFooter>
@@ -305,6 +310,7 @@ function ReportList() {
                         fullWidth
                         value={responseText}
                         onChange={handleResponseChange}
+                        sx={{marginTop: 2}}
                     />
                 </DialogContent>
                 <DialogActions>

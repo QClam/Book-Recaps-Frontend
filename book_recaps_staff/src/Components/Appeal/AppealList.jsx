@@ -255,11 +255,12 @@ function AppealList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell><strong>Tên Contributor</strong></TableCell>
-                            <TableCell><strong>Tên Staff </strong></TableCell>
-                            <TableCell><strong>Nội dung kháng cáo </strong> </TableCell>
+                            <TableCell sx={{width: 120}}><strong>Tên</strong></TableCell>
+                            <TableCell sx={{width: 120}}><strong>Nhân viên </strong></TableCell>
+                            <TableCell><strong>Nội dung </strong> </TableCell>
                             <TableCell><strong>Phản hồi từ Staff </strong></TableCell>
-                            <TableCell><strong>Ngày </strong></TableCell>
+                            <TableCell><strong>Ngày tạo</strong></TableCell>
+                            <TableCell sx={{width: 150}}><strong>Ngày Phản hồi</strong></TableCell>
                             <TableCell><strong>Bản Review</strong></TableCell>
                             <TableCell><strong>Phản hồi Kháng cáo</strong></TableCell>
                             <TableCell><strong>Trạng Thái</strong></TableCell>
@@ -274,6 +275,9 @@ function AppealList() {
                                     <TableCell>{val.reason}</TableCell>
                                     <TableCell>{val.response || "Chưa có phản hồi từ Staff"}</TableCell>
                                     <TableCell>{new Date(val.createdAt).toLocaleDateString()}</TableCell>
+                                    <TableCell>{val.updatedAt === "0001-01-01T00:00:00" || !val.updatedAt
+                                        ? "Chưa phản hồi"
+                                        : new Date(val.updatedAt).toLocaleDateString()}</TableCell>
                                     <TableCell>
                                         <Chip
                                             label="Xem Review"
@@ -323,6 +327,8 @@ function AppealList() {
                                 labelDisplayedRows={({ from, to, count }) =>
                                     `${from}–${to} trong tổng số ${count !== -1 ? count : `nhiều hơn ${to}`}`
                                 }
+                                showFirstButton
+                                showLastButton
                             />
                         </TableRow>
                     </TableFooter>
@@ -340,6 +346,7 @@ function AppealList() {
                         fullWidth
                         value={responseText}
                         onChange={handleResponseChange}
+                        sx={{ marginTop: 2 }}
                     />
                 </DialogContent>
                 <DialogActions>

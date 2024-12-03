@@ -6,6 +6,7 @@ import Swal from 'sweetalert2';
 import axios from 'axios';
 
 import api from '../Auth/AxiosInterceptors';
+import empty_image from "../../data/empty-image.png"
 import './ReviewNote.scss';
 
 function Review() {
@@ -540,6 +541,14 @@ function Review() {
                            {transcript.transcriptSections.map((section, sectionIndex) => {
                               return (
                                  <div key={sectionIndex} className='transcript-section'>
+                                    <img src={section.image || empty_image}
+                                       alt='Ảnh tiêu đề'
+                                       style={{ width: "auto", height: 80 }}
+                                       onError={({ currentTarget }) => {
+                                          currentTarget.onerror = null;
+                                          currentTarget.src = empty_image
+                                       }}
+                                    />
                                     <h2>{section.title || "Chưa có tiêu đề"}</h2>
                                     {section.transcriptSentences.map((sentence) => {
                                        const globalSentenceIndex = sentence.sentence_index;
@@ -653,7 +662,7 @@ function Review() {
                         <Chip
                            label='Từ Chối'
                            color='error'
-                           variant={hover || contentItem.recapVersion?.status === 3 ? "contained" : "outlined" }
+                           variant={hover || contentItem.recapVersion?.status === 3 ? "contained" : "outlined"}
                            onMouseEnter={handleMouseEnter}
                            onMouseLeave={handleMouseLeave}
                            onClick={confirmReject}
