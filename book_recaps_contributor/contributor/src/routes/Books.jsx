@@ -385,14 +385,14 @@ function BooksTable({ handleClickCreate }) {
           <Table.Cell>
             <div className="min-w-28">
               <p className="min-w-full line-clamp-2 break-words">
-                {book.authors.map((author) => author.name).join(", ")}
+                {book.authors?.map((author) => author.name).join(", ")}
               </p>
             </div>
           </Table.Cell>
           <Table.Cell>
             <div className="min-w-28">
               <p className="min-w-full line-clamp-2 break-words">
-                {book.categories.map((category) => category.name).join(", ")}
+                {book.categories?.map((category) => category.name).join(", ")}
               </p>
             </div>
           </Table.Cell>
@@ -400,7 +400,7 @@ function BooksTable({ handleClickCreate }) {
             {book.publicationYear}
           </Table.Cell>
           <Table.Cell>
-            {book.publisher.name}
+            {book.publisher?.name}
           </Table.Cell>
           <Table.Cell>
             <button

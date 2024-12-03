@@ -1395,7 +1395,7 @@ const PlagiarismResults = () => {
                 <div className="bg-gray-200 rounded h-4 my-2 overflow-hidden">
                   <div className="h-full bg-red-300" style={{ width: `${result.similarity_score * 100}%` }}></div>
                 </div>
-                <p className="font-bold text-right">${Number(result.similarity_score * 100).toFixed(1)}%</p>
+                <p className="font-bold text-right">{Number(result.similarity_score * 100).toFixed(1)}%</p>
               </div>
             ))}
           </div>

@@ -41,12 +41,12 @@ const Dashboard = () => {
         <div className="bg-white p-6 rounded-md shadow-sm border border-gray-300 space-y-4">
           <div className="text-lg font-semibold">Thu nhập chưa quyết toán</div>
           <div className="text-2xl font-bold mb-2">
-            {data.totalIncome} VND
+            {Number(data.totalIncome).toLocaleString("vi-VN")} VNĐ
           </div>
           <div>
             <div className="text-sm text-gray-500">Quyết toán gần nhất</div>
             <div className="flex items-center justify-between gap-3">
-              <p>{data.lastPayoutAmount} VND</p>
+              <p>{Number(data.lastPayoutAmount).toLocaleString("vi-VN")} VNĐ</p>
               <i className="pi pi-chart-line text-gray-500 text-2xl"></i>
             </div>
           </div>
@@ -76,7 +76,7 @@ const Dashboard = () => {
         <div className="bg-white p-6 rounded-md shadow-sm border border-gray-300 space-y-4">
           <div className="text-lg font-semibold">Số dư hiện tại</div>
           <div className="flex items-center justify-between gap-3">
-            <div className="text-2xl font-bold mb-2">{data.currentEarnings} VND</div>
+            <div className="text-2xl font-bold mb-2">{Number(data.currentEarnings).toLocaleString("vi-VN")} VNĐ</div>
             <i className="pi pi-wallet text-gray-500 text-2xl"></i>
           </div>
           <Divider/>
@@ -117,7 +117,7 @@ const Dashboard = () => {
                     </div>
                     <div>
                       <div className="text-lg font-semibold">{recap.recapName}</div>
-                      <div className="text-sm font-semibold">Tóm tắt sách "{recap.bookName}"</div>
+                      <div className="text-sm font-semibold">Tóm tắt sách &#34;{recap.bookName}&#34;</div>
                       <div className="text-sm text-gray-500">Trạng thái: {recap.isPublished ? "Công khai" : "Ẩn"}</div>
                       <div className="text-sm text-gray-500">Lượt xem: {recap.viewsCount}</div>
                       <div className="text-sm text-gray-500">Lượt thích: {recap.likesCount}</div>
@@ -152,7 +152,7 @@ const Dashboard = () => {
                     </div>
                     <div>
                       <div className="text-lg font-semibold">{recap.recapName}</div>
-                      <div className="text-sm font-semibold">Tóm tắt sách "{recap.bookName}"</div>
+                      <div className="text-sm font-semibold">Tóm tắt sách &#34;{recap.bookName}&#34;</div>
                       <div className="text-sm text-gray-500">Trạng thái: {recap.isPublished ? "Công khai" : "Ẩn"}</div>
                       <div className="text-sm text-gray-500">Lượt xem: {recap.viewsCount}</div>
                       <div className="text-sm text-gray-500">Lượt thích: {recap.likesCount}</div>
