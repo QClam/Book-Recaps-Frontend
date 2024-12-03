@@ -47,7 +47,8 @@ const ContributorTerm = () => {
             <h1>Congratulations on becoming an contributor!</h1>
             <p>You've successfully created an account. We think this calls for a little celebration.</p>
             <p>Now, are you ready to explore?</p>
-            <a href="https://contributor.hieuvo.dev/login" className="explore-button">Take me to Book Recaps</a>
+            <a href={import.meta.env.VITE_CONTRIBUTOR_ENDPOINT + "/login"} className="explore-button">Take me to Book
+              Recaps</a>
           </div>
         ) : (
           <>
