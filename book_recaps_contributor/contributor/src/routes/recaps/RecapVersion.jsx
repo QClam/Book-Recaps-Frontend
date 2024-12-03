@@ -21,6 +21,7 @@ import { useAuth } from "../../contexts/Auth";
 import TextArea from "../../components/form/TextArea";
 import BookInfo from "../../components/BookInfo";
 import axios from "axios";
+import { Image } from "primereact/image";
 
 const getRecapVersion = async (versionId, request) => {
   try {
@@ -1386,9 +1387,28 @@ const PlagiarismResults = () => {
                 onClick={() => handleClickForHighlight(`highlight-plagiarism-${result.sentence_index}`, [ '!bg-red-200' ])}
                 className={`${"card-plagiarism-" + result.sentence_index} border border-gray-300 p-4 mb-4 rounded-lg bg-gray-50 cursor-pointer`}
               >
-                <h3 className="text-lg mb-2">{result.existing_recap_metadata?.book_title}</h3>
-                <p>Bài viết của: <span
-                  className="font-bold">{result.existing_recap_metadata?.contributor_full_name}</span></p>
+                <div className="flex gap-3">
+                  <div className="w-1/4 bg-gray-200 rounded-md flex items-center justify-center">
+                    <Image
+                      src={result.existing_recap_metadata?.book_image || "/empty-image.jpg"}
+                      alt={result.existing_recap_metadata?.book_title}
+                      className="block overflow-hidden rounded-md shadow-md"
+                      imageClassName="aspect-[3/4] object-cover w-full bg-white"
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <h3 className="text-lg mb-2">{result.existing_recap_metadata?.book_title}</h3>
+                    <p>Bài viết: <a
+                      href={import.meta.env.VITE_AUDIENCE_ENDPOINT + '/recap/' + result.existing_recap_metadata?.recap_id}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                      onClick={(e) => e.stopPropagation()}
+                      className="font-bold hover:underline text-indigo-600">{result.existing_recap_metadata?.recap_name}</a></p>
+                    <p>Của: <span
+                      className="font-bold">{result.existing_recap_metadata?.contributor_full_name}</span></p>
+                  </div>
+                </div>
+                <Divider/>
                 <blockquote className="italic text-gray-600 my-2">
                   <p>&#34;{result.existing_sentence}&#34;</p>
                 </blockquote>
