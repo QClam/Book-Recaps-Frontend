@@ -24,6 +24,7 @@ function BookDetail() {
         dailyStats: [],
         lastPayout: { fromDate: '', toDate: '', amount: 0 },
         unpaidEarning: 0,
+        originalTitle: '',
     });
 
     const getBookData = async (fromDate, toDate) => {
@@ -41,7 +42,8 @@ function BookDetail() {
                 title: bookDetails.title || "Không có tiêu đề",
                 dailyStats,
                 lastPayout: bookDetails.lastPayout || { fromDate: '', toDate: '', amount: 0 },
-                unpaidEarning: bookDetails.unpaidEarning
+                unpaidEarning: bookDetails.unpaidEarning,
+                originalTitle: bookDetails.originalTitle
             });
 
             updateChart(dailyStats);
@@ -126,7 +128,7 @@ function BookDetail() {
     return (
         <Box sx={{ padding: 4, width: "80vw" }}>
             <Typography variant="h4" gutterBottom>
-                Doanh thu của cuốn sách: {bookData.title}
+                Doanh thu của cuốn sách: {bookData.title} | Tên gốc: {bookData.originalTitle}
             </Typography>
             <Box display="flex" flexDirection="column">
                 <Grid container spacing={2}>

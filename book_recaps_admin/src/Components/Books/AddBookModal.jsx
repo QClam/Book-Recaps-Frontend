@@ -7,13 +7,11 @@ import {
     DialogContent,
     DialogTitle,
     TextField,
-    Select,
-    MenuItem,
-    InputLabel,
     FormControl,
     Autocomplete,
 } from '@mui/material';
 import api from '../Auth/AxiosInterceptors';
+import TestGetAvaliableBook from './TestGetAvaliableBook';
 
 const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
     const [authors, setAuthors] = useState([]);
@@ -34,6 +32,19 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
         coverImage: '', // Cover image file
         authorImages: [], // Author images file(s)
     });
+
+    const handleBookSelect = (book) => {
+        if (book) {
+            setFormData(prev => ({
+                ...prev,
+                Title: book.title || '',
+                ISBN_13: book.isbn13 || '',
+                ISBN_10: book.isbn10 || '',
+                Description: book.description || '',
+                PublicationYear: book.publishedDate?.slice(0, 4) || '', // Chỉ lấy năm nếu có ngày
+            }));
+        }
+    };
 
     const validateForm = () => {
         const errors = {};
@@ -67,7 +78,7 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-    
+
         if (name === 'Authors') {
             // Tìm tác giả từ danh sách tác giả đã fetch và lưu đối tượng tác giả vào formData
             const selectedAuthors = value.map(id => authors.find(author => author.id === id));
@@ -78,7 +89,7 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
         } else {
             setFormData(prev => ({ ...prev, [name]: value }));
         }
-    };    
+    };
 
     const handleFileChange = (e) => {
         const { name } = e.target;
@@ -122,7 +133,7 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
 
         try {
             const formDataToSend = new FormData();
-    
+
             // Thêm các trường thông thường vào form-data
             for (const key in formData) {
                 if (key === 'Authors') continue; // Bỏ qua Authors
@@ -132,15 +143,15 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
                     formDataToSend.append(key, formData[key]);
                 }
             }
-    
+
             // Convert Authors thành chuỗi JSON
             formDataToSend.append('Authors', JSON.stringify(formData.Authors));
-    
+
             // Gửi dữ liệu
             await api.post('/api/book/createbook', formDataToSend, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
-    
+
             alert("Thêm sách thành công")
             onBookAdded();
             onClose();
@@ -149,12 +160,12 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
             console.error('Error adding book:', error);
         }
     };
-    
 
     return (
         <Dialog open={isOpen} onClose={onClose} fullWidth maxWidth="md">
             <DialogTitle>Add New Book</DialogTitle>
             <DialogContent>
+                <TestGetAvaliableBook onSelectBook={handleBookSelect} />
                 <Box component="form" noValidate autoComplete="off" sx={{ mt: 2 }}>
                     {[
                         { name: 'Title', label: 'Tiêu đề sách' },
@@ -182,7 +193,7 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
 
                     {/* Multiple Author selection */}
                     <FormControl fullWidth margin="normal">
-                        
+
                         <Autocomplete
                             multiple
                             id="authors"

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { TextField, Autocomplete, Box } from '@mui/material';
 import api from '../Auth/AxiosInterceptors';
 
-function TestGetAvaliableBook() {
+function TestGetAvaliableBook({ onSelectBook }) {
   const [avaliableBook, setAvaliableBook] = useState([]); // Danh sách sách
   const [searchQuery, setSearchQuery] = useState(''); // Từ khóa tìm kiếm
   const [loading, setLoading] = useState(false); // Trạng thái loading
@@ -50,11 +50,12 @@ function TestGetAvaliableBook() {
   }, [searchQuery]);
 
   return (
-    <Box width='80vw'>
+    <Box marginTop={1}>
       <Autocomplete
         options={avaliableBook}
         getOptionLabel={(option) => `${option.title} - ${option.authors}`} // Hiển thị tiêu đề và tác giả
         onInputChange={(event, value) => setSearchQuery(value)} // Cập nhật từ khóa tìm kiếm
+        onChange={(event, value) => onSelectBook(value)}
         renderInput={(params) => (
           <TextField
             {...params}

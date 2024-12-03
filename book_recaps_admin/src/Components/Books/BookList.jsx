@@ -46,6 +46,8 @@ function BookList() {
     const [modalIsOpen, setModalIsOpen] = useState(false); // Modal visibility state
     const [loading, setLoading] = useState(true);
     const [isHover, setIsHover] = useState(false);
+    const [selectedAuthor, setSelectedAuthor] = useState(""); // Tác giả được chọn
+    const [selectedCategory, setSelectedCategory] = useState(""); // Danh mục được chọn
 
     const navigate = useNavigate();
 
@@ -72,6 +74,9 @@ function BookList() {
         fetchBooks();
     }, [])
 
+    const authors = [...new Set(books.flatMap(book => book.authors?.$values?.map(author => author.name)))];
+    const categories = [...new Set(books.flatMap(book => book.categories?.$values?.map(category => category.name)))];
+
     useEffect(() => {
         let filteredData = books;
 
@@ -83,6 +88,20 @@ function BookList() {
             );
         }
 
+        // Author filter
+        if (selectedAuthor) {
+            filteredData = filteredData.filter((item) =>
+                item.authors?.$values?.some((author) => author.name === selectedAuthor)
+            );
+        }
+
+        // Category filter
+        if (selectedCategory) {
+            filteredData = filteredData.filter((item) =>
+                item.categories?.$values?.some((category) => category.name === selectedCategory)
+            );
+        }
+
         setFilteredBooks(filteredData);
 
         // Kiểm tra nếu page vượt quá tổng số trang
@@ -90,7 +109,7 @@ function BookList() {
         if (page >= totalPages) {
             setPage(0);  // Reset page về 0 nếu vượt quá số trang
         }
-    }, [searchTerm, books, page, rowsPerPage]);
+    }, [searchTerm, books, page, rowsPerPage, selectedAuthor, selectedCategory]);
 
     const handleChangePage = (event, newPage) => {
         // Kiểm tra xem trang có hợp lệ hay không
@@ -143,6 +162,37 @@ function BookList() {
                     size="small"
                     sx={{ width: '40%' }}
                 />
+                <TextField
+                    select
+                    value={selectedAuthor}
+                    onChange={(e) => setSelectedAuthor(e.target.value)}
+                    variant="outlined"
+                    size="small"
+                    SelectProps={{ native: true }}
+                    sx={{ width: '20%' }}
+
+                >
+                    <option value="" disabled hidden>Chọn tác giả</option> {/* Placeholder */}
+                    <option value="">Tất cả</option> {/* Hiển thị "Tất cả" khi chọn */}
+                    {authors.map((author, index) => (
+                        <option key={index} value={author}>{author}</option>
+                    ))}
+                </TextField>
+                <TextField
+                    select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    variant="outlined"
+                    size="small"
+                    SelectProps={{ native: true }}
+                    sx={{ width: '20%' }}
+                >
+                    <option value="" disabled hidden>Chọn thể loại</option> {/* Placeholder */}
+                    <option value="">Tất cả</option> {/* Hiển thị "Tất cả" khi chọn */}
+                    {categories.map((category, index) => (
+                        <option key={index} value={category}>{category}</option>
+                    ))}
+                </TextField>
                 <Chip label="Tạo mới cuốn sách"
                     variant={isHover ? "contained" : "outlined"}
                     color="primary"
@@ -157,8 +207,7 @@ function BookList() {
                     <TableHead>
                         <TableRow>
                             <TableCell></TableCell>
-                            <TableCell><strong>Tên Sách</strong></TableCell>
-                            <TableCell><strong>Tên Gốc</strong></TableCell>
+                            <TableCell><strong>Tên</strong></TableCell>
                             <TableCell><strong>Thể loại</strong></TableCell>
                             <TableCell><strong>Mã ISBN</strong></TableCell>
                             <TableCell><strong>Xuất bản</strong></TableCell>
@@ -174,18 +223,15 @@ function BookList() {
                                 <TableCell><img
                                     src={book.coverImage || empty_image}
                                     alt="Book Cover"
-                                    style={{ width: 60, height: 60 }}
+                                    style={{ width: 60, height: 100 }}
                                     onError={(e) => {
                                         e.currentTarget.onerror = null; // Đảm bảo không lặp lại sự kiện
                                         e.currentTarget.src = empty_image; // Đặt lại ảnh nếu lỗi
                                     }}
                                 /></TableCell>
                                 <TableCell>{book.title}</TableCell>
-                                <TableCell>{book.originalTitle}</TableCell>
-                                <TableCell>
-                                    {book.categories.$values.map((cate) => (
-                                        <Typography>{cate.name}</Typography>
-                                    ))}
+                                <TableCell sx={{ width: 120 }}>
+                                    {book.categories.$values ? book.categories.$values.map(cate => cate.name).join(", ") : "N/A"}
                                 </TableCell>
                                 <TableCell>
                                     <Box>
