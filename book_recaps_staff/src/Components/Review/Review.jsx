@@ -192,7 +192,7 @@ function Review() {
          setRecapVersion(response.data);
 
          const id = recapVersionId;
-         const postPlagirism = await axios.post("https://ai.hieuvo.dev/plagiarism/add-recap-versions", [id])
+         const postPlagirism = await axios.post("https://ai.bookrecaps.net/plagiarism/add-recap-versions", [id])
       } catch (error) {
          Swal.fire('Error', 'Failed to update status.', 'error');
       }
@@ -387,7 +387,7 @@ function Review() {
       }
       try {
          const response = await axios.get(
-            `https://ai.hieuvo.dev/plagiarism/check-plagiarism/${recapVersionId}`
+            `https://ai.bookrecaps.net/plagiarism/check-plagiarism/${recapVersionId}`
          );
          console.log("Initial check response:", response.data);
          return response.data;
@@ -405,7 +405,7 @@ function Review() {
       }
       try {
          const response = await axios.get(
-            `https://ai.hieuvo.dev/plagiarism/get-results/${recapVersionId}`,
+            `https://ai.bookrecaps.net/plagiarism/get-results/${recapVersionId}`,
             {
                signal: controller.signal,
             }
