@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { TextField, Autocomplete, Box } from '@mui/material';
+import { TextField, Autocomplete, Box, Tooltip } from '@mui/material';
+import InfoIcon from "@mui/icons-material/Info";
 import api from '../Auth/AxiosInterceptors';
 
 function TestGetAvaliableBook({ onSelectBook }) {
@@ -51,9 +52,18 @@ function TestGetAvaliableBook({ onSelectBook }) {
 
   return (
     <Box marginTop={1}>
+      <Tooltip title="Ô này giúp Admin tìm kiếm thông tin sách và tự động điền những thông tin sẵn có khi sách được chọn (nếu có)">
+        <InfoIcon
+          style={{
+            color: "#1976d2",
+            marginLeft: "10px",
+            cursor: "pointer",
+          }}
+        />
+      </Tooltip>
       <Autocomplete
         options={avaliableBook}
-        getOptionLabel={(option) => `${option.title} - ${option.authors}`} // Hiển thị tiêu đề và tác giả
+        getOptionLabel={(option) => `${option.title}`} // Hiển thị tiêu đề
         onInputChange={(event, value) => setSearchQuery(value)} // Cập nhật từ khóa tìm kiếm
         onChange={(event, value) => onSelectBook(value)}
         renderInput={(params) => (

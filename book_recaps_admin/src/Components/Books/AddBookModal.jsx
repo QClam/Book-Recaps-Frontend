@@ -41,7 +41,7 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
                 ISBN_13: book.isbn13 || '',
                 ISBN_10: book.isbn10 || '',
                 Description: book.description || '',
-                PublicationYear: book.publishedDate?.slice(0, 4) || '', // Chỉ lấy năm nếu có ngày
+                PublicationYear: book.publishedDate || '', // Chỉ lấy năm nếu có ngày
             }));
         }
     };
@@ -156,7 +156,7 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
             onBookAdded();
             onClose();
         } catch (error) {
-            alert("Thêm sách thất bại")
+            alert("Thêm sách thất bại")           
             console.error('Error adding book:', error);
         }
     };
