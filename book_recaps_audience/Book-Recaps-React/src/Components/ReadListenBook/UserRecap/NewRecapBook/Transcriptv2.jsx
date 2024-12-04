@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Fragment, useEffect, useMemo, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { ContextMenu } from "primereact/contextmenu";
 import { axiosInstance } from "../../../../utils/axios";
@@ -7,11 +7,18 @@ import { Image } from "primereact/image";
 import { useAuth } from "../../../../contexts/Auth";
 import { MediaActionTypes, useMediaDispatch, useMediaSelector } from "media-chrome/react/media-store";
 import { toast } from "react-toastify";
+import { Tooltip } from "primereact/tooltip";
+import Show from "../../../Show";
+import { Dialog } from "primereact/dialog";
+import Modal from "../../../modal";
+import { InputText } from "primereact/inputtext";
+import { Divider } from "primereact/divider";
 
 const initialContextMenu = {
   selectedText: '',
   sentenceIndex: null,
   isHighlighted: false,
+  highlightNote: '',
 }
 
 const Transcriptv2 = ({ transcriptData, userId, recapVersionId, isGenAudio }) => {
@@ -19,9 +26,11 @@ const Transcriptv2 = ({ transcriptData, userId, recapVersionId, isGenAudio }) =>
   const dispatch = useMediaDispatch();
   const currentTime = useMediaSelector(state => state.mediaCurrentTime);
 
+  const [ openCreateDialog, setOpenCreateDialog ] = useState(false);
   const [ contextMenu, setContextMenu ] = useState(initialContextMenu);
   const [ activeSentenceIndex, setActiveSentenceIndex ] = useState(null);
   const [ highlightedSentences, setHighlightedSentences ] = useState([]);
+  const [ updatingHighlight, setUpdatingHighlight ] = useState(false);
 
   const sentenceRefs = useRef({});
   const cm = useRef(null);
@@ -83,21 +92,23 @@ const Transcriptv2 = ({ transcriptData, userId, recapVersionId, isGenAudio }) =>
   };
 
   const handleHighlight = async () => {
-    const { sentenceIndex, selectedText } = contextMenu;
+    const { sentenceIndex, selectedText, highlightNote } = contextMenu;
+
     const startIndex = 0;
     const endIndex = selectedText.length - 1;
 
     if (!selectedText) return;
 
-    const highlightedSent = highlightedSentences.filter(item => item.sentenceIndex === sentenceIndex);
+    const highlightedSent = highlightedSentences.find(item => item.sentenceIndex === sentenceIndex);
+    setUpdatingHighlight(true);
 
-    if (highlightedSent.length > 0) {
+    if (highlightedSent) {
       // Remove the highlight
       try {
-        const response = await axiosInstance.delete("/api/highlight/delete/" + highlightedSent[0].id);
+        const response = await axiosInstance.delete("/api/highlight/delete/" + highlightedSent.id);
         console.log("Delete highlight response:", response.data);
 
-        const updatedHighlights = highlightedSentences.filter(item => item.id !== highlightedSent[0].id);
+        const updatedHighlights = highlightedSentences.filter(item => item.id !== highlightedSent.id);
         setHighlightedSentences(updatedHighlights);
         toast.success("Highlight removed successfully!");
       } catch (error) {
@@ -111,7 +122,7 @@ const Transcriptv2 = ({ transcriptData, userId, recapVersionId, isGenAudio }) =>
         const requestBody = {
           recapVersionId: recapVersionId,
           userId: userId,
-          note: "",
+          note: highlightNote,
           targetText: selectedText,
           startIndex: startIndex.toString(),
           endIndex: endIndex.toString(),
@@ -126,12 +137,14 @@ const Transcriptv2 = ({ transcriptData, userId, recapVersionId, isGenAudio }) =>
         toast.error("Failed to save highlight.");
       }
     }
+    setOpenCreateDialog(false);
+    setUpdatingHighlight(false);
   };
 
-  const handleContextMenu = (event, sentenceIndex, selectedText, isHighlighted) => {
+  const handleContextMenu = (event, sentenceIndex, selectedText, isHighlighted, highlightNote) => {
     if (!isAuthenticated) return;
     if (cm.current) {
-      setContextMenu({ selectedText, sentenceIndex, isHighlighted });
+      setContextMenu({ selectedText, sentenceIndex, isHighlighted, highlightNote });
       cm.current.show(event);
     }
   };
@@ -150,8 +163,8 @@ const Transcriptv2 = ({ transcriptData, userId, recapVersionId, isGenAudio }) =>
 
   const items = [
     {
-      label: contextMenu.isHighlighted ? "🧽 Unhighlight" : "🖋️ Highlight",
-      command: () => handleHighlight(),
+      label: contextMenu.isHighlighted ? "❌ Unhighlight" : "🖋️ Highlight",
+      command: () => contextMenu.isHighlighted ? handleHighlight() : setOpenCreateDialog(true),
     },
     {
       label: "📋 Copy",
@@ -182,33 +195,98 @@ const Transcriptv2 = ({ transcriptData, userId, recapVersionId, isGenAudio }) =>
               const time = sentence.start;
               const sentenceIndex = String(sentence.sentence_index);
               const isHighlighted = highlightedSentences.some(item => item.sentenceIndex === sentenceIndex);
+              const highlightNote = highlightedSentences.find(item => item.sentenceIndex === sentenceIndex)?.note || "";
               return (
-                <span
-                  key={idx}
-                  id={"sentence-" + index + "-" + idx}
-                  ref={el => {
-                    sentenceRefs.current[sentenceIndex] = el
-                  }}
-                  data-start={sentence.start}
-                  data-end={sentence.end}
-                  onContextMenu={(e) => handleContextMenu(e, String(sentenceIndex), sentence.value.html, isHighlighted)}
-                  onClick={() => {
-                    if (isFinite(time)) handleSentenceClick(time);
-                  }}
-                  className={cn("transcript-sentence hover:bg-gray-300", {
-                    "bg-orange-300": activeSentenceIndex === sentenceIndex,
-                    "bg-yellow-200": isHighlighted && activeSentenceIndex !== sentenceIndex,
-                  })}
-                >
+                <Fragment key={idx}>
+                  <Show when={isHighlighted && highlightNote}>
+                    <Tooltip target={"#sentence-" + index + "-" + idx} position="top" autoHide={false}>
+                      <p className="text-sm">{highlightNote?.trim()}</p>
+                    </Tooltip>
+                  </Show>
+                  <span
+                    id={"sentence-" + index + "-" + idx}
+                    ref={el => {
+                      sentenceRefs.current[sentenceIndex] = el
+                    }}
+                    data-start={sentence.start}
+                    data-end={sentence.end}
+                    onContextMenu={(e) => handleContextMenu(e, String(sentenceIndex), sentence.value.html, isHighlighted, highlightNote)}
+                    onClick={() => {
+                      if (isFinite(time)) handleSentenceClick(time);
+                    }}
+                    className={cn("transcript-sentence hover:bg-gray-300", {
+                      "bg-orange-300": activeSentenceIndex === sentenceIndex,
+                      "bg-yellow-200": isHighlighted && activeSentenceIndex !== sentenceIndex,
+                    })}
+                  >
                 {sentence.value.html}
               </span>
+                </Fragment>
               );
             })}
           </div>
         </div>
       ))}
 
-      <ContextMenu ref={cm} model={items} onHide={() => setContextMenu(initialContextMenu)}/>
+      <ContextMenu ref={cm} model={items}/>
+      <Dialog
+        visible={openCreateDialog}
+        onHide={() => {
+          if (updatingHighlight) return;
+          setOpenCreateDialog(false)
+        }}
+        content={({ hide }) => (
+          <Modal.Wrapper className="min-w-80">
+            <Modal.Header title="Tạo highlight" onClose={hide}/>
+            <div className="flex flex-col">
+              <Modal.Body className="space-y-4">
+                <p className="text-gray-700 text-sm">
+                  Bạn đang tạo highlight cho câu:
+                </p>
+
+                <blockquote className="italic text-gray-600 my-2 p-2 bg-yellow-100 rounded-md">
+                  <p>&#34;{contextMenu.selectedText}&#34;</p>
+                </blockquote>
+
+                <Divider/>
+
+                <div className="flex flex-col gap-2">
+                  <label htmlFor="note" className="block text-sm font-medium leading-6 text-gray-900">
+                    Ghi chú (nếu có):
+                  </label>
+                  <InputText
+                    id="note"
+                    placeholder="Viết ghi chú cho highlight"
+                    value={contextMenu.highlightNote}
+                    onChange={(e) => setContextMenu({ ...contextMenu, highlightNote: e.target.value })}
+                  />
+                </div>
+              </Modal.Body>
+              <Modal.Footer className="justify-end gap-3 text-sm">
+                <button
+                  className={cn(
+                    "bg-gray-200 rounded py-1.5 px-3 border font-semibold hover:bg-gray-300",
+                    { "opacity-50 cursor-not-allowed": updatingHighlight }
+                  )}
+                  type="button"
+                  onClick={hide}
+                  disabled={updatingHighlight}
+                >
+                  Hủy
+                </button>
+                <button
+                  className="text-white bg-indigo-600 rounded py-1.5 px-3 border font-semibold hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-progress"
+                  disabled={updatingHighlight}
+                  type="button"
+                  onClick={handleHighlight}
+                >
+                  Lưu
+                </button>
+              </Modal.Footer>
+            </div>
+          </Modal.Wrapper>
+        )}
+      />
     </div>
   );
 };
