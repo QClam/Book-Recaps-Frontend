@@ -13,10 +13,11 @@ function BookDetail() {
     const location = useLocation();
     const { fromDate, toDate } = location.state || {};
 
-    const today = dayjs().format("DD-MM-YYYY");
+    const today = dayjs();
+    const oneWeekAgo = today.subtract(7, 'day');
     const [dateRange, setDateRange] = useState([
-        fromDate || dayjs().format("YYYY-MM-DD"),
-        toDate || dayjs().format("YYYY-MM-DD"),
+        fromDate || oneWeekAgo.toDate(),
+        toDate || today.toDate(),
     ]);
 
     const [bookData, setBookData] = useState({
@@ -53,20 +54,21 @@ function BookDetail() {
     };
 
     useEffect(() => {
-        const [fromDate, toDate] = dateRange;
+        const fromDate = dayjs(dateRange[0]).format("YYYY-MM-DD");
+        const toDate = dayjs(dateRange[1]).format("YYYY-MM-DD");
         getBookData(fromDate, toDate); // Sử dụng dateRange từ state
     }, [dateRange]); // Chỉ chạy một lần khi component render
 
 
     const handleDateChange = async (range) => {
+
+        setDateRange(range);
+
         if (range?.[0] && range?.[1]) {
             const fromDate = dayjs(range[0]).format("YYYY-MM-DD");
             const toDate = dayjs(range[1]).format("YYYY-MM-DD");
 
-            setDateRange([fromDate, toDate]);
             await getBookData(fromDate, toDate);
-        } else {
-            console.error("Invalid date range");
         }
     };
 
@@ -145,7 +147,7 @@ function BookDetail() {
                             </Typography>
                             <Typography variant="caption" display="block" color="textSecondary" gutterBottom>
                                 ({bookData.lastPayout?.toDate ? dayjs(bookData.lastPayout.toDate).format('DD-MM-YYYY') : 'N/A'} -
-                                {today})
+                                {today.format("DD-MM-YYYY")})
                             </Typography>
                             <Typography variant="h6">
                                 {(bookData.unpaidEarning ?? 0).toLocaleString('vi-VN')} VND
@@ -243,7 +245,6 @@ function BookDetail() {
                 <Box display='flex' justifyContent='center'>
                     <DateRangePicker
                         value={[new Date(dateRange[0]), new Date(dateRange[1])]}
-                        format="dd-MM-yyyy"
                         onChange={handleDateChange}
                     />
                 </Box>

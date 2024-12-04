@@ -84,7 +84,9 @@ function BookList() {
         if (searchTerm) {
             filteredData = filteredData.filter((item) =>
                 item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.originalTitle.toLowerCase().includes(searchTerm.toLowerCase())
+                item.originalTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.authors?.$values?.some((author) => 
+                author.name.toLowerCase().includes(searchTerm.toLocaleLowerCase()))
             );
         }
 
@@ -155,7 +157,7 @@ function BookList() {
             <Typography variant='h5' margin={1}>Danh sách những cuốn sách</Typography>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
                 <TextField
-                    label="Tìm kiếm theo tên cuốn sách"
+                    label="Tìm kiếm theo tên cuốn sách hoặc tên tác giả"
                     variant="outlined"
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
@@ -229,7 +231,7 @@ function BookList() {
                                         e.currentTarget.src = empty_image; // Đặt lại ảnh nếu lỗi
                                     }}
                                 /></TableCell>
-                                <TableCell>{book.title}</TableCell>
+                                <TableCell sx={{ width: 180 }}>{book.title}</TableCell>
                                 <TableCell sx={{ width: 120 }}>
                                     {book.categories.$values ? book.categories.$values.map(cate => cate.name).join(", ") : "N/A"}
                                 </TableCell>
@@ -240,7 +242,7 @@ function BookList() {
                                     </Box>
                                 </TableCell>
                                 <TableCell>{book.publicationYear}</TableCell>
-                                <TableCell> {book.authors.$values ? book.authors.$values.map(author => author.name).join(", ") : "N/A"}</TableCell>
+                                <TableCell>{book.authors.$values ? book.authors.$values.map(author => author.name).join(", ") : "N/A"}</TableCell>
                                 <TableCell>{book.ageLimit} tuổi</TableCell>
                                 <TableCell>
                                     {book.contracts?.$values?.length > 0 ? (

@@ -14,10 +14,11 @@ function RecapDetail() {
     const location = useLocation();
     const { fromDate, toDate } = location.state || {};
 
-    const today = dayjs().format("DD-MM-YYYY");
+    const today = dayjs();
+    const oneWeekAgo = today.subtract(7, 'day')
     const [dateRange, setDateRange] = useState([
-        fromDate || dayjs().format("YYYY-MM-DD"),
-        toDate || dayjs().format("YYYY-MM-DD"),
+        fromDate || oneWeekAgo.toDate(),
+        toDate || today.toDate(),
     ]);
 
     const [recapData, setRecapData] = useState({
@@ -146,7 +147,7 @@ function RecapDetail() {
                             </Typography>
                             <Typography variant="caption" display="block" color="textSecondary" gutterBottom>
                                 ({recapData.lastPayout?.toDate ? dayjs(recapData.lastPayout.toDate).format('DD-MM-YYYY') : 'N/A'} -
-                                {today})
+                                {today.format('DD-MM-YYYY')})
                             </Typography>
                             <Typography variant="h6">
                                 {(recapData.unpaidEarning ?? 0).toLocaleString('vi-VN')} VND

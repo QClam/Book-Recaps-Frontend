@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { TextField, Autocomplete, Box, Tooltip } from '@mui/material';
+import { TextField, Autocomplete, Box, Tooltip, CircularProgress } from '@mui/material';
 import InfoIcon from "@mui/icons-material/Info";
 import api from '../Auth/AxiosInterceptors';
 
@@ -77,7 +77,7 @@ function TestGetAvaliableBook({ onSelectBook }) {
               ...params.InputProps,
               endAdornment: (
                 <>
-                  {loading ? <span>Loading...</span> : null}
+                  {loading ? <CircularProgress size={20} color='inherit'/> : null}
                   {params.InputProps.endAdornment}
                 </>
               ),

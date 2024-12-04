@@ -11,9 +11,10 @@ import api from '../Auth/AxiosInterceptors';
 
 function Dashboard() {
 
-    const today = dayjs().format("YYYY-MM-DD");
-    const [dateRange, setDateRange] = useState([today, today]);
-
+    const today = dayjs();
+    const oneWeekAgo = today.subtract(7, 'day');
+    const [dateRange, setDateRange] = useState([oneWeekAgo.toDate(), today.toDate()]);
+    
     const [dashboardData, setDashboardData] = useState([]);
     const [premiumPackage, setPremiumPackage] = useState([]);
 
@@ -32,8 +33,8 @@ function Dashboard() {
     };
 
     useEffect(() => {
-        const fromDate = dayjs(today).format("YYYY-MM-DD");
-        const toDate = dayjs(today).format("YYYY-MM-DD");
+        const fromDate = dayjs(dateRange[0]).format("YYYY-MM-DD");
+        const toDate = dayjs(dateRange[1]).format("YYYY-MM-DD");
         fetchDashboardData(fromDate, toDate);
     }, []); // Chỉ chạy khi component được render lần đầu
 
@@ -117,6 +118,7 @@ function Dashboard() {
                 <div className="date-picker-container">
                     <Typography variant='h6' textAlign='center' sx={{ marginBottom: 2 }}>Hãy chọn khoảng thời gian để hiển thị số liệu</Typography>
                     <DateRangePicker
+                        value={dateRange}
                         onChange={handleDateChange}
                     />
                 </div>

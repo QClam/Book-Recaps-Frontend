@@ -9,6 +9,8 @@ import {
     TextField,
     FormControl,
     Autocomplete,
+    CircularProgress,
+    Tooltip,
 } from '@mui/material';
 import api from '../Auth/AxiosInterceptors';
 import TestGetAvaliableBook from './TestGetAvaliableBook';
@@ -17,6 +19,9 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
     const [authors, setAuthors] = useState([]);
     const [categories, setCategories] = useState([]);
     const [errors, setErrors] = useState({});
+    const [previewBookImage, setPreviewBookImage] = useState(null);
+    const [previewAuthorImage, setPreviewAuthorImage] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const [formData, setFormData] = useState({
         Title: '',
@@ -92,13 +97,26 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
     };
 
     const handleFileChange = (e) => {
-        const { name } = e.target;
-        const file = e.target.files[0];
-        setFormData(prev => ({
+        const { name, files } = e.target;
+
+        if (name === 'coverImage' && files[0]) {
+            setPreviewBookImage(URL.createObjectURL(files[0]));
+        } else if (name === 'authorImages' && files.length > 0) {
+            const imageURLs = Array.from(files).map((file) => URL.createObjectURL(file));
+            // Nối ảnh mới vào danh sách hiện có
+            setPreviewAuthorImage((prev) => [...(prev || []), ...imageURLs]);
+        }
+
+        setFormData((prev) => ({
             ...prev,
-            [name]: file,
+            [name]: name === 'authorImages'
+                ? [...(prev[name] || []), ...files] // Nối file mới vào danh sách hiện có
+                : files[0],
         }));
+        console.log("Form: ", formData);
+
     };
+
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -124,6 +142,8 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
     }, []);
 
     const handleSubmit = async () => {
+
+        setLoading(true);
 
         const validationErrors = validateForm();
         if (Object.keys(validationErrors).length > 0) {
@@ -153,11 +173,14 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
             });
 
             alert("Thêm sách thành công")
+            setLoading(false);
             onBookAdded();
             onClose();
         } catch (error) {
             alert("Thêm sách thất bại")
             console.error('Error adding book:', error);
+            console.log("Sách add: ", formData);
+
         }
     };
 
@@ -168,27 +191,28 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
                 <TestGetAvaliableBook onSelectBook={handleBookSelect} />
                 <Box component="form" noValidate autoComplete="off" sx={{ mt: 2 }}>
                     {[
-                        { name: 'Title', label: 'Tiêu đề sách' },
-                        { name: 'OriginalTitle', label: 'Tiêu đề gốc' },
-                        { name: 'ISBN_13', label: 'ISBN_13' },
-                        { name: 'ISBN_10', label: 'ISBN_10' },
-                        { name: 'Description', label: 'Mô tả', multiline: true, rows: 4 },
-                        { name: 'PublicationYear', label: 'Năm xuất bản' },
-                        { name: 'AgeLimit', label: 'Giới hạn tuổi' },
+                        { name: 'Title', label: 'Tiêu đề sách', tooltip: 'Tiêu đề sách bằng tiếng việt' },
+                        { name: 'OriginalTitle', label: 'Tiêu đề gốc', tooltip: 'Tiêu đề sách bằng tiếng gốc. Ví dụ: Anh, Pháp,...' },
+                        { name: 'ISBN_13', label: 'ISBN_13', tooltip: 'Mã ISBN_13 của cuốn sách' },
+                        { name: 'ISBN_10', label: 'ISBN_10', tooltip: 'Mã ISBN_10 của cuốn sách' },
+                        { name: 'Description', label: 'Mô tả', multiline: true, rows: 4, tooltip: 'Mô tả ngắn gọn nội dung sách.' },
+                        { name: 'PublicationYear', label: 'Năm xuất bản', tooltip: 'Năm xuất bản sách. Lưu ý: Chỉ nhập năm, không nhập ngày và tháng. Sẽ có lúc Tự động điền sẽ điền cả ngày tháng năm, xin vui lòng xóa ngày và tháng nếu có.' },
+                        { name: 'AgeLimit', label: 'Giới hạn tuổi', tooltip: 'Nhập độ tuổi tối thiểu phù hợp với nội dung sách.' },
                     ].map(field => (
-                        <TextField
-                            key={field.name}
-                            fullWidth
-                            margin="normal"
-                            label={field.label}
-                            name={field.name}
-                            value={formData[field.name]}
-                            onChange={handleInputChange}
-                            error={!!errors[field.name]}
-                            helperText={errors[field.name]}
-                            multiline={field.multiline}
-                            rows={field.rows}
-                        />
+                        <Tooltip key={field.name} title={field.tooltip || ''} placement="top" arrow>
+                            <TextField
+                                fullWidth
+                                margin="normal"
+                                label={field.label}
+                                name={field.name}
+                                value={formData[field.name]}
+                                onChange={handleInputChange}
+                                error={!!errors[field.name]}
+                                helperText={errors[field.name]}
+                                multiline={field.multiline}
+                                rows={field.rows}
+                            />
+                        </Tooltip>
                     ))}
 
                     {/* Multiple Author selection */}
@@ -201,7 +225,7 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
                             getOptionLabel={(option) => option.name} // Lấy tên tác giả để hiển thị
                             value={formData.Authors} // Giá trị đang chọn
                             freeSolo
-                            onChange={(newValue) => {
+                            onChange={(event, newValue) => {
                                 let newValueString
                                 const arrayValue = newValue.filter(v => {
                                     if (typeof v === 'string') {
@@ -213,7 +237,10 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
                                     setFormData(prev => ({
                                         ...prev,
                                         Authors: [...arrayValue, {
-                                            name: newValueString
+                                            id: null,
+                                            name: newValueString,
+                                            description: "Tác giả này chưa có mô tả",
+                                            image: ""
                                         }],
                                     }))
                                 } else {
@@ -222,6 +249,8 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
                                         Authors: arrayValue,
                                     }));
                                 }
+                                console.log("Authors: ", arrayValue);
+
                             }}
                             renderInput={(params) => (
                                 <TextField {...params} label="Select Authors" variant="outlined" />
@@ -253,6 +282,22 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
                     </FormControl>
                     {errors.CategoryIds && <p style={{ color: 'red' }}>{errors.CategoryIds}</p>}
 
+                    {/* Hiển thị ảnh xem trước bìa sách */}
+                    <Box display='flex' gap={2}>
+                        {previewBookImage && (
+                            <Box sx={{ mt: 2 }}>
+                                <img src={previewBookImage} alt="Book Cover Preview" style={{ maxWidth: '100%', maxHeight: '200px' }} />
+                            </Box>
+                        )}
+
+                        {previewAuthorImage && (
+                            <Box sx={{ mt: 2, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                                {previewAuthorImage.map((src, index) => (
+                                    <img key={index} src={src} alt={`Author ${index + 1}`} style={{ maxWidth: '100px', maxHeight: '100px', borderRadius: '8px' }} />
+                                ))}
+                            </Box>
+                        )}
+                    </Box>
                     {/* File inputs */}
                     <Button variant="contained" component="label" sx={{ mt: 2 }}>
                         Chọn ảnh bìa sách
@@ -262,12 +307,14 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
                         Chọn ảnh tác giả
                         <input type="file" name="authorImages" hidden onChange={handleFileChange} />
                     </Button>
+
+
                 </Box>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose} color='error'>Hủy</Button>
-                <Button onClick={handleSubmit} variant="contained" color="primary">
-                    Thêm
+                <Button onClick={onClose} color='error' disabled={loading}>Hủy</Button>
+                <Button onClick={handleSubmit} variant="contained" color="primary" disabled={loading}>
+                    {loading ? <CircularProgress size={20} color='inherit' /> : "Thêm"}
                 </Button>
             </DialogActions>
         </Dialog>
