@@ -108,9 +108,6 @@ function PublisherList() {
                             <TableCell sx={{ fontWeight: "bold" }}>
                                 Tài khoản Ngân Hàng
                             </TableCell>
-                            <TableCell sx={{ fontWeight: "bold" }}>
-                                Lợi nhuận
-                            </TableCell>
                             <TableCell></TableCell>
                         </TableRow>
                     </TableHead>
@@ -120,7 +117,6 @@ function PublisherList() {
                                 <TableCell>{item.publisherName}</TableCell>
                                 <TableCell>{item.contactInfo}</TableCell>
                                 <TableCell>{item.bankAccount}</TableCell>
-                                <TableCell><Typography color="success">{item.revenueSharePercentage} %</Typography></TableCell>
                                 <TableCell>
                                     <Button
                                         onClick={() => handleEditClick(item)}
@@ -159,15 +155,6 @@ function PublisherList() {
                                 label="Tài khoản Ngân Hàng"
                                 name="bankAccount"
                                 value={selectedPublisher.bankAccount || ""}
-                                onChange={handleInputChange}
-                                fullWidth
-                                margin="normal"
-                            />
-                            <TextField
-                                label="Phần trăm lợi nhuận"
-                                name="revenueSharePercentage"
-                                type="number"
-                                value={selectedPublisher.revenueSharePercentage || ""}
                                 onChange={handleInputChange}
                                 fullWidth
                                 margin="normal"

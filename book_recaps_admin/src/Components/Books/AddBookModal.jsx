@@ -41,7 +41,7 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
                 ISBN_13: book.isbn13 || '',
                 ISBN_10: book.isbn10 || '',
                 Description: book.description || '',
-                PublicationYear: book.publishedDate || '', // Chỉ lấy năm nếu có ngày
+                PublicationYear: book.publishedDate || '',
             }));
         }
     };
@@ -156,7 +156,7 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
             onBookAdded();
             onClose();
         } catch (error) {
-            alert("Thêm sách thất bại")           
+            alert("Thêm sách thất bại")
             console.error('Error adding book:', error);
         }
     };
@@ -200,11 +200,28 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
                             options={authors}
                             getOptionLabel={(option) => option.name} // Lấy tên tác giả để hiển thị
                             value={formData.Authors} // Giá trị đang chọn
-                            onChange={(event, newValue) => {
-                                setFormData(prev => ({
-                                    ...prev,
-                                    Authors: newValue,
-                                }));
+                            freeSolo
+                            onChange={(newValue) => {
+                                let newValueString
+                                const arrayValue = newValue.filter(v => {
+                                    if (typeof v === 'string') {
+                                        newValueString = v;
+                                        return false;
+                                    } return true;
+                                })
+                                if (!!newValueString) {
+                                    setFormData(prev => ({
+                                        ...prev,
+                                        Authors: [...arrayValue, {
+                                            name: newValueString
+                                        }],
+                                    }))
+                                } else {
+                                    setFormData(prev => ({
+                                        ...prev,
+                                        Authors: arrayValue,
+                                    }));
+                                }
                             }}
                             renderInput={(params) => (
                                 <TextField {...params} label="Select Authors" variant="outlined" />
