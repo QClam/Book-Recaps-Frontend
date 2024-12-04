@@ -172,28 +172,29 @@ const DashboardDetail = () => {
       <p><strong>ISBN-13:</strong> {book.isbN_13 || "Not available"}</p>
       <p><strong>ISBN-10:</strong> {book.isbN_10 || "Not available"}</p>
       <p><strong>Giới hạn tuổi:</strong> {book.ageLimit}</p>
+      {/* <p><strong>Số lượng recap:</strong> {book.recaps.$values.length}</p>
+      <p><strong>Tên recap:</strong> {book.recaps.$values.map((recap) => recap.name).join(', ')}</p> */}
+      <div>
+        <p>
+          <strong>Số lượng recap:</strong>{" "}
+          {book?.recaps?.$values?.length > 0 ? book.recaps.$values.length : "0"}
+        </p>
+        <p>
+          <strong>Tên recap:</strong>{" "}
+          {book?.recaps?.$values?.length > 0
+            ? book.recaps.$values.map((recap) => recap.name).join(", ")
+            : "Không có recap"}
+        </p>
+      </div>
+
       <div>    
-      <p>
-  <strong>Tổng thu nhập:</strong> {totalEarnings ? 
+      {/* <p>
+    <strong>Tổng thu nhập:</strong> {totalEarnings ? 
     `${new Intl.NumberFormat('vi-VN').format(totalEarnings)} đ` : 
     'No earnings available'}
-</p>
+    </p> */}
 
     </div>
-      {/* <div className="recaps">
-        <p><strong>Số lượng recap:</strong> {book.recaps.$values.length}</p>
-        <p><strong>Tên recap:</strong> {book.recaps.$values.map((recap) => recap.name).join(', ')}</p>
-      </div> */}
-       {/* Hiển thị tổng thu nhập */}
-       {/* <div className="total-earnings">
-          <p><strong>Tổng thu nhập:</strong> {bookData.totalEarnings.toLocaleString("vi-VN")} VND</p>
-        </div> */}
-
-      {/* Hiển thị số lượng và tên các recap */}
-      {/* <div className="recaps">
-        <p><strong>Số lượng recap:</strong> {book.recaps.$values.length}</p>
-        <p><strong>Tên recap:</strong> {book.recaps.$values.map((recap) => recap.name).join(', ')}</p>
-      </div> */}
      
       </div>
       <div className="chart-container">
@@ -203,11 +204,11 @@ const DashboardDetail = () => {
         </Typography>
         
           {/* Hiển thị số tiền ngay trên biểu đồ */}
-      {/* <Box sx={{ position: "relative", textAlign: "center", marginBottom: 2 }}>
+      <Box sx={{ position: "relative", textAlign: "center", marginBottom: 2 }}>
       <Typography variant="h6" color="secondary" sx={{ marginTop: 1 }}>
-        <strong>Tổng thu nhập:</strong> {bookData.totalEarnings.toLocaleString("vi-VN")} VND
+        <strong>Tổng thu nhập:</strong> {bookData.totalEarnings.toLocaleString("vi-VN")} đ
       </Typography>
-     </Box> */}
+     </Box>
 
       <Box>
   <Typography textAlign="center" sx={{ marginBottom: 2 }}>

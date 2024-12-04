@@ -23,12 +23,18 @@ const BookPayout = () => {
   const chartRef = useRef(null);
   const chartInstanceRef = useRef(null);
 
-  const today = dayjs().format("YYYY-MM-DD");
-  const [dateRange, setDateRange] = useState([today, today]);
+  //const today = dayjs().format("YYYY-MM-DD");
+  //const [dateRange, setDateRange] = useState([today, today]);
  
   const location = useLocation();
   const { totalEarnings } = location.state || {}; 
   const earningAmount = location.state?.earningAmount;
+  const { fromDate, toDate } = location.state || {};
+    const [dateRange, setDateRange] = useState([
+        fromDate || dayjs().subtract(30, "days").format("YYYY-MM-DD"), 
+        toDate || dayjs().format("YYYY-MM-DD")
+    ]);
+
 
   // Fetch thông tin sách
   const fetchBookDetail = async () => {
@@ -144,12 +150,13 @@ const BookPayout = () => {
     fetchBookDetail();
   
     // Lấy ngày bắt đầu mặc định (30 ngày trước) và ngày hiện tại
-    const fromDate = dayjs().subtract(30, "days").format("YYYY-MM-DD");
-    const toDate = dayjs().format("YYYY-MM-DD");
+    // const fromDate = dayjs().subtract(30, "days").format("YYYY-MM-DD");
+    // const toDate = dayjs().format("YYYY-MM-DD");
     
-    setDateRange([fromDate, toDate]);
-    getBookData(fromDate, toDate);
-  }, [bookId, accessToken]);
+    // setDateRange([fromDate, toDate]);
+    // getBookData(fromDate, toDate);
+    getBookData(dateRange[0], dateRange[1]);
+  }, [bookId, accessToken, dateRange]);
   
 
   if (loading) return <div>Loading...</div>;
@@ -172,20 +179,36 @@ const BookPayout = () => {
       <p><strong>ISBN-13:</strong> {book.isbN_13 || "Not available"}</p>
       <p><strong>ISBN-10:</strong> {book.isbN_10 || "Not available"}</p>
       <p><strong>Giới hạn tuổi:</strong> {book.ageLimit}</p>
+      {/* <div className="recaps">
+        <p><strong>Số lượng recap:</strong> {book.recaps.$values.length}</p>
+        <p><strong>Tên recap:</strong> {book.recaps.$values.map((recap) => recap.name).join(', ')}</p>
+      </div> */}
+
+      <div>
+        <p>
+          <strong>Số lượng recap:</strong>{" "}
+          {book?.recaps?.$values?.length > 0 ? book.recaps.$values.length : "0"}
+        </p>
+        <p>
+          <strong>Tên recap:</strong>{" "}
+          {book?.recaps?.$values?.length > 0
+            ? book.recaps.$values.map((recap) => recap.name).join(", ")
+            : "Không có recap"}
+        </p>
+      </div>
+
       <div>    
-      <p className="thunhap">
-    <strong>Tổng thu nhập: </strong> 
-    {earningAmount ? (
-        <>
-        {`${new Intl.NumberFormat('vi-VN').format(earningAmount)}`} 
-        <span className="currency-dong">₫</span>
-        </>
-    ) : (
-        'Không có dữ liệu'
-    )}
-    </p>
-
-
+          <p className="thunhap">
+        <strong>Tổng thu nhập: </strong> 
+        {earningAmount ? (
+            <>
+            {`${new Intl.NumberFormat('vi-VN').format(earningAmount)}`} 
+            <span className="currency-dong">₫</span>
+            </>
+        ) : (
+            '0đ'
+        )}
+        </p>
     </div>
      
       </div>
@@ -195,18 +218,26 @@ const BookPayout = () => {
           Doanh thu của cuốn sách: {bookData.title}
         </Typography>
        
+       
+          {/* Hiển thị số tiền ngay trên biểu đồ */}
+      <Box sx={{ position: "relative", textAlign: "center", marginBottom: 2 }}>
+      <Typography variant="h6" color="secondary" sx={{ marginTop: 1 }}>
+        <strong>Tổng thu nhập:</strong> {bookData.totalEarnings.toLocaleString("vi-VN")} đ
+      </Typography>
+     </Box>
+
       <Box>
-  <Typography textAlign="center" sx={{ marginBottom: 2 }}>
-    Tổng thu nhập từ {dayjs(dateRange[0]).format("DD-MM-YYYY")} đến {dayjs(dateRange[1]).format("DD-MM-YYYY")}
-  </Typography>
-  <Box display="flex" justifyContent="center">
-    <DateRangePicker 
-      format="dd-MM-yyyy" 
-      onChange={handleDateChange} 
-      value={[dayjs(dateRange[0]).toDate(), dayjs(dateRange[1]).toDate()]} // Hiển thị khoảng mặc định
-    />
-  </Box>
-</Box>
+        <Typography textAlign="center" sx={{ marginBottom: 2 }}>
+          Tổng thu nhập từ {dayjs(dateRange[0]).format("DD-MM-YYYY")} đến {dayjs(dateRange[1]).format("DD-MM-YYYY")}
+        </Typography>
+        <Box display="flex" justifyContent="center">
+          <DateRangePicker 
+            format="dd-MM-yyyy" 
+            onChange={handleDateChange} 
+            value={[dayjs(dateRange[0]).toDate(), dayjs(dateRange[1]).toDate()]} // Hiển thị khoảng mặc định
+          />
+        </Box>
+      </Box>
 
         <Card>
           <CardContent>

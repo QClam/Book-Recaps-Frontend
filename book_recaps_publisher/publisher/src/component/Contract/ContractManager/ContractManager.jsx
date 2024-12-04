@@ -41,7 +41,7 @@ const ContractManager = () => {
 
         const result = response.data;
         setContracts(result.data.$values); 
-        setFilteredContracts(result.data.$values); // Initialize with full list
+        setFilteredContracts(result.data.$values);
         setLoading(false);
          // Sau khi lấy hợp đồng, gọi API để lấy các attachment cho mỗi contract
          result.data.$values.forEach((contract) => {

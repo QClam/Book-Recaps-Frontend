@@ -2,6 +2,11 @@ import React, { useState, useEffect } from 'react';
 import './Dashboard.scss';
 import { useNavigate } from 'react-router-dom';
 import emptyImage from "../../assets/empty-image.png";
+import { Line } from 'react-chartjs-2';
+import { Chart as ChartJS, LineElement, CategoryScale, LinearScale, PointElement } from 'chart.js';
+// Đăng ký các thành phần cần thiết của Chart.js
+ChartJS.register(LineElement, CategoryScale, LinearScale, PointElement);
+
 
 const Dashboard = ( ) => {
   const [books, setBooks] = useState([]); // Danh sách sách
@@ -12,12 +17,32 @@ const Dashboard = ( ) => {
   const accessToken = localStorage.getItem('authToken');
   const navigate = useNavigate();
   const [incomeLastMonth, setIncomeLastMonth] = useState('--');
-const [newPostsLastMonth, setNewPostsLastMonth] = useState('--');
-const [viewsLastMonth, setViewsLastMonth] = useState('--');
+  const [newPostsLastMonth, setNewPostsLastMonth] = useState('--');
+  const [viewsLastMonth, setViewsLastMonth] = useState('--');
+  const [chartData, setChartData] = useState(null);
+  const [fromDate, setFromDate] = useState('');
+  const [toDate, setToDate] = useState('');
 
   const handleRowClick = (bookId, totalEarnings) => {
-    navigate(`/book-dashboard/${bookId}`, { state: { totalEarnings } }); // Điều hướng kèm bookId
+    navigate(`/book-dashboard/${bookId}`, { state: { totalEarnings } }); 
   };
+  useEffect(() => {
+    // Tự động lấy ngày đầu tiên và cuối cùng của tháng hiện tại
+    const today = new Date();
+    const firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1)
+      .toISOString()
+      .split("T")[0];
+    const lastDayOfMonth = new Date(
+      today.getFullYear(),
+      today.getMonth() + 1,
+      0
+    )
+      .toISOString()
+      .split("T")[0];
+
+    setFromDate(firstDayOfMonth);
+    setToDate(lastDayOfMonth);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -49,6 +74,51 @@ const [viewsLastMonth, setViewsLastMonth] = useState('--');
         const publisherData = await publisherResponse.json();
         const publisherId = publisherData?.id;
 
+         // Fetch chart data
+      const chartResponse = await fetch(
+        `https://bookrecaps.cloud/api/dashboard/getpublisherchart/${publisherId}?fromDate=${fromDate}&toDate=${toDate}`,
+        {
+          method: 'GET',
+          headers: {
+            Authorization: `Bearer ${accessToken}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      if (!chartResponse.ok) throw new Error("Failed to fetch chart data");
+      const chartData = await chartResponse.json();
+      const dailyStats = chartData.data.dailyStats.$values || [];
+
+      setChartData({
+        labels: dailyStats.map((item) => item.date.split('T')[0]),
+        datasets: [
+          {
+            label: 'Views',
+            data: dailyStats.map((item) => item.views),
+            borderColor: 'rgba(75,192,192,1)',
+            backgroundColor: 'rgba(75,192,192,0.2)',
+            tension: 0.4,
+          },
+          {
+            label: 'Watch Time (minutes)',
+            data: dailyStats.map((item) => item.watchTime),
+            borderColor: 'rgba(153,102,255,1)',
+            backgroundColor: 'rgba(153,102,255,0.2)',
+            tension: 0.4,
+          },
+          {
+            label: 'Earnings (VNĐ)',
+            data: dailyStats.map((item) => item.earning),
+            borderColor: 'rgba(255,159,64,1)',
+            backgroundColor: 'rgba(255,159,64,0.2)',
+            tension: 0.4,
+          },
+        ],
+      });
+
+
+
         // Lấy dữ liệu bảng điều khiển
         const dashboardResponse = await fetch(
           `https://bookrecaps.cloud/api/dashboard/publisherdashboard/${publisherId}`,
@@ -63,35 +133,29 @@ const [viewsLastMonth, setViewsLastMonth] = useState('--');
         if (!dashboardResponse.ok) throw new Error("Failed to fetch dashboard data");
         const dashboardData = await dashboardResponse.json();
 
-        // Cập nhật state
-        // const data = dashboardData?.data || {};
-        // setIncome(data.lastPayoutAmount || 0);
-        // setNewPosts(data.oldRecapsCount || 0);
-        // // setViews(data.newViewCount + data.oldViewCount || 0);
-        // setViews(data.oldViewCount || 0);
-        // setBooks(data.books?.$values || []);
         const data = dashboardData?.data || {};
-      setIncome(data.totalIncomeFromViewTracking || 0); // Thu nhập tháng này
-      setNewPosts(data.newRecapsCount || 0); // Số bài viết mới tháng này
+      setIncome(data.totalIncomeFromViewTracking || 0); 
+      setNewPosts(data.newRecapsCount || 0); 
       setViews(data.newViewCount || 0);
          // Lấy dữ liệu tháng trước
-      setIncomeLastMonth(data.lastPayoutAmount || 0); // Thu nhập tháng trước
-      setNewPostsLastMonth(data.oldRecapsCount || 0); // Bài viết tháng trước
-      setViewsLastMonth(data.oldViewCount || 0); // Lượt xem tháng trước
+      setIncomeLastMonth(data.lastPayoutAmount || 0); 
+      setNewPostsLastMonth(data.oldRecapsCount || 0); 
+      setViewsLastMonth(data.oldViewCount || 0); 
       setBooks(data.books?.$values || []);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
       }
     };
-
+    
     fetchData();
-  }, [accessToken]);
+  }, [fromDate, toDate, accessToken]);
 
   const handleSelectChange = (event) => {
     const value = event.target.value === "All" ? "All" : parseInt(event.target.value);
     setBooksToShow(value);
   };
 
+  
   return (
     <div className="dashboard">
       <div className="performance-overview">
@@ -156,7 +220,9 @@ const [viewsLastMonth, setViewsLastMonth] = useState('--');
               <th>Tiêu đề</th>
               <th>Năm xuất bản</th>
               <th>Số Recap</th>
-              <th>Tổng thu nhập (VND)</th>
+              {/* <th>Tổng thu nhập (VND)</th> */}
+              <th>Tổng tiền đã thanh toán (VND)</th>
+              <th>Tổng tiền chưa thanh toán (VND)</th>
             </tr>
           </thead>
           <tbody>
@@ -168,15 +234,61 @@ const [viewsLastMonth, setViewsLastMonth] = useState('--');
                 <td>{book.publicationYear}</td>
                 <td>{book.recapCount}</td>
                 <td>
-                {book.totalEarnings 
-                  ? `${book.totalEarnings.toLocaleString("vi-VN")} đ` 
+                {book.paidEarnings 
+                  ? `${book.paidEarnings.toLocaleString("vi-VN")} đ` 
                   : '0 đ'}
               </td>
+              <td>
+                {book.unPaidEarnings 
+                  ? `${book.unPaidEarnings.toLocaleString("vi-VN")} đ` 
+                  : '0 đ'}
+              </td>
+
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+
+      <div className="date-filter">
+        <label htmlFor="fromDate">Từ ngày:</label>
+        <input
+          type="date"
+          id="fromDate"
+          value={fromDate}
+          onChange={(e) => setFromDate(e.target.value)}
+        />
+        <label htmlFor="toDate">Đến ngày:</label>
+        <input
+          type="date"
+          id="toDate"
+          value={toDate}
+          onChange={(e) => setToDate(e.target.value)}
+        />
+      </div>
+
+      <div className="chart-section">
+        <h3>Thống kê biểu đồ</h3>
+        {chartData ? (
+          <Line
+            data={chartData}
+            options={{
+              responsive: true,
+              plugins: {
+                legend: { position: 'top' },
+                tooltip: { mode: 'index', intersect: false },
+              },
+              scales: {
+                x: { title: { display: true, text: 'Date' } },
+                y: { title: { display: true, text: 'Values' } },
+              },
+            }}
+          />
+        ) : (
+          <p>Chọn ngày để xem dữ liệu.</p>
+        )}
+      </div>
+
     </div>
   );
 };

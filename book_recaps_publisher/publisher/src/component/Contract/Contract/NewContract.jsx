@@ -193,7 +193,7 @@ const Contract = () => {
             </div>
 
       <table className="contract-table">
-        <thead  className="contract-th">
+        <thead>
         <tr>
         <th>ID</th>
         <th>Nhà Xuất Bản</th>

@@ -56,7 +56,7 @@ const toggleMenu = (index) => {
 
 const handleDelete = (book) => {
   setBookToDelete(book); // Lưu thông tin cuốn sách cần xóa
-  setShowPopup(true);    // Hiển thị popup
+  setShowPopup(true);    
 };
 
 const confirmDelete = async () => {
@@ -177,8 +177,8 @@ useEffect(() => {
     navigate(`/contract-detail/${contractId}`);
   };
 
-  const handleBookInfoClick = (id) => {
-    navigate(`/book-detail/${id}`); // Điều hướng đến trang chi tiết với `id` của sách
+  const handleBookInfoClick = (id, totalEarnings) => {
+    navigate(`/book-detail/${id}`, { state: { totalEarnings } });
   };
 
   
@@ -219,8 +219,8 @@ useEffect(() => {
           <tr>
             <th>STT</th>
             <th>Ảnh bìa</th>
-            <th>Thể loại</th>
             <th>Tiêu đề</th>
+            <th>Thể loại</th>           
             <th>Tác giả</th>
             <th>Năm xuất bản</th>
             <th>Hợp đồng</th>
@@ -231,33 +231,36 @@ useEffect(() => {
         {currentBooks.map((book, index) => (
              <tr key={index} onDoubleClick={() => handleBookInfoClick(book.id)} style={{ cursor: 'pointer' }}>
 
-              <td>{(currentPage - 1) * booksPerPage + index + 1}</td>
+              <td className="title">{(currentPage - 1) * booksPerPage + index + 1}</td>
               <td> <img src={book.coverImage ? book.coverImage : emptyImage} width="50" height="95" /></td>
+      
+      <td className="title">{book.title || 'No Title'}</td>
       
       <td>
         <span className={`tag ${book.categories?.$values[0]?.name?.toLowerCase() || 'unknown'}`}>
           {book.categories?.$values[0]?.name || 'Unknown'}
         </span>
       </td>
-      <td>{book.title || 'No Title'}</td>
-      <td>
+      <td className="title">
         {book.authors?.$values.map(author => author.name).join(', ') || 'Unknown Author'}
       </td>
-      <td>{book.publicationYear || 'N/A'}</td> {/* Display publication year */}
+      <td className="title">{book.publicationYear || 'N/A'}</td> {/* Display publication year */}
      
       <td>
     {book.publisher?.contracts?.$values?.length > 0
     ? book.publisher.contracts.$values.map(contract => (
-        <div key={contract.id} className="contract-item">
-          <span
+      <div key={contract.id} className="contract-item">
+      <span
         className="contract-id"
         onClick={() => handleNavigate(contract.id)}
-        style={{ cursor: "pointer", color: "blue", textDecoration: "underline" }}
       >
         ID: {contract.id}
       </span>
-          <span className="contract-status">Status: {getStatusLabel(contract.status)}</span>
-        </div>
+      <span className={`contract-status status-${contract.status}`}>
+        Status: {getStatusLabel(contract.status)}
+      </span>
+    </div>
+    
       ))
     : "Không có hợp đồng"}
 </td>
