@@ -76,7 +76,7 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId }) => {
         { headers: { Authorization: `Bearer ${accessToken}` } }
       );
 
-      Alert.alert('Playlist created and recap added!');
+      Alert.alert('Playlist đã được tạo và recap đã được thêm vào!');
       setIsLoading(false);
       onClose();
     } catch (error) {
@@ -104,7 +104,7 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId }) => {
           { headers: { Authorization: `Bearer ${accessToken}` } }
         );
       }
-      Alert.alert('Recap added to selected playlists!');
+      Alert.alert('Recap đã được thêm vào playlist đã chọn!');
       setIsLoading(false);
       onClose();
     } catch (error) {
@@ -144,8 +144,8 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId }) => {
   >
   
       <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10 }}>
-        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Save in My Library</Text>
-        <Text style={{ marginTop: 20 }}>Select Existing Playlists</Text>
+        <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Thêm vào Playlist</Text>
+        <Text style={{ marginTop: 20 }}>Chọn Playlist hiện có</Text>
         {existingPlaylists.length > 0 ? (
           existingPlaylists.map((playlist) => (
             <TouchableOpacity
@@ -164,11 +164,11 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId }) => {
             </TouchableOpacity>
           ))
         ) : (
-          <Text>No playlists available.</Text>
+          <Text>Không có Playlist nào.</Text>
         )}
 
         <View style={{ marginTop: 20 }}>
-          <Text>Or Create a New Playlist</Text>
+          <Text>Hoặc Tạo một Playlist Mới</Text>
           <TextInput
             style={{
               borderWidth: 1,
@@ -177,7 +177,7 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId }) => {
               padding: 8,
               borderRadius: 5,
             }}
-            placeholder="Playlist name"
+            placeholder="Tên Playlist"
             value={playlistName}
             onChangeText={setPlaylistName}
           />
@@ -185,21 +185,21 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId }) => {
 
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
           <TouchableOpacity onPress={onClose} style={{ padding: 10, backgroundColor: '#ccc', borderRadius: 5 }}>
-            <Text>Cancel</Text>
+            <Text>Hủy</Text>
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handleSaveInSelectedPlaylists}
             disabled={isLoading}
             style={{ padding: 10, backgroundColor: '#007bff', borderRadius: 5 }}
           >
-            {isLoading ? <ActivityIndicator size="small" color="#fff" /> : <Text style={{ color: '#fff' }}>Save </Text>}
+            {isLoading ? <ActivityIndicator size="small" color="#fff" /> : <Text style={{ color: '#fff' }}>Lưu </Text>}
           </TouchableOpacity>
           <TouchableOpacity
             onPress={handleCreatePlaylist}
             disabled={isLoading || !playlistName}
             style={{ padding: 10, backgroundColor: '#28a745', borderRadius: 5 }}
           >
-            {isLoading ? <ActivityIndicator size="small" color="#fff" /> : <Text style={{ color: '#fff' }}>Create New</Text>}
+            {isLoading ? <ActivityIndicator size="small" color="#fff" /> : <Text style={{ color: '#fff' }}>Tạo mới</Text>}
           </TouchableOpacity>
         </View>
       </View>

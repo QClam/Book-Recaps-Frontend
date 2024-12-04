@@ -155,51 +155,77 @@ export default HomeScreen;
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#f5f5f5",
+        backgroundColor: "#f0f0f5", // Đổi màu nền nhẹ nhàng
     },
     searchContainer: {
-        padding: 12,
-        backgroundColor: "#fff",
+        padding: 5,
+        backgroundColor: "#ffffff",
+        borderBottomWidth: 1,
+        borderBottomColor: "#e0e0e0", // Đổi màu viền nhẹ cho đẹp mắt
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 4, // Thêm bóng đổ cho thanh tìm kiếm
     },
     searchInput: {
-        backgroundColor: "#f0f0f0",
-        borderRadius: 8,
-        paddingHorizontal: 12,
-        paddingVertical: 8,
+        backgroundColor: "#f4f4f4",
+        borderRadius: 25,
+        paddingHorizontal: 20,
+        paddingVertical: 10,
         fontSize: 16,
+        color: "#333", // Màu chữ tối cho dễ đọc
+        
     },
     filterContainer: {
-        backgroundColor: "#fff",
-        paddingVertical: 12,
+        backgroundColor: "#ffffff",
+        paddingVertical: 14,
         borderBottomWidth: 1,
         borderBottomColor: "#e1e1e1",
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+        paddingHorizontal: 16,
     },
     filterScroll: {
-        paddingHorizontal: 16,
+        flexDirection: "row",
+        paddingVertical: 8,
     },
     filterButton: {
-        paddingHorizontal: 16,
-        paddingVertical: 8,
-        borderRadius: 20,
-        backgroundColor: "#f0f0f0",
-        marginRight: 8,
+        paddingVertical: 10,
+        paddingHorizontal: 20,
+        borderRadius: 30,
+        backgroundColor: "#e0e0e0",
+        marginRight: 10,
+        borderWidth: 1,
+        borderColor: "#d0d0d0",
+        transition: "all 0.3s ease", // Hiệu ứng khi hover
     },
     filterButtonActive: {
         backgroundColor: "#007AFF",
+        borderColor: "#007AFF", // Thay đổi màu khi được chọn
     },
     filterButtonText: {
-        fontSize: 14,
-        color: "#666",
-        fontWeight: "500",
+        fontSize: 16,
+        color: "#777",
+        fontWeight: "600",
     },
     filterButtonTextActive: {
         color: "#fff",
     },
     listContainer: {
-        padding: 8, // Cách lề của danh sách
+        paddingHorizontal: 12, // Khoảng cách từ hai bên
     },
     cardContainer: {
         flex: 1,
-        margin: 8, // Khoảng cách giữa các card
+        margin: 10, // Tăng khoảng cách giữa các thẻ
+        borderRadius: 10, // Góc bo tròn
+        overflow: "hidden", // Ẩn phần ngoài thẻ
+        backgroundColor: "#ffffff",
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 3 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 5, // Thêm bóng đổ cho card
     },
 });

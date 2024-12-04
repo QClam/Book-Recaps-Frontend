@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView, ActivityIndicator, FlatList } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import api from '../utils/AxiosInterceptors';
-
+import SubscriptionHistory from '../components/History/SubcriptionHistory';
+import { useNavigation } from '@react-navigation/native';
 const ProfileScreen = () => {
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [subscriptionPackageName, setSubscriptionPackageName] = useState('');
+    const navigation = useNavigation();
 
     useEffect(() => {
         const fetchProfile = async () => {
@@ -52,10 +54,18 @@ const ProfileScreen = () => {
             </View>
         );
     }
+    
+  const handleProfileNameClick = () => {
+    navigation.navigate('History'); 
+  };
 
-    return (
-        <ScrollView contentContainerStyle={styles.container}>
-            <Text style={styles.title}>{profile.userName || 'N/A'}</Text>
+    // Header component
+    const renderHeader = () => (
+        <View style={styles.container}>
+            <Text style={styles.title} onPress={handleProfileNameClick}>
+        {profile.userName || 'N/A'}
+      </Text>
+
             {profile ? (
                 <View style={styles.infoGroup}>
                     {profile.imageUrl && profile.imageUrl.trim() !== '' ? (
@@ -113,14 +123,24 @@ const ProfileScreen = () => {
             ) : (
                 <Text>Unable to load profile data.</Text>
             )}
-        </ScrollView>
+        </View>
+    );
+
+    return (
+        <FlatList
+        data={[]} // Vì không có danh sách thực tế, để trống.
+        keyExtractor={(item, index) => index.toString()}
+        ListHeaderComponent={renderHeader}
+        ListFooterComponent={<SubscriptionHistory />} // Thêm SubscriptionHistory vào cuối.
+    />
+
     );
 };
 
 const styles = StyleSheet.create({
     container: {
         padding: 20,
-        backgroundColor: '#f9f9f9',
+        //backgroundColor: '#f9f9f9',
     },
     loadingContainer: {
         flex: 1,
@@ -159,6 +179,7 @@ const styles = StyleSheet.create({
         paddingVertical: 10,
         borderBottomWidth: 1,
         borderBottomColor: '#ddd',
+        
     },
     label: {
         fontWeight: 'bold',

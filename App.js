@@ -21,6 +21,7 @@ import RecapsScreen from "./screens/RecapsScreen";
 import Onboarding from "./components/Onboarding";
 import RecapDetail from "./components/Books/RecapDetail";
 import RecapItemDetail from "./components/Books/RecapItemDetail";
+import History from "./components/History/History";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -135,6 +136,10 @@ export default function App() {
                             component={RecapItemDetail}
                             options={{ title: "Detail Recap" }}
                         />
+                        <Stack.Screen 
+                        name="History" 
+                        component={History}
+                        options={{ title: "History" }} />
                 </Stack.Navigator>
                 <StatusBar style="auto" />
             </SafeAreaView>

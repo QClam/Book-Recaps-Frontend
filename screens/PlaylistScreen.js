@@ -112,7 +112,7 @@ const PlaylistScreen = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>My Playlists</Text>
+      <Text style={styles.title}>Danh sách phát của tôi</Text>
       {playlists.length === 0 ? (
         <Text>No playlists found.</Text>
       ) : (
@@ -123,7 +123,7 @@ const PlaylistScreen = () => {
             <View style={styles.playlist}>
               <View style={styles.playlistHeader}>
                 <Text style={styles.playlistName}>
-                  Playlist Name: {playlist.playListName}
+                Tên playlist: {playlist.playListName}
                 </Text>
                 <TouchableOpacity
                   onPress={() => handleDeletePlaylist(playlist.id)}
