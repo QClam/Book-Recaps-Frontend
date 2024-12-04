@@ -1,89 +1,135 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import "../History/History.scss";
-import { generatePath, useNavigate } from 'react-router-dom';
+import { generatePath, Link } from 'react-router-dom';
 import { axiosInstance } from "../../utils/axios";
 import { useAuth } from "../../contexts/Auth";
 import { routes } from "../../routes";
+import ReactPaginate from "react-paginate";
+import { Image } from "primereact/image";
+import { FaClockRotateLeft } from "react-icons/fa6";
+import { LuTimer } from "react-icons/lu";
+import Show from "../Show";
 
 const History = () => {
-  const [ recapData, setRecapData ] = useState([]);
-  const [ loading, setLoading ] = useState(true);
-  const [ error, setError ] = useState(null);
-  const navigate = useNavigate(); // Initialize navigate
   const { user } = useAuth();
 
+  const [ viewTrackings, setViewTrackings ] = useState([]);
+  const [ loading, setLoading ] = useState(true);
+  const [ error, setError ] = useState(null);
+  const [ page, setPage ] = useState(1);
+  const totalPages = useRef(0);
+
   useEffect(() => {
-    fetchRecapData();
-  }, []);
+    fetchRecapData(page);
+  }, [ page ]);
 
-  // Function to fetch and filter recap data by user ID
-  const fetchRecapData = async () => {
+  const fetchRecapData = async (pageNumber) => {
+    setLoading(true);
     try {
-      // TODO: Pagination for this page
-      const response = await axiosInstance.get(`/api/viewtracking/getviewtrackingbyuserid/${user.id}?pageNumber=1&pageSize=10`);
+      const response = await axiosInstance.get(`/api/viewtracking/getviewtrackingbyuserid/${user.id}?pageNumber=${pageNumber}&pageSize=5`);
+      const recaps = response.data.data.data.$values || [];
 
-      // Extract recap data
-      const recaps = response.data.data.data.$values;
-
-      // Filter out duplicate recaps by recapName and keep the latest one based on createdAt
-      // const uniqueRecaps = Array.from(
-      //   recaps
-      //     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) // Sort by createdAt descending
-      //     .reduce((map, recap) => map.set(recap.recapName, recap), new Map())
-      //     .values()
-      // );
-
-      setRecapData(recaps);
-      setLoading(false);
+      totalPages.current = response.data.data?.totalPages;
+      setViewTrackings(recaps);
     } catch (err) {
       console.error('Error fetching recap data:', err);
       setError('Failed to fetch recap data');
-      setLoading(false);
     }
+    setLoading(false);
   };
 
-  // Render loading or error state
+  const handleChangePage = ({ selected }) => {
+    setPage(selected + 1);
+  };
+
   if (loading) return <div className="loading">Loading...</div>;
   if (error) return <div className="error">Error: {error}</div>;
 
-  // Render recap data
   return (
     <div className="container mx-auto max-w-screen-xl p-5">
       <div className="history-container">
-        <h1>User Recap History</h1>
+        <h1>Lịch sử xem bài viết</h1>
         <div className="history-list">
-          {recapData.map((recap, index) => (
-            <div key={index} className="history-card"
-
+          {viewTrackings.map((view, index) => (
+            <Link
+              key={index}
+              to={generatePath(routes.recapPlayer, { recapId: view.recapId })}
+              className="history-card"
             >
-              <div className="recap-thumbnail">
-                <img
-                  src={recap.book.coverImage}
-                  alt={recap.book.title}
-                  style={{ cursor: 'pointer' }}
-                  onClick={() => navigate(generatePath(routes.bookDetail, { id: recap.book.bookId }))} // Navigate to the detail page
+              <div className="relative w-28">
+                <Image
+                  src={view.book.coverImage || "/empty-image.jpg"}
+                  alt={view.book.title}
+                  className="!block overflow-hidden rounded-md shadow-md w-full"
+                  imageClassName="aspect-[3/4] object-cover w-full bg-white"
                 />
               </div>
 
-              <div className="recap-details">
-                <h2>{recap.recapName}</h2>
-                <div className="recap-info">
-                  <span className="author"><strong>Author:</strong> {recap.book.authors.$values.join(', ')}</span>
-                  {/* <span className="created-at"><strong>Created At:</strong> {new Date(recap.createdAt).toLocaleString()}</span> */}
+              <div className="flex-1">
+                <p className="text-base mb-2 line-clamp-1 flex gap-2 items-center" title={view.recapName}>
+                  <span>Bài viết: <strong>{view.recapName}</strong></span>
+                  <Show when={view.isPremium}>
+                    <span className="bg-yellow-400 text-xs rounded px-2 py-1">Premium</span>
+                  </Show>
+                </p>
+                <div className="flex gap-2 items-center text-sm mb-2">
+                  <div className="w-6 h-6">
+                    <img
+                      src={view.contributorImage?.replace("Files/Image/jpg/ad.jpg", "") || '/avatar-placeholder.png'}
+                      alt="User Avatar" className="w-full h-full object-cover rounded-full"/>
+                  </div>
+                  <p className="font-semibold line-clamp-1">{view.contributorName}</p>
                 </div>
-                <div className="recap-meta">
-                  {/* <p><strong>Book ID:</strong> {recap.book.bookId} </p> */}
-                  <p><strong>Title:</strong> {recap.book.title} </p>
-                  <p><strong>Original Title:</strong> {recap.book.originalTitle}</p>
-                  <p className="likes-views">
-                    <span className="likes"><strong>Likes:</strong> {recap.likesCount}</span>
-                    <span className="views"><strong>Views:</strong> {recap.viewsCount}</span>
+
+                <div className="flex gap-2 items-center text-sm text-gray-500 mb-2">
+                  {/*<p className="flex items-center gap-2">*/}
+                  {/*  <span className="bg-green-100 p-1 rounded"><RiEyeLine size={15}/></span>*/}
+                  {/*  <span>{view.viewsCount || 0} Lượt xem</span>*/}
+                  {/*</p>*/}
+                  {/*<p>·</p>*/}
+                  {/*<p className="flex items-center gap-2">*/}
+                  {/*  <span className="bg-green-100 p-1 rounded"><RiThumbUpLine size={15}/></span>*/}
+                  {/*  <span>{view.likesCount || 0} Lượt thích</span>*/}
+                  {/*</p>*/}
+                  {/*<p>·</p>*/}
+                  <p className="flex items-center gap-2">
+                    <span className="bg-green-100 p-1 rounded"><FaClockRotateLeft size={15}/></span>
+                    <span>{new Date(view.createdAt + 'Z').toLocaleString()}</span>
+                  </p>
+                  <p>·</p>
+                  <p className="flex items-center gap-2">
+                    <span className="bg-green-100 p-1 rounded"><LuTimer size={15}/></span>
+                    <span>Đã xem {((view.durations || 0) / 60).toFixed(1)} phút</span>
+                  </p>
+                </div>
+
+                <div className="border-t border-gray-300 my-2.5"></div>
+
+                <div className="relative text-xs italic">
+                  <p className="mb-1 line-clamp-2" title={view.book.originalTitle}>
+                    Sách: <strong>{view.book.originalTitle} ({view.book.title})</strong>
+                  </p>
+                  <p className="line-clamp-1"
+                     title={view.book.authors.$values.join(', ')}>
+                    Tác giả: <strong>{view.book.authors.$values.join(', ')}</strong>
                   </p>
                 </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
+
+        <ReactPaginate
+          previousLabel="Trước"
+          nextLabel="Sau"
+          breakLabel="..."
+          pageCount={totalPages.current}
+          marginPagesDisplayed={1}
+          pageRangeDisplayed={1}
+          onPageChange={handleChangePage}
+          containerClassName="pagination"
+          activeClassName="active"
+        />
       </div>
     </div>
   );
