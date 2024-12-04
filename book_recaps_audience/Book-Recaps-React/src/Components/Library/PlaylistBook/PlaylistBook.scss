@@ -26,11 +26,11 @@ $border-radius: 8px;
     //  background-color: $hover-color;
     //}
 
-    h3 {
-      font-size: 1.4rem;
-      color: $text-color;
-      margin-bottom: 10px;
-    }
+    //h3 {
+    //  font-size: 1.4rem;
+    //  color: $text-color;
+    //  margin-bottom: 10px;
+    //}
 
     h4 {
       font-size: 1.2rem;
@@ -59,13 +59,13 @@ $border-radius: 8px;
           background-color: $hover-color;
         }
 
-        img {
-          width: 80px;
-          height: 120px;
-          border-radius: $border-radius;
-          object-fit: cover;
-          margin-right: 10px;
-        }
+        //img {
+        //  width: 80px;
+        //  height: 120px;
+        //  border-radius: $border-radius;
+        //  object-fit: cover;
+        //  margin-right: 10px;
+        //}
 
         .book-info {
           display: flex;
@@ -143,12 +143,6 @@ $border-radius: 8px;
   display: flex; /* Sử dụng Flexbox */
   justify-content: space-between; /* Để căn giữa khoảng cách giữa tiêu đề và dấu ba chấm */
   align-items: center; /* Căn giữa theo chiều dọc */
-
-  h3 {
-    margin: 0; /* Để loại bỏ khoảng cách mặc định */
-    font-size: 1.4rem; /* Kích thước chữ */
-    color: $text-color; /* Màu chữ */
-  }
 
   .options-menu {
     cursor: pointer;

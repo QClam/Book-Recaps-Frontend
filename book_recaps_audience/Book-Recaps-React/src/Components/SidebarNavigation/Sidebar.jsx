@@ -234,17 +234,27 @@ function Sidebar() {
                 <Show when={showProfileDropDown}>
                   <div className="logout-option rounded">
                     <Link
-                      className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20"
-                      to={routes.profileSettings}>
-                      Profile settings
-                    </Link>
-                    <Link
-                      className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20"
+                      className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20 decoration-0"
                       to={routes.viewHistory}>
                       View history
                     </Link>
                     <Link
-                      className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20"
+                      className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20 decoration-0"
+                      to={routes.profileSettings}>
+                      Profile settings
+                    </Link>
+                    <Link
+                      className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20 decoration-0"
+                      to={routes.subscriptionHistory}>
+                      Subscriptions
+                    </Link>
+                    <Link
+                      className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20 decoration-0"
+                      to={routes.becomeContributor}>
+                      Become a contributor
+                    </Link>
+                    <Link
+                      className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20 decoration-0"
                       to={routes.logout}
                       state={{ from: location.pathname }}>
                       Logout

@@ -99,12 +99,12 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId, savedPlayListId
           <h3>Select Existing Playlists</h3>
           {existingPlaylists.length > 0 ? (
             existingPlaylists.map((playlist) => (
-              <div key={playlist.id}>
+              <div key={playlist.playListId}>
                 <input
                   type="checkbox"
-                  value={playlist.id}
-                  checked={selectedPlaylistIds.includes(playlist.id)}
-                  onChange={() => handleCheckboxChange(playlist.id)}
+                  value={playlist.playListId}
+                  checked={selectedPlaylistIds.includes(playlist.playListId)}
+                  onChange={() => handleCheckboxChange(playlist.playListId)}
                 />
                 <label>{playlist.playListName}</label>
               </div>

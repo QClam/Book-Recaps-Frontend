@@ -5,7 +5,7 @@ import Settings from './Components/Setting/Settings';
 import MainLayout from './Components/Layout/MainLayout';
 import Application from "./Components/Setting/Application/Application";
 import Billing from "./Components/Setting/Billing/Billing";
-import LibraryBook from "./Components/Library/LibraryBook";
+import LibraryBook, { playlistLoader } from "./Components/Library/LibraryBook";
 import Login from "./Components/Auth/Login";
 // import ExploreCategory from "./Components/Explore/ExploreCategory";
 // import BookListCategory from "./Components/Explore/BookApiCategory/BookListCategory/BookListCategory";
@@ -68,7 +68,7 @@ export const router = createBrowserRouter(createRoutesFromElements(
 
       {/* Cần đăng nhập trước */}
       <Route element={<ProtectedRoute/>}>
-        <Route path={routes.playlist} element={<LibraryBook/>}/>
+        <Route path={routes.playlist} element={<LibraryBook/>} loader={playlistLoader}/>
         <Route path={routes.viewHistory} element={<History/>}/>
         <Route path={routes.supportTickets} element={<Application/>}/>
         <Route path={routes.subscriptionHistory} element={<SubscriptionHistory/>}/>

@@ -21,6 +21,9 @@ const getBooks = async (request) => {
     return response.data.data?.$values || [];
   } catch (e) {
     const err = handleFetchError(e);
+    if (err.status === 400) {
+      return [];
+    }
     throw json({ error: err.error }, { status: err.status });
   }
 }
