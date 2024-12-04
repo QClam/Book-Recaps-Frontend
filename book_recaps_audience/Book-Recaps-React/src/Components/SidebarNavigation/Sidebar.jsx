@@ -23,7 +23,8 @@ function Sidebar() {
 
   const userName = user?.profileData.userName || user?.profileData.fullName || '';
   const imageUrl = user?.profileData.imageUrl?.replace("Files/Image/jpg/ad.jpg", "") || '/avatar-placeholder.png';
-  const isPremium = user?.profileData.subscriptions.$values.some((sub) => sub.status === 0);
+  const activeSubscription = user?.profileData.subscriptions.$values.find((sub) => sub.status === 0);
+  const isPremium = !!activeSubscription;
 
   useClickAway(profileDropdownEl, () => {
     if (showProfileDropDown) setShowProfileDropDown(false);
@@ -237,7 +238,9 @@ function Sidebar() {
                         "bg-[#FF6F61] text-white": isPremium,
                         "bg-gray-300 text-gray-700": !isPremium
                       })}>
-                        {isPremium ? "Premium" : "Miễn phí"}
+                        {isPremium ?
+                          <>Premium <strong>({activeSubscription.expectedViewsCount - activeSubscription.actualViewsCount}/{activeSubscription.expectedViewsCount})</strong></> :
+                          "Miễn phí"}
                       </p>
                     </div>
                     <div className="w-10 h-10">
@@ -255,13 +258,18 @@ function Sidebar() {
                     </Link>
                     <Link
                       className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20 decoration-0"
-                      to={routes.profileSettings}>
-                      Cài đặt tài khoản
+                      to={routes.subscriptionHistory}>
+                      Lịch sử đăng ký gói
                     </Link>
                     <Link
                       className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20 decoration-0"
-                      to={routes.subscriptionHistory}>
-                      Lịch sử đăng ký gói
+                      to={routes.supportTickets}>
+                      Lịch sử báo cáo
+                    </Link>
+                    <Link
+                      className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20 decoration-0"
+                      to={routes.profileSettings}>
+                      Cài đặt tài khoản
                     </Link>
                     <Link
                       className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20 decoration-0"

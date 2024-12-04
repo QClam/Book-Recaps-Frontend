@@ -1,16 +1,13 @@
 import { useEffect, useState } from 'react';
 import "../Application/Application.scss";
-import { useNavigate } from 'react-router-dom';
-import { routes } from "../../../routes";
 import { axiosInstance } from "../../../utils/axios";
 import { useAuth } from "../../../contexts/Auth";
+import { cn } from "../../../utils/cn";
 
 const Application = () => {
   const [ supportTickets, setSupportTickets ] = useState([]);
   const [ errorMessage, setErrorMessage ] = useState(null);
   const { user } = useAuth();
-
-  const navigate = useNavigate();
 
   // Fetch support tickets by userId and get book title
   useEffect(() => {
@@ -54,49 +51,40 @@ const Application = () => {
     fetchSupportTickets();
   }, []);
 
-  const goToExplore = () => {
-    navigate(routes.explore);
-  };
-
   return (
     <div className="container mx-auto max-w-screen-xl p-5">
+      <h1 className="font-semibold text-2xl mb-6">Lịch sử đơn báo cáo</h1>
       {errorMessage && <p className="error-notice">{errorMessage}</p>}
 
-      <div className="tabs">
-        <button className="tab active" onClick={goToExplore}>Home</button>
-      </div>
-
-      <table className="support-tickets-table">
+      <table className="support-tickets-table bg-white">
         <thead>
         <tr>
-          <th>Type</th>
-          <th>Book Title</th>
-          <th>Recap Name</th>
-
-
-          <th>Descriptions</th>
-          <th>Status</th>
-
-          <th>Response</th>
-          <th>Create Date</th>
+          <th>Loại đơn</th>
+          <th><p className="w-max">Tên bài viết</p></th>
+          <th>Nội dung</th>
+          <th>Trạng thái</th>
+          <th>Xử lý</th>
+          <th>Ngày tạo</th>
+          <th><p className="w-max">Ngày xử lý</p></th>
         </tr>
         </thead>
         <tbody>
         {supportTickets.map(ticket => (
           <tr key={ticket.id}>
             <td><a href="#">{ticket.category}</a></td>
-            <td>{ticket.bookTitle || "Unknown Book Title"}</td>
             <td>{ticket.recapName || "Unknown Recap Name"}</td>
-
-
             <td>{ticket.description}</td>
-            <td className={`status ${ticket.status === 1 ? 'open' : 'closed'}`}>
-              {ticket.status === 1 ? 'Đang xử lí' : 'Đã xử lí'}
-
+            <td>
+              <p className={cn("status text-sm w-max", {
+                "open": ticket.status === 1,
+                "closed": ticket.status === 2
+              })}>
+                {ticket.status === 1 ? 'Đang xử lí' : ticket.status === 2 ? 'Đã xử lí' : 'Chưa gửi'}
+              </p>
             </td>
-
             <td>{ticket.response}</td>
-            <td>{new Date(ticket.createdAt).toLocaleDateString()}</td>
+            <td><p className="break-words">{new Date(ticket.createdAt).toLocaleString()}</p></td>
+            <td><p className="break-words">{ticket.updatedAt !== "0001-01-01T00:00:00" && new Date(ticket.updatedAt).toLocaleString()}</p></td>
           </tr>
         ))}
         </tbody>
