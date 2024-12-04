@@ -23,7 +23,7 @@ const PlaylistBook = ({ playlistsData }) => {
 
   const handleDeletePlaylist = async (playlistId) => {
     try {
-      await axiosInstance.delete(`/api/playlists/deleteplaylist/${playlistId}`);
+      await axiosInstance.delete(`/api/playlists/softdeleteplaylist/${playlistId}`);
       // Update playlists after deletion
       setPlaylists(playlists.filter((playlist) => playlist.playListId !== playlistId));
       toast.success('Playlist deleted successfully.');

@@ -3,6 +3,7 @@ import './CreatePlaylistModal.scss';
 import { axiosInstance } from "../../../../utils/axios";
 import { useAuth } from "../../../../contexts/Auth";
 import { toast } from "react-toastify";
+import { Divider } from "primereact/divider";
 
 const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId, savedPlayListIds, setSavedPlayListIds }) => {
   const { isAuthenticated } = useAuth();
@@ -92,11 +93,11 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId, savedPlayListId
   return (
     <div className="modal-overlay">
       <div className="modal-content">
-        <h2>Save in My Library</h2>
+        <h2>Danh sách của tôi</h2>
 
         {/* Display existing playlists with checkboxes */}
         <div>
-          <h3>Select Existing Playlists</h3>
+          <h3>Các danh sách hiện có</h3>
           {existingPlaylists.length > 0 ? (
             existingPlaylists.map((playlist) => (
               <div key={playlist.playListId}>
@@ -110,19 +111,20 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId, savedPlayListId
               </div>
             ))
           ) : (
-            <p>No playlists available.</p>
+            <p>Chưa có danh sách nào</p>
           )}
         </div>
 
+        <Divider/>
+
         {/* Form to create a new playlist */}
         <div className="create-playlist">
-          <h3>Or Create a New Playlist</h3>
+          <p>Tạo danh sách mới</p>
           <input
             type="text"
             placeholder="Playlist name"
             value={playlistName}
             onChange={(e) => setPlaylistName(e.target.value)}
-            className="playlistnameform"
           />
         </div>
 

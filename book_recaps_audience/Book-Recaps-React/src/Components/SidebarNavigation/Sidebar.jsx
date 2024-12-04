@@ -58,6 +58,11 @@ function Sidebar() {
     setShowSearchResultDropDown(true);
   };
 
+  const handleSearchClear = () => {
+    setSearchTerm('');
+    setShowSearchResultDropDown(false);
+  }
+
   const toggleLogout = () => {
     setShowProfileDropDown(prev => !prev); // Toggle the visibility of the logout option
   };
@@ -154,7 +159,7 @@ function Sidebar() {
                         "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,
                         "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive
                       })}>
-                      Danh sách phát
+                      Danh sách đã lưu
                     </NavLink>
                   </Show>
                 </div>
@@ -167,15 +172,25 @@ function Sidebar() {
                 className="relative flex items-center w-full rounded-xl border border-gray-300 px-1.5 py-0.5 mx-2"
                 ref={searchResultsDropdownEl}
               >
-                <input
-                  type="search"
-                  className="search-inputme text-sm"
-                  placeholder="Tìm kiếm tác giả hoặc tiêu đề"
-                  autoComplete="off"
-                  value={searchTerm}
-                  onChange={handleSearchChange}
-                  onFocus={() => setShowSearchResultDropDown(true)}
-                />
+                <div className="relative flex-1">
+                  <input
+                    type="text"
+                    className="search-inputme text-sm"
+                    placeholder="Tìm kiếm tác giả hoặc tiêu đề"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    onFocus={() => setShowSearchResultDropDown(true)}
+                  />
+                  <Show when={searchTerm}>
+                    <button
+                      type="button"
+                      className="absolute right-2 top-1/2 -translate-y-1/2 cursor-pointer text-gray-600"
+                      onClick={handleSearchClear}
+                    >
+                      <CgClose size={20}/>
+                    </button>
+                  </Show>
+                </div>
                 <div className="search-buttonme text-gray-600">
                   <TbSearch size={20}/>
                 </div>
@@ -236,28 +251,28 @@ function Sidebar() {
                     <Link
                       className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20 decoration-0"
                       to={routes.viewHistory}>
-                      View history
+                      Lịch sử xem
                     </Link>
                     <Link
                       className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20 decoration-0"
                       to={routes.profileSettings}>
-                      Profile settings
+                      Cài đặt tài khoản
                     </Link>
                     <Link
                       className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20 decoration-0"
                       to={routes.subscriptionHistory}>
-                      Subscriptions
+                      Lịch sử đăng ký gói
                     </Link>
                     <Link
                       className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20 decoration-0"
                       to={routes.becomeContributor}>
-                      Become a contributor
+                      Trở thành contributor
                     </Link>
                     <Link
                       className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20 decoration-0"
                       to={routes.logout}
                       state={{ from: location.pathname }}>
-                      Logout
+                      Đăng xuất
                     </Link>
                   </div>
                 </Show>
