@@ -12,7 +12,7 @@ const ReadRecapNew = () => {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await axiosInstance.get('https://bookrecaps.cloud/api/book/getallbooks');
+        const response = await axiosInstance.get('/api/book/getallbooks');
         const data = response.data;
         if (data && data.succeeded && Array.isArray(data.data.$values)) {
           setBooks(data.data.$values);

@@ -1,16 +1,16 @@
 import { createBrowserRouter, createRoutesFromElements, Route } from 'react-router-dom';
-import Explore from './Components/Explore/Explore';
+import Explore, { bookLoader } from './Components/Explore/Explore';
 import BookFree from './Components/TodayFreeRead/BookFree';
 import Settings from './Components/Setting/Settings';
 import MainLayout from './Components/Layout/MainLayout';
 import Application from "./Components/Setting/Application/Application";
-import AuthorBy from "./Components/Space/AuthorBy";
 import Billing from "./Components/Setting/Billing/Billing";
 import LibraryBook from "./Components/Library/LibraryBook";
-import ExploreCategory from "./Components/Explore/ExploreCategory";
 import Login from "./Components/Auth/Login";
-import BookListCategory from "./Components/Explore/BookApiCategory/BookListCategory/BookListCategory";
-import AuthorBookApi from "./Components/Space/AuthorApi/AuthorBookApi/AuthorBookApi";
+// import ExploreCategory from "./Components/Explore/ExploreCategory";
+// import BookListCategory from "./Components/Explore/BookApiCategory/BookListCategory/BookListCategory";
+// import AuthorBy from "./Components/Space/AuthorBy";
+// import AuthorBookApi from "./Components/Space/AuthorApi/AuthorBookApi/AuthorBookApi";
 import ConfirmEmail from "./Components/Auth/ConfirmEmail";
 import ForgetPassword from "./Components/Auth/ForgetPassword";
 import ContributorTerm from "./Components/Setting/BecomeContributor/ContributorTerm";
@@ -46,13 +46,13 @@ export const router = createBrowserRouter(createRoutesFromElements(
       <Route path={routes.forgetPassword} element={<ForgetPassword/>}/>
 
       <Route path={routes.index} element={<Homepage/>} loader={homepageLoader}/>
-      <Route path={routes.explore} element={<Explore/>}/>
+      <Route path={routes.explore} element={<Explore/>} loader={bookLoader}/>
 
-      <Route path={routes.categories} element={<ExploreCategory/>}/>
-      <Route path={routes.categoryDetail} element={<BookListCategory/>}/>
+      {/*<Route path={routes.categories} element={<ExploreCategory/>}/>*/}
+      {/*<Route path={routes.categoryDetail} element={<BookListCategory/>}/>*/}
 
-      <Route path={routes.authors} element={<AuthorBy/>}/>
-      <Route path={routes.authorBooks} element={<AuthorBookApi/>}/>
+      {/*<Route path={routes.authors} element={<AuthorBy/>}/>*/}
+      {/*<Route path={routes.authorBooks} element={<AuthorBookApi/>}/>*/}
 
       {/* Book details - recaps */}
       <Route path={routes.bookDetail} element={<UsRecapDetail/>} loader={bookDetailLoader}/>

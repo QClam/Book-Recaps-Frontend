@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import "../PlaylistBook/PlaylistBook.scss";
 import { generatePath, useNavigate } from 'react-router-dom';
 import { axiosInstance } from "../../../utils/axios";
 import { routes } from "../../../routes";
+import { useClickAway } from "react-use";
 
 const PlaylistBook = () => {
   const [ playlists, setPlaylists ] = useState([]);
@@ -11,6 +12,16 @@ const PlaylistBook = () => {
   const [ error, setError ] = useState(null);
   const navigate = useNavigate();
   const [ showOptions, setShowOptions ] = useState(null);
+  const deletePlaylistRef = useRef(null);
+  const deletePlaylistItemRef = useRef(null);
+
+  useClickAway(deletePlaylistRef, () => {
+    if (showOptions) setShowOptions(null);
+  });
+
+  useClickAway(deletePlaylistItemRef, () => {
+    if (showOptions) setShowOptions(null);
+  });
 
   useEffect(() => {
     const fetchPlaylists = async () => {
@@ -81,13 +92,6 @@ const PlaylistBook = () => {
     setShowOptions(showOptions === itemId ? null : itemId);
   };
 
-  // const handleBookClick = (book) => {
-  //   // Chỉ điều hướng nếu nhấp chuột trái
-
-  //     navigate(`/user-recap-detail/${book.id}`);
-
-  // };
-
   const handleBookClick = (book) => {
     navigate(generatePath(routes.bookDetail, { id: book.id }));
   };
@@ -113,7 +117,7 @@ const PlaylistBook = () => {
               <div className="options-menu">
                 <span onClick={(event) => toggleOptions(playlist.id, event)}>⋮</span>
                 {showOptions === playlist.id && (
-                  <div className="dropdown-options">
+                  <div className="dropdown-options" ref={deletePlaylistRef}>
                     <button onClick={() => handleDeletePlaylist(playlist.id)}>Delete</button>
                   </div>
                 )}
@@ -150,7 +154,7 @@ const PlaylistBook = () => {
                               toggleOptions(item.id, event)
                             }}>⋮</span>
                             {showOptions === item.id && (
-                              <div className="dropdown-options">
+                              <div className="dropdown-options" ref={deletePlaylistItemRef}>
                                 <button onClick={(e) => {
                                   e.stopPropagation();
                                   handleDelete(item.id)

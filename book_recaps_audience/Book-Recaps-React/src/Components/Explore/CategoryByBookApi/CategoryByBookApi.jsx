@@ -34,7 +34,7 @@ const CategoryByBookApi = () => {
 
     const fetchBooks = async () => {
       try {
-        const response = await axiosInstance.get('https://bookrecaps.cloud/api/book/getallbooks');
+        const response = await axiosInstance.get('/api/book/getallbooks');
 
         const data = resolveRefs(response.data);
         // const data = response.data;

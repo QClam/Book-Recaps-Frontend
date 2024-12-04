@@ -42,9 +42,9 @@ function Sidebar() {
   useEffect(() => {
     const fetchBooks = async () => {
       try {
-        const response = await axiosInstance.get('/api/book/getallbooks');
-        const data = response.data.data.$values;
-        setBooks(data || []);
+        const response = await axiosInstance.get('/api/book/getallbookswithcontract');
+        const data = response.data.data?.$values || [];
+        setBooks(data);
       } catch (error) {
         console.error("Error fetching books:", error);
       }
@@ -68,12 +68,12 @@ function Sidebar() {
     return books.filter((book) => {
       const titleMatch = book.title && book.title.toLowerCase().includes(searchStr);
       const originalTitleMatch = book.originalTitle && book.originalTitle.toLowerCase().includes(searchStr);
-      const authorMatch = book.authors.$values && book.authors.$values.some((author) =>
-        author.name && author.name.toLowerCase().includes(searchStr)
+      const authorMatch = book.authorNames?.$values && book.authorNames.$values.some((name) =>
+        name.toLowerCase().includes(searchStr)
       );
       return titleMatch || originalTitleMatch || authorMatch;
     });
-  }, [ searchTerm ]);
+  }, [ books, searchTerm ]);
 
   return (
     <nav className="relative py-2 border-b border-gray-300 z-10">
@@ -130,14 +130,14 @@ function Sidebar() {
                   {/*  })}>*/}
                   {/*  Books*/}
                   {/*</NavLink>*/}
-                  <NavLink
-                    to={routes.categories}
-                    className={({ isActive }) => cn("grid place-items-center h-full mt-0.5 border-b-2 border-transparent px-3 py-2 text-sm font-medium", {
-                      "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,
-                      "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive
-                    })}>
-                    Thể loại
-                  </NavLink>
+                  {/*<NavLink*/}
+                  {/*  to={routes.categories}*/}
+                  {/*  className={({ isActive }) => cn("grid place-items-center h-full mt-0.5 border-b-2 border-transparent px-3 py-2 text-sm font-medium", {*/}
+                  {/*    "!border-[#FF6F61] text-[#FF6F61] cursor-default": isActive,*/}
+                  {/*    "hover:border-[#FF6F61] hover:text-[#FF6F61]": !isActive*/}
+                  {/*  })}>*/}
+                  {/*  Thể loại*/}
+                  {/*</NavLink>*/}
                   {/*<NavLink*/}
                   {/*  to={routes.authors}*/}
                   {/*  className={({ isActive }) => cn("grid place-items-center h-full mt-0.5 border-b-2 border-transparent px-3 py-2 text-sm font-medium", {*/}
@@ -188,7 +188,7 @@ function Sidebar() {
                             <img src={book.coverImage || "/empty-image.jpg"} alt="Book cover" className="book-cover"/>
                             <div className="book-info">
                               <strong>{book.title}</strong>
-                              <p>By: {book.authors.$values.map((author) => author.name).join(', ')}</p>
+                              <p>By: {book.authorNames?.$values.join(', ')}</p>
                             </div>
                           </div>
                         </Link>

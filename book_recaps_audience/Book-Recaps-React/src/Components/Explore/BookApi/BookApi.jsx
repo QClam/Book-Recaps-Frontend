@@ -1,19 +1,15 @@
 import { useEffect, useState } from "react";
-import { generatePath, useNavigate } from 'react-router-dom';
+import { generatePath, Link, useLoaderData} from 'react-router-dom';
 import ReactPaginate from "react-paginate";
 import "./BookApi.scss";
-import { axiosInstance } from "../../../utils/axios";
 // import { resolveRefs } from "../../../utils/resolveRefs";
 import { routes } from "../../../routes";
 import Show from "../../Show"; // Import CSS cho styling
 
 const BookApi = () => {
-  const [ books, setBooks ] = useState([]);
+  const { books } = useLoaderData();
   const [ filteredBooks, setFilteredBooks ] = useState([]);
   const [ currentPage, setCurrentPage ] = useState(0);
-  const [ error, setError ] = useState(null); // For error handling
-  const booksPerPage = 16; // Số lượng sách mỗi trang
-  const navigate = useNavigate();
   // Trạng thái cho Search
   const [ searchTitle, setSearchTitle ] = useState("");
   const [ searchAuthor, setSearchAuthor ] = useState("");
@@ -31,64 +27,27 @@ const BookApi = () => {
   const [ selectedPublisher, setSelectedPublisher ] = useState("");
 
   useEffect(() => {
-    const fetchBooks = async () => {
-      try {
-        // Fetch books data from the API
-        const response = await axiosInstance.get("/api/book/getallbooks");
+    const extractFilters = (booksData) => {
+      const categorySet = new Set();
+      const ageLimitSet = new Set();
+      const publicationYearSet = new Set();
+      const publisherSet = new Set();
 
-        // const data = resolveRefs(response.data);
-        const data = response.data;
-        // console.log("Fetched Books Data:", data); // Kiểm tra dữ liệu
+      booksData.forEach((book) => {
+        if (book.categoryNames?.$values) book.categoryNames.$values.forEach((n) => categorySet.add(n));
+        if (book.publicationYear) publicationYearSet.add(book.publicationYear);
+        if (book.publisherName) publisherSet.add(book.publisherName);
+        ageLimitSet.add(book.ageLimit);
+      });
 
-        if (data && data.data && Array.isArray(data.data.$values)) {
-          setBooks(data.data.$values); // Giả sử dữ liệu sách nằm trong `data.$values`
-          setFilteredBooks(data.data.$values);
-          extractFilters(data.data.$values);
-        } else {
-          setBooks([]);
-          setFilteredBooks([]);
-        }
-      } catch (error) {
-        // Nếu token hết hạn, thử làm mới nó
-        setError(error.message);
-        console.error("Error fetching books:", error);
-      }
+      setCategories([ ...categorySet ]);
+      setAgeLimits([ ...ageLimitSet ].sort((a, b) => a - b));
+      setPublicationYears([ ...publicationYearSet ].sort((a, b) => b - a));
+      setPublishers([ ...publisherSet ]);
     };
 
-    fetchBooks();
+    extractFilters(books);
   }, []);
-
-  // Hàm để trích xuất các giá trị lọc từ dữ liệu sách
-  const extractFilters = (booksData) => {
-    const categorySet = new Set();
-    const ageLimitSet = new Set();
-    const publicationYearSet = new Set();
-    const publisherSet = new Set();
-
-    booksData.forEach((book) => {
-      // Categories
-      if (book.categories && book.categories.$values) {
-        book.categories.$values.forEach((cat) => categorySet.add(cat.name));
-      }
-
-      // Age Limits
-      ageLimitSet.add(book.ageLimit);
-
-      // Publication Years
-      publicationYearSet.add(book.publicationYear);
-
-      if (book.publisher && book.publisher.publisherName) {
-        publisherSet.add(book.publisher.publisherName);
-      }
-
-    });
-
-    setCategories([ ...categorySet ]);
-    setAgeLimits([ ...ageLimitSet ].sort((a, b) => a - b));
-    setPublicationYears([ ...publicationYearSet ].sort((a, b) => b - a));
-    setPublishers([ ...publisherSet ]);
-
-  };
 
   // Hàm xử lý khi thay đổi Search hoặc Filter
   useEffect(() => {
@@ -97,7 +56,8 @@ const BookApi = () => {
     // Apply Search by title
     if (searchTitle) {
       tempBooks = tempBooks.filter((book) =>
-        book.title.toLowerCase().includes(searchTitle.toLowerCase())
+        book.title.toLowerCase().includes(searchTitle.toLowerCase()) ||
+        (book.originalTitle && book.originalTitle.toLowerCase().includes(searchTitle.toLowerCase()))
       );
     }
 
@@ -105,24 +65,16 @@ const BookApi = () => {
     if (searchAuthor) {
       const lowerSearchAuthor = searchAuthor.toLowerCase();
       tempBooks = tempBooks.filter((book) =>
-        book.authors &&
-        book.authors.$values &&
-        book.authors.$values.some(
-          (author) =>
-            author.name &&
-            author.name.toLowerCase().includes(lowerSearchAuthor)
-        )
+        book.authorNames?.$values &&
+        book.authorNames.$values.some((name) => name.toLowerCase().includes(lowerSearchAuthor))
       );
     }
 
     // Apply Filter (Categories, Age Limit, Publication Year)
     if (selectedCategories.length > 0) {
       tempBooks = tempBooks.filter((book) =>
-        book.categories &&
-        book.categories.$values &&
-        book.categories.$values.some((cat) =>
-          selectedCategories.includes(cat.name)
-        )
+        book.categoryNames?.$values &&
+        book.categoryNames.$values.some((name) => selectedCategories.includes(name))
       );
     }
 
@@ -141,7 +93,7 @@ const BookApi = () => {
     // Apply publisher filter
     if (selectedPublisher) {
       tempBooks = tempBooks.filter((book) =>
-        book.publisher?.publisherName === selectedPublisher
+        book.publisherName === selectedPublisher
       );
     }
 
@@ -154,13 +106,12 @@ const BookApi = () => {
     selectedCategories,
     selectedAgeLimit,
     selectedPublicationYear,
-    selectedPublisher,
-
+    selectedPublisher
   ]);
 
   // Tính toán phân trang
-  const pageCount =
-    filteredBooks.length > 0 ? Math.ceil(filteredBooks.length / booksPerPage) : 1;
+  const booksPerPage = 16; // Số lượng sách mỗi trang
+  const pageCount = filteredBooks.length > 0 ? Math.ceil(filteredBooks.length / booksPerPage) : 1;
   const offset = currentPage * booksPerPage;
   const currentBooks = filteredBooks.slice(offset, offset + booksPerPage);
 
@@ -191,18 +142,10 @@ const BookApi = () => {
     setSelectedPublisher(e.target.value);
   };
 
-  // const handleBookClick = (id) => {
-  //   navigate(`/bookdetailbook/${id}`); // Use the book's id for navigation
-  // };
-  const handleBookClick = (id) => {
-    navigate(generatePath(routes.bookDetail, { id })); // Navigate to UserRecapDetail with the book ID
-  };
-
   return (
     <div className="book-api-container container mx-auto max-w-screen-xl mb-4 pt-6 md:pt-12 md:px-12">
       {/* <h1 className="title">Danh Sách Sách</h1> */}
 
-      {error && <p className="error">Lỗi: {error}</p>}
 
       {/* Phần Search và Filter */}
       <div className="filters-container">
@@ -296,10 +239,10 @@ const BookApi = () => {
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5">
             <Show when={currentBooks.length > 0} fallback={<p className="text-center">Không tìm thấy sách nào.</p>}>
               {currentBooks.map((book) => (
-                <div
-                  className="bg-white border border-gray-300 rounded-lg overflow-hidden flex flex-col transition-transform duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg"
+                <Link
                   key={book.id}
-                  onClick={() => handleBookClick(book.id)}
+                  to={generatePath(routes.bookDetail, { id: book.id })}
+                  className="bg-white border border-gray-300 rounded-lg overflow-hidden flex flex-col transition-transform duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg"
                 >
                   <div className="block bg-gray-200">
                     <img
@@ -315,17 +258,16 @@ const BookApi = () => {
                     <p className="text-sm text-gray-600 line-clamp-1 mb-2" title={book.originalTitle}>
                       Tên gốc: <strong>{book.originalTitle}</strong>
                     </p>
-                    {book.authors && book.authors.$values.length > 0 && (
-                      <p className="text-sm text-gray-600 mb-2"
-                         title={book.authors.$values.map((author) => author.name).join(", ")}>
-                        Tác giả: <strong>{book.authors.$values.map((author) => author.name).join(", ")}</strong>
+                    {book.authorNames?.$values?.length > 0 && (
+                      <p className="text-sm text-gray-600 mb-2" title={book.authorNames.$values.join(", ")}>
+                        Tác giả: <strong>{book.authorNames.$values.join(", ")}</strong>
                       </p>
                     )}
                     <p className="text-sm text-gray-600 mb-2">
                       Năm xuất bản: <strong>{book.publicationYear}</strong>
                     </p>
                   </div>
-                </div>
+                </Link>
               ))}
             </Show>
           </div>
