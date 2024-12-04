@@ -152,9 +152,9 @@ const FetchPublisherData = () => {
                     <table>
                         <thead>
                             <tr>
-                                <th>Nhà Xuất Bản</th> {/* Cột Mới */}
-                                <th>Tỷ Lệ Chia Lợi Nhuận</th> {/* Cột Mới */}
-                                <th>Hình Ảnh</th>
+                                <th>Nhà Xuất Bản</th> 
+                                {/* <th>Tỷ Lệ Chia Lợi Nhuận</th> */}
+                                {/* <th>Hình Ảnh</th> */}
                                 <th>Mô Tả</th>
                                 <th>Thu nhập</th>
                                 <th>Trạng Thái</th>
@@ -166,17 +166,17 @@ const FetchPublisherData = () => {
                         <tbody>
                             {payoutData.map((payout) => (
                                 <tr key={payout.id}>
-                                    <td>{publisherData?.publisherName}</td> {/* Hiển Thị Tên Nhà Xuất Bản */}
-                                    <td>{publisherData?.revenueSharePercentage}%</td> {/* Hiển Thị Tỷ Lệ Chia Lợi Nhuận */}
-                                    <td>
+                                    <td>{publisherData?.publisherName}</td> 
+                                    {/* <td>{publisherData?.revenueSharePercentage}%</td>  */}
+                                    {/* <td>
                                     <img
                                 src={payout.imageURL}
                                 alt="Doanh Thu"
                                 className={isImageLarge ? "large-image" : "small-image"}
                                 style={{ cursor: 'pointer' }}
-                                onClick={handleImageClick} // Khi bấm vào sẽ mở hoặc thu nhỏ ảnh
+                                onClick={handleImageClick} 
                                     />
-                                    </td>
+                                    </td> */}
     
                                     <td>{payout.description}</td>
                                     <td className="earnings">

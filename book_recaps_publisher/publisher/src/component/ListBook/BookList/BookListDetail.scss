@@ -43,7 +43,7 @@
     text-align: center;
   }
   /* Flexbox layout for authors and categories */
-.author-category {
+  .author-category {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
@@ -54,6 +54,37 @@
   
   .book-detail div {
     margin-bottom: 15px;
+  }
+
+
+  .stat-container {
+    margin-top: -3cm; /* Tạo khoảng cách 2cm phía trên stat-container */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px; /* Khoảng cách giữa các stat-item */
+    justify-content: center;
+    
+  }
+  
+  .stat-item {
+    flex: 1 1 calc(50% - 20px); /* 50% chiều rộng cho hàng đầu */
+    text-align: center;
+    border: 1px solid #ddd; /* Viền mỏng để phân biệt */
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+    margin-bottom: 20px;
+  }
+  
+  .stat-item:nth-child(3),
+  .stat-item:nth-child(4),
+  .stat-item:nth-child(5) {
+    flex: 1 1 calc(33.33% - 20px); /* 33% chiều rộng cho hàng thứ hai */
+  }
+  
+  .chart-containerr {
+    margin-top: -950px;
+    margin-left: -50px;
   }
   
   @media (max-width: 768px) {

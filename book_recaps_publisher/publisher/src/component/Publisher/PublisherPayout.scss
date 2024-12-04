@@ -59,3 +59,15 @@
     object-fit: cover; /* Giữ tỷ lệ hình ảnh */
   }
   
+  /* Dành cho trạng thái Đã Thanh Toán */
+.paid {
+    color: green; /* Màu xanh cho "Đã Thanh Toán" */
+    font-weight: bold;
+  }
+  
+  /* Dành cho trạng thái Chưa Thanh Toán */
+  .unpaid {
+    color: red; /* Màu đỏ cho "Chưa Thanh Toán" */
+    font-weight: bold;
+  }
+  

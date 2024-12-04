@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import "../Publisher/PublisherPayout.scss";
 import AllBookValue from '../Dashboard/AllBookValue';
 
-const PublisherPayout = () => {
+const BookDashboard = () => {
     const { id } = useParams(); // Get the payout ID from the URL
     const [payoutDetail, setPayoutDetail] = useState(null);
     const [error, setError] = useState(null);
@@ -158,4 +158,4 @@ const PublisherPayout = () => {
     
 };
 
-export default PublisherPayout;
+export default BookDashboard;

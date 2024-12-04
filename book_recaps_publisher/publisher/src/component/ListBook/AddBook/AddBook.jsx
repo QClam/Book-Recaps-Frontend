@@ -119,10 +119,10 @@ const AddBook = () => {
   const handleCategorySelect = (category) => {
     setBookData((prevData) => ({
       ...prevData,
-      categoryIds: [...prevData.categoryIds, category.id], // Lưu ID danh mục vào mảng
-      selectedCategory: category, // Lưu thông tin danh mục đã chọn
+      categoryIds: [...prevData.categoryIds, category.id], 
+      selectedCategory: category, 
     }));
-    setIsCategoryDropdownOpen(false); // Đóng dropdown sau khi chọn
+    setIsCategoryDropdownOpen(false); 
   };
 
   const handleAuthorClick = () => {
@@ -132,8 +132,8 @@ const AddBook = () => {
   const handleAuthorSelect = (author) => {
     setBookData((prevData) => ({
       ...prevData,
-      authorId: author.id, // Lưu ID của tác giả đã chọn
-      selectedAuthor: author, // Lưu thông tin tác giả đã chọn
+      authorId: author.id, 
+      selectedAuthor: author, 
     }));
     setIsAuthorDropdownOpen(false);
   };

@@ -144,11 +144,16 @@ const ContractDetail = () => {
         <p><strong>Ngày kết thúc:</strong> {new Date(contract.endDate).toLocaleDateString()}</p>
         <p><strong>Trạng thái:</strong> <span className="status">{getStatusLabel(contract.status)}</span></p>
         <div className="buttons">
-        <div className="buttons">
   <button
     className="edit-btn"
     onClick={() => setShowRejectModal(true)}
-    disabled={isApproved || contract?.status === 2} // Disable nếu đã "Chấp thuận"
+    disabled={
+      contract?.status === 3 || // Đang kích hoạt
+      contract?.status === 2 || // Chưa bắt đầu
+      contract?.status === 5 || //Từ chối
+      isApproved || 
+      contract?.status === 2 // Nếu đã chấp thuận
+    }
   >
     Từ chối
   </button>
@@ -156,14 +161,17 @@ const ContractDetail = () => {
   <button
     className="approve-btn"
     onClick={() => setShowConfirmModal(true)}
-    disabled={isRejected || contract?.status === 5} // Disable nếu đã "Từ chối"
+    disabled={
+      contract?.status === 3 || // Đang kích hoạt
+      contract?.status === 2 || // Chưa bắt đầu
+      isRejected || 
+      contract?.status === 5 // Nếu đã từ chối
+    }
   >
     Chấp thuận
   </button>
 </div>
 
-
-        </div>
       </div>
       <div className="attachments">
         <h3>Tài liệu đính kèm:</h3>

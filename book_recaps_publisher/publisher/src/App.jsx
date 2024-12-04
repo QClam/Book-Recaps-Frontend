@@ -65,7 +65,8 @@ const App = () => {
             <Route path="/contract-detail/:id" element={<ContractDetail />} />
             {/* <Route path="/bookmanager" element={<ListBook/>} /> */}
             <Route path="/bookmanager" element={<BookList/>} />
-            <Route path="/book-detail/:id" element={<BookListDetail />} />
+            <Route path="/book-detail/:bookId" element={<BookListDetail />} />
+            {/* <Route path="/book-detail/:id" element={<BookListDetail />} /> */}
             <Route path="/addbook" element={<AddBook/>} />
             <Route path="/updatebook/:id" element={<UpdateBook />} />
             {/* <Route path="/overview" element={<BookGraph/>} /> */}
@@ -83,7 +84,7 @@ const App = () => {
             <Route path="/book-dashboard/:bookId" element={<DashboardDetail />} />
             <Route path="/book-payout/:bookId" element={<BookPayout />} />
             
-            
+           
             </Route>
 
             

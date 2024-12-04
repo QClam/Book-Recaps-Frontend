@@ -65,9 +65,9 @@ body {
     margin-top: -1px;
 }
 .settings-nav li.active {
-    color: #51c634;
+    color: #3498db;
     font-weight: bold;
-    border-bottom: 2px solid #66d83a;
+    border-bottom: 2px solid #3498db;
 }
 
 .settings-content {
@@ -117,7 +117,7 @@ body {
 
 .update-button {
     padding: 10px 20px;
-    background-color: #4de328;
+    background-color: #3498db;
     color: white;
     border: none;
     border-radius: 4px;
@@ -129,7 +129,7 @@ body {
 }
 
 .update-button:hover {
-    background-color: #22ce44;
+    background-color: #3498db;
 }
 
 .skills-section {
@@ -184,4 +184,27 @@ body {
     padding: 8px;
     border: 1px solid #e0e0e0;
     border-radius: 4px;
+}
+
+// .modal {
+//     position: fixed;
+//     top: 50%;
+//     left: 50%;
+//     transform: translate(-50%, -50%);
+//     background: white;
+//     border-radius: 10px;
+//     padding: 20px;
+//     z-index: 1000;
+//     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+// }
+// .modal-content {
+//     display: flex;
+//     flex-direction: column;
+//     gap: 10px;
+// }
+button {
+    border: #3498db;
+    background-color: #3498db;
+    margin-left: 20px;
+    color: white;
 }

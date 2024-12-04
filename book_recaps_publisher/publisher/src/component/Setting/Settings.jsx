@@ -30,10 +30,24 @@ function Settings() {
     const [imageFile, setImageFile] = useState(null); // New state to store selected image file
     const [imageUploadLoading, setImageUploadLoading] = useState(false);
     const [publisher, setPublisher] = useState(null);
+    const [updatePublisherModalOpen, setUpdatePublisherModalOpen] = useState(false);
+    const [publisherUpdate, setPublisherUpdate] = useState({
+        publisherName: '',
+        contactInfo: '',
+        bankAccount: '',
+        revenueSharePercentage: '',
+});
 
      // Handle tab change
      const handleTabChange = (tab) => {
         setCurrentTab(tab);
+    };
+
+    const [passwordVisible, setPasswordVisible] = useState(false); // State để quản lý xem mật khẩu
+    const [password, setPassword] = useState(""); // State để lưu mật khẩu
+
+    const togglePasswordVisibility = () => {
+        setPasswordVisible(!passwordVisible);
     };
 
     // Fetch user profile data
@@ -85,6 +99,31 @@ function Settings() {
             [name]: value,
         }));
     };
+    const handleUpdatePublisherInfo = async () => {
+        const accessToken = localStorage.getItem('authToken');
+        try {
+            const response = await fetch(`https://bookrecaps.cloud/api/publisher/updatepublisherinfo/${publisher.id}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(publisherUpdate),
+            });
+    
+            if (response.ok) {
+                const updatedPublisher = await response.json();
+                console.log('Publisher updated:', updatedPublisher);
+                setPublisher(updatedPublisher); // Cập nhật state với thông tin mới
+                setUpdatePublisherModalOpen(false); // Đóng modal
+            } else {
+                console.error('Error updating publisher:', await response.text());
+            }
+        } catch (error) {
+            console.error('Error updating publisher info:', error);
+        }
+    };
+    
 
     // Handle profile update
     const handleUpdateProfile = async () => {
@@ -136,7 +175,7 @@ function Settings() {
 
             try {
                 // Fetch profile data
-                const profileResponse = await fetch('https://bookrecaps.cloud/api//personal/profile', {
+                const profileResponse = await fetch('https://bookrecaps.cloud/api/personal/profile', {
                     method: 'GET',
                     headers: {
                         'Authorization': `Bearer ${accessToken}`,
@@ -440,25 +479,27 @@ function Settings() {
                     <p>Loading profile...</p>
                 )}
                 
-
+                
 
                  <button className="update-button" onClick={() => setModalOpen(true)}>
-                    Update Account Settings
+                    Cập nhật thông tin 
                 </button>
 
                 <button className="update-button" onClick={() => setPhoneUpdateModalOpen(true)}>
-                    Update Phone
+                    Cập nhật Số điện thoại
                 </button>
 
-                <button className="update-button" onClick={() => setImageUpdateModalOpen(true)}>Update Profile Image</button>
+                <button className="update-button" onClick={() => setImageUpdateModalOpen(true)}>Cập nhật hình</button>
 
+                <button className="update-button" onClick={() => setUpdatePublisherModalOpen(true)}>Cập nhật thông tin NXB</button>
+ 
 
                 {isModalOpen && (
                     <div className="modal">
                         <div className="modal-content">
-                            <h3>Update Profile</h3>
+                            <h3>Cập nhật thông tin</h3>
                             <div className="form-group">
-                                <label>Full Name</label>
+                                <label>Họ tên đầy đủ</label>
                                 <input
                                     type="text"
                                     name="fullName"
@@ -467,19 +508,19 @@ function Settings() {
                                 />
                             </div>
                             <div className="form-group">
-                                <label>Gender</label>
+                                <label>Giới tính</label>
                                 <select
                                     name="gender"
                                     value={updatedProfile.gender}
                                     onChange={handleInputChange}
                                 >
-                                    <option value={0}>Female</option>
-                                    <option value={1}>Male</option>
-                                    <option value={2}>Other</option>
+                                    <option value={0}>Nữ</option>
+                                    <option value={1}>Nam</option>
+                                    <option value={2}>Khác</option>
                                 </select>
                             </div>
                             <div className="form-group">
-                                <label>Birth Date</label>
+                                <label>Ngày tháng năm sinh</label>
                                 <input
                                     type="date"
                                     name="birthDate"
@@ -488,7 +529,7 @@ function Settings() {
                                 />
                             </div>
                             <div className="form-group">
-                                <label>Address</label>
+                                <label>Địa chỉ</label>
                                 <input
                                     type="text"
                                     name="address"
@@ -496,8 +537,8 @@ function Settings() {
                                     onChange={handleInputChange}
                                 />
                             </div>
-                            <button onClick={handleUpdateProfile}>Update</button>
-                            <button onClick={() => setModalOpen(false)}>Cancel</button>
+                            <button className="update-button" onClick={handleUpdateProfile}>Cập nhật</button> <span></span>
+                            <button className="update-button" onClick={() => setModalOpen(false)}>Hủy</button>
                         </div>
                     </div>
                 )}
@@ -505,9 +546,9 @@ function Settings() {
                     {phoneUpdateModalOpen && (
                     <div className="modal">
                         <div className="modal-content">
-                            <h3>Update Phone Number</h3>
+                            <h3>Cập nhật Số điện thoại </h3>
                             <div className="form-group">
-                                <label>Phone Number</label>
+                                <label>Số điện thoại</label>
                                 <input
                                     type="text"
                                     name="phoneNumber"
@@ -515,17 +556,35 @@ function Settings() {
                                     onChange={handlePhoneInputChange}
                                 />
                             </div>
-                            <div className="form-group">
-                                <label>Password</label>
+                            <div style={{ position: "relative", width: "300px" }}>
+                                <label>Mật khẩu</label>
                                 <input
-                                    type="password"
+                                    type={passwordVisible ? "text" : "password"}
+
                                     name="password"
                                     value={phoneUpdate.password}
                                     onChange={handlePhoneInputChange}
+                                    style={{ width: "100%", paddingRight: "40px" }}
                                 />
+                                <button
+                                    type="button"
+                                    onClick={togglePasswordVisibility}
+                                    style={{
+                                        position: "absolute",
+                                        right: "-20px",
+                                        top: "70%",
+                                        transform: "translateY(-50%)",
+                                        background: "none",
+                                        border: "none",
+                                        cursor: "pointer"
+                                    }}
+                                >
+                                    {passwordVisible ? "👁️" : "🙈"} 
+                                </button>
+
                             </div>
-                            <button onClick={handleUpdatePhone}>Update Phone</button>
-                            <button onClick={() => setPhoneUpdateModalOpen(false)}>Cancel</button>
+                            <button className="update-button" onClick={handleUpdatePhone}>Update Phone</button>
+                            <button className="update-button" onClick={() => setPhoneUpdateModalOpen(false)}>Cancel</button>
                         </div>
                     </div>
                 )}
@@ -564,7 +623,7 @@ function Settings() {
                                 onChange={handlePasswordChange}
                             />
                         </div>
-                        <button onClick={handleUpdatePassword}>Update Password</button>
+                        <button onClick={handleUpdatePassword}>Cập nhật mật khẩu</button>
                     </div>
                 )}
 
@@ -573,15 +632,65 @@ function Settings() {
             {imageUpdateModalOpen && (
                 <div className="modal">
                     <div className="modal-content">
-                        <h3>Update Profile Image</h3>
+                        <h3>Cập nhật hình</h3>
                         <input type="file" accept="image/*" onChange={handleImageChange} />
                         <button onClick={handleUpdateImage} disabled={imageUploadLoading}>
                             {imageUploadLoading ? 'Uploading...' : 'Upload'}
                         </button>
-                        <button onClick={() => setImageUpdateModalOpen(false)}>Cancel</button>
+                        <button className="update-button" onClick={() => setImageUpdateModalOpen(false)}>Cancel</button>
                     </div>
                 </div>
             )}
+
+{updatePublisherModalOpen && (
+    <div className="modal">
+        <div className="modal-content">
+            <h3>Cập nhật thông tin NXB</h3>
+            <div className="form-group">
+            <label>Tên NXB</label>
+            <input
+                type="text"
+                name="publisherName"
+                value={publisherUpdate.publisherName}
+                onChange={(e) => setPublisherUpdate({ ...publisherUpdate, publisherName: e.target.value })}
+            />
+             </div>
+
+            <div className="form-group">
+            <label>Thông tin liên lạc</label>
+            <input
+                type="email"
+                name="contactInfo"
+                value={publisherUpdate.contactInfo}
+                onChange={(e) => setPublisherUpdate({ ...publisherUpdate, contactInfo: e.target.value })}
+            />
+            </div>
+            <div className="form-group">
+            <label>Số tài khoản</label>
+            <input
+                type="text"
+                name="bankAccount"
+                value={publisherUpdate.bankAccount}
+                onChange={(e) => setPublisherUpdate({ ...publisherUpdate, bankAccount: e.target.value })}
+            />
+             </div>
+            
+             <div className="form-group">
+            <label>Phần trăm chia sẻ doanh thu</label>
+            <input
+                type="number"
+                name="revenueSharePercentage"
+                value={publisherUpdate.revenueSharePercentage}
+                onChange={(e) => setPublisherUpdate({ ...publisherUpdate, revenueSharePercentage: e.target.value })}
+            />
+            </div>
+
+            <button className="update-button" onClick={handleUpdatePublisherInfo}>Lưu thay đổi</button>
+            <button className="update-button" onClick={() => setUpdatePublisherModalOpen(false)}>Hủy</button>
+        </div>
+    </div>
+)}
+
 
             </div>
         </div>

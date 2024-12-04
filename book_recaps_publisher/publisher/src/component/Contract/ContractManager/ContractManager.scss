@@ -50,6 +50,7 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
     overflow: hidden;
+    margin-top: 20px;
 
     thead {
       background-color:#3498db;
@@ -155,6 +156,7 @@
 .contract-button {
   background-color: #3498db;
   color: white;
+  font-size: 0.8rem;
 }
 
 .contract-th {
@@ -166,4 +168,12 @@
   padding: 12px 15px;
   text-align: left; /* Căn trái, hoặc có thể thay bằng 'center' nếu muốn căn giữa */
   font-size: 16px;
+}
+
+.contract-table th {
+  background-color:  #3498db;;
+  color: white;
+  font-size: 17px;
+  //text-transform: uppercase;
+  text-align: left;
 }
