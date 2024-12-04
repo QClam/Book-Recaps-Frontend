@@ -247,7 +247,7 @@ function AppealList() {
                 >
                     <MenuItem value="">Tất cả</MenuItem>
                     <MenuItem value={1}>Đang xử lý</MenuItem>
-                    <MenuItem value={2}>Đã xử lý</MenuItem>
+                    <MenuItem value={2}>Đã phản hồi</MenuItem>
                 </TextField>
             </Box>
 
@@ -303,7 +303,7 @@ function AppealList() {
                                         {val.appealStatus === 1 ? (
                                             <Typography color="primary">Đang xử lý</Typography>
                                         ) : val.appealStatus === 2 ? (
-                                            <Typography color="success">Đã xử lý</Typography>
+                                            <Typography color="success">Đã phản hồi</Typography>
                                         ) : val.appealStatus === 0 ? (
                                             <Typography color="warning">Đang mở</Typography>
                                         ) : (

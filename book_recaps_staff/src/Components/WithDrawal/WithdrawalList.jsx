@@ -211,6 +211,8 @@ function WithdrawalList() {
                                 labelDisplayedRows={({ from, to, count }) =>
                                     `${from}–${to} trong tổng số ${count !== -1 ? count : `nhiều hơn ${to}`}`
                                 }
+                                showFirstButton
+                                showLastButton
                             />
                         </TableRow>
                     </TableFooter>

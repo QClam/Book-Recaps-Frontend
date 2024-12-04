@@ -220,7 +220,7 @@ function ReportList() {
                 >
                     <MenuItem value="">Tất cả</MenuItem>
                     <MenuItem value={1}>Đang xử lý</MenuItem>
-                    <MenuItem value={2}>Đã xử lý</MenuItem>
+                    <MenuItem value={2}>Đã phản hồi</MenuItem>
                 </TextField>
             </Box>
 
@@ -265,7 +265,7 @@ function ReportList() {
                                     <TableCell width={120}>{val.status === 1 ? (
                                         <Typography color="primary" >Đang xử lý</Typography>
                                     ) : val.status === 2 ? (
-                                        <Typography color="success" >Đã xử lý</Typography>
+                                        <Typography color="success" >Đã phản hồi</Typography>
                                     ) : (
                                         <Typography color="warning" >Đã mở</Typography>
                                     )}</TableCell>

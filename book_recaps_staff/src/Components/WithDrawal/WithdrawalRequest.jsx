@@ -1,4 +1,4 @@
-import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Paper, Select, TextField, Typography } from '@mui/material'
+import { Box, Button, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Paper, Select, TextField, Typography } from '@mui/material'
 import React, { useEffect, useState } from 'react'
 import api from '../Auth/AxiosInterceptors';
 
@@ -9,6 +9,7 @@ function WithdrawalRequest({ open, onClose, drawalId, onUpdate }) {
     const [selectedImage, setSelectedImage] = useState(null); // File ảnh
     const [responseText, setResponseText] = useState("");
     const [withdrawalStatus, setWithdrawalStatus] = useState("");
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         if (drawalId) {
@@ -43,10 +44,14 @@ function WithdrawalRequest({ open, onClose, drawalId, onUpdate }) {
 
     // Xử lý khi thay đổi trạng thái
     const handleStatusChange = (e) => {
+
         setWithdrawalStatus(e.target.value);
     };
 
     const responseWithdrawal = async () => {
+
+        setLoading(true);
+
         if (!drawalId) {
             return;
         }
@@ -70,11 +75,13 @@ function WithdrawalRequest({ open, onClose, drawalId, onUpdate }) {
                 }
             )
             alert("Cập nhật thành công!");
+            setLoading(false);
             onClose();
             if (onUpdate) onUpdate(); // Gọi lại để cập nhật danh sách
         } catch (error) {
             console.error("Error updating withdrawal request:", error);
             alert("Đã xảy ra lỗi khi cập nhật!");
+            setLoading(false);
         }
     }
 
@@ -116,10 +123,10 @@ function WithdrawalRequest({ open, onClose, drawalId, onUpdate }) {
 
                             <Box display="flex" justifyContent="space-between">
                                 <Typography>
-                                    Số dư còn lại:
+                                    <strong>Số dư còn lại:</strong>
                                 </Typography>
                                 <Typography>
-                                    <strong>Thêm field nha HA</strong>
+                                    <strong>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(withdrawalDetails.contributor?.earning)}</strong>
                                 </Typography>
                             </Box>
 
@@ -132,14 +139,14 @@ function WithdrawalRequest({ open, onClose, drawalId, onUpdate }) {
                                 </Typography>
                             </Box>
 
-                            <Box display="flex" justifyContent="space-between">
+                            {/* <Box display="flex" justifyContent="space-between">
                                 <Typography>
                                     Phí giao dịch:
                                 </Typography>
                                 <Typography>
                                     <strong>Miễn phí</strong>
                                 </Typography>
-                            </Box>
+                            </Box> */}
 
                             <Box display="flex" justifyContent="space-between">
                                 <Typography>
@@ -226,8 +233,15 @@ function WithdrawalRequest({ open, onClose, drawalId, onUpdate }) {
             </DialogContent>
 
             <DialogActions>
-                <Button onClick={onClose} variant="contained" color="error">Đóng</Button>
-                <Button onClick={responseWithdrawal} variant="contained" color="primary">Gửi phản hồi</Button>
+                <Button onClick={onClose} variant="contained" color="error" disabled={loading}>Đóng</Button>
+                <Button
+                    onClick={responseWithdrawal}
+                    variant="contained"
+                    color="primary"
+                    disabled={loading}                   
+                >
+                    {loading ? <CircularProgress size={20} color="inherit" /> : "Chấp nhận" }
+                </Button>
             </DialogActions>
         </Dialog>
     )

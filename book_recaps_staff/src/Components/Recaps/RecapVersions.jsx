@@ -194,7 +194,7 @@ function RecapVersions() {
                     <TableBody>
                         {filteredVersions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
                             <TableRow key={item.recapVersionId}>
-                                <TableCell>{item.recapVersionId}</TableCell>
+                                <TableCell sx={{width: 180}}>{item.recapVersionId}</TableCell>
                                 <TableCell>{item.versionName}</TableCell>
                                 <TableCell>{item.bookTitle}</TableCell>
                                 <TableCell>{item.contributorName}</TableCell>
