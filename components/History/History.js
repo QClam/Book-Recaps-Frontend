@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, FlatList, Image, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import api from '../../utils/AxiosInterceptors';
 import { useNavigation } from '@react-navigation/native'; // Navigation for React Native
+import defaultImage from '../../assets/empty-image.png';
 
 const History = () => {
   const [userId, setUserId] = useState('');
@@ -75,7 +76,15 @@ const History = () => {
   const renderRecapItem = ({ item }) => (
     <View style={styles.card}>
       <TouchableOpacity onPress={() => navigation.navigate('RecapDetail', { bookId: item.book.bookId })}>
-        <Image source={{ uri: item.book.coverImage }} style={styles.thumbnail} />
+      <Image 
+                                  source={
+                                      item.book.coverImage
+                                      ? { uri: item.book.coverImage } 
+                                      : defaultImage
+                                  }
+                                  style={styles.thumbnail}
+                              />
+
       </TouchableOpacity>
       <View style={styles.details}>
         <Text style={styles.title}>{item.recapName}</Text>

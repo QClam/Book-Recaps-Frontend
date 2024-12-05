@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import api from '../../utils/AxiosInterceptors'; // Import the axios utility for making API calls
+import api from '../../utils/AxiosInterceptors';
+import defaultImage from '../../assets/empty-image.png';
 
 const RecapDetail = ({ route, navigation }) => {
-  const { bookId } = route.params; // Get bookId from the navigation params
+  const { bookId } = route.params;
   const [book, setBook] = useState(null);
   const [contributors, setContributors] = useState([]);
   const [error, setError] = useState(null);
@@ -43,35 +44,37 @@ const RecapDetail = ({ route, navigation }) => {
   };
 
   if (error) {
-    return <Text>{error}</Text>;
+    return <Text style={styles.error}>{error}</Text>;
   }
 
   if (!book) {
-    return <Text>Đang tải...</Text>;
+    return <Text style={styles.loading}>Đang tải...</Text>;
   }
 
   const handleRecapClick = (recapId) => {
-    navigation.navigate('RecapItemDetail', { recapId }); // Navigate to the Recap Item detail page
+    navigation.navigate('RecapItemDetail', { recapId });
   };
 
-  // Concatenate categories into a string
   const categoriesString = book.categories.$values.map((category) => category.name).join(', ');
+
   return (
     <ScrollView style={styles.container}>
-      <Image source={{ uri: book.coverImage }} style={styles.coverImage} />
-      <Text style={styles.title}>{book.title}</Text>
-      <Text style={styles.author}>{book.originalTitle}</Text>
-      <Text style={styles.author}>Tác giả: {book.authors.$values[0].name}</Text>
+      <Image 
+        source={book.coverImage ? { uri: book.coverImage } : defaultImage} 
+        style={styles.coverImage} 
+      />
+
+      <View style={styles.infoContainer}>
+        <Text style={styles.title}>{book.title}</Text>
+        <Text style={styles.subtitle}>{book.originalTitle}</Text>
+        <Text style={styles.author}>Tác giả: {book.authors.$values[0].name}</Text>
+      </View>
 
       <Text style={styles.description}>{book.description}</Text>
-      <Text style={styles.publicationYear}>Năm xuất bản: {book.publicationYear}</Text>
-      <Text style={styles.publisher}>Nhà xuất bản: {book.publisher.publisherName}</Text>
-      <Text style={styles.categoryTitle}>Thể loại: {categoriesString ? (
-        <Text style={styles.categoryItem}>{categoriesString}</Text>
-      ) : (
-        <Text>Không có thể loại cho sách này</Text>
-      )} </Text>
-      
+      <Text style={styles.detail}>Năm xuất bản: {book.publicationYear}</Text>
+      <Text style={styles.detail}>Nhà xuất bản: {book.publisher.publisherName}</Text>
+      <Text style={styles.detail}>Thể loại: {categoriesString || 'Không có thể loại cho sách này'}</Text>
+
       <View style={styles.recapsContainer}>
         <Text style={styles.recapsTitle}>Recaps</Text>
         {book.recaps && book.recaps.$values.length > 0 ? (
@@ -88,9 +91,7 @@ const RecapDetail = ({ route, navigation }) => {
                   onPress={() => handleRecapClick(recap.id)}
                 >
                   <Text style={styles.recapName}>{recap.name}</Text>
-                  {recap.isPremium && (
-                    <Text style={styles.recapPremium}>Premium</Text>
-                  )}
+                  {recap.isPremium && <Text style={styles.premiumTag}>Premium</Text>}
 
                   {contributorData && contributorData.contributor && (
                     <View style={styles.contributor}>
@@ -111,14 +112,6 @@ const RecapDetail = ({ route, navigation }) => {
                       </View>
                     </View>
                   )}
-
-                  {recap.recapVersions && recap.recapVersions.$values.length > 0 && (
-                    <View style={styles.recapVersions}>
-                      {recap.recapVersions.$values.map((version) => (
-                        <Text key={version.id}> {version.versionName}</Text>
-                      ))}
-                    </View>
-                  )}
                 </TouchableOpacity>
               );
             })
@@ -133,146 +126,117 @@ const RecapDetail = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: '#f0f0f0', // Màu nền nhẹ
+    backgroundColor: '#F5F5F5',
+    paddingHorizontal: 16,
   },
   coverImage: {
-    width: 140,
-    height: 200,
-    borderRadius: 10,
-    marginBottom: 20,
-    alignSelf: 'center',
+    width: '50%',
+    height: 250,
+    resizeMode: 'cover',
+    borderRadius: 8,
+    marginBottom: 16,
+    marginLeft: 80
+  },
+  infoContainer: {
+    marginBottom: 16,
   },
   title: {
-    fontSize: 28,
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#2a2a2a',  // Màu chữ tối cho tiêu đề
-    textAlign: 'center',
-    marginVertical: 10,
+    color: '#333',
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 18,
+    color: '#666',
+    marginBottom: 4,
   },
   author: {
-    fontSize: 20,
-    color: '#4a4a4a',  // Màu nhẹ cho tên tác giả
-    textAlign: 'center',
+    fontSize: 16,
+    color: '#333',
   },
   description: {
-    fontSize: 18,
-    marginVertical: 20,
-    lineHeight: 24,
-    color: '#333',
-    textAlign: 'justify',  // Căn đều mô tả
-  },
-  publicationYear: {
     fontSize: 16,
-    //color: '#777',
-    textAlign: 'center',
-    marginTop: -10
+    color: '#555',
+    marginVertical: 12,
+    lineHeight: 22,
   },
-  publisher: {
+  detail: {
     fontSize: 16,
-    //color: '#777',
-    textAlign: 'center',
-    marginVertical: 8,
-  },
-  categoryTitle: {
-    fontSize: 16,
-    //fontWeight: 'bold',
-    //color: '#333',
-    marginVertical: 10,
-    textAlign: 'center'
-  },
-  categoryItem: {
-    fontSize: 16,
-    paddingVertical: 5,
-    //color: '#333',
-    textAlign: 'center'
-  },
-  buttonContainer: {
-    marginTop: 20,
-    alignItems: 'center',
-  },
-  startButton: {
-    backgroundColor: '#F27C5A', // Màu cam nổi bật cho nút
-    paddingVertical: 14,
-    paddingHorizontal: 35,
-    borderRadius: 25,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  startButtonText: {
-    fontSize: 18,
-    color: '#fff',
-    fontWeight: 'bold',
+    color: '#555',
+    marginBottom: 8,
   },
   recapsContainer: {
-    marginTop: 20,
-    backgroundColor: '#fff',
-    borderRadius: 10,
-    padding: 15,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
+    marginTop: 24,
   },
   recapsTitle: {
     fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 16,
     color: '#333',
+    marginBottom: 12,
   },
   recapItem: {
-    marginBottom: 20,
-    backgroundColor: '#f9f9f9',
-    padding: 15,
-    borderRadius: 10,
+    backgroundColor: '#FFF',
+    padding: 16,
+    marginBottom: 12,
+    borderRadius: 8,
     shadowColor: '#000',
-    shadowOpacity: 0.05,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 4 },
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
   },
   recapName: {
     fontSize: 18,
     fontWeight: 'bold',
     color: '#333',
   },
-  recapPremium: {
-    color: '#FF8C20', // Màu vàng cam cho premium
-    fontWeight: 'bold',
-    fontSize: 16,
+  premiumTag: {
+    fontSize: 14,
+    color: '#FF8C20',
+    marginTop: 4,
+    fontWeight: 'bold'
   },
   contributor: {
     flexDirection: 'row',
-    marginVertical: 8,
+    marginTop: 12,
   },
   contributorImage: {
-    width: 50,
-    height: 50,
-    borderRadius: 25,
-    marginRight: 16,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 8,
   },
   contributorName: {
-    fontSize: 16,
-    fontWeight: 'bold',
+    fontSize: 14,
     color: '#333',
+    fontWeight: 'bold',
   },
   contributorGender: {
     fontSize: 14,
-    color: '#888',
+    color: '#555',
   },
   contributorBirthDate: {
     fontSize: 14,
-    color: '#888',
+    color: '#555',
   },
-  recapVersions: {
-    marginTop: 10,
+  error: {
+    fontSize: 18,
+    color: 'red',
+    textAlign: 'center',
+    marginTop: 20,
+  },
+  loading: {
+    fontSize: 18,
+    color: '#333',
+    textAlign: 'center',
+    marginTop: 20,
   },
   noRecaps: {
     fontSize: 16,
-    color: '#888',
+    color: '#777',
     textAlign: 'center',
+    marginTop: 12,
   },
 });
-
-
 
 export default RecapDetail;

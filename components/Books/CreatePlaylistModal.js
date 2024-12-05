@@ -147,25 +147,26 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId }) => {
         <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Thêm vào Playlist</Text>
         <Text style={{ marginTop: 20 }}>Chọn Playlist hiện có</Text>
         {existingPlaylists.length > 0 ? (
-          existingPlaylists.map((playlist) => (
-            <TouchableOpacity
-              key={playlist.id}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                marginVertical: 5,
-                padding: 10,
-                backgroundColor: selectedPlaylists.includes(playlist.id) ? '#e0e0e0' : 'transparent',
-                borderRadius: 5,
-              }}
-              onPress={() => handleSelectPlaylist(playlist.id)}
-            >
-              <Text>{playlist.playListName}</Text>
-            </TouchableOpacity>
-          ))
-        ) : (
-          <Text>Không có Playlist nào.</Text>
-        )}
+  existingPlaylists.map((playlist, index) => (
+    <TouchableOpacity
+      key={playlist.id || index} // Fallback to index if id is not unique or missing
+      style={{
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginVertical: 5,
+        padding: 10,
+        backgroundColor: selectedPlaylists.includes(playlist.id) ? '#e0e0e0' : 'transparent',
+        borderRadius: 5,
+      }}
+      onPress={() => handleSelectPlaylist(playlist.id)}
+    >
+      <Text>{playlist.playListName}</Text>
+    </TouchableOpacity>
+  ))
+) : (
+  <Text>Không có Playlist nào.</Text>
+)}
+
 
         <View style={{ marginTop: 20 }}>
           <Text>Hoặc Tạo một Playlist Mới</Text>

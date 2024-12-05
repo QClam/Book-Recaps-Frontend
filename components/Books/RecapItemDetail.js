@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, TouchableOpacity, Platform, Dimensions, Animated, Modal} from 'react-native';
 import api from '../../utils/AxiosInterceptors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -7,6 +7,7 @@ import CreatePlaylistModal from './CreatePlaylistModal';
 import { Audio } from 'expo-av';
 import Slider from '@react-native-community/slider';
 import CircularButtonWithArrow from './CircularButtonWithArrow';
+import defaultImage from '../../assets/empty-image.png';
 const screenWidth = Dimensions.get('window').width; // Chiều rộng màn hình thiết bị
 
 // Function to resolve $refs in the data
@@ -65,13 +66,11 @@ const RecapItemDetail = ({ route }) => {
     const [theme, setTheme] = useState('white'); // Default theme
     const [modalVisible, setModalVisible] = useState(false); // Toggle for popup visibility
 
+    const startTime = useRef(new Date().getTime()); // Track the start time
+    const currentViewTrackingId = useRef(null); // Store the current view tracking ID
+
     const togglePopup = () => {
         setModalVisible(!modalVisible); // Toggle the popup
-    };
-
-
-    const handleFontSelect = (font) => {
-        setSelectedFont(font);
     };
 
     const handleThemeSelect = (color) => {
@@ -98,29 +97,29 @@ const RecapItemDetail = ({ route }) => {
       }, []);
      
        // Track view event inside useEffect to avoid hook errors
-       useEffect(() => {
-        const trackViewEvent = async () => {
-            try {
-                const deviceType = Platform.OS === 'ios' || Platform.OS === 'android' ? 0 : 1;
-                const recapIdFromStorage = await AsyncStorage.getItem('recapId');
-                const recapData = recapIdFromStorage || recapId;
-                const userId = await AsyncStorage.getItem('userId');
+    //    useEffect(() => {
+    //     const trackViewEvent = async () => {
+    //         try {
+    //             const deviceType = Platform.OS === 'ios' || Platform.OS === 'android' ? 0 : 1;
+    //             const recapIdFromStorage = await AsyncStorage.getItem('recapId');
+    //             const recapData = recapIdFromStorage || recapId;
+    //             const userId = await AsyncStorage.getItem('userId');
 
-                // API call with query params in URL
-                const response = await api.post(`/api/viewtracking/createviewtracking?recapid=${recapData}&deviceType=${deviceType}`, {
-                    userId: userId // Add additional body if necessary
-                });
+    //             // API call with query params in URL
+    //             const response = await api.post(`/api/viewtracking/createviewtracking?recapid=${recapData}&deviceType=${deviceType}`, {
+    //                 userId: userId // Add additional body if necessary
+    //             });
 
-                console.log('View tracking event sent successfully:', response.data);
-            } catch (error) {
-                console.error('Error sending view tracking event:', error);
-            }
-        };
+    //             console.log('View tracking event sent successfully:', response.data);
+    //         } catch (error) {
+    //             console.error('Error sending view tracking event:', error);
+    //         }
+    //     };
 
-        if (userId) {
-            trackViewEvent();
-        }
-    }, [recapId, userId]);
+    //     if (userId) {
+    //         trackViewEvent();
+    //     }
+    // }, [recapId, userId]);
 
 // Kiểm tra trạng thái liked từ AsyncStorage khi component render lại
 useEffect(() => {
@@ -272,18 +271,78 @@ useEffect(() => {
 
         try {
             if (isPlaying) {
+                // Pause và gửi yêu cầu cập nhật thời gian
                 await sound.pauseAsync();
+                await updateViewTrackingDuration(); // Cập nhật thời gian khi dừng phát
             } else {
+                // Play và gửi yêu cầu tạo view tracking (nếu chưa tạo)
+                if (!currentViewTrackingId.current) {
+                    await trackViewEvent(); // Gọi hàm tạo view tracking khi bắt đầu phát
+                }
                 if (currentPosition >= duration) {
                     await sound.setPositionAsync(0);
                 }
                 await sound.playAsync();
+                startTime.current = new Date().getTime();
             }
             setIsPlaying(!isPlaying);
+    
         } catch (error) {
             console.error('Error toggling play/pause:', error);
         }
     };
+
+    // Hàm tạo view tracking
+const trackViewEvent = async () => {
+    try {
+        const deviceType = Platform.OS === 'ios' || Platform.OS === 'android' ? 0 : 1;
+        const recapIdFromStorage = await AsyncStorage.getItem('recapId');
+        const recapData = recapIdFromStorage || recapId;
+        const userId = await AsyncStorage.getItem('userId');
+
+        // API call với query params
+        const response = await api.post(`/api/viewtracking/createviewtracking?recapid=${recapData}&deviceType=${deviceType}`, {
+            userId: userId // Thêm body nếu cần
+        });
+
+        console.log('View tracking event sent successfully:', response.data);
+        currentViewTrackingId.current = response.data.id; // Lưu ID của view tracking
+    } catch (error) {
+        console.error('Error sending view tracking event:', error);
+    }
+};
+
+// Hàm cập nhật thời gian view tracking
+const updateViewTrackingDuration = async () => {
+    try {
+        if (!currentViewTrackingId.current || !startTime.current) return; 
+
+        const endTime = new Date().getTime();
+        const duration = Math.round((endTime - startTime.current) / 1000); // Tính thời gian sử dụng (giây)
+
+        await api.put(`/api/viewtracking/updateduration/${currentViewTrackingId.current}`, {}, {
+            params: { duration },
+        });
+
+        console.log('View tracking duration updated successfully:', duration);
+    } catch (error) {
+        console.error('Error updating view tracking duration:', error);
+    }
+};
+
+// useEffect để theo dõi thời gian sử dụng
+useEffect(() => {
+    if (isPlaying && !startTime.current) {
+        startTime.current = new Date().getTime(); // Cập nhật thời gian bắt đầu khi bắt đầu phát
+    }
+
+    return () => {
+        if (isPlaying) {
+            updateViewTrackingDuration(); // Cập nhật thời gian khi component bị unmount hoặc dừng phát
+        }
+    };
+}, [isPlaying]);
+
 
     useEffect(() => {
         if (currentVersion?.audioURL) {
@@ -308,6 +367,7 @@ useEffect(() => {
 
         return () => clearInterval(updatePosition);
     }, [sound]);
+
 
 
     // Xử lý seek
@@ -373,7 +433,10 @@ useEffect(() => {
                     {recapDetail.book.title}
                 </Text>
 
-                <Image source={{ uri: book.coverImage }} style={styles.bookImage} />
+                <Image source={ book.coverImage ? { uri: book.coverImage } : defaultImage}
+                                  style={styles.bookImage}
+                              />
+
                 <Text style={styles.views}>{recapDetail.viewsCount} Views</Text>
                 <View style={styles.likeContainer}>
                     <TouchableOpacity onPress={handleLikeClick} style={styles.likeButton}>
@@ -387,11 +450,6 @@ useEffect(() => {
 
                 </View>
             </View>
-              
-            <View style={styles.versionInfo}>
-                {renderTranscript()}
-            </View>
-
             <View style={styles.audioPlayerContainer}>
                     {/* Các nút điều khiển */}
                     <View style={styles.controlsRow}>
@@ -435,6 +493,53 @@ useEffect(() => {
                         thumbTintColor="#FFD700"
                     />
                 </View>
+            <View style={styles.versionInfo}>
+                {renderTranscript()}
+            </View>
+
+            {/* <View style={styles.audioPlayerContainer}>
+                   
+                    <View style={styles.controlsRow}>
+                       
+                        <CircularButtonWithArrow
+                                    direction="backward"
+                                    onPress={async () => {
+                                        if (sound) {
+                                            const newPosition = Math.max(currentPosition - 15000, 0);
+                                            await sound.setPositionAsync(newPosition);
+                                            setCurrentPosition(newPosition);
+                                        }
+                                    }}
+                                />
+                       
+                        <TouchableOpacity onPress={togglePlayPause} style={styles.playPauseButton}>
+                            <Text style={styles.buttonIcon}>{isPlaying ? '⏸' : '▶️'}</Text>
+                        </TouchableOpacity>
+
+                    
+                        <CircularButtonWithArrow
+                                    direction="forward"
+                                    onPress={async () => {
+                                        if (sound) {
+                                            const newPosition = Math.min(currentPosition + 15000, duration);
+                                            await sound.setPositionAsync(newPosition);
+                                            setCurrentPosition(newPosition);
+                                        }
+                                    }}
+                                />
+                    </View>
+                   
+                    <Slider
+                        style={styles.progressBar}
+                        minimumValue={0}
+                        maximumValue={duration}
+                        value={currentPosition}
+                        onSlidingComplete={handleSeek}
+                        minimumTrackTintColor="#FFD700"
+                        maximumTrackTintColor="#D3D3D3"
+                        thumbTintColor="#FFD700"
+                    />
+                </View> */}
             {/* Create Playlist Modal */}
             <CreatePlaylistModal
                 isOpen={isModalOpen}
@@ -544,6 +649,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#444',
         marginBottom: 8,
+        marginTop: -20
     },
     bookImage: {
         width: 160,
@@ -554,8 +660,8 @@ const styles = StyleSheet.create({
     },
     versionInfo: {
         marginVertical: 20,
-        marginBottom: -18,
-        marginTop: -50,
+        marginBottom: 50,
+        marginTop: 20,
     },
     versionList: {
         marginVertical: 20,
@@ -605,14 +711,16 @@ const styles = StyleSheet.create({
         backgroundColor: '#4A3F35',
         paddingVertical: 15,
         borderRadius: 17,
-        height: 145,
+        height: 110,
+        marginBottom: 20,
+        marginTop: -40
 
     },
     controlsRow: {
         flexDirection: 'row', // Các nút nằm ngang hàng
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: 20, // Tạo khoảng cách với thanh tiến trình
+        marginBottom: 1, // Tạo khoảng cách với thanh tiến trình
     },
     controlButton: {
         marginHorizontal: 20, // Khoảng cách giữa các nút

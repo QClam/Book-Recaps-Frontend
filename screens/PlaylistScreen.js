@@ -11,7 +11,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import api from '../utils/AxiosInterceptors';
-
+import Icon from 'react-native-vector-icons/MaterialIcons';
 import defaultImage from '../assets/empty-image.png';
 
 const PlaylistScreen = () => {
@@ -38,8 +38,8 @@ const PlaylistScreen = () => {
             setError('Invalid data format received from API.');
           }
         } catch (err) {
-          console.error('Error fetching playlists:', err);
-          setError('Failed to fetch playlists.');
+          console.error('Không có Playlist');
+          setError('Không có Playlist');
         } finally {
           setIsLoading(false);
         }
@@ -72,23 +72,47 @@ const PlaylistScreen = () => {
     }
   };
 
-  const handleDelete = async (playlistItemId) => {
-    try {
-      await api.delete(`/api/playlists/deleteplaylistitem/${playlistItemId}`);
-      const updatedPlaylists = playlists.map((playlist) => ({
-        ...playlist,
-        playListItems: {
-          $values: playlist.playListItems.$values.filter(
-            (item) => item.id !== playlistItemId
-          ),
-        },
-      }));
-      setPlaylists(updatedPlaylists);
-    } catch (err) {
-      console.error('Error deleting item:', err);
-      Alert.alert('Error', 'Failed to delete item.');
-    }
-  };
+const handleDelete = async (playlistItemId) => {
+  try {
+    // Log dữ liệu trước khi xóa
+    console.log('Before deletion - Playlists:', playlists);
+
+    // Gọi API để xóa playlist item
+    await api.delete(`/api/playlists/deleteplaylistitem/${playlistItemId}`);
+    
+    // Cập nhật lại playlists sau khi xóa item
+    const updatedPlaylists = playlists.map((playlist) => {
+      // Kiểm tra nếu playlist có playListItems.$values
+      if (playlist.playListItems && playlist.playListItems.$values) {
+        const updatedItems = playlist.playListItems.$values.filter(
+          (item) => item.playlistItemId !== playlistItemId // Loại bỏ item có playlistItemId khớp
+        );
+
+        return {
+          ...playlist,
+          playListItems: {
+            ...playlist.playListItems,
+            $values: updatedItems // Cập nhật lại playListItems.$values
+          }
+        };
+      }
+
+      return playlist; // Trả về playlist nếu không có playListItems
+    });
+
+    // Log dữ liệu sau khi xóa
+    console.log('After deletion - Updated Playlists:', updatedPlaylists);
+
+    // Cập nhật lại state với danh sách playlists đã được cập nhật
+    setPlaylists(updatedPlaylists);
+
+  } catch (err) {
+    console.error('Error deleting item:', err);
+    Alert.alert('Error', 'Failed to delete item.');
+  }
+};
+
+  
 
   const handleBookClick = (recapId) => {
     navigation.navigate("RecapItemDetail", { recapId });
@@ -118,40 +142,49 @@ const PlaylistScreen = () => {
       ) : (
         <FlatList
           data={playlists}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item, index) => (item?.id ? item.id.toString() : index.toString())}
+
           renderItem={({ item: playlist }) => (
             <View style={styles.playlist}>
               <View style={styles.playlistHeader}>
                 <Text style={styles.playlistName}>
-                Tên playlist: {playlist.playListName}
+                Tên playlist: {playlist?.playListName || 'Unknown Playlist'}
+
                 </Text>
-                <TouchableOpacity
-                  onPress={() => handleDeletePlaylist(playlist.id)}
-                >
+                {/* <TouchableOpacity onPress={() => handleDeletePlaylist(playlist?.id)}>
                   <Text style={styles.deleteText}>Delete</Text>
-                </TouchableOpacity>
+                  <Icon
+                  name="delete"
+                  size={24}
+                  color="#FF0000"
+                  style={styles.deleteIcon}
+                />
+
+                </TouchableOpacity> */}
               </View>
-              {playlist.playListItems.$values.length === 0 ? (
+              {playlist?.playListItems?.$values?.length === 0 ? (
+
                 <Text>No books in this playlist.</Text>
               ) : (
                 <FlatList
-                  data={playlist.playListItems.$values}
-                  keyExtractor={(item) => item.id.toString()}
+                data={playlist.playListItems.$values || []}
+
+                  keyExtractor={(item, index) => (item?.id ? item.id.toString() : index.toString())}
+
                   renderItem={({ item }) => {
                     const book = books.find((book) =>
-                      book.recaps.$values.some(
-                        (recap) => recap.id === item.recapId
-                      )
+                      book.recaps?.$values?.some((recap) => recap.id === item?.recapId)
                     );
-
-                    return (
+                  return (
                       <View style={styles.bookItem}>
                         <TouchableOpacity
                           style={{ flex: 1 }}
-                          onPress={() => handleBookClick(item.recapId)}
+                          onPress={() => handleBookClick(item?.recapId)}
+
                         >
                           {book ? (
                             <>
+                            <View style={styles.con}>
                               <Image 
                                   source={
                                       book.coverImage 
@@ -162,25 +195,30 @@ const PlaylistScreen = () => {
                               />
 
                               <View style={styles.bookInfo}>
-                                <Text style={styles.bookTitle}>
-                                  {book.title}
-                                </Text>
-                                <Text style={styles.bookAuthor}>
-                                  {book.authors.$values
-                                    .map((author) => author.name)
-                                    .join(', ')}
-                                </Text>
+                              <Text style={styles.bookTitle}>{book.title || 'Unknown Title'}</Text>
+                              <Text style={styles.bookAuthor}>
+                                {book.authors?.$values
+                                  ?.map((author) => author.name)
+                                  ?.join(', ') || 'Unknown Authors'}
+                              </Text>
                               </View>
+                            </View>
                             </>
                           ) : (
                             <Text>No book information available.</Text>
                           )}
                         </TouchableOpacity>
-                        <TouchableOpacity
-                          onPress={() => handleDelete(item.id)}
-                        >
-                          <Text style={styles.deleteText}>Delete</Text>
-                        </TouchableOpacity>
+                        {/* <TouchableOpacity onPress={() => handleDelete(item?.id)}>
+                        <Text style={styles.deleteText}>Delete</Text>
+                        <Icon
+                            name="delete"
+                            size={20}
+                            color="#FF0000"
+                            style={styles.deleteIcon}
+                          />
+
+                      </TouchableOpacity> */}
+
                       </View>
                     );
                   }}
@@ -228,21 +266,32 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginVertical: 8,
   },
+  con: {
+    flexDirection: 'row', // Sắp xếp các phần tử theo hàng ngang
+    alignItems: 'center', // Căn giữa theo trục dọc
+    padding: 10, // Khoảng cách bên trong
+    backgroundColor: '#fff', // Màu nền (tùy chỉnh theo ý muốn)
+    borderRadius: 8, // Bo góc (tùy chỉnh)
+    marginBottom: 10, // Khoảng cách giữa các mục
+  },
   bookImage: {
-    width: 50,
-    height: 75,
-    marginRight: 8,
+    width: 80, // Chiều rộng của hình ảnh
+    height: 120, // Chiều cao của hình ảnh
+    borderRadius: 5, // Bo góc hình ảnh
+    marginRight: 15, // Khoảng cách giữa hình ảnh và thông tin
   },
   bookInfo: {
-    flex: 1,
+    flex: 1, // Cho phép phần thông tin chiếm phần còn lại của không gian
   },
   bookTitle: {
-    fontSize: 14,
-    fontWeight: 'bold',
+    fontSize: 16, // Kích thước chữ cho tiêu đề
+    fontWeight: 'bold', // Chữ đậm cho tiêu đề
+    color: '#333', // Màu chữ (tùy chỉnh)
+    marginBottom: 5, // Khoảng cách bên dưới tiêu đề
   },
   bookAuthor: {
-    fontSize: 12,
-    color: '#666',
+    fontSize: 14, // Kích thước chữ cho tác giả
+    color: '#555', // Màu chữ (tùy chỉnh)
   },
   loader: {
     flex: 1,
