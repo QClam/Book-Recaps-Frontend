@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react'
 import api from '../Auth/AxiosInterceptors'
-import { Visibility } from "@mui/icons-material";
+import { Delete, Visibility } from "@mui/icons-material";
 import empty_image from "../../data/empty-image.png"
 import { Box, Button, Chip, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import AddBookModal from './AddBookModal';
 import { Hourglass } from 'react-loader-spinner';
+import Swal from 'sweetalert2';
 
 const resolveRefs = (data) => {
     const refMap = new Map();
@@ -46,7 +47,7 @@ function BookList() {
     const [modalIsOpen, setModalIsOpen] = useState(false); // Modal visibility state
     const [loading, setLoading] = useState(true);
     const [isHover, setIsHover] = useState(false);
-    const [selectedAuthor, setSelectedAuthor] = useState(""); // Tác giả được chọn
+    const [selectedPublisher, setSelectedPublisher] = useState(""); // Tác giả được chọn
     const [selectedCategory, setSelectedCategory] = useState(""); // Danh mục được chọn
 
     const navigate = useNavigate();
@@ -58,9 +59,9 @@ function BookList() {
             const books = resolveRefs(response.data.data.$values);
             const contracts = books.map((book) => book.contracts?.$values || []);
             const categories = books.map((book) => book.categories?.$values || [])
-            console.log("Books: ", books);
-            console.log("Contracts: ", contracts);
-            console.log("Cate: ", categories);
+            // console.log("Books: ", books);
+            // console.log("Contracts: ", contracts);
+            // console.log("Cate: ", categories);
             setBooks(books);
             setFilteredBooks(books);
             setLoading(false);
@@ -74,7 +75,7 @@ function BookList() {
         fetchBooks();
     }, [])
 
-    const authors = [...new Set(books.flatMap(book => book.authors?.$values?.map(author => author.name)))];
+    const publishers = [...new Set(books.flatMap(book => book.contracts?.$values?.map(author => author.publisher?.publisherName)))];
     const categories = [...new Set(books.flatMap(book => book.categories?.$values?.map(category => category.name)))];
 
     useEffect(() => {
@@ -85,15 +86,15 @@ function BookList() {
             filteredData = filteredData.filter((item) =>
                 item.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                 item.originalTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.authors?.$values?.some((author) => 
-                author.name.toLowerCase().includes(searchTerm.toLocaleLowerCase()))
+                item.authors?.$values?.some((author) =>
+                    author.name.toLowerCase().includes(searchTerm.toLocaleLowerCase()))
             );
         }
 
-        // Author filter
-        if (selectedAuthor) {
+        // Publisher filter
+        if (selectedPublisher) {
             filteredData = filteredData.filter((item) =>
-                item.authors?.$values?.some((author) => author.name === selectedAuthor)
+                item.contracts?.$values?.some((author) => author.publisher?.publisherName === selectedPublisher)
             );
         }
 
@@ -111,7 +112,33 @@ function BookList() {
         if (page >= totalPages) {
             setPage(0);  // Reset page về 0 nếu vượt quá số trang
         }
-    }, [searchTerm, books, page, rowsPerPage, selectedAuthor, selectedCategory]);
+    }, [searchTerm, books, page, rowsPerPage, selectedPublisher, selectedCategory]);
+
+    const handleDeleteBook = async (id) => {
+        Swal.fire({
+            title: "Bạn có chắc chắn muốn xóa?",
+            text: "Bạn không thể hoàn tác hành động này!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Xóa",
+            cancelButtonText: "Hủy",
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await api.delete(`/api/book/deletebook/${id}`);
+                    if (response && response.status === 200) {
+                        setBooks(books.filter((book) => book.id !== id))
+                        Swal.fire("Đã xóa!", "Sách đã được xóa", "success");
+                        await fetchBooks();
+                    }
+                } catch (error) {
+                    Swal.fire("Thất bại", "Có lỗi xảy ra trong quá trình xóa", "error");
+                }
+            }
+        })
+    }
 
     const handleChangePage = (event, newPage) => {
         // Kiểm tra xem trang có hợp lệ hay không
@@ -166,18 +193,18 @@ function BookList() {
                 />
                 <TextField
                     select
-                    value={selectedAuthor}
-                    onChange={(e) => setSelectedAuthor(e.target.value)}
+                    value={selectedPublisher}
+                    onChange={(e) => setSelectedPublisher(e.target.value)}
                     variant="outlined"
                     size="small"
                     SelectProps={{ native: true }}
                     sx={{ width: '20%' }}
 
                 >
-                    <option value="" disabled hidden>Chọn tác giả</option> {/* Placeholder */}
+                    <option value="" disabled hidden>Chọn Nhà xuất Bản</option> {/* Placeholder */}
                     <option value="">Tất cả</option> {/* Hiển thị "Tất cả" khi chọn */}
-                    {authors.map((author, index) => (
-                        <option key={index} value={author}>{author}</option>
+                    {publishers.map((publisher, index) => (
+                        <option key={index} value={publisher}>{publisher}</option>
                     ))}
                 </TextField>
                 <TextField
@@ -235,7 +262,7 @@ function BookList() {
                                 <TableCell sx={{ width: 120 }}>
                                     {book.categories.$values ? book.categories.$values.map(cate => cate.name).join(", ") : "N/A"}
                                 </TableCell>
-                                <TableCell>
+                                <TableCell sx={{width: 240}}>
                                     <Box>
                                         <Typography>ISBN_10: {book.isbN_10 || "Hệ thống chưa gắn mã ISBN"}</Typography>
                                         <Typography>ISBN_13: {book.isbN_13 || "Hệ thống chưa gắn mã ISBN"}</Typography>
@@ -261,7 +288,16 @@ function BookList() {
                                         <Typography>Chưa có hợp đồng</Typography>
                                     )}
                                 </TableCell>
-                                <TableCell><Button onClick={() => detailBook(book.id)}><Visibility /></Button></TableCell>
+                                <TableCell>
+                                    <Box display='flex'>
+                                        <Button onClick={() => detailBook(book.id)}>
+                                            <Visibility />
+                                        </Button>
+                                        <Button onClick={() => handleDeleteBook(book.id)}>
+                                            <Delete />
+                                        </Button>
+                                    </Box>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>

@@ -77,9 +77,9 @@ function HistoryPublisherPayout() {
                                 <TableCell>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.totalEarnings)}</TableCell>
                                 <TableCell>{item.description}</TableCell>
                                 {item.status === "Done" ? (
-                                    <TableCell>Hoàn thành</TableCell>
+                                    <TableCell><Typography color='success'>Đã Hoàn thành</Typography></TableCell>
                                 ) : (
-                                    <TableCell>Lỗi</TableCell>
+                                    <TableCell><Typography color='error'>Đã Hoàn thành</Typography></TableCell>
                                 )}
                                 <TableCell><Button onClick={() => detailPayout(item.payoutId)}><Visibility /> </Button></TableCell>
                             </TableRow>

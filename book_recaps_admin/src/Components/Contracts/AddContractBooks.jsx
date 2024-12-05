@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { fetchContractDetail } from './ContractServices';
-import { Box, Button, Card, CardContent, Checkbox, Grid, Modal, TextField, Typography } from '@mui/material';
+import { Box, Button, Card, CardContent, Checkbox, CircularProgress, Grid, Modal, TextField, Typography } from '@mui/material';
 import api from '../Auth/AxiosInterceptors';
 
 function AddContractBooks({ contractId, disableUpdate, onUpdateContractBooks }) {
@@ -19,6 +19,7 @@ function AddContractBooks({ contractId, disableUpdate, onUpdateContractBooks }) 
     const [contract, setContract] = useState([]);
     const [selectedBookIds, setSelectedBookIds] = useState([]);
     const [searchBook, setSearchBook] = useState("");
+    const [loading, setLoading] = useState(false);
 
     // const disableUpdate = contract.status === 1 || contract.status === 2 || contract.status === 3;
 
@@ -50,6 +51,9 @@ function AddContractBooks({ contractId, disableUpdate, onUpdateContractBooks }) 
     };
 
     const handleAddBook = async () => {
+
+        setLoading(true);
+
         try {
             const response = await api.put(`/api/Contract/addbooktocontract/${contractId}`, { bookIds: selectedBookIds });  
             const updatedBooks = response.data.data;
@@ -59,6 +63,7 @@ function AddContractBooks({ contractId, disableUpdate, onUpdateContractBooks }) 
             console.log("Sách đính kèm: ", updatedBooks);
             
             await getContractDetail(); // Gọi lại API để cập nhật contractBooks
+            setLoading(false);
             handleClose();
         } catch (error) {
             console.error("Error Adding", error);
@@ -148,11 +153,11 @@ function AddContractBooks({ contractId, disableUpdate, onUpdateContractBooks }) 
                     </Box>
 
                     <Box display="flex" justifyContent="space-between" sx={{ mt: 2 }}>
-                        <Button onClick={handleClose} color="error" variant="contained">
+                        <Button onClick={handleClose} color="error" variant="contained" disabled={loading}>
                             Đóng
                         </Button>
-                        <Button color="primary" variant="contained" onClick={handleAddBook}>
-                            Chỉnh sửa
+                        <Button color="primary" variant="contained" onClick={handleAddBook} disabled={loading}>
+                            {loading ? <CircularProgress size={20} color='inherit'/> : "Chỉnh sửa"}
                         </Button>
                     </Box>
                 </Box>

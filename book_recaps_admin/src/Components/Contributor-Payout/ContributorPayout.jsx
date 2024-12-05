@@ -206,10 +206,10 @@ function ContributorPayout() {
                                 <TableCell> {new Date(item.fromdate).toLocaleDateString('en-GB')} - {new Date(item.todate).toLocaleDateString('en-GB')}</TableCell>
                                 <TableCell>{(item.totalEarnings ?? 0).toLocaleString("vi-VN")} VND</TableCell>
                                 {item.status === "Done" ? (
-                                    <TableCell><Typography color='success'>Hoàn thành</Typography></TableCell>
+                                    <TableCell><Typography color='success'>Đã Hoàn thành</Typography></TableCell>
 
                                 ) : (
-                                    <TableCell>Lỗi</TableCell>
+                                    <TableCell><Typography color='error'>Lỗi</Typography></TableCell>
 
                                 )}
                                 <TableCell>

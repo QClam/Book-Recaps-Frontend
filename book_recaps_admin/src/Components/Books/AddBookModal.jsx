@@ -57,25 +57,25 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
         const stringFields = ['Title', 'OriginalTitle'];
         stringFields.forEach(field => {
             if (!/^[A-Z]/.test(formData[field])) {
-                errors[field] = `${field} should start with an uppercase letter.`;
+                errors[field] = `${field} Phải bắt đầu bằng chữ viết hoa.`;
             }
         });
 
         const currentYear = new Date().getFullYear();
-        if (!/^\d+$/.test(formData.PublicationYear) || formData.PublicationYear < 1000 || formData.PublicationYear > currentYear) {
-            errors.PublicationYear = `Publication Year must be a valid year between 1000 and ${currentYear}.`;
+        if (!/^\d+$/.test(formData.PublicationYear) || formData.PublicationYear <= 1000 || formData.PublicationYear > currentYear) {
+            errors.PublicationYear = `Năm xuất bản phải từ năm 1000 đến năm ${currentYear}.`;
         }
 
         if (!/^\d+$/.test(formData.AgeLimit)) {
-            errors.AgeLimit = 'Age Limit must be a number.';
+            errors.AgeLimit = 'Giới hạn tuổi phải là số.';
         }
 
         if (formData.Authors.length === 0) {
-            errors.Authors = 'Please select at least one author.';
+            errors.Authors = 'Hãy chọn ít nhất một tác giả.';
         }
 
         if (formData.CategoryIds.length === 0) {
-            errors.CategoryIds = 'Please select at least one category.';
+            errors.CategoryIds = 'Hãy chọn ít nhất một thể loại.';
         }
 
         return errors;
@@ -197,7 +197,7 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
                         { name: 'ISBN_10', label: 'ISBN_10', tooltip: 'Mã ISBN_10 của cuốn sách' },
                         { name: 'Description', label: 'Mô tả', multiline: true, rows: 4, tooltip: 'Mô tả ngắn gọn nội dung sách.' },
                         { name: 'PublicationYear', label: 'Năm xuất bản', tooltip: 'Năm xuất bản sách. Lưu ý: Chỉ nhập năm, không nhập ngày và tháng. Sẽ có lúc Tự động điền sẽ điền cả ngày tháng năm, xin vui lòng xóa ngày và tháng nếu có.' },
-                        { name: 'AgeLimit', label: 'Giới hạn tuổi', tooltip: 'Nhập độ tuổi tối thiểu phù hợp với nội dung sách.' },
+                        { name: 'AgeLimit', type:'number', label: 'Giới hạn tuổi', tooltip: 'Nhập độ tuổi tối thiểu phù hợp với nội dung sách.' },
                     ].map(field => (
                         <Tooltip key={field.name} title={field.tooltip || ''} placement="top" arrow>
                             <TextField
@@ -205,6 +205,7 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
                                 margin="normal"
                                 label={field.label}
                                 name={field.name}
+                                type={field.type || 'text'}
                                 value={formData[field.name]}
                                 onChange={handleInputChange}
                                 error={!!errors[field.name]}
@@ -253,7 +254,7 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
 
                             }}
                             renderInput={(params) => (
-                                <TextField {...params} label="Select Authors" variant="outlined" />
+                                <TextField {...params} label="Chọn tác giả" variant="outlined" />
                             )}
                             isOptionEqualToValue={(option, value) => option.id === value.id}
                         />
@@ -275,7 +276,7 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
                                 }));
                             }}
                             renderInput={(params) => (
-                                <TextField {...params} label="Select Categories" variant="outlined" />
+                                <TextField {...params} label="Chọn thể loại" variant="outlined" />
                             )}
                             isOptionEqualToValue={(option, value) => option.id === value.id}
                         />

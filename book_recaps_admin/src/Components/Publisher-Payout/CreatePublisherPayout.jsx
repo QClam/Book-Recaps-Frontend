@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
-    Box, Typography, TextField, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Link, Grid
+    Box, Typography, TextField, Button, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Link, Grid,
+    CircularProgress
 } from '@mui/material';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import dayjs from 'dayjs';
@@ -12,6 +13,7 @@ function PublisherPayout() {
     const { id } = useParams();
     const location = useLocation();
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
 
     const publisher = location.state; // Dữ liệu từ PublisherPayout 
     const [books, setBooks] = useState(location.state?.bookDetails.$values || []);
@@ -64,6 +66,8 @@ function PublisherPayout() {
 
     const postPayoutForm = async () => {
 
+        setLoading(true);
+
         if (!selectedImage) {
             alert('Vui lòng chọn ảnh trước khi gửi!');
             return;
@@ -80,8 +84,10 @@ function PublisherPayout() {
         try {
             const response = await api.post(
                 `/api/PublisherPayout/createpayout/${publisher?.publisherId}`, formData, { params });
-            console.log('Quyết Toán:', response.data.data);
+            // console.log('Quyết Toán:', response.data.data);
+            setLoading(false);
             alert('Tạo quyết toán thành công!');
+            navigate('/publisher-payout');
         } catch (error) {
             console.error('Error:', error.response?.data || error.message);
             alert('Không thể tạo quyết toán. Vui lòng thử lại.');
@@ -168,8 +174,8 @@ function PublisherPayout() {
                 <Box borderBottom={1} mb={3} pb={2}>
                     <Typography variant="h6" gutterBottom>Tạo quyết toán mới</Typography>
                     <Box display="flex" gap={2}>
-                        <TextField label="Từ ngày" value={formatDate(publisher?.fromDate)} disabled/>
-                        <TextField label="Đến ngày" value={formatDate(publisher?.toDate)} disabled/>
+                        <TextField label="Từ ngày" value={formatDate(publisher?.fromDate)} disabled />
+                        <TextField label="Đến ngày" value={formatDate(publisher?.toDate)} disabled />
 
                         <Box display="flex"
                             alignItems="center"
@@ -251,7 +257,9 @@ function PublisherPayout() {
                 {/* Tổng tiền và hoàn tất */}
                 <Box display="flex" justifyContent="space-between" mt={3}>
                     <Typography variant="h6">Tổng tiền: {publisher.totalEarnings} VND</Typography>
-                    <Button variant="contained" color="primary" onClick={handleComplete}>Hoàn tất</Button>
+                    <Button variant="contained" color="primary" onClick={handleComplete} disabled={loading}>
+                        {loading ? <CircularProgress size={20} color='inherit'/> : "Hoàn tất"}
+                    </Button>
                 </Box>
             </Box >
         </Box>

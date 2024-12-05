@@ -10,6 +10,7 @@ function CreateContributorPayout() {
     const { id } = useParams();
     const location = useLocation();
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
 
     const contributor = location.state; // Dữ liệu từ ContributorPayout 
     const [recaps, setRecps] = useState(location.state?.recapDetails.$values || []);
@@ -20,7 +21,7 @@ function CreateContributorPayout() {
         description: '',
         toDate: '',
     })
-    
+
     console.log('Location State:', location.state);
     if (!contributor) {
         console.error('No initialData provided');
@@ -54,6 +55,8 @@ function CreateContributorPayout() {
 
     const postPayoutForm = async () => {
 
+        setLoading(true);
+
         const params = {
             description: description || "Không có ghi chú",
             toDate: formatDateISO(contributor?.todate),
@@ -62,7 +65,9 @@ function CreateContributorPayout() {
         try {
             const response = await api.post(`/api/contributorpayout/createpayout/${contributor?.contributorId}`, null, { params });
             console.log('Quyết Toán:', response.data);
+            setLoading(false);
             alert('Tạo quyết toán thành công!');
+            navigate("/contributor-payout");
         } catch (error) {
             console.error('Lỗi khi tạo quyết toán:', error);
             alert('Không thể tạo quyết toán. Vui lòng thử lại. Thiếu ghi chú');
@@ -190,7 +195,9 @@ function CreateContributorPayout() {
                 {/* Tổng tiền và hoàn tất */}
                 <Box display="flex" justifyContent="space-between" mt={3}>
                     <Typography variant="h6">Tổng tiền: {contributor.totalEarnings} VND</Typography>
-                    <Button variant="contained" color="primary" onClick={handleComplete}>Hoàn tất</Button>
+                    <Button variant="contained" color="primary" onClick={handleComplete} disabled={loading}>
+                        {loading ? <CircularProgress size={20} color='inherit' /> : "Hoàn tất"}
+                    </Button>
                 </Box>
             </Box >
         </Box>

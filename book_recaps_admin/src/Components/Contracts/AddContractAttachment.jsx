@@ -1,4 +1,4 @@
-import { Box, Button, Card, CardContent, Grid, Modal, TextField, Typography } from '@mui/material';
+import { Box, Button, Card, CardContent, CircularProgress, Grid, Modal, TextField, Typography } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import api from '../Auth/AxiosInterceptors';
 import { Article } from '@mui/icons-material';
@@ -10,6 +10,7 @@ function AddContractAttachment({ contractId, disableUpdate, onUpdateAttachments 
 
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
+    const [loading, setLoading] = useState(false);
 
     const [contract, setContract] = useState([]);
     const [contractAttachments, setContractAttachments] = useState([]);
@@ -56,6 +57,9 @@ function AddContractAttachment({ contractId, disableUpdate, onUpdateAttachments 
     };
 
     const handleAddContractAttachment = async () => {
+
+        setLoading(true);
+
         const formData = new FormData();
         formData.append("Name", contractAttachment.Name);
         formData.append("ContractId", contractId);
@@ -71,8 +75,8 @@ function AddContractAttachment({ contractId, disableUpdate, onUpdateAttachments 
 
            // Cập nhật danh sách tài liệu đính kèm trong ContractDetail qua callback
            onUpdateAttachments((prevAttachments) => [...prevAttachments, newAttachment]);
-
-            console.log("Hàng đính kèm: ", contractAttachment);
+            setLoading(false);
+            // console.log("Hàng đính kèm: ", contractAttachment);
             handleClose();
             await getContractDetail(); // Gọi lại API để cập nhật contractBooks
         } catch (error) {
@@ -159,11 +163,11 @@ function AddContractAttachment({ contractId, disableUpdate, onUpdateAttachments 
                     </Grid>
 
                     <Box display="flex" justifyContent="space-between" sx={{ mt: 2 }}>
-                        <Button onClick={handleClose} color="error" variant="contained">
+                        <Button onClick={handleClose} color="error" variant="contained" disabled={loading}>
                             Đóng
                         </Button>
-                        <Button onClick={handleAddContractAttachment} color="primary" variant="contained">
-                            Thêm
+                        <Button onClick={handleAddContractAttachment} color="primary" variant="contained" disabled={loading}>
+                            {loading ? <CircularProgress size={20} color='inherit' /> : "Thêm"}
                         </Button>
                     </Box>
                 </Box>

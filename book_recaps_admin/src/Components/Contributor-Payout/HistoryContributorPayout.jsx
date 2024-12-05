@@ -77,7 +77,7 @@ function HistoryContributorPayout() {
                                 <TableCell>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.totalEarnings)}</TableCell>
                                 <TableCell>{item.description}</TableCell>
                                 {item.status === "Done" ? (
-                                    <TableCell>Hoàn thành</TableCell>
+                                    <TableCell><Typography color='success'>Đã Hoàn thành</Typography></TableCell>
                                 ) : (
                                     <TableCell>Unknow</TableCell>
                                 )}

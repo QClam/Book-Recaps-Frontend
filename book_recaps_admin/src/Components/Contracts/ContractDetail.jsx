@@ -152,7 +152,7 @@ function ContractDetail() {
             console.log(contract);
             alert("Lưu thành công");
         } catch (error) {
-
+            alert("Ngày kết thúc phải lớn hơn ngày bắt đầu.")
         }
     }
 
@@ -182,8 +182,8 @@ function ContractDetail() {
             showCancelButton: true,
             confirmButtonText: 'Có, ' + (isCheckbox ? 'Kích hoạt' : 'Gửi') + '!',
             cancelButtonText: 'Hủy!',
-            confirmButtonColor: "#d33",
-            cancelButtonColor: "#3085d6",
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
         });
 
         if (result.isConfirmed) {
