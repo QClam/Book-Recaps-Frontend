@@ -81,7 +81,7 @@ const PayoutDetailsImpl = () => {
       'Tiêu đề': recap.recapId,
       'Từ ngày': recap.fromDate ? new Date(recap.fromDate).toLocaleDateString() : 'N/A',
       'Tới ngày': recap.toDate ? new Date(recap.toDate).toLocaleDateString() : 'N/A',
-      'Tổng thu nhập': recap.earningAmount.toLocaleString('vi-VN') + 'đ'
+      'Tổng thu nhập': recap.earningAmount.toLocaleString('vi-VN') + '₫'
     }));
     const worksheet = XLSX.utils.json_to_sheet(earnings);
     const workbook = XLSX.utils.book_new();

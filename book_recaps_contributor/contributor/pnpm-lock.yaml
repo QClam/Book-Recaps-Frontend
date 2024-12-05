@@ -23,6 +23,9 @@ importers:
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
+      media-chrome:
+        specifier: ^4.2.3
+        version: 4.2.3
       primeicons:
         specifier: ^7.0.0
         version: 7.0.0
@@ -1491,6 +1494,9 @@ packages:
 
   mdn-data@2.0.14:
     resolution: {integrity: sha512-dn6wd0uw5GsdswPFfsgMp5NSB0/aDe6fK94YJV/AJDYXL6HVLWBsxeq7js7Ad+mU2K9LAlwpk6kN2D5mwCPVow==}
+
+  media-chrome@4.2.3:
+    resolution: {integrity: sha512-gzwFy2b+RLsEtnPzUzqzf2L5XkaTLQr8POOyLOcoebWSAWg31cPy2vfXNiUnd93sc5IxwJ8OAwkKxnaJNZ8Gjg==}
 
   media-typer@0.3.0:
     resolution: {integrity: sha512-dq+qelQ9akHpcOl/gUVRTxVIOkAJ1wR3QAvb4RsVjS8oVoFjDGTc679wJYmUmknUF5HwMLOgb5O+a3KxfWapPQ==}
@@ -3693,6 +3699,8 @@ snapshots:
       yallist: 3.1.1
 
   mdn-data@2.0.14: {}
+
+  media-chrome@4.2.3: {}
 
   media-typer@0.3.0: {}
 

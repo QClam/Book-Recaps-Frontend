@@ -101,7 +101,7 @@ const Dashboard = () => {
             <Show when={data.recaps.$values.length > 0} fallback={
               <div className="text-center text-gray-500">No recaps found</div>
             }>
-              {data.recaps.$values.map((recap, index) => (
+              {data.recaps.$values.slice(0, 4).map((recap, index) => (
                 <Fragment key={index}>
                   <Show when={index !== 0}>
                     <Divider/>
@@ -133,7 +133,7 @@ const Dashboard = () => {
         <div className="flex-1">
           <div className="text-xl font-semibold mb-4">Most views in last month</div>
           <div className="space-y-4 bg-white rounded-md border border-gray-300 p-2">
-            <Show when={data.mostViewedRecaps.$values.length > 0} fallback={
+            <Show when={data.mostViewedRecaps.$values.slice(0, 4).length > 0} fallback={
               <div className="text-center text-gray-500">No recaps found</div>
             }>
               {data.mostViewedRecaps.$values.map((recap, index) => (

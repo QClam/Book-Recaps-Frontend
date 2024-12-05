@@ -22,6 +22,27 @@ import TextArea from "../../components/form/TextArea";
 import BookInfo from "../../components/BookInfo";
 import axios from "axios";
 import { Image } from "primereact/image";
+import {
+  MediaControlBar,
+  MediaController,
+  MediaDurationDisplay,
+  MediaMuteButton,
+  MediaPlayButton,
+  MediaPreviewTimeDisplay,
+  MediaSeekBackwardButton,
+  MediaSeekForwardButton,
+  MediaTimeDisplay,
+  MediaTimeRange,
+  MediaVolumeRange
+} from "media-chrome/react";
+import {
+  MediaActionTypes,
+  MediaProvider,
+  useMediaDispatch,
+  useMediaRef,
+  useMediaSelector
+} from "media-chrome/react/media-store";
+import { MediaPlaybackRateMenu, MediaPlaybackRateMenuButton } from "media-chrome/react/menu";
 
 const getRecapVersion = async (versionId, request) => {
   try {
@@ -1403,7 +1424,8 @@ const PlagiarismResults = () => {
                       rel="noopener noreferrer"
                       target="_blank"
                       onClick={(e) => e.stopPropagation()}
-                      className="font-bold hover:underline text-indigo-600">{result.existing_recap_metadata?.recap_name}</a></p>
+                      className="font-bold hover:underline text-indigo-600">{result.existing_recap_metadata?.recap_name}</a>
+                    </p>
                     <p>Của: <span
                       className="font-bold">{result.existing_recap_metadata?.contributor_full_name}</span></p>
                   </div>
@@ -1413,7 +1435,14 @@ const PlagiarismResults = () => {
                   <p>&#34;{result.existing_sentence}&#34;</p>
                 </blockquote>
                 <div className="bg-gray-200 rounded h-4 my-2 overflow-hidden">
-                  <div className="h-full bg-red-300" style={{ width: `${result.similarity_score * 100}%` }}></div>
+                  <div
+                    className={cn("h-full", {
+                      "bg-red-300": result.similarity_score >= 0.8,
+                      "bg-orange-300": result.similarity_score >= 0.4 && result.similarity_score < 0.8,
+                      "bg-green-300": result.similarity_score < 0.4
+                    })}
+                    style={{ width: `${result.similarity_score * 100}%` }}
+                  ></div>
                 </div>
                 <p className="font-bold text-right">{Number(result.similarity_score * 100).toFixed(1)}%</p>
               </div>
@@ -1433,6 +1462,7 @@ const AudioTranscriptPreview = ({ hide, isOpen, audioUrl, transcriptUrl }) => {
   const [ loading, setLoading ] = useState(false);
   const [ transcript, setTranscript ] = useState(null);
   const [ audioLoaded, setAudioLoaded ] = useState(false);
+  const [ selectedTab, setSelectedTab ] = useState("preview");
 
   useEffect(() => {
     const controller = new AbortController();
@@ -1470,33 +1500,55 @@ const AudioTranscriptPreview = ({ hide, isOpen, audioUrl, transcriptUrl }) => {
   };
 
   return (
-    <Modal.Wrapper className="w-screen max-w-screen-sm">
-      <Modal.Header title="Preview audio and transcript" onClose={hide}/>
-      <Modal.Body className="">
-        <div className="h-96 overflow-y-auto border p-3 mb-4 bg-gray-100 shadow-inner">
-          <Show when={!loading} fallback={
-            <div className="flex gap-2 items-center mt-3">
-              <div>
-                <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
-                                 fill="var(--surface-ground)" animationDuration=".5s"/>
+    <Modal.Wrapper className="w-screen !max-w-screen-md !min-w-0">
+      <Modal.Header
+        title="Preview audio and transcript"
+        onClose={hide}
+        headerTabs={[
+          {
+            label: "Preview",
+            stateName: "preview",
+            onClick: () => setSelectedTab("preview")
+          },
+          {
+            label: "Code",
+            stateName: "code",
+            onClick: () => setSelectedTab("code")
+          }
+        ]}
+        headerTabSelected={selectedTab}
+      />
+      <Modal.Body className="overflow-y-auto">
+        <MediaProvider>
+          <div className={cn("h-96 overflow-y-auto p-3 mb-4", {
+            "border bg-gray-100 shadow-inner": selectedTab === "code",
+          })}>
+            <Show when={!loading} fallback={
+              <div className="flex gap-2 items-center mt-3">
+                <div>
+                  <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
+                                   fill="var(--surface-ground)" animationDuration=".5s"/>
+                </div>
+                <p>Loading...</p>
               </div>
-              <p>Loading...</p>
-            </div>
-          }>
-            <Show when={transcript} fallback={<p className="text-center text-gray-500">No transcript found</p>}>
-              <pre className="leading-relaxed">
+            }>
+              <Show when={transcript} fallback={<p className="text-center text-gray-500">No transcript found</p>}>
+              <pre className={cn("leading-relaxed", selectedTab !== "code" && "hidden")}>
                 <code>{JSON.stringify(transcript, null, 2)}</code>
               </pre>
-            </Show>
-          </Show>
 
-        </div>
-        <audio controls onCanPlayThrough={handleAudioLoaded} className={cn("w-full", {
-          "opacity-50 cursor-progress": !audioLoaded
-        })}>
-          <source src={audioUrl} type={audioUrl.endsWith(".wav") ? "audio/wav" : "audio/mp4"}/>
-          Your browser does not support the audio element.
-        </audio>
+                <div className={cn("flex flex-col gap-3 text-lg", selectedTab !== "preview" && "hidden")}>
+                  <TranscriptPreviewTab transcriptData={transcript}/>
+                </div>
+              </Show>
+            </Show>
+          </div>
+          <AudioPlayer
+            audioURL={audioUrl}
+            handleAudioLoaded={handleAudioLoaded}
+            audioLoaded={audioLoaded}
+          />
+        </MediaProvider>
       </Modal.Body>
       <Modal.Footer className="justify-end gap-3 text-sm">
         <button
@@ -1510,3 +1562,270 @@ const AudioTranscriptPreview = ({ hide, isOpen, audioUrl, transcriptUrl }) => {
     </Modal.Wrapper>
   )
 }
+
+const TranscriptPreviewTab = ({ transcriptData }) => {
+  const dispatch = useMediaDispatch();
+  const currentTime = useMediaSelector(state => state.mediaCurrentTime);
+
+  const [ activeSentenceIndex, setActiveSentenceIndex ] = useState(null);
+
+  // Highlight the corresponded sentence when the audio is playing
+  useEffect(() => {
+    let found = false;
+    for (let sentence of sentences) {
+      if (
+        isFinite(sentence.start) && isFinite(sentence.end) &&
+        currentTime >= sentence.start && currentTime <= sentence.end
+      ) {
+        // console.log("Highlighting sentence:", currentTime);
+        if (activeSentenceIndex !== String(sentence.sentence_index)) setActiveSentenceIndex(String(sentence.sentence_index));
+        found = true;
+        break;
+      }
+    }
+
+    if (!found) {
+      setActiveSentenceIndex(null);
+    }
+  }, [ currentTime ]);
+
+  const sentences = useMemo(() => {
+    const sents = [];
+    transcriptData.transcriptSections.forEach(section => {
+      section.transcriptSentences.forEach(sentence => sents.push(sentence))
+    })
+    return sents;
+  }, [ transcriptData ])
+
+  const handleSentenceClick = (startTime) => {
+    dispatch({ type: MediaActionTypes.MEDIA_SEEK_REQUEST, detail: parseFloat(startTime) });
+  };
+
+  return (
+    <>
+      {transcriptData.transcriptSections.map((section, index) => (
+        <div key={index} className="rounded-lg bg-white shadow-[0px_0px_8px_rgba(0,0,0,0.1)] border">
+          {section.image && (
+            <div className="relative h-32">
+              <Image
+                src={section.image}
+                alt={section.title || "Section image"}
+                className="w-full h-full rounded-t-lg overflow-hidden"
+                imageClassName="object-cover w-full h-full"
+                preview
+              />
+            </div>
+          )}
+
+          <div className="px-8 py-6">
+            {section.title && <h3 className="font-bold text-gray-700 text-xl mb-3.5">{section.title}</h3>}
+
+            {section.transcriptSentences.map((sentence, idx) => {
+              const time = sentence.start;
+              const sentenceIndex = String(sentence.sentence_index);
+
+              return (
+                <Fragment key={idx}>
+                  <span
+                    id={"sentence-" + index + "-" + idx}
+                    data-start={sentence.start}
+                    data-end={sentence.end}
+                    onClick={() => {
+                      if (isFinite(time)) handleSentenceClick(time);
+                    }}
+                    className={cn("p-0.5 transition-colors cursor-pointer select-none", {
+                      "bg-orange-300": activeSentenceIndex === sentenceIndex,
+                      "hover:bg-gray-300": activeSentenceIndex !== sentenceIndex
+                    })}
+                  >{sentence.value.html}</span>
+                </Fragment>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </>
+  )
+}
+
+const AudioPlayer = ({ audioURL, handleAudioLoaded, audioLoaded }) => {
+  const mediaRef = useMediaRef();
+  return (
+    <div className="border-t border-gray-300">
+      <SvgIcons/>
+      <MediaController audio className="@container block max-w-screen-md mx-auto px-5">
+        <audio
+          slot="media"
+          ref={mediaRef}
+          src={audioURL}
+          onCanPlayThrough={handleAudioLoaded}
+          className={cn("w-full", {
+            "opacity-50 cursor-progress": !audioLoaded
+          })}
+        />
+        <div className="flex gap-2 items-center">
+          <MediaTimeDisplay
+            className="block p-2 text-slate-500 text-sm rounded-md focus:outline-none focus:ring-slate-700 focus:ring-2"/>
+
+          <MediaTimeRange
+            className="block w-full h-2 min-h-0 p-0 bg-slate-50 focus-visible:ring-slate-700 focus-visible:ring-2">
+            <MediaPreviewTimeDisplay slot="preview" className="text-slate-600 text-xs"/>
+          </MediaTimeRange>
+
+          <MediaDurationDisplay className="block p-2 text-slate-500 text-sm"/>
+        </div>
+
+        <MediaControlBar className="h-14 px-4 w-full flex items-center justify-between">
+          <div className="relative group">
+            <MediaMuteButton
+              noTooltip
+              className="order-first @md:order-none rounded-md focus:outline-none focus-visible:ring-slate-700 focus-visible:ring-2">
+              <svg slot="high" aria-hidden="true" className="h-5 w-5 fill-slate-500">
+                <use href="#high"/>
+              </svg>
+              <svg slot="medium" aria-hidden="true" className="h-5 w-5 fill-slate-500">
+                <use href="#high"/>
+              </svg>
+              <svg slot="low" aria-hidden="true" className="h-5 w-5 fill-slate-500">
+                <use href="#high"/>
+              </svg>
+              <svg slot="off" aria-hidden="true" className="h-5 w-5 fill-slate-500">
+                <use href="#off"/>
+              </svg>
+            </MediaMuteButton>
+            <MediaVolumeRange
+              className="group-hover:block hidden absolute bg-slate-800 border border-gray-700 rounded-lg shadow-lg mt-2 w-40 z-10 p-4 bottom-full left-0"
+            />
+          </div>
+          <MediaSeekBackwardButton
+            className="w-8 h-8 p-0 group rounded-full focus:outline-none focus-visible:ring-slate-700 focus-visible:ring-2"
+            seekOffset={10}>
+            <svg
+              slot="icon"
+              aria-hidden="true"
+              className="w-7 h-7 fill-none stroke-slate-500"
+            >
+              <use href="#backward"/>
+            </svg>
+          </MediaSeekBackwardButton>
+          <MediaPlayButton
+            className="h-10 w-10 p-2 mx-3 rounded-full bg-slate-700 hover:bg-slate-900 focus:outline-none focus:ring-slate-700 focus:ring-2 focus:ring-offset-2">
+            <svg slot="play" aria-hidden="true" className="relative left-px">
+              <use href="#play"/>
+            </svg>
+            <svg slot="pause" aria-hidden="true">
+              <use href="#pause"/>
+            </svg>
+          </MediaPlayButton>
+          <MediaSeekForwardButton
+            className="w-8 h-8 p-0 group relative rounded-full focus:outline-none focus-visible:ring-slate-700 focus-visible:ring-2"
+            seekOffset={10}>
+            <svg
+              slot="icon"
+              aria-hidden="true"
+              className="w-7 h-7 fill-none stroke-slate-500"
+            >
+              <use href="#forward"/>
+            </svg>
+          </MediaSeekForwardButton>
+          <MediaPlaybackRateMenuButton
+            className="text-slate-500 rounded-md focus:outline-none focus-visible:ring-slate-700 focus-visible:ring-2 select-none"
+            id="menu-button"
+            invoketarget="menu1"
+          />
+          <MediaPlaybackRateMenu
+            hidden
+            id="menu1"
+            anchor="menu-button"
+            rates={[ 2, 1.5, 1.25, 1, 0.75 ]}
+            className="z-10"
+          />
+        </MediaControlBar>
+      </MediaController>
+    </div>
+  )
+}
+
+const SvgIcons = () => (
+  <svg className="hidden">
+    <symbol
+      id="backward"
+      viewBox="0 0 24 24"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path
+        d="M8 5L5 8M5 8L8 11M5 8H13.5C16.5376 8 19 10.4624 19 13.5C19 15.4826 18.148 17.2202 17 18.188"
+      ></path>
+      <path d="M5 15V19"></path>
+      <path
+        d="M8 18V16C8 15.4477 8.44772 15 9 15H10C10.5523 15 11 15.4477 11 16V18C11 18.5523
+            10.5523 19 10 19H9C8.44772 19 8 18.5523 8 18Z"
+      ></path>
+    </symbol>
+
+    <symbol id="play" viewBox="0 0 24 24">
+      <path
+        fillRule="evenodd"
+        d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0
+            3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653z"
+        clipRule="evenodd"
+      />
+    </symbol>
+
+    <symbol id="pause" viewBox="0 0 24 24">
+      <path
+        fillRule="evenodd"
+        d="M6.75 5.25a.75.75 0 01.75-.75H9a.75.75 0 01.75.75v13.5a.75.75 0
+          01-.75.75H7.5a.75.75 0 01-.75-.75V5.25zm7.5 0A.75.75 0 0115 4.5h1.5a.75.75 0 01.75.75v13.5a.75.75 0
+          01-.75.75H15a.75.75 0 01-.75-.75V5.25z"
+        clipRule="evenodd"
+      />
+    </symbol>
+
+    <symbol id="forward" viewBox="0 0 24 24">
+      <path
+        d="M16 5L19 8M19 8L16 11M19 8H10.5C7.46243 8 5 10.4624 5 13.5C5 15.4826 5.85204 17.2202 7 18.188"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></path>
+      <path
+        d="M13 15V19"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></path>
+      <path
+        d="M16 18V16C16 15.4477 16.4477 15 17 15H18C18.5523 15 19 15.4477 19 16V18C19 18.5523 18.5523 19 18
+          19H17C16.4477 19 16 18.5523 16 18Z"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      ></path>
+    </symbol>
+
+    <symbol id="high" viewBox="0 0 24 24">
+      <path
+        d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0
+          001.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276
+          2.561-1.06V4.06zM18.584 5.106a.75.75 0 011.06 0c3.808 3.807 3.808 9.98 0 13.788a.75.75 0 11-1.06-1.06
+          8.25 8.25 0 000-11.668.75.75 0 010-1.06z"
+      ></path>
+      <path
+        d="M15.932 7.757a.75.75 0 011.061 0 6 6 0 010 8.486.75.75 0 01-1.06-1.061 4.5 4.5 0 000-6.364.75.75 0
+          010-1.06z"
+      ></path>
+    </symbol>
+
+    <symbol id="off" viewBox="0 0 24 24">
+      <path
+        d="M13.5 4.06c0-1.336-1.616-2.005-2.56-1.06l-4.5 4.5H4.508c-1.141 0-2.318.664-2.66 1.905A9.76 9.76 0
+          001.5 12c0 .898.121 1.768.35 2.595.341 1.24 1.518 1.905 2.659 1.905h1.93l4.5 4.5c.945.945 2.561.276
+          2.561-1.06V4.06zM17.78 9.22a.75.75 0 10-1.06 1.06L18.44 12l-1.72 1.72a.75.75 0 001.06 1.06l1.72-1.72 1.72
+          1.72a.75.75 0 101.06-1.06L20.56 12l1.72-1.72a.75.75 0 00-1.06-1.06l-1.72 1.72-1.72-1.72z"
+      />
+    </symbol>
+  </svg>
+)

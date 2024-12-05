@@ -22,3 +22,67 @@ body {
     flex-direction: column;
     min-height: 100vh;
 }
+
+media-controller {
+    --media-background-color: transparent;
+    --media-control-background: transparent;
+    --media-control-hover-background: transparent;
+}
+
+media-playback-rate-menu {
+    --media-primary-color: #ffffff; /* Text and icon color */
+    --media-secondary-color: rgba(20, 20, 30, 0.8); /* Background color */
+    --media-text-color: var(--media-primary-color); /* Text color */
+    --media-control-background: var(--media-secondary-color); /* Control background */
+    --media-menu-display: inline-flex; /* Menu display style */
+    --media-menu-flex-direction: column; /* Menu layout direction */
+    --media-menu-gap: 0.25em; /* Gap between menu items */
+    --media-menu-background: var(--media-control-background); /* Menu background */
+    --media-menu-border-radius: 8px; /* Menu border radius */
+    --media-menu-border: 1px solid #ccc; /* Menu border */
+    --media-menu-transition-in: visibility 0s, opacity 0.2s ease-out, transform 0.15s ease-out; /* Transition in */
+    --media-menu-transition-out: visibility 0.15s ease-in, opacity 0.15s ease-in, transform 0.15s ease-in; /* Transition out */
+    --media-menu-visibility: visible; /* Menu visibility when shown */
+    --media-menu-hidden-visibility: hidden; /* Menu visibility when hidden */
+    --media-menu-max-height: 300px; /* Maximum menu height */
+    --media-menu-hidden-max-height: var(--media-menu-max-height); /* Max height when hidden */
+    --media-menu-opacity: 1; /* Menu opacity when shown */
+    --media-menu-hidden-opacity: 0; /* Menu opacity when hidden */
+    --media-menu-transform-in: translateY(0) scale(1); /* Transform when shown */
+    --media-menu-transform-out: translateY(2px) scale(0.99); /* Transform when hidden */
+    --media-font: normal 14px/24px 'Helvetica Neue', 'Segoe UI', Roboto, Arial, sans-serif; /* Font settings */
+    --media-icon-color: var(--media-primary-color); /* Icon color */
+    --media-menu-icon-height: 24px; /* Icon height */
+    --media-menu-item-checked-indicator-display: none; /* Checked indicator display */
+    --media-menu-item-checked-background: rgba(255, 255, 255, 0.2); /* Checked item background */
+    --media-menu-item-max-width: 100%; /* Max width of menu item text */
+}
+
+media-time-range {
+    --media-range-track-background: transparent;
+    --media-time-range-buffered-color: rgb(0 0 0 / 0.02);
+    --media-range-bar-color: rgb(79 70 229);
+    --media-range-track-height: 0.5rem;
+    --media-range-thumb-background: rgb(79 70 229);
+    --media-range-thumb-box-shadow: 0 0 0 2px rgb(255 255 255 / 0.9);
+    --media-range-thumb-width: 0.25rem;
+    --media-range-thumb-height: 1rem;
+    --media-preview-time-text-shadow: transparent;
+}
+
+media-volume-range {
+    --media-range-track-background: transparent;
+    --media-volume-range-buffered-color: rgb(0 0 0 / 0.02);
+    --media-range-bar-color: rgb(79 70 229);
+    --media-range-track-border-radius: 4px;
+    --media-range-track-height: 0.5rem;
+    --media-range-thumb-background: rgb(79 70 229);
+    --media-range-thumb-box-shadow: 0 0 0 2px rgb(255 255 255 / 0.9);
+    --media-range-thumb-width: 0.25rem;
+    --media-range-thumb-height: 1rem;
+    --media-primary-color: #ffffff;
+    --media-secondary-color: rgba(20, 20, 30, 0.8);
+    --media-control-background: rgba(20, 20, 30, 0.8);
+    --media-menu-border-radius: 8px;
+    --media-menu-border: 1px solid #ccc;
+}

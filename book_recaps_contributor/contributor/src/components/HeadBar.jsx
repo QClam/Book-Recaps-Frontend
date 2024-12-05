@@ -33,11 +33,6 @@ export const HeadBar = () => {
             className="rounded-full flex items-center justify-center gap-3"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
-            {/*<img*/}
-            {/*  className="h-8 w-8 rounded-full bg-gray-400"*/}
-            {/*  src="/user-avatar.png"*/}
-            {/*  alt="Profile Image"*/}
-            {/*/>*/}
             <div className="text-start hidden sm:block">
               <p className="font-semibold">{user.name}</p>
               <p className="text-sm text-gray-500 font-medium">

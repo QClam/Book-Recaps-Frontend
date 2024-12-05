@@ -108,7 +108,7 @@ function PayoutsTable() {
             {p.todate ? new Date(p.todate).toLocaleDateString() : 'N/A'}
           </Table.Cell>
           <Table.Cell>
-            <p className="font-semibold text-indigo-600 text-lg">{p.totalEarnings.toLocaleString('vi-VN')}đ</p>
+            <p className="font-semibold text-indigo-600 text-lg">{p.totalEarnings.toLocaleString('vi-VN')}₫</p>
           </Table.Cell>
           <Table.Cell>
             <Badge

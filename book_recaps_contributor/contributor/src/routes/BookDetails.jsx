@@ -94,7 +94,6 @@ const BookDetails = () => {
           <BookDetailsImpl dialogVisible={dialogVisible} setDialogVisible={setDialogVisible}/>
         </Await>
       </Suspense>
-
     </>
   );
 }

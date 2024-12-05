@@ -288,14 +288,14 @@ const EarningWithdrawals = () => {
                       id="amount"
                       label="Số tiền cần rút:"
                       name="amount"
-                      placeholder="0đ"
+                      placeholder="0₫"
                       required
                       value={turnNumberToVNDStr(withdrawAmount)}
                       onChange={(e) => setWithdrawAmount(turnVNDStrToNumber(e.target.value))}
                       error={
-                        withdrawAmount && withdrawAmount < 50000 ? "Số tiền rút tối thiểu là 50,000đ" :
+                        withdrawAmount && withdrawAmount < 50000 ? "Số tiền rút tối thiểu là 50,000₫" :
                           withdrawAmount > resolvedWithdrawInfo.totalEarning ? "Số tiền vượt quá số dư hiện tại" :
-                            withdrawAmount % 1000 !== 0 ? "Số tiền phải là bội số của 1,000đ" : ""
+                            withdrawAmount % 1000 !== 0 ? "Số tiền phải là bội số của 1,000₫" : ""
                       }
                     />
                   )}
@@ -464,7 +464,7 @@ function WithdrawRequestsTable() {
             </div>
           </Table.Cell>
           <Table.Cell>
-            <span className="font-semibold text-indigo-600 text-lg">{wd.totalEarnings.toLocaleString('vi-VN')}đ</span>
+            <span className="font-semibold text-indigo-600 text-lg">{wd.totalEarnings.toLocaleString('vi-VN')}₫</span>
           </Table.Cell>
           <Table.Cell>
             <div className="min-w-28">
