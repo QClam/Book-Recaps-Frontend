@@ -94,7 +94,7 @@ const History = () => {
                   {/*<p>·</p>*/}
                   <p className="flex items-center gap-2">
                     <span className="bg-green-100 p-1 rounded"><FaClockRotateLeft size={15}/></span>
-                    <span>{new Date(view.createdAt + 'Z').toLocaleString()}</span>
+                    <span>{new Date(view.createdAt + "Z").toLocaleString()}</span>
                   </p>
                   <p>·</p>
                   <p className="flex items-center gap-2">

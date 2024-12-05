@@ -22,7 +22,9 @@ const initialContextMenu = {
 }
 
 const Transcriptv2 = ({ transcriptData, userId, recapVersionId, isGenAudio }) => {
-  const { isAuthenticated } = useAuth();
+  const { user, isAuthenticated } = useAuth();
+  const hasSubscription = user?.profileData.subscriptions.$values.some((sub) => sub.status === 0);
+
   const dispatch = useMediaDispatch();
   const currentTime = useMediaSelector(state => state.mediaCurrentTime);
 
@@ -92,6 +94,12 @@ const Transcriptv2 = ({ transcriptData, userId, recapVersionId, isGenAudio }) =>
   };
 
   const handleHighlight = async () => {
+    if (!isAuthenticated) return;
+    if (!hasSubscription) {
+      toast.info("Vui lòng mua gói để sử dụng tính năng này.");
+      return;
+    }
+
     const { sentenceIndex, selectedText, highlightNote } = contextMenu;
 
     const startIndex = 0;

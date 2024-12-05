@@ -121,6 +121,7 @@
   .checkbox-container {
     display: flex;
     align-items: center;
+    margin-bottom: 20px;
   
     input[type="checkbox"] {
       margin-right: 8px;
@@ -128,7 +129,7 @@
     }
   
     label {
-      font-size: 18px;
+      font-size: 15px;
     }
   
     a {

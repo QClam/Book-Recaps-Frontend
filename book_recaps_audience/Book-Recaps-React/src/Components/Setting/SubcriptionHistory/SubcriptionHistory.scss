@@ -1,6 +1,6 @@
 .subscription-history {
     font-family: Arial, sans-serif;
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
     padding: 20px;
     background-color: #fff;
@@ -24,13 +24,13 @@
   
   .subscription-details {
     display: flex;
-    justify-content: space-between;
+    justify-content: space-evenly;
   }
   
-  .subscription-details div {
+  .subscription-details > div {
     width: 45%;
   }
-  
+
   .history-table {
     width: 100%;
     border-collapse: collapse;

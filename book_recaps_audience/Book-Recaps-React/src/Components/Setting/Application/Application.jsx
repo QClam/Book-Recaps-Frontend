@@ -3,6 +3,8 @@ import "../Application/Application.scss";
 import { axiosInstance } from "../../../utils/axios";
 import { useAuth } from "../../../contexts/Auth";
 import { cn } from "../../../utils/cn";
+import { generatePath, Link } from "react-router-dom";
+import { routes } from "../../../routes";
 
 const Application = () => {
   const [ supportTickets, setSupportTickets ] = useState([]);
@@ -44,7 +46,7 @@ const Application = () => {
           setErrorMessage('Failed to fetch support tickets');
         }
       } catch (error) {
-        setErrorMessage('Error fetching support tickets');
+        // setErrorMessage('Error fetching support tickets');
         console.error('Error:', error);
       }
     }
@@ -59,8 +61,8 @@ const Application = () => {
       <table className="support-tickets-table bg-white">
         <thead>
         <tr>
-          <th>Loại đơn</th>
           <th><p className="w-max">Tên bài viết</p></th>
+          <th>Tiêu đề</th>
           <th>Nội dung</th>
           <th>Trạng thái</th>
           <th>Xử lý</th>
@@ -71,8 +73,15 @@ const Application = () => {
         <tbody>
         {supportTickets.map(ticket => (
           <tr key={ticket.id}>
-            <td><a href="#">{ticket.category}</a></td>
-            <td>{ticket.recapName || "Unknown Recap Name"}</td>
+            <td>
+              <Link
+                to={generatePath(routes.recapPlayer, { recapId: ticket.recapId })}
+                className="line-clamp-2"
+              >
+                {ticket.recapName || "Unknown Recap Name"}
+              </Link>
+            </td>
+            <td>{ticket.category}</td>
             <td>{ticket.description}</td>
             <td>
               <p className={cn("status text-sm w-max", {
@@ -83,8 +92,12 @@ const Application = () => {
               </p>
             </td>
             <td>{ticket.response}</td>
-            <td><p className="break-words">{new Date(ticket.createdAt).toLocaleString()}</p></td>
-            <td><p className="break-words">{ticket.updatedAt !== "0001-01-01T00:00:00" && new Date(ticket.updatedAt).toLocaleString()}</p></td>
+            <td><p className="break-words">{new Date(ticket.createdAt + "Z").toLocaleString()}</p></td>
+            <td>
+              <p className="break-words">
+                {ticket.updatedAt !== "0001-01-01T00:00:00" && new Date(ticket.updatedAt + "Z").toLocaleString()}
+              </p>
+            </td>
           </tr>
         ))}
         </tbody>

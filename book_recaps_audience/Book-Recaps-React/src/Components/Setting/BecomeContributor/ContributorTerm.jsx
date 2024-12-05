@@ -149,52 +149,6 @@ const ContributorTerm = () => {
                 </label>
               </div>
 
-              {/* <div className="form-group">
-          <label>Name</label>
-          <div className="name-fields">
-            <input
-              type="text"
-              name="firstName"
-              placeholder="First Name"
-              value={formData.firstName}
-              onChange={handleChange}
-              required
-            />
-            <input
-              type="text"
-              name="lastName"
-              placeholder="Last Name"
-              value={formData.lastName}
-              onChange={handleChange}
-              required
-            />
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label>Email</label>
-          <input
-            type="email"
-            name="email"
-            placeholder="example@example.com"
-            value={formData.email}
-            onChange={handleChange}
-            required
-          />
-        </div>
-
-        <div className="form-group">
-        <label>Signature</label>
-        <input
-            type="text"
-            name="signature"
-            placeholder="Sign Here"
-            value={formData.signature}
-            onChange={handleChange}
-            required
-        />
-        </div> */}
-
               {error && <p className="error-message">{error}</p>}
               <button type="submit" className="submit-button">Submit</button>
             </form>

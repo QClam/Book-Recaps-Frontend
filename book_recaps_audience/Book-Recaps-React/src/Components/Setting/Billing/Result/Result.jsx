@@ -34,8 +34,8 @@ const Result = () => {
     if (paymentResult.cancel) {
       return (
         <div className="cancel-message">
-          <h1>Payment Failed</h1>
-          <p>Order Code: {paymentResult.orderCode}</p>
+          <h1>Thanh toán thất bại</h1>
+          <p>Mã đơn: {paymentResult.orderCode}</p>
         </div>
       );
     } else if (paymentResult.status === 'PAID' && paymentResult.code === '00') {
@@ -49,7 +49,7 @@ const Result = () => {
             )}
           </div> */}
           <h1>{user?.name}</h1>
-          <h2>Payment Successfully Completed</h2>
+          <h2>Thanh toán thành công</h2>
         </div>
       );
     } else {
@@ -63,9 +63,9 @@ const Result = () => {
 )}
 
           </div> */}
-          <h1>Payment Failed</h1>
-          <p>Transaction was not successful or has been canceled. Please try again.</p>
-          <p>Order Code: {paymentResult.orderCode}</p>
+          <h1>Thanh toán thất bại</h1>
+          <p>Giao dịch không thành công hoặc đã bị hủy. Vui lòng thử lại.</p>
+          <p>Mã đơn: {paymentResult.orderCode}</p>
         </div>
       );
     }
@@ -87,7 +87,7 @@ const Result = () => {
       {renderMessage()}
       <div className="payment-details">
         <div className="details-label">
-          <p>Transaction ID</p>
+          <p>Mã giao dịch</p>
         </div>
         <div className="details-value">
           <p>{paymentResult.id}</p>
@@ -95,8 +95,8 @@ const Result = () => {
       </div>
       {/*{error && <p className="error">{error}</p>}*/}
       <div className="button-group">
-        <button className="explore-button" onClick={() => navigate(routes.explore)}>Explore</button>
-        <button className="try-again-button" onClick={() => navigate(routes.billing)}>Try Again</button>
+        <button className="explore-button" onClick={() => navigate(routes.index)}>Trang chủ</button>
+        <button className="try-again-button" onClick={() => navigate(routes.billing)}>Thử lại</button>
       </div>
     </div>
   );

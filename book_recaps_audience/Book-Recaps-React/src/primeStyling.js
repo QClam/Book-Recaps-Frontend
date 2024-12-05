@@ -214,7 +214,7 @@ export const primeStyling = {
   },
   dialog: {
     root: ({ state }) => ({
-      className: cn('rounded-lg shadow-lg border-0', 'max-h-[90%] transform scale-100', 'm-0 w-[50vw]', {
+      className: cn('rounded-lg border-0', 'max-h-[90%] transform scale-100', 'm-0 w-[50vw]', {
         'transition-none transform-none !w-screen !h-screen !max-h-full !top-0 !left-0': state.maximized
       })
     }),
@@ -279,5 +279,16 @@ export const primeStyling = {
                 leaveToClass: 'opacity-0 scale-75'
               };
     }
+  },
+  message: {
+    root: ({ props }) => ({
+      className: cn('flex items-center justify-start align-top', 'p-3 m-0 rounded-md', {
+        'bg-blue-100 border-0 text-blue-700': props.severity == 'info',
+        'bg-green-100 border-0 text-green-700': props.severity == 'success',
+        'bg-orange-100 border-0 text-orange-700': props.severity == 'warn',
+        'bg-red-100 border-0 text-red-700': props.severity == 'error'
+      })
+    }),
+    icon: 'text-base mr-2'
   }
 }
