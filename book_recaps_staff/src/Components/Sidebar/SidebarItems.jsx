@@ -10,11 +10,11 @@ import {
 } from "@mui/icons-material";
 
 export const SidebarItems = [
-  {
-    title: "Tổng quan",
-    icon: <SpaceDashboard />,
-    link: "/dashboard",
-  },
+  // {
+  //   title: "Tổng quan",
+  //   icon: <SpaceDashboard />,
+  //   link: "/dashboard",
+  // },
   // {
   //   title: "Nội dung chờ duyệt",
   //   icon: <Widgets />,
