@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import "../Publisher/PublisherPayout.scss";
 import AllBookValue from '../Dashboard/AllBookValue';
+import defaultImage from "../../assets/empty-image.png";
 
 const PublisherPayout = () => {
     const { id } = useParams(); // Get the payout ID from the URL
@@ -135,9 +136,17 @@ const PublisherPayout = () => {
                                             {book.title}
                                         </td>
     
-                                        <td>
+                                        {/* <td>
                                             <img src={book.coverImage} alt={book.title} width="50" />
+                                        </td> */}
+                                        <td>
+                                        <img 
+                                            src={book.coverImage || defaultImage} 
+                                            alt={book.title} 
+                                            width="50" 
+                                        />
                                         </td>
+
                                         <td>
                                         {new Intl.NumberFormat('vi-VN').format(book.earningAmount)} <span className="currency-symbol">₫</span>
                                         </td>
