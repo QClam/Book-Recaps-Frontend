@@ -105,7 +105,7 @@ function Settings() {
       const response = await axiosInstance.put('/api/personal/profile', {
         fullName: updatedProfile.fullName,
         gender: parseInt(updatedProfile.gender, 10), // Ensure gender is sent as an integer
-        birthDate: updatedProfile.birthDate, // Ensure correct date format
+        birthDate: updatedProfile.birthDate || null, // Ensure correct date format
         address: updatedProfile.address,
       });
 
