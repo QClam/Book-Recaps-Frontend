@@ -69,7 +69,7 @@ const Transcriptv2 = ({ transcriptData, userId, recapVersionId, isGenAudio }) =>
         isFinite(sentence.start) && isFinite(sentence.end) &&
         currentTime >= sentence.start && currentTime <= sentence.end
       ) {
-        console.log("Highlighting sentence:", currentTime);
+        // console.log("Highlighting sentence:", currentTime);
         if (activeSentenceIndex !== String(sentence.sentence_index)) setActiveSentenceIndex(String(sentence.sentence_index));
         found = true;
         break;
@@ -223,12 +223,10 @@ const Transcriptv2 = ({ transcriptData, userId, recapVersionId, isGenAudio }) =>
                       if (isFinite(time)) handleSentenceClick(time);
                     }}
                     className={cn("transcript-sentence hover:bg-gray-300", {
-                      "bg-orange-300": activeSentenceIndex === sentenceIndex,
+                      "bg-orange-300 hover:bg-orange-300": activeSentenceIndex === sentenceIndex,
                       "bg-yellow-200": isHighlighted && activeSentenceIndex !== sentenceIndex,
                     })}
-                  >
-                {sentence.value.html}
-              </span>
+                  >{sentence.value.html}</span>
                 </Fragment>
               );
             })}
