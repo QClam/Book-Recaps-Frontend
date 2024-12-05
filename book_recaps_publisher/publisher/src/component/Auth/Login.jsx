@@ -300,11 +300,9 @@ function Login() {
             </div>
             <div className="toggle-panel toggle-right">
               <h1>Xin chào</h1>
-              <p>
-             Nhập thông tin để sử dụng các chức năng dành cho
             <br></br>  
             <h3 className="xuatban">NHÀ XUẤT BẢN</h3>
-            </p>
+           
               {/* <button
                 className="hidden"
                 id="register"
