@@ -10,9 +10,10 @@ export const sessionLoader = async () => {
   }
 
   let responseId = null;
+  let response;
 
   try {
-    const response = await axiosInstance.get("/api/personal/profile");
+    response = await axiosInstance.get("/api/personal/profile");
     responseId = response.data.id || null;
   } catch (e) {
     console.error(e);
@@ -31,6 +32,7 @@ export const sessionLoader = async () => {
       name: decoded[import.meta.env.VITE_CLAIMS_NAME],
       role: "Contributor",
       id: userId,
+      profileData: response.data,
     }
   }
   setSession(null)

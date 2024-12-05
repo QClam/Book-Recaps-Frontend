@@ -8,7 +8,7 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const loaderData = useLoaderData()
   // const { executeRecaptcha } = useGoogleReCaptcha();
-  const [ user, setUser ] = useState(loaderData); // { id, email, name, role }
+  const [ user, setUser ] = useState(loaderData); // { id, email, name, role, profileData }
   // const [ reCaptchaTokens, setReCaptchaTokens ] = useState(null); // { loginToken, signupToken }
   const [ reCaptchaTokens ] = useState({ loginToken: "...", signupToken: "..." });
 
@@ -76,7 +76,8 @@ export function AuthProvider({ children }) {
   const isAuthenticated = !!user;
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated, reCaptchaTokens, reFetchReCaptchaTokens }}>
+    <AuthContext.Provider
+      value={{ user, login, logout, isAuthenticated, reCaptchaTokens, reFetchReCaptchaTokens, setUser }}>
       {children}
     </AuthContext.Provider>
   );

@@ -31,12 +31,19 @@ export async function loginAction({ request }) {
       return { error: "Vui lòng đăng nhập bằng tài khoản Contributor" };
     }
 
+    const profileResponse = await axiosInstance.get("/api/personal/profile", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
+
     return {
       user: {
         email: decoded.email,
         name: decoded[import.meta.env.VITE_CLAIMS_NAME],
         role: "Contributor",
-        id: decoded[import.meta.env.VITE_CLAIMS_IDENTIFIER]
+        id: decoded[import.meta.env.VITE_CLAIMS_IDENTIFIER],
+        profileData: profileResponse.data,
       },
       token: accessToken
     };

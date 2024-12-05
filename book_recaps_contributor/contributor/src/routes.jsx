@@ -20,6 +20,7 @@ import EarningWithdrawals, { earningWithdrawalsAction, earningWithdrawalsLoader 
 import Payouts, { payoutsLoader } from "./routes/Payouts";
 import PayoutDetails, { payoutDetailsLoader } from "./routes/PayoutDetails";
 import Dashboard, { dashboardLoader } from "./routes/Dashboard";
+import Profile from "./routes/Profile";
 // import Support, { supportTicketsAction, supportTicketsLoader } from "./routes/Support";
 
 export const routes = {
@@ -146,15 +147,9 @@ export const router = createBrowserRouter([
                   }
                 ]
               },
-              // {
-              //   path: routes.supportTickets,
-              //   loader: supportTicketsLoader,
-              //   action: supportTicketsAction,
-              //   element: <Support/>
-              // },
               {
                 path: routes.profile,
-                element: <div>Profile</div>
+                element: <Profile/>
               },
             ]
           }

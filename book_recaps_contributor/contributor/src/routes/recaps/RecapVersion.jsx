@@ -1,3 +1,4 @@
+import axios from "axios";
 import { Await, defer, generatePath, json, Link, useAsyncValue, useLoaderData, useNavigate } from "react-router-dom";
 import { Fragment, Suspense, useEffect, useMemo, useState } from "react";
 import { useDebounce } from "react-use";
@@ -6,22 +7,8 @@ import { ProgressSpinner } from "primereact/progressspinner";
 import { Divider } from 'primereact/divider';
 import { Badge } from "primereact/badge";
 import { Dialog } from "primereact/dialog";
-
-import { axiosInstance, axiosInstance2 } from "../../utils/axios";
-import { handleFetchError } from "../../utils/handleFetchError";
-import Show from "../../components/Show";
-import { cn } from "../../utils/cn";
-import { routes } from "../../routes";
-import { useToast } from "../../contexts/Toast";
-import { getBookInfoByRecap } from "../fetch";
-import CustomBreadCrumb from "../../components/CustomBreadCrumb";
-import { RecapVersionProvider, useRecapVersion } from "../../contexts/RecapVersion";
-import Modal from "../../components/modal";
-import { useAuth } from "../../contexts/Auth";
-import TextArea from "../../components/form/TextArea";
-import BookInfo from "../../components/BookInfo";
-import axios from "axios";
 import { Image } from "primereact/image";
+import { Message } from "primereact/message";
 import {
   MediaControlBar,
   MediaController,
@@ -43,6 +30,22 @@ import {
   useMediaSelector
 } from "media-chrome/react/media-store";
 import { MediaPlaybackRateMenu, MediaPlaybackRateMenuButton } from "media-chrome/react/menu";
+import { TbExclamationCircle } from "react-icons/tb";
+
+import { axiosInstance, axiosInstance2 } from "../../utils/axios";
+import { handleFetchError } from "../../utils/handleFetchError";
+import Show from "../../components/Show";
+import { cn } from "../../utils/cn";
+import { routes } from "../../routes";
+import { useToast } from "../../contexts/Toast";
+import { getBookInfoByRecap } from "../fetch";
+import CustomBreadCrumb from "../../components/CustomBreadCrumb";
+import { RecapVersionProvider, useRecapVersion } from "../../contexts/RecapVersion";
+import Modal from "../../components/modal";
+import { useAuth } from "../../contexts/Auth";
+import TextArea from "../../components/form/TextArea";
+import BookInfo from "../../components/BookInfo";
+import { CgArrowsExpandLeft, CgClose } from "react-icons/cg";
 
 const getRecapVersion = async (versionId, request) => {
   try {
@@ -158,7 +161,7 @@ const RecapVersion = () => {
                 Error loading book info!
               </div>
             }>
-              {(book) => <BookInfo book={book}/>}
+              {(book) => <BookInfo book={book} compact={true}/>}
             </Await>
           </Suspense>
 
@@ -528,14 +531,14 @@ const RecapVersionDetails = () => {
             value={recapVersion.versionName || ''}
             onChange={(e) => setRecapVersion((prevData) => ({ ...prevData, versionName: e.target.value }))}
             disabled={loading}
-            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-gray-100"
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-gray-100"
           />
           <button
             type="button"
             disabled={loading}
             onClick={handleUpdateName}
             className="px-4 py-2 text-white border bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300 disabled:opacity-50">
-            Save
+            Save&nbsp;name
           </button>
         </div>
       </div>
@@ -664,12 +667,12 @@ const RecapVersionDetails = () => {
           <Divider/>
           <div>
             <Show when={isKeyIdeasChanged}>
-              <p className="block text-xs text-red-500 mb-2">
-                Key ideas have been changed. Please run generate/upload audio before submitting for review.
+              <p className="block text-sm text-red-500 mb-2">
+                Key ideas have been changed. Please run generate or upload new audio before submitting for review.
               </p>
             </Show>
             <Show when={isKeyIdeasEmpty}>
-              <p className="block text-xs text-red-500 mb-2">Key ideas cannot be empty.</p>
+              <p className="block text-sm text-red-500 mb-2">Key ideas cannot be empty.</p>
             </Show>
             <button
               type="button"
@@ -687,6 +690,7 @@ const RecapVersionDetails = () => {
 
 const ListKeyIdeas = () => {
   const { keyIdeas, addNewKeyIdea, recapVersion } = useRecapVersion();
+  const [ openMessage, setOpenMessage ] = useState(true);
 
   if (!keyIdeas) {
     return null;
@@ -694,6 +698,44 @@ const ListKeyIdeas = () => {
 
   return (
     <div>
+      <Message
+        severity="warn"
+        className="mb-4 !flex !justify-start"
+        content={
+          <div className={cn("flex gap-2 w-full", {
+            "items-center": !openMessage,
+            "items-start": openMessage
+          })}>
+            <div className="w-5">
+              <TbExclamationCircle size={20}/>
+            </div>
+            <div className="flex-1">
+              <p><strong>Lưu ý:</strong></p>
+              <ul className={cn("list-disc", { "hidden": !openMessage, "ml-4": openMessage })}>
+                <li>
+                  Sau khi thêm hoặc chỉnh sửa key ideas, nhấn <strong>&#34;Generate
+                  audio&#34;</strong> hoặc <strong>&#34;Upload audio&#34;</strong> để cập nhật audio và transcript.
+                </li>
+                <li>
+                  Chỉ có thể <strong>&#34;Apply for review&#34;</strong> khi audio và transcript đã được cập nhật nội
+                  dung mới nhất.
+                </li>
+                <li>
+                  Không thể chỉnh sửa nội dung sau khi gửi review, chỉ chỉnh sửa được khi nội dung ở trạng
+                  thái <strong>&#34;Draft&#34;</strong>.
+                </li>
+              </ul>
+            </div>
+            <button
+              onClick={() => setOpenMessage(!openMessage)}
+              className="hover:text-opacity-80 focus:outline-none"
+            >
+              {openMessage ? <CgClose size={20}/> : <CgArrowsExpandLeft size={20}/>}
+            </button>
+          </div>
+        }
+      />
+
       {keyIdeas.map((idea) => (
         <KeyIdeaItem
           key={String(idea.id).toLowerCase()}
