@@ -43,7 +43,7 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, isAuthenticated, reCaptchaTokens }}>
+    <AuthContext.Provider value={{ user, login, logout, isAuthenticated, reCaptchaTokens, setUser }}>
       {children}
     </AuthContext.Provider>
   );

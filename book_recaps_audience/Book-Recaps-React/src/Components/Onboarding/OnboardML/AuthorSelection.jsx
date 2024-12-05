@@ -67,7 +67,7 @@ const AuthorSelection = ({ onNext, onAuthorSelect, selectedCategories }) => {
   const fetchAuthors = async (controller, query = '', page = 1) => {
     setLoading(true);
     const data = await getAuthors(query, selectedCategories, page, controller);
-    console.log(data);
+    // console.log(data);
 
     setAuthors(prevAuthors => page === 1 ? data.items : [ ...prevAuthors, ...data.items ]);
     setLastPage(data.last_page);
@@ -95,7 +95,7 @@ const AuthorSelection = ({ onNext, onAuthorSelect, selectedCategories }) => {
 
   return (
     <div className="step-content">
-      <h2>Select your favorite authors</h2>
+      <h2>Chọn 3 tác giả mà bạn yêu thích hoặc từng nghe tới</h2>
       <TextField
         label="Search Authors"
         variant="outlined"
@@ -119,7 +119,7 @@ const AuthorSelection = ({ onNext, onAuthorSelect, selectedCategories }) => {
       <br/>
       {lastPage > 1 && page < lastPage &&
         <Button variant="contained" color="primary" onClick={handleLoadMore} disabled={loading}>
-          {loading ? 'Loading...' : 'Load More'}
+          {loading ? 'Loading...' : 'Xem thêm'}
         </Button>
       }
     </div>

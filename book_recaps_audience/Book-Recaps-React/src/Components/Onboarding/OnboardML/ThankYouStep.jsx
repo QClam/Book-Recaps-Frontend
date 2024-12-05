@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
-import { useRevalidator } from "react-router-dom";
+import { Link, useRevalidator } from "react-router-dom";
 import { useAuth } from "../../../contexts/Auth";
 import { axiosInstance2 } from "../../../utils/axios";
+import Show from "../../Show";
+import { ProgressSpinner } from "primereact/progressspinner";
+import { routes } from "../../../routes";
 
 const postOnboardingFinish = async (userId, categories, authors, books, controller) => {
   try {
@@ -26,7 +29,6 @@ const postOnboardingFinish = async (userId, categories, authors, books, controll
   }
 };
 
-
 const ThankYouStep = ({ userId = '', categories = [], authors = [], books = [] }) => {
   const { user } = useAuth();
   const [ loading, setLoading ] = useState(true);
@@ -43,7 +45,6 @@ const ThankYouStep = ({ userId = '', categories = [], authors = [], books = [] }
       setSuccess(null);
 
       const data = await postOnboardingFinish(userId, categories, authors, books, controller);
-      revalidator.revalidate(); // Revalidate the data (sessionLoader) after finishing onboarding
 
       setLoading(false);
       setError(data.success ? null : data.message);
@@ -57,19 +58,44 @@ const ThankYouStep = ({ userId = '', categories = [], authors = [], books = [] }
     };
   }, [ userId, categories, authors, books ]);
 
+  // Delay 3 seconds before redirecting to the home page
+  useEffect(() => {
+    if (!success) return;
+
+    const timer = setTimeout(() => {
+      revalidator.revalidate(); // Revalidate the data (sessionLoader) after finishing onboarding
+    }, 5000);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [ success ]);
+
   return (
     <div className="thank-you">
-      <h2>Thank you, {user.name}!</h2>
-      <h2>You're all set!</h2>
-      <p>We will tailor your experience based on your preferences</p>
-      <div className="summary">
-        <h3>Your Choices:</h3>
-        <p><strong>Categories:</strong> {categories.map(c => c.name).join(', ')}</p>
-        <p><strong>Authors:</strong> {authors.map(a => a.name).join(', ')}</p>
-        <p><strong>Books you liked:</strong> {books.map(b => b.title).join(', ')}</p>
+      <h2>Cám ơn bạn, {user.name}!</h2>
+      <h2>Khảo sát hoàn tất!</h2>
+      <p>Chúng tôi sẽ điều chỉnh trải nghiệm của bạn dựa trên kết quả khảo sát</p>
+      <div className="summary text-sm">
+        <h3 className="font-semibold text-lg">Lựa chọn của bạn:</h3>
+        <p><strong>Danh mục sách:</strong> {categories.map(c => c.name).join(', ')}</p>
+        <p><strong>Tác giả:</strong> {authors.map(a => a.name).join(', ')}</p>
+        <p><strong>Những cuốn sách bạn có hứng thú:</strong> {books.map(b => b.title).join(', ')}</p>
       </div>
       {error && <p className="error-message">{error}</p>}
-      {success && <p className="success-message">{success}</p>}
+      <Show when={success}>
+        <p className="success-message">{success}</p>
+        <div className="flex gap-2 items-center justify-center">
+          <div>
+            <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"/>
+          </div>
+          <p>Chuyển hướng về trang chủ sau 5 giây...</p>
+        </div>
+        <div>
+          Hoặc <Link to={routes.index} className="text-indigo-600 underline hover:bg-indigo-700">bấm vào đây</Link> nếu
+          không muốn chờ đợi
+        </div>
+      </Show>
       {loading && <p className="loading-message">Loading...</p>}
     </div>
   );

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Button } from "@mui/material";
 import { axiosInstance2 } from "../../../utils/axios";
+import { LuThumbsDown, LuThumbsUp } from "react-icons/lu";
+import { Image } from "primereact/image";
 
 const getBooks = async (categories, authors, controller) => {
   try {
@@ -76,26 +78,32 @@ const BookSelection = ({ onNext, onBookSelect, selectedAuthors, selectedCategori
 
   return (
     <div className="step-content">
-      <h2>Select the books that catch your interest</h2>
+      <h2>Chọn cuốn sách mà bạn cảm thấy hứng thú</h2>
       <div className="book-selection">
-        <div className="book-img-wrapper">
-          <img
-            src={books[currentBookIndex].coverImage || "/empty-image.jpg"}
-            alt={books[currentBookIndex].title}
-            className="book-image"
-            onError={({ currentTarget }) => {
-              currentTarget.onerror = null; // prevents looping
-              currentTarget.src = "/empty-image.jpg";
-            }}
-          />
+        <div
+          className="flex w-48 flex-col justify-center items-center border rounded-lg shadow p-3 relative bg-white hover:shadow-lg mx-auto gap-3 mb-3">
+          <div className="relative bg-gray-200">
+            <Image
+              src={books[currentBookIndex].coverImage || "/empty-image.jpg"}
+              alt={books[currentBookIndex].title}
+              className="!block overflow-hidden rounded-md shadow-md w-full"
+              imageClassName="aspect-[3/4.5] object-cover w-full bg-white"
+              preview
+            />
+          </div>
+          <div
+            className="text-lg font-bold mb-2 line-clamp-2"
+            title={`${books[currentBookIndex].title} (${books[currentBookIndex].publicationYear})`}
+          >
+            {books[currentBookIndex].title} ({books[currentBookIndex].publicationYear})
+          </div>
         </div>
-        <div className="book-item">{books[currentBookIndex].title}</div>
         <div className="book-buttons">
-          <Button variant="contained" color="primary" onClick={() => handleBookReaction(true)} disabled={loading}>
-            Thumb Up
+          <Button variant="contained" color="error" onClick={() => handleBookReaction(false)} disabled={loading}>
+            <LuThumbsDown size={25}/>
           </Button>
-          <Button variant="contained" color="secondary" onClick={() => handleBookReaction(false)} disabled={loading}>
-            Thumb Down
+          <Button variant="contained" color="primary" onClick={() => handleBookReaction(true)} disabled={loading}>
+            <LuThumbsUp size={25}/>
           </Button>
         </div>
       </div>

@@ -53,12 +53,7 @@ const AuthorBookApi = () => {
             <img
               src={book.coverImage || 'https://via.placeholder.com/150'}
               alt={book.title}
-              onError={({ currentTarget }) => {
-                currentTarget.onerror = null; // Ngăn chặn lặp lại lỗi
-                currentTarget.src = 'https://via.placeholder.com/150'; // Đặt ảnh mặc định
-              }}
             />
-
             <h3>{book.title}</h3>
             <p className="book-author">
               <strong>Author:</strong> {book.authors?.$values?.map(author => author.name).join(', ')}</p>

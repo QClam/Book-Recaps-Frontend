@@ -56,7 +56,7 @@ const CategorySelection = ({ onNext, onCategorySelect }) => {
 
     return (
       <div className="step-content">
-        <h2>Select your favorite categories</h2>
+        <h2>Chọn 3 danh mục sách mà bạn yêu thích</h2>
         <div className="category-selection">
           {loading && <div className="loading-indicator">Loading...</div>}
           {categories.map(category => (

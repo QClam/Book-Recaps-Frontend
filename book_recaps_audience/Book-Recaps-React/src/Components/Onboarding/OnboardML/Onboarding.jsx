@@ -48,14 +48,14 @@ const OnboardingStepper = () => {
               <img src={bookListen} alt="Welcome illustration" className="welcome-illustration"/>
             </div>
 
-            <h2>Welcome, {user.name ? user.name : 'User'}!</h2>
+            <h2 className="mb-2">Xin chào, {user.name ? user.name : 'User'}!</h2>
             <Button
               variant="contained"
               color="primary"
               onClick={handleNext}
               disabled={!isAuthenticated}
             >
-              Start Onboarding
+              Bắt đầu
             </Button>
             {!isAuthenticated && (<p className="login-message">Please login to start onboarding</p>)}
           </div>
@@ -96,10 +96,10 @@ const OnboardingStepper = () => {
     <div className="onboarding-container">
       <div className="relative text-center mb-7">
         <h1 className="text-xl font-bold">
-          Onboarding
+          Cá nhân hóa trải nghiệm
         </h1>
         <p className="max-w-screen-md mx-auto">
-          This will help us get to know you better and provide you with a personalized experience.
+          Điều này sẽ giúp chúng tôi hiểu hơn về bạn và đề xuất nội dung phù hợp với bạn.
         </p>
         <Link
           to={routes.logout}
