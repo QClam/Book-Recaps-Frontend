@@ -99,7 +99,7 @@ const History = () => {
                   <p>·</p>
                   <p className="flex items-center gap-2">
                     <span className="bg-green-100 p-1 rounded"><LuTimer size={15}/></span>
-                    <span>Đã xem {((view.durations || 0) / 60).toFixed(1)} phút</span>
+                    <span>Đã xem {((view.durations || 0) / 60).toFixed(1).replace(/(\.0)$/, '')} phút</span>
                   </p>
                 </div>
 

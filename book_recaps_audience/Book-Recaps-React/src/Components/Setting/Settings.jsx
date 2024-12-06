@@ -9,14 +9,15 @@ import { Dialog } from "primereact/dialog";
 
 function Settings() {
   const navigate = useNavigate(); // Create a navigate function
-  const [ profile, setProfile ] = useState(null); // State to store profile data
+  const { user, setUser } = useAuth();
+  const [ profile, setProfile ] = useState(user.profileData); // State to store profile data
   const [ isModalOpen, setModalOpen ] = useState(false); // Modal state
   const [ updatedProfile, setUpdatedProfile ] = useState({
-    fullName: '',
-    gender: 0,
-    birthDate: '',
-    address: '',
-    bankAccount: '',
+    fullName: user.profileData.fullName || '',
+    gender: user.profileData.gender || 0,
+    birthDate: user.profileData.birthDate || '',
+    address: user.profileData.address || '',
+    bankAccount: user.profileData.bankAccount || '',
   });
 
   const [ phoneUpdateModalOpen, setPhoneUpdateModalOpen ] = useState(false);
@@ -35,7 +36,6 @@ function Settings() {
   const [ imageFile, setImageFile ] = useState(null); // New state to store selected image file
   const [ imageUploadLoading, setImageUploadLoading ] = useState(false);
   const [ subscriptionPackageName, setSubscriptionPackageName ] = useState('');
-  const { user, setUser } = useAuth();
 
   // Handle tab change
   const handleTabChange = (tab) => {
@@ -48,25 +48,15 @@ function Settings() {
       try {
         const data = user.profileData
 
-        if (data) { // Check if data exists
-          setProfile(data); // Set profile directly
-          setUpdatedProfile({
-            fullName: data.fullName || '', // Access properties directly
-            gender: data.gender || 0,
-            birthDate: data.birthDate || '',
-            address: data.address || '',
-            bankAccount: data.bankAccount || '',
-          });
+        if (data) {
           // Fetch subscription package if available
           if (data.subscriptions && data.subscriptions.$values.length > 0) {
             const subscriptionPackageId = data.subscriptions.$values[0].subscriptionPackageId;
             fetchSubscriptionPackage(subscriptionPackageId); // Fetch subscription package name
           }
-
         } else {
           console.error('Profile data is not available');
         }
-
       } catch (error) {
         console.error("Error fetching profile:", error);
       }
@@ -108,16 +98,22 @@ function Settings() {
         fullName: updatedProfile.fullName,
         gender: parseInt(updatedProfile.gender, 10), // Ensure gender is sent as an integer
         birthDate: updatedProfile.birthDate || null, // Ensure correct date format
-        address: updatedProfile.address,
-        bankAccount: updatedProfile.bankAccount,
+        address: updatedProfile.address || null,
+        bankAccount: updatedProfile.bankAccount || null,
       });
 
-      const result = await response.data;
+      const result = response.data;
 
-      console.log('Profile updated successfully!', result);
+      // console.log('Profile updated successfully!', result);
       toast.success('Cập nhật thông tin thành công!');
       setProfile({ ...result.data, imageUrl: profile.imageUrl }); // Update profile in state
       setModalOpen(false); // Close modal
+      setUser({
+        ...user,
+        name: result.data.userName,
+        email: result.data.email,
+        profileData: result.data
+      })
 
     } catch (error) {
       console.error('Error updating profile:', error);
