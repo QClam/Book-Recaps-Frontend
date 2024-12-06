@@ -1486,7 +1486,7 @@ const PlagiarismResults = () => {
                     style={{ width: `${result.similarity_score * 100}%` }}
                   ></div>
                 </div>
-                <p className="font-bold text-right">{Number(result.similarity_score * 100).toFixed(1)}%</p>
+                <p className="font-bold text-right">{Number(result.similarity_score * 100).toFixed(1).replace(/(\.0)$/, '')}%</p>
               </div>
             ))}
           </div>

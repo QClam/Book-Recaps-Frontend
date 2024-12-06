@@ -12,6 +12,7 @@ import {
   useActionData,
   useAsyncValue,
   useLoaderData,
+  useLocation,
   useNavigation,
   useSubmit
 } from "react-router-dom";
@@ -220,9 +221,10 @@ const RecapDetails = () => {
   const { recapVersions, bookInfo, recap } = useLoaderData();
   const actionData = useActionData();
   const navigation = useNavigation()
+  const location = useLocation();
   const { showToast } = useToast();
   const [ dialogVisible, setDialogVisible ] = useState(false);
-  const [ activeTab, setActiveTab ] = useState('versions');
+  const [ activeTab, setActiveTab ] = useState(location.state?.openChart ? 'income' : 'versions');
 
   useEffect(() => {
     if (actionData?.error && actionData.method !== 'put') {
@@ -507,8 +509,9 @@ oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
 const RecapVersionStats = () => {
   const { recap } = useLoaderData();
-  const [ fromDate, setFromDate ] = useState(oneWeekAgo.toISOString().split('T')[0]);
-  const [ toDate, setToDate ] = useState(new Date().toISOString().split('T')[0]);
+  const location = useLocation();
+  const [ fromDate, setFromDate ] = useState((location.state?.fromDate || oneWeekAgo.toISOString()).split('T')[0]);
+  const [ toDate, setToDate ] = useState((location.state?.toDate || new Date().toISOString()).split('T')[0]);
   const [ stats, setStats ] = useState(null);
   const [ loading, setLoading ] = useState(true);
   const [ activeTab, setActiveTab ] = useState('views');
@@ -552,9 +555,9 @@ const RecapVersionStats = () => {
       earning: "url(#colorEarning)"
     },
     name: {
-      views: "Views",
-      watchTime: "Watch time",
-      earning: "Earning"
+      views: "Lựợt xem",
+      watchTime: "Thời gian xem (giây)",
+      earning: "Thu nhập"
     }
   }
 
@@ -639,7 +642,7 @@ const RecapVersionStats = () => {
           onClick={() => setActiveTab('views')}
         >
           <div className="text-2xl font-bold">{stats?.totalViews || 0}</div>
-          <div>Views</div>
+          <div>Lượt xem</div>
         </button>
         <button
           className={cn("flex-1 rounded-md bg-gray-100", {
@@ -647,8 +650,9 @@ const RecapVersionStats = () => {
           })}
           onClick={() => setActiveTab('watchTime')}
         >
-          <div className="text-2xl font-bold">{stats?.totalWatchTime || 0}</div>
-          <div>Watch time (minutes)</div>
+          <div
+            className="text-2xl font-bold">{((stats?.totalWatchTime || 0) / 60).toFixed(1).replace(/(\.0)$/, '')}</div>
+          <div>Thời gian xem (phút)</div>
         </button>
         <button
           className={cn("flex-1 rounded-md bg-gray-100", {
@@ -656,8 +660,8 @@ const RecapVersionStats = () => {
           })}
           onClick={() => setActiveTab('earning')}
         >
-          <div className="text-2xl font-bold">{stats?.totalEarnings || 0}</div>
-          <div>Earning (VNĐ)</div>
+          <div className="text-2xl font-bold">{(stats?.totalEarnings || 0).toLocaleString('vi-VN')}</div>
+          <div>Thu nhập (VNĐ)</div>
         </button>
       </div>
 

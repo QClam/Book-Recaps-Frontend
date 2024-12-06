@@ -183,6 +183,21 @@ const PayoutDetailsImpl = () => {
                 <Link
                   to={generatePath(routes.recapDetails, { recapId: recap.recapId })}
                   className="font-semibold text-indigo-600 hover:underline"
+                  state={(() => {
+                    let fDate = recap.fromDate;
+
+                    if (fDate === "0001-01-01T00:00:00") {
+                      fDate = new Date(recap.toDate);
+                      fDate.setDate(fDate.getDate() - 30);
+                      fDate = fDate.toISOString();
+                    }
+
+                    return {
+                      fromDate: fDate,
+                      toDate: recap.toDate,
+                      openChart: true
+                    }
+                  })()}
                 >
                   {recap.recap.name}
                 </Link>

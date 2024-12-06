@@ -9,6 +9,8 @@ import { axiosInstance } from "../utils/axios";
 import { routes } from "../routes";
 import { handleFetchError } from "../utils/handleFetchError";
 import { TbEye } from "react-icons/tb";
+import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
+import SuspenseAwait from "../components/SuspenseAwait";
 
 const getPayouts = async (request) => {
   try {
@@ -36,7 +38,16 @@ const Payouts = () => {
   return (
     <>
       <CustomBreadCrumb items={[ { label: "Payouts" } ]}/>
+
       <h1 className="mt-4 mb-6 text-xl font-semibold text-gray-900">Lịch sử quyết toán</h1>
+
+      <SuspenseAwait
+        resolve={payouts}
+        errorElement={<div className="alert alert-error">Error loading payout history!</div>}
+        defaultLoadingMessage="Loading payout history..."
+      >
+        <PayoutChart/>
+      </SuspenseAwait>
 
       <Table.Container>
         <Table.Head columns={[
@@ -131,5 +142,45 @@ function PayoutsTable() {
         </Table.Row>
       ))}
     </Table.Body>
+  )
+}
+
+const PayoutChart = () => {
+  const payouts = useAsyncValue();
+
+  const dashboardData = payouts.filter((p) => p.status === "Done").map((item) => ({
+    date: new Date(item.todate).toLocaleDateString().slice(0, 5),
+    earnings: item.totalEarnings
+  })).reverse();
+
+  return (
+    <div className="max-h-[400px] aspect-video p-4 bg-white rounded-lg shadow-md border border-gray-300 mb-6">
+      <ResponsiveContainer>
+        <AreaChart data={dashboardData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+          <defs>
+            <linearGradient id="colorViews" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="5%" stopColor="#82ca9d" stopOpacity={0.8}/>
+              <stop offset="95%" stopColor="#82ca9d" stopOpacity={0}/>
+            </linearGradient>
+          </defs>
+          <XAxis dataKey="date"/>
+          <YAxis/>
+          <CartesianGrid strokeDasharray="3 3"/>
+          <Tooltip/>
+          <Legend verticalAlign="bottom" wrapperStyle={{
+            // bottom: -10,
+            width: '100%',
+          }}/>
+          <Area
+            type="monotone"
+            fillOpacity={1}
+            dataKey="earnings"
+            stroke="#82ca9d"
+            fill="url(#colorViews)"
+            name="Thu nhập quyết toán (VNĐ)"
+          />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
   )
 }

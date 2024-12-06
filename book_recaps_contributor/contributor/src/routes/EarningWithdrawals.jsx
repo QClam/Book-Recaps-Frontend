@@ -263,7 +263,7 @@ const EarningWithdrawals = () => {
                   <Await resolve={withdrawInfo} errorElement={<>Error occurred</>}>
                     {(resolvedWithdrawInfo) => (
                       <div className="text-xl text-indigo-600 font-bold">
-                        {Number(resolvedWithdrawInfo.totalEarning).toLocaleString("vi")} VNĐ
+                        {Number(resolvedWithdrawInfo.totalEarning).toLocaleString("vi-VN")} VNĐ
                       </div>
                     )}
                   </Await>

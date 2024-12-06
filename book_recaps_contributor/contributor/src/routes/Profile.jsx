@@ -135,7 +135,7 @@ const Profile = () => {
       setProfile(data);
       setUpdatedProfile({
         fullName: data.fullName || '',
-        gender: data.gender || '',
+        gender: data.gender || 0,
         birthDate: data.birthDate || '',
         address: data.address || '',
         bankAccount: data.bankAccount || ''
@@ -219,8 +219,21 @@ const Profile = () => {
                   <span>{profile.phoneNumber || "N/A"}</span>
                 </div>
                 <div className="info-item">
+                  <label>Giới tính</label>
+                  <span>{profile.gender === 0 ? "Female" : profile.gender === 1 ? "Male" : "Other"}</span>
+                </div>
+                <div className="info-item">
+                  <label>Ngày sinh</label>
+                  <span>{profile.birthDate ? new Date(profile.birthDate).toLocaleDateString() : "N/A"}</span>
+                </div>
+                <div className="info-item">
                   <label>Thông tin ngân hàng</label>
                   <span>{profile.bankAccount || "N/A"}</span>
+                </div>
+                <div className="info-item">
+                  <label>Hình đại diện</label>
+                  <img src={profile.imageUrl?.replace("Files/Image/jpg/ad.jpg", "") || '/avatar-placeholder.png'}
+                       alt="Profile" className="profile-image"/>
                 </div>
               </div>
             ) : (

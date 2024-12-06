@@ -8,6 +8,7 @@ import { axiosInstance } from "../utils/axios";
 import { handleFetchError } from "../utils/handleFetchError";
 import { getCurrentUserInfo } from "../utils/getCurrentUserInfo";
 import { Image } from "primereact/image";
+import TotalInfoChart from "../components/TotalInfoChart";
 
 const getDashboardData = async (request) => {
   try {
@@ -30,14 +31,14 @@ export const dashboardLoader = async ({ request }) => {
 
 const Dashboard = () => {
   const { data } = useLoaderData();
-  console.log(data.recaps.$values.length);
+  // console.log(data.recaps.$values.length);
 
   return (
     <>
       <CustomBreadCrumb items={[ { label: "Dashboard" } ]}/>
 
       {/* Performance Overview Section */}
-      <div className="grid grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-4 gap-4 mb-6">
         <div className="bg-white p-6 rounded-md shadow-sm border border-gray-300 space-y-4">
           <div className="text-lg font-semibold">Thu nhập chưa quyết toán</div>
           <div className="text-2xl font-bold mb-2">
@@ -90,80 +91,92 @@ const Dashboard = () => {
 
       <div className="flex gap-4 items-start">
         {/* Published Recaps Section */}
-        <div className="flex-1">
-          <div className="relative flex justify-between items-center mb-4">
-            <div className="text-xl font-semibold">Published recaps</div>
-            <Link to={routes.recaps} className="bg-blue-500 text-white font-semibold py-1.5 px-3 rounded-md absolute right-0 bottom-0">
-              All recaps
-            </Link>
-          </div>
-          <div className="space-y-4 bg-white rounded-md border border-gray-300 p-2">
-            <Show when={data.recaps.$values.length > 0} fallback={
-              <div className="text-center text-gray-500">No recaps found</div>
-            }>
-              {data.recaps.$values.slice(0, 4).map((recap, index) => (
-                <Fragment key={index}>
-                  <Show when={index !== 0}>
-                    <Divider/>
-                  </Show>
-                  <Link to={generatePath(routes.recapDetails, {recapId: recap.recapId})} className="flex gap-4 p-5 hover:bg-gray-100">
-                    <div className="w-20 bg-gray-200 rounded-md flex items-center justify-center">
-                      <Image
-                        src={recap.bookImage || "/empty-image.jpg"}
-                        alt={recap.bookName}
-                        className="block overflow-hidden rounded-md shadow-md"
-                        imageClassName="aspect-[3/4] object-cover w-full bg-white"
-                      />
-                    </div>
-                    <div>
-                      <div className="text-lg font-semibold">{recap.recapName}</div>
-                      <div className="text-sm font-semibold">Tóm tắt sách &#34;{recap.bookName}&#34;</div>
-                      <div className="text-sm text-gray-500">Trạng thái: {recap.isPublished ? "Công khai" : "Ẩn"}</div>
-                      <div className="text-sm text-gray-500">Lượt xem: {recap.viewsCount}</div>
-                      <div className="text-sm text-gray-500">Lượt thích: {recap.likesCount}</div>
-                    </div>
-                  </Link>
-                </Fragment>
-              ))}
-            </Show>
-          </div>
+        {/*<div className="flex-1">*/}
+        {/*  <div className="relative flex justify-between items-center mb-4">*/}
+        {/*    <div className="text-xl font-semibold">Published recaps</div>*/}
+        {/*    <Link to={routes.recaps} className="bg-blue-500 text-white font-semibold py-1.5 px-3 rounded-md absolute right-0 bottom-0">*/}
+        {/*      All recaps*/}
+        {/*    </Link>*/}
+        {/*  </div>*/}
+        {/*  <div className="space-y-4 bg-white rounded-md border border-gray-300 p-2">*/}
+        {/*    <Show when={data.recaps.$values.slice(0, 3).length > 0} fallback={*/}
+        {/*      <div className="text-center text-gray-500">No recaps found</div>*/}
+        {/*    }>*/}
+        {/*      {data.recaps.$values.slice(0, 3).map((recap, index) => (*/}
+        {/*        <Fragment key={index}>*/}
+        {/*          <Show when={index !== 0}>*/}
+        {/*            <Divider/>*/}
+        {/*          </Show>*/}
+        {/*          <Link to={generatePath(routes.recapDetails, {recapId: recap.recapId})} className="flex gap-4 p-5 hover:bg-gray-100">*/}
+        {/*            <div className="w-20 bg-gray-200 rounded-md flex items-center justify-center">*/}
+        {/*              <Image*/}
+        {/*                src={recap.bookImage || "/empty-image.jpg"}*/}
+        {/*                alt={recap.bookName}*/}
+        {/*                className="block overflow-hidden rounded-md shadow-md"*/}
+        {/*                imageClassName="aspect-[3/4] object-cover w-full bg-white"*/}
+        {/*              />*/}
+        {/*            </div>*/}
+        {/*            <div>*/}
+        {/*              <div className="text-lg font-semibold">{recap.recapName}</div>*/}
+        {/*              <div className="text-sm font-semibold">Tóm tắt sách &#34;{recap.bookName}&#34;</div>*/}
+        {/*              <div className="text-sm text-gray-500">Trạng thái: {recap.isPublished ? "Công khai" : "Ẩn"}</div>*/}
+        {/*              <div className="text-sm text-gray-500">Lượt xem: {recap.viewsCount}</div>*/}
+        {/*              <div className="text-sm text-gray-500">Lượt thích: {recap.likesCount}</div>*/}
+        {/*            </div>*/}
+        {/*          </Link>*/}
+        {/*        </Fragment>*/}
+        {/*      ))}*/}
+        {/*    </Show>*/}
+        {/*  </div>*/}
+        {/*</div>*/}
+
+        <div className="flex-[2]">
+          <TotalInfoChart/>
         </div>
 
         {/* Most Views in Last Month Section */}
         <div className="flex-1">
-          <div className="text-xl font-semibold mb-4">Most views in last month</div>
           <div className="space-y-4 bg-white rounded-md border border-gray-300 p-2">
-            <Show when={data.mostViewedRecaps.$values.slice(0, 4).length > 0} fallback={
+            <div className="text-xl font-semibold mt-2 mx-2">Most views in last month</div>
+            <Divider/>
+            <Show when={data.mostViewedRecaps.$values.slice(0, 3).length > 0} fallback={
               <div className="text-center text-gray-500">No recaps found</div>
             }>
-              {data.mostViewedRecaps.$values.map((recap, index) => (
-                <Fragment key={index}>
-                  <Show when={index !== 0}>
-                    <Divider/>
-                  </Show>
-                  <Link to={generatePath(routes.recapDetails, {recapId: recap.recapId})} className="flex gap-4 p-5 hover:bg-gray-100">
-                    <div className="w-20 bg-gray-200 rounded-md flex items-center justify-center">
-                      <Image
-                        src={recap.bookImage || "/empty-image.jpg"}
-                        alt={recap.bookName}
-                        className="block overflow-hidden rounded-md shadow-md"
-                        imageClassName="aspect-[3/4] object-cover w-full bg-white"
-                      />
-                    </div>
-                    <div>
-                      <div className="text-lg font-semibold">{recap.recapName}</div>
-                      <div className="text-sm font-semibold">Tóm tắt sách &#34;{recap.bookName}&#34;</div>
-                      <div className="text-sm text-gray-500">Trạng thái: {recap.isPublished ? "Công khai" : "Ẩn"}</div>
-                      <div className="text-sm text-gray-500">Lượt xem: {recap.viewsCount}</div>
-                      <div className="text-sm text-gray-500">Lượt thích: {recap.likesCount}</div>
-                    </div>
-                  </Link>
-                </Fragment>
-              ))}
+              <div>
+                {data.mostViewedRecaps.$values.slice(0, 3).map((recap, index) => (
+                  <Fragment key={index}>
+                    <Show when={index !== 0}>
+                      <Divider/>
+                    </Show>
+                    <Link to={generatePath(routes.recapDetails, { recapId: recap.recapId })}
+                          className="flex gap-4 p-5 hover:bg-gray-100">
+                      <div className="w-20 bg-gray-200 rounded-md flex items-center justify-center">
+                        <Image
+                          src={recap.bookImage || "/empty-image.jpg"}
+                          alt={recap.bookName}
+                          className="block overflow-hidden rounded-md shadow-md"
+                          imageClassName="aspect-[3/4] object-cover w-full bg-white"
+                        />
+                      </div>
+                      <div>
+                        <div className="text-lg font-semibold">{recap.recapName}</div>
+                        <div className="text-sm font-semibold">Tên sách &#34;{recap.bookName}&#34;</div>
+                        <div className="text-sm text-gray-700">
+                          Trạng thái: {recap.isPublished ? "Công khai" : "Ẩn"}
+                        </div>
+                        <div className="text-sm text-gray-700">Tổng lượt xem: <strong>{recap.viewsCount}</strong></div>
+                        <div className="text-sm text-gray-700">Tổng lượt thích: <strong>{recap.likesCount}</strong>
+                        </div>
+                      </div>
+                    </Link>
+                  </Fragment>
+                ))}
+              </div>
             </Show>
           </div>
         </div>
       </div>
+
     </>
   );
 }

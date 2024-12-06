@@ -62,7 +62,8 @@ function Login() {
             <div className="flex items-center justify-between">
               <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">Password</label>
               <div className="text-sm">
-                <a href="#" className="font-semibold text-indigo-600 hover:text-indigo-500">Forgot password?</a>
+                <a href={import.meta.env.VITE_AUDIENCE_ENDPOINT + "/forget-password"}
+                   className="font-semibold text-indigo-600 hover:text-indigo-500">Forgot password?</a>
               </div>
             </div>
             <div className="mt-2">
@@ -82,7 +83,8 @@ function Login() {
         </Form>
         <p className="mt-10 text-center text-sm text-gray-500">
           Not a Contributor?&nbsp;
-          <a href="#" className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Become a Contributor</a>
+          <a href={import.meta.env.VITE_AUDIENCE_ENDPOINT + "/become-contributor"}
+             className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500">Become a Contributor</a>
         </p>
       </div>
     </div>
