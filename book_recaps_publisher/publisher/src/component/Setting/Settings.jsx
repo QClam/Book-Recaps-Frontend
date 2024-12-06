@@ -637,7 +637,7 @@ function Settings() {
                         <button onClick={handleUpdateImage} disabled={imageUploadLoading}>
                             {imageUploadLoading ? 'Uploading...' : 'Upload'}
                         </button>
-                        <button className="update-button" onClick={() => setImageUpdateModalOpen(false)}>Cancel</button>
+                        <button className="update-button" onClick={() => setImageUpdateModalOpen(false)}>Hủy</button>
                     </div>
                 </div>
             )}

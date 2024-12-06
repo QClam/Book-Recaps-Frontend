@@ -38,7 +38,7 @@ export const SidebarItems = [
     {
         title: "Doanh thu ",
        
-        link: "/publisher",
+        link: "/publisher-payout",
     },
 
     // {

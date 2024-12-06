@@ -1,4 +1,4 @@
-.book-detail-dt {
+.book-detailv2 {
     font-family: 'Arial', sans-serif;
     max-width: 900px;
     margin: 0 auto;
@@ -9,34 +9,36 @@
     margin-left: 400px;
   }
   
-  .book-detail h1 {
+  .book-detailv2 h1 {
     color: #2c3e50;
     font-size: 2em;
     text-align: center;
   }
   
-  .book-detail p {
+  .book-detailv2 p {
     font-size: 1.1em;
     line-height: 1.6;
     margin: 10px 0;
   }
   
-  .book-detail strong {
+  .book-detailv2 strong {
     color: #2980b9;
   }
   
   .book-image {
     text-align: center;
     margin-bottom: 20px;
+    margin-top: 100px;
   }
   
   .book-image img {
     max-width: 200px;
     border-radius: 8px;
+    
   }
   
   
-  .book-detail .error-message {
+  .book-detailv2 .error-message {
     color: red;
     font-weight: bold;
     font-size: 1.2em;
@@ -52,7 +54,7 @@
   
   
   
-  .book-detail div {
+  .book-detailv2 div {
     margin-bottom: 15px;
   }
 

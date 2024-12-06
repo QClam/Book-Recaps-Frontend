@@ -155,11 +155,12 @@ const FetchPublisherData = () => {
                                 <th>Nhà Xuất Bản</th> 
                                 {/* <th>Tỷ Lệ Chia Lợi Nhuận</th> */}
                                 {/* <th>Hình Ảnh</th> */}
-                                <th>Mô Tả</th>
+                                
                                 <th>Thu nhập</th>
                                 <th>Trạng Thái</th>
                                 <th>Từ Ngày</th>
                                 <th>Đến Ngày</th>
+                                <th>Nội dung</th>
                                 <th>Hành Động</th>
                             </tr>
                         </thead>
@@ -178,17 +179,22 @@ const FetchPublisherData = () => {
                                     />
                                     </td> */}
     
-                                    <td>{payout.description}</td>
+                                   
                                     <td className="earnings">
-                                        {new Intl.NumberFormat('vi-VN').format(payout.totalEarnings || 0)} <span className="currency-symbol">₫</span>
+                                        {new Intl.NumberFormat('vi-VN').format(payout.totalEarnings || 0)} <span className="currency-symbol">đ</span>
                                     </td>
 
                                     <td>{payout.status}</td>
                                     <td>{new Date(payout.fromDate).toLocaleDateString()}</td>
                                     <td>{new Date(payout.toDate).toLocaleDateString()}</td>
-                                    <td>
+                                    <td>{payout.description}</td>
+                                    {/* <td className="chitiet">
                                         <button onClick={() => handleDetailClick(payout.payoutId)}>Chi Tiết</button>
-                                    </td>                                   
+                                    </td>      */}
+                                    <td className="chitiet"> 
+                                        <button className="small-button" onClick={() => handleDetailClick(payout.payoutId)}>Chi Tiết</button>
+                                    </td>
+                              
                                 </tr>
                                 
                             ))}

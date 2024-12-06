@@ -5,51 +5,212 @@
     font-size: 20px;
 }
 
+/* Tổng thể card bao quanh */
+.card-container {
+    width: 90%;
+    max-width: 1000px;
+    margin: 20px auto; /* Căn giữa card */
+    border: 2px solid #8D82E0; /* Viền xanh nhạt */
+    border-radius: 12px; /* Bo góc tổng thể */
+    overflow: hidden; /* Để bo góc cũng áp dụng cho tiêu đề */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Bóng đổ nhẹ */
+    background-color: #fff; /* Nền trắng */
+}
+
+/* Phần tiêu đề card */
+.card-header {
+    background: linear-gradient(90deg, #8D82E0, #b9b6f3); /* Màu gradient cho tiêu đề */
+    color: white; /* Chữ trắng */
+    padding: 15px;
+    text-align: center; /* Căn giữa chữ */
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* Nội dung bên trong card */
 .payout-info {
-    display: flex;
+    display: flex; /* Chia thành 2 cột */
     justify-content: space-between;
-    margin-bottom: 20px;
+    gap: 20px;
+    padding: 20px;
 }
 
-.payout-info .left,
+/* Bố cục bên trái */
+.payout-info .left {
+    flex: 1; /* Cột chiếm 50% */
+}
+
+/* Bố cục bên phải */
 .payout-info .right {
-    width: 45%; /* Each side takes up 45% of the container */
+    flex: 1; /* Cột chiếm 50% */
 }
 
-.payout-info .left p,
-.payout-info .right p {
-    margin: 5px 0;
+/* Văn bản */
+.payout-info p {
+    font-size: 16px;
+    color: #555; /* Màu chữ trung tính */
+    margin: 10px 0;
+}
+
+/* Thông tin trạng thái */
+.payout-info .paid {
+    color: green; /* Màu xanh cho "Đã Thanh Toán" */
+    font-weight: bold;
+}
+
+.payout-info .unpaid {
+    color: red; /* Màu đỏ cho "Chưa Thanh Toán" */
+    font-weight: bold;
+}
+
+/* Hình ảnh nhỏ */
+/* Hình ảnh nhỏ */
+.small-image {
+    max-width: 100px;
+    border-radius: 8px;
+    margin-top: 10px;
+    cursor: pointer; /* Thêm hiệu ứng con trỏ */
+    transition: transform 0.2s ease;
+}
+
+.small-image:hover {
+    transform: scale(1.1); /* Phóng to nhẹ khi rê chuột */
+}
+
+/* Overlay che toàn màn hình */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* Màu nền tối mờ */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000; /* Đảm bảo nằm trên các phần tử khác */
+}
+
+/* Nội dung modal */
+.modal-content {
+    max-width: 250px; /* Đặt giới hạn kích thước */
+    max-height: 100%; /* Đặt giới hạn chiều cao */
+    overflow: hidden; /* Đảm bảo hình không bị vượt ra ngoài */
+    position: relative;
+}
+
+.modal-content img {
+    width: 100%; /* Hình ảnh chiếm toàn bộ modal */
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5); /* Bóng đổ cho hình ảnh */
+}
+
+/* Hiệu ứng đóng modal khi bấm vào overlay */
+.modal-overlay:hover {
+    cursor: pointer;
+}
+
+
+/* Đáp ứng màn hình nhỏ */
+@media (max-width: 768px) {
+    .payout-info {
+        flex-direction: column; /* Chuyển sang hiển thị dọc */
+    }
+
+    .payout-info .left,
+    .payout-info .right {
+        flex: unset;
+    }
+}
+
+.book-earnings {
+    margin: 20px auto;
+    padding: 20px;
+    background-color: #f9f9f9; /* Màu nền nhạt */
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 1200px; /* Giới hạn chiều rộng */
+    font-family: 'Arial', sans-serif;
+}
+
+.book-earnings h3 {
+    text-align: center;
+    color: #333;
+    font-size: 24px;
+    margin-bottom: 20px;
 }
 
 .book-earnings table {
     width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
+    overflow-x: auto;
 }
 
-.book-earnings th,
-.book-earnings td {
-    border: 1px solid #ddd;
-    padding: 8px;
+.book-earnings table th,
+.book-earnings table td {
+    padding: 12px 15px;
     text-align: left;
+    font-size: 16px;
+    color: #555;
 }
 
-.book-earnings th {
-    background-color: #f4f4f4;
+.book-earnings table th {
+    background-color: #8D82E0; /* Màu nền tiêu đề */
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
 }
 
-.book-earnings tr:nth-child(even) {
-    background-color: #f9f9f9;
+.book-earnings table tbody tr:nth-child(even) {
+    background-color: #f2f2f2; /* Màu nền hàng chẵn */
 }
 
-.book-earnings tr:hover {
-    background-color: #e2e2e2;
+// .book-earnings table tbody tr:hover {
+//     background-color: #ffe5d4; /* Màu nền khi hover */
+//     cursor: pointer;
+// }
+
+.book-earnings table img {
+    border-radius: 5px;
+    width: 60px;
+    height: auto;
+    object-fit: cover;
 }
+
+.book-earnings table td img:hover {
+    transform: scale(1.2); /* Phóng to khi hover vào ảnh */
+    transition: transform 0.3s ease;
+}
+
+// .currency-symbol {
+//     color: #8D82E0; /* Màu tím nhấn */
+//     font-weight: bold;
+// }
+
+.book-earnings table td {
+    vertical-align: middle;
+    border-bottom: 1px solid #ddd;
+}
+
+.book-earnings table th, 
+.book-earnings table td:first-child {
+    border-radius: 5px;
+}
+
+.book-earnings table thead tr th:first-child {
+    border-top-left-radius: 10px;
+}
+
+.book-earnings table thead tr th:last-child {
+    border-top-right-radius: 10px;
+}
+
 
 .currency-symbol {
-    font-size: 1.2em; /* Tăng kích thước */
+    font-size: 1.4em; /* Tăng kích thước */
     //vertical-align: middle;
-    margin-top: -50px;
+    margin-top: -40px;
   }
   
   .small-image {

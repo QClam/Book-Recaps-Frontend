@@ -232,7 +232,7 @@ useEffect(() => {
              <tr key={index} onDoubleClick={() => handleBookInfoClick(book.id)} style={{ cursor: 'pointer' }}>
 
               <td className="title">{(currentPage - 1) * booksPerPage + index + 1}</td>
-              <td> <img src={book.coverImage ? book.coverImage : emptyImage} width="50" height="95" /></td>
+              <td> <img src={book.coverImage ? book.coverImage : emptyImage} width="70" height="95" /></td>
       
       <td className="title">{book.title || 'No Title'}</td>
       
