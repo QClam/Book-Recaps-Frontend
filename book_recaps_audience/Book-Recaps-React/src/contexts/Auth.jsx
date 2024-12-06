@@ -9,7 +9,7 @@ const AuthContext = createContext(null);
 export function AuthProvider({ children }) {
   const loaderData = useLoaderData();
   const location = useLocation();
-  const [ user, setUser ] = useState(loaderData); // { id, email, name, isOnboarded, profileData }
+  const [ user, setUser ] = useState(loaderData); // { id, email, name, role, isOnboarded, profileData }
   const [ reCaptchaTokens ] = useState({ loginToken: "...", signupToken: "..." });
   const isAuthenticated = !!user;
 

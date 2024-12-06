@@ -1,8 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import './ContributorTerm.scss';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { axiosInstance } from "../../../utils/axios";
+import { useAuth } from "../../../contexts/Auth";
+import { Navigate } from "react-router-dom";
+import { routes } from "../../../routes";
 
 const ContributorTerm = () => {
   const [ formData, setFormData ] = useState({
@@ -12,10 +15,16 @@ const ContributorTerm = () => {
     email: '',
     signature: ''
   });
-  const [ error, setError ] = useState(null);
-
-  // Get tokens from localStorage
   const [ submitted, setSubmitted ] = useState(false);
+  const [ error, setError ] = useState(null);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (user.role === 'Contributor') {
+      toast.warning("Bạn đã là Contributor rồi.");
+    }
+  }, [ user ]);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prevData) => ({
@@ -37,6 +46,10 @@ const ContributorTerm = () => {
       toast.error("Bạn đã trở thành Contributor rồi.", { position: "top-right" });
     }
   };
+
+  if (user.role === 'Contributor') {
+    return <Navigate to={routes.index} replace={true}/>;
+  }
 
   return (
     <div className="container mx-auto max-w-screen-xl p-5">

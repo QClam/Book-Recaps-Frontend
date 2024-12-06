@@ -13,9 +13,10 @@ function Settings() {
   const [ isModalOpen, setModalOpen ] = useState(false); // Modal state
   const [ updatedProfile, setUpdatedProfile ] = useState({
     fullName: '',
-    gender: '',
+    gender: 0,
     birthDate: '',
     address: '',
+    bankAccount: '',
   });
 
   const [ phoneUpdateModalOpen, setPhoneUpdateModalOpen ] = useState(false);
@@ -51,9 +52,10 @@ function Settings() {
           setProfile(data); // Set profile directly
           setUpdatedProfile({
             fullName: data.fullName || '', // Access properties directly
-            gender: data.gender || '',
+            gender: data.gender || 0,
             birthDate: data.birthDate || '',
             address: data.address || '',
+            bankAccount: data.bankAccount || '',
           });
           // Fetch subscription package if available
           if (data.subscriptions && data.subscriptions.$values.length > 0) {
@@ -107,6 +109,7 @@ function Settings() {
         gender: parseInt(updatedProfile.gender, 10), // Ensure gender is sent as an integer
         birthDate: updatedProfile.birthDate || null, // Ensure correct date format
         address: updatedProfile.address,
+        bankAccount: updatedProfile.bankAccount,
       });
 
       const result = await response.data;
@@ -162,9 +165,10 @@ function Settings() {
       setProfile(data);
       setUpdatedProfile({
         fullName: data.fullName || '',
-        gender: data.gender || '',
+        gender: data.gender || 0,
         birthDate: data.birthDate || '',
         address: data.address || '',
+        bankAccount: data.bankAccount || ''
       });
     } catch (error) {
       console.error("Error fetching profile:", error);
@@ -300,6 +304,10 @@ function Settings() {
                   <span>{subscriptionPackageName || "No subscription"}</span> {/* Display subscription package name */}
                 </div>
                 <div className="info-item">
+                  <label>Thông tin ngân hàng</label>
+                  <span>{profile.bankAccount || "N/A"}</span>
+                </div>
+                <div className="info-item">
                   <label>Hình đại diện</label>
                   <img src={profile.imageUrl?.replace("Files/Image/jpg/ad.jpg", "") || '/avatar-placeholder.png'}
                        alt="Profile" className="profile-image"/>
@@ -379,6 +387,16 @@ function Settings() {
                         type="text"
                         name="address"
                         value={updatedProfile.address}
+                        onChange={handleInputChange}
+                        className="!mb-0"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="!font-normal">Thông tin ngân hàng</label>
+                      <input
+                        type="text"
+                        name="bankAccount"
+                        value={updatedProfile.bankAccount}
                         onChange={handleInputChange}
                         className="!mb-0"
                       />

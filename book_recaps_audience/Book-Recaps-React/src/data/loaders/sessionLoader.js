@@ -31,6 +31,7 @@ export const sessionLoader = async () => {
       email: decoded.email,
       name: decoded[import.meta.env.VITE_CLAIMS_NAME],
       id: userId,
+      role: isRoleMatched(decoded, "Contributor") ? "Contributor" : "Customer",
       isOnboarded,
       profileData,
     }
