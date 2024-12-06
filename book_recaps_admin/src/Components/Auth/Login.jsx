@@ -2,7 +2,9 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { useNavigate } from "react-router-dom";
+import { jwtDecode } from "jwt-decode";
 
+import { isRoleMatched } from "../../utils/matchRole";
 import "./Login.scss";
 
 function Login() {
@@ -35,11 +37,17 @@ function Login() {
       );
 
       const { accessToken, refreshToken } = response.data.message.token;
+      const decoded = jwtDecode(accessToken);
       localStorage.setItem("access_token", accessToken);
       localStorage.setItem("refresh_token", refreshToken);
       
-      navigate("/users")
-      console.log("Login successfully", response.data);
+      if (isRoleMatched(decoded, "SuperAdmin")) {
+        navigate("/users")
+        console.log("Login successfully", response.data);
+      } else {
+        setError("Hãy dùng tài khoản của Admin để đăng nhập");
+        console.error("Role mismatch: Access denied");
+      }
     } catch (error) {
       setError("Đăng nhập thất bại", error);
     }

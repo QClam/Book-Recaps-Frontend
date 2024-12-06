@@ -34,7 +34,7 @@ function RecapDetail() {
             const toDate = dayjs(range[1]).format("YYYY-MM-DD");
 
             setDateRange([fromDate, toDate]);
-            await getBookData(fromDate, toDate);
+            // await getRecapData(fromDate, toDate);
         } else {
             console.error("Invalid date range");
         }

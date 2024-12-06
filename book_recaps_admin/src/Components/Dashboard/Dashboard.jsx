@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { DateRangePicker } from 'rsuite';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
-import { Typography, Box } from '@mui/material';
+import { Typography, Box, Card, CardContent } from '@mui/material';
 import { BarChart, LocalOffer, Article, RemoveRedEye, AttachMoney } from '@mui/icons-material';
 import dayjs from 'dayjs';
+import Chart from 'chart.js/auto';
 
 import './Dashboard.scss';
 import api from '../Auth/AxiosInterceptors';
@@ -14,9 +15,19 @@ function Dashboard() {
     const today = dayjs();
     const oneWeekAgo = today.subtract(7, 'day');
     const [dateRange, setDateRange] = useState([oneWeekAgo.toDate(), today.toDate()]);
-    
+
     const [dashboardData, setDashboardData] = useState([]);
     const [premiumPackage, setPremiumPackage] = useState([]);
+
+    const chartRef = useRef(null);
+    const chartInstanceRef = useRef(null);
+    const [packageData, setPackageData] = useState({
+        dailyStats: [],
+    });
+    const [viewData, setViewData] = useState({
+        dailyStats: [],
+    });
+    
 
     const fetchDashboardData = async (fromDate, toDate) => {
         try {
@@ -32,11 +43,115 @@ function Dashboard() {
         }
     };
 
+    const updateChart = (dailyStatsPackage, dailyStatsView) => {
+        if (!chartInstanceRef.current || !dailyStatsPackage || !dailyStatsView) return;
+    
+        // Tạo ánh xạ dữ liệu từ các dailyStats
+        const packageMap = new Map(dailyStatsPackage.map(stat => [dayjs(stat.date).format('DD-MM-YYYY'), stat.earning]));
+        const viewMap = new Map(dailyStatsView.map(stat => [dayjs(stat.date).format('DD-MM-YYYY'), stat.revenueEarning]));
+    
+        // Hợp nhất và sắp xếp các nhãn
+        const allLabels = Array.from(new Set([...packageMap.keys(), ...viewMap.keys()])).sort((a, b) =>
+            dayjs(a, 'DD-MM-YYYY').unix() - dayjs(b, 'DD-MM-YYYY').unix()
+        );
+    
+        // Xây dựng dữ liệu cho từng dataset
+        const packageData = allLabels.map(label => packageMap.get(label) || 0);
+        const viewData = allLabels.map(label => viewMap.get(label) || 0);
+    
+        // Cập nhật biểu đồ
+        chartInstanceRef.current.data.labels = allLabels;
+        chartInstanceRef.current.data.datasets[0].data = viewData;
+        chartInstanceRef.current.data.datasets[1].data = packageData;
+    
+        chartInstanceRef.current.update();
+    };    
+
+    const fetchPackageSale = async (fromDate, toDate) => {
+        try {
+            const response = await api.get('api/dashboard/package-sales', {
+                params: { fromDate, toDate },
+            });
+            const dailyStats = response.data.data.dailyStats.$values || [];
+            console.log("Package-Sale: ", dailyStats);
+            setPackageData({
+                dailyStats
+            });
+            updateChart(dailyStats, viewData.dailyStats); // Cập nhật biểu đồ với dữ liệu Package và View
+        } catch (error) {
+            console.error("Error Fetching Package Sale", error);
+        }
+    };
+    
+    const fetchViewRevenue = async (fromDate, toDate) => {
+        try {
+            const response = await api.get('api/dashboard/view-chart', {
+                params: { fromDate, toDate },
+            });
+            const dailyStats = response.data.data.dailyStats.$values || [];
+            console.log("View-Revenue: ", dailyStats);
+            setViewData({
+                dailyStats
+            });
+            updateChart(packageData.dailyStats, dailyStats); // Cập nhật biểu đồ với dữ liệu View và Package
+        } catch (error) {
+            console.error("Error Fetching Package Sale", error);
+        }
+    };    
+
+    useEffect(() => {
+        if (chartRef.current) {
+            const ctx = chartRef.current.getContext('2d');
+
+            chartInstanceRef.current = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [], // Sẽ được cập nhật sau
+                    datasets: [
+                        {
+                            label: 'Lượt xem',
+                            data: [],
+                            borderColor: 'rgb(75, 192, 192)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            tension: 0.2
+                        },
+                        {
+                            label: 'Gói Premium',
+                            data: [],
+                            borderColor: 'rgb(255, 99, 132)',
+                            backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                            tension: 0.2
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { position: 'top' },
+                        title: { display: true, text: 'Doanh thu theo thời gian (Lượt xem và gói Premium)' },
+                    },
+                    scales: {
+                        y: { beginAtZero: true },
+                    },
+                },
+            });
+        }
+
+        // Cleanup khi component unmount
+        return () => {
+            if (chartInstanceRef.current) {
+                chartInstanceRef.current.destroy();
+            }
+        };
+    }, []);
+
     useEffect(() => {
         const fromDate = dayjs(dateRange[0]).format("YYYY-MM-DD");
         const toDate = dayjs(dateRange[1]).format("YYYY-MM-DD");
         fetchDashboardData(fromDate, toDate);
-    }, []); // Chỉ chạy khi component được render lần đầu
+        fetchPackageSale(fromDate, toDate);
+        fetchViewRevenue(fromDate, toDate);
+    }, [dateRange]); // Cập nhật khi dateRange thay đổi
 
     const handleDateChange = async (range) => {
         setDateRange(range);
@@ -47,6 +162,8 @@ function Dashboard() {
             console.log('From Date:', fromDate, 'To Date:', toDate);
 
             fetchDashboardData(fromDate, toDate);
+            fetchPackageSale(fromDate, toDate);
+            fetchViewRevenue(fromDate, toDate);
         }
     };
 
@@ -150,6 +267,11 @@ function Dashboard() {
                             {renderDataCards(platform)}
                         </Grid>
                     </Box>
+                    <Card>
+                        <CardContent>
+                            <canvas ref={chartRef}></canvas>
+                        </CardContent>
+                    </Card>
                 </div>
             </div>
         </div>
