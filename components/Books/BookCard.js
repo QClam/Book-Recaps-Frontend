@@ -34,9 +34,9 @@ export default BookCard;
 const styles = StyleSheet.create({
     card: {
         width: '100%',
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 5,
+        // borderWidth: 1,
+        // borderColor: '#ccc',
+        // borderRadius: 5,
         padding: 10,
         backgroundColor: '#fff',
         marginVertical: 5,
