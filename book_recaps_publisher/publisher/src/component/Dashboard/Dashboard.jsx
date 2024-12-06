@@ -94,21 +94,21 @@ const Dashboard = ( ) => {
         labels: dailyStats.map((item) => item.date.split('T')[0]),
         datasets: [
           {
-            label: 'Views',
+            label: 'Lượt xem',
             data: dailyStats.map((item) => item.views),
             borderColor: 'rgba(75,192,192,1)',
             backgroundColor: 'rgba(75,192,192,0.2)',
             tension: 0.4,
           },
           {
-            label: 'Watch Time (seconds )',
+            label: 'Thời lượng xem (giây )',
             data: dailyStats.map((item) => item.watchTime),
             borderColor: 'rgba(153,102,255,1)',
             backgroundColor: 'rgba(153,102,255,0.2)',
             tension: 0.4,
           },
           {
-            label: 'Earnings (VNĐ)',
+            label: 'Doanh thu (VNĐ)',
             data: dailyStats.map((item) => item.earning),
             borderColor: 'rgba(255,159,64,1)',
             backgroundColor: 'rgba(255,159,64,0.2)',
@@ -157,7 +157,7 @@ const Dashboard = ( ) => {
 
   
   return (
-    <div className="dashboard">
+    <div className="dashboarddr">
       <div className="performance-overview">
   <div className="overview-card">
     <h3>Thu nhập chưa quyết toán</h3>
@@ -249,7 +249,7 @@ const Dashboard = ( ) => {
           </tbody>
         </table>
       </div>
-
+      <div className="chartdb">
       <div className="date-filter">
         <label htmlFor="fromDate">Từ ngày:</label>
         <input
@@ -280,13 +280,14 @@ const Dashboard = ( ) => {
               },
               scales: {
                 x: { title: { display: true, text: 'Date' } },
-                y: { title: { display: true, text: 'Values' } },
+                y: { title: { display: true, text: 'Giá trị' } },
               },
             }}
           />
         ) : (
           <p>Chọn ngày để xem dữ liệu.</p>
         )}
+      </div>
       </div>
 
     </div>

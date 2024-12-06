@@ -78,7 +78,7 @@ const App = () => {
             {/* <Route path="/feedback" element={<Feedback/>} /> */}
             {/* <Route path="/help" element={<Report/>} /> */}
             <Route path="/settings" element={<Settings/>} />
-            <Route path="/publisher" element={<FetchPublisherData/>} />
+            <Route path="/publisher-payout" element={<FetchPublisherData/>} />
             <Route path="/publisher-payout-detail/:id" element={<PublisherPayout />} /> 
             {/* <Route path="/book-detail-tt/:id" element={<BookDetailbook />} /> */}
             <Route path="/book-dashboard/:bookId" element={<DashboardDetail />} />

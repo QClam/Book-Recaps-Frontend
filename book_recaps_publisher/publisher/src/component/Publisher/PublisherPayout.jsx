@@ -10,6 +10,7 @@ const PublisherPayout = () => {
     const [error, setError] = useState(null);
     const [detailedBooks, setDetailedBooks] = useState([]);
     const navigate = useNavigate(); // Initialize navigate hook
+    const [isModalOpen, setModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchPayoutDetail = async () => {
@@ -73,7 +74,10 @@ const PublisherPayout = () => {
             {error && <p style={{ color: 'red' }}>Lỗi: {error}</p>}
             {payoutDetail ? (
                 <div>
-                    <h2>Chi Tiết Thanh Toán</h2>
+                    <div className="card-container">
+
+                    <div className="card-header">Chi Tiết Thanh Toán</div>
+
                     <div className="payout-info">
                         <div className="left">
                             <p><strong>Tên Nhà Xuất Bản:</strong> {payoutDetail?.data?.publisher?.publisherName}</p>
@@ -81,11 +85,12 @@ const PublisherPayout = () => {
                             <p><strong>Số Tài Khoản Ngân Hàng:</strong> {payoutDetail?.data?.publisher?.bankAccount}</p>
                             <p><strong>Mô Tả:</strong> {payoutDetail?.data?.description || "Không có mô tả"}</p>
                             <p>
-                                <strong>Hình Ảnh:</strong>  
+                                <strong>Minh chứng thanh toán:</strong>  
                                 <img 
                                     src={payoutDetail?.data?.imageURL || "Không có hình ảnh"} 
                                     className="small-image" 
                                     alt="Chi Tiết Thanh Toán"
+                                    onClick={() => setModalOpen(true)} 
                                 />
                             </p>
                         </div>
@@ -104,6 +109,19 @@ const PublisherPayout = () => {
                             </p>
 
                         </div>
+                    </div>
+
+                    {/* Modal hiển thị hình ảnh */}
+            {isModalOpen && (
+                <div className="modal-overlay" onClick={() => setModalOpen(false)}>
+                    <div className="modal-content">
+                        <img
+                            src={payoutDetail?.data?.imageURL || "Không có hình ảnh"}
+                            alt="Chi Tiết Thanh Toán"
+                        />
+                    </div>
+                </div>
+            )}
                     </div>
                      {/* Chart showing the earnings of the books */}
           <AllBookValue bookEarnings={detailedBooks} />
