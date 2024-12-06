@@ -44,13 +44,15 @@ const styles = StyleSheet.create({
         elevation: 3, // Hiệu ứng bóng trên Android
         borderRadius: 10,
         backgroundColor: 'transparent',
+        
     },
     card: {
         borderRadius: 10,
         backgroundColor: '#fff',
         overflow: 'hidden',
-        height: 415, // Chiều cao cố định
+        height: 430, // Chiều cao cố định
         width: '100%',
+
     },
     image: {
         width: '100%',

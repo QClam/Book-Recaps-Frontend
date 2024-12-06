@@ -6,8 +6,6 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
-    
-
     "splash": {
       "image": "./assets/splash.png",
       "resizeMode": "contain",
@@ -17,15 +15,25 @@
       "supportsTablet": true
     },
     "android": {
-      "permissions": ["INTERNET"],
+      "permissions": [
+        "INTERNET"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-        
-      }
+      },
+      "package": "com.dya.audiobooksummary",
+      "enablePngCrunchInReleaseBuilds": false
+
+
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "4bf89b73-92df-4079-b342-c804a0dfd0d9"
+      }
     }
   }
 }

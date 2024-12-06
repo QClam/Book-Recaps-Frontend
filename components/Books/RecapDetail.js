@@ -73,7 +73,7 @@ const RecapDetail = ({ route, navigation }) => {
       <Text style={styles.description}>{book.description}</Text>
       <Text style={styles.detail}>Năm xuất bản: {book.publicationYear}</Text>
       <Text style={styles.detail}>Nhà xuất bản: {book.publisher.publisherName}</Text>
-      <Text style={styles.detail}>Thể loại: {categoriesString || 'Không có thể loại cho sách này'}</Text>
+      <Text style={styles.detail}>Thể loại: {categoriesString || 'Chưa có thể loại cho sách này'}</Text>
 
       <View style={styles.recapsContainer}>
         <Text style={styles.recapsTitle}>Recaps</Text>

@@ -10,7 +10,7 @@ const CircularButtonWithArrow = ({ onPress, direction }) => {
                 {/* Mũi tên */}
                 <Icon
                     name={direction === 'backward' ? 'rotate-left' : 'rotate-right'}
-                    size={24}
+                    size={22}
                     color="#FFFFFF"
                     style={styles.arrowIcon}
                 />
@@ -25,7 +25,8 @@ export default CircularButtonWithArrow;
 
 const styles = StyleSheet.create({
     buttonContainer: {
-        marginHorizontal: 10, // Khoảng cách giữa các nút
+        marginHorizontal: 7, // Khoảng cách giữa các nút
+        marginBottom: 5
     },
     circle: {
         width: 60,
@@ -39,7 +40,7 @@ const styles = StyleSheet.create({
     },
     arrowIcon: {
         position: 'absolute',
-        top: 14, // Đặt mũi tên ở phía trên vòng tròn
+        top: 15, // Đặt mũi tên ở phía trên vòng tròn
         fontSize: 45,
        
     },

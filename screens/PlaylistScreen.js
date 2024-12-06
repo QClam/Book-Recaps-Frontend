@@ -38,8 +38,8 @@ const PlaylistScreen = () => {
             setError('Invalid data format received from API.');
           }
         } catch (err) {
-          console.error('Không có Playlist');
-          setError('Không có Playlist');
+          //console.error('Không có Playlist');
+          //setError('Không có Playlist');
         } finally {
           setIsLoading(false);
         }

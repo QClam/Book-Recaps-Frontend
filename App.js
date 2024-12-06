@@ -22,6 +22,7 @@ import Onboarding from "./components/Onboarding";
 import RecapDetail from "./components/Books/RecapDetail";
 import RecapItemDetail from "./components/Books/RecapItemDetail";
 import History from "./components/History/History";
+import HistoryScreen from "./screens/HistoryScreen";
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -40,9 +41,12 @@ const TabNavigator = () => {
                         iconName = focused ? "list" : "list-outline";
                     } else if (route.name === "Recap") {
                         iconName = focused ? "albums" : "albums-outline";
+                    }  else if (route.name === "History") {
+                        iconName = focused ? "time" : "time-outline";
                     } else if (route.name === "Profile") {
                         iconName = focused ? "person" : "person-outline";
                     }
+
 
                     return <Ionicons name={iconName} size={size} color={color} />;
                 },
@@ -66,10 +70,17 @@ const TabNavigator = () => {
                 options={{ title: "Recap" }}
             />
             <Tab.Screen
+                name="History"
+                component={HistoryScreen}
+                options={{ title: "History" }}
+            />
+            <Tab.Screen
                 name="Profile"
                 component={ProfileScreen } 
                 options={{ title: "Profile" }}
             />
+            
+
         </Tab.Navigator>
     );
 }

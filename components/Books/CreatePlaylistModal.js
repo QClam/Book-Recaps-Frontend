@@ -145,7 +145,7 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId }) => {
   
       <View style={{ backgroundColor: 'white', padding: 20, borderRadius: 10 }}>
         <Text style={{ fontSize: 20, fontWeight: 'bold' }}>Thêm vào Playlist</Text>
-        <Text style={{ marginTop: 20 }}>Chọn Playlist hiện có</Text>
+        {/* <Text style={{ marginTop: 20 }}>Chọn Playlist hiện có</Text>
         {existingPlaylists.length > 0 ? (
   existingPlaylists.map((playlist, index) => (
     <TouchableOpacity
@@ -165,11 +165,11 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId }) => {
   ))
 ) : (
   <Text>Không có Playlist nào.</Text>
-)}
+)} */}
 
 
         <View style={{ marginTop: 20 }}>
-          <Text>Hoặc Tạo một Playlist Mới</Text>
+          {/* <Text> Tạo Playlist Mới</Text> */}
           <TextInput
             style={{
               borderWidth: 1,
@@ -188,13 +188,13 @@ const CreatePlaylistModal = ({ isOpen, onClose, recapId, userId }) => {
           <TouchableOpacity onPress={onClose} style={{ padding: 10, backgroundColor: '#ccc', borderRadius: 5 }}>
             <Text>Hủy</Text>
           </TouchableOpacity>
-          <TouchableOpacity
+          {/* <TouchableOpacity
             onPress={handleSaveInSelectedPlaylists}
             disabled={isLoading}
             style={{ padding: 10, backgroundColor: '#007bff', borderRadius: 5 }}
           >
             {isLoading ? <ActivityIndicator size="small" color="#fff" /> : <Text style={{ color: '#fff' }}>Lưu </Text>}
-          </TouchableOpacity>
+          </TouchableOpacity> */}
           <TouchableOpacity
             onPress={handleCreatePlaylist}
             disabled={isLoading || !playlistName}

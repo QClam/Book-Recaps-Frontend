@@ -162,6 +162,7 @@ const styles = StyleSheet.create({
     cardContainer: {
         flex: 1,
         margin: 8,
+        
     },
 
     filterContainer: {

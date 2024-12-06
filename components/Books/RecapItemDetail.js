@@ -168,7 +168,7 @@ useEffect(() => {
         }
       }
     } catch (error) {
-      console.error('Error handling like action:', error);
+      //console.error('Error handling like action:', error);
     }
   };
     
@@ -445,7 +445,9 @@ useEffect(() => {
                     <Text style={styles.likeCount}>{likeCount} Likes</Text>
 
                     <TouchableOpacity onPress={handleSaveClick} style={styles.saveButton}>
-                        <Text style={styles.saveText}>🔖 Save in My Playlist</Text>
+                    <Icon name="bookmark" size={20} color="#f39c12" style={styles.icon} />
+                    <Text style={styles.saveText}>Lưu</Text>
+                        
                     </TouchableOpacity>
 
                 </View>
@@ -556,10 +558,10 @@ useEffect(() => {
             >
                 <View style={styles.modalOverlay}>
                     <View style={styles.settingsMenu}>
-                        <Text style={styles.menuTitle}>Customize Text Display</Text>
+                        <Text style={styles.menuTitle}>Tùy chỉnh hiển thị văn bản</Text>
 
                         {/* Text Size Adjustment */}
-                        <Text style={styles.subMenuTitle}>Text Size</Text>
+                        <Text style={styles.subMenuTitle}>Kích thước</Text>
                         <View style={styles.sliderContainer}>
                             <Text style={styles.sliderLabel}>Aa</Text>
                             <Slider
@@ -574,7 +576,7 @@ useEffect(() => {
                         </View>
 
                         {/* Theme Selection */}
-                        <Text style={styles.subMenuTitle}>Theme</Text>
+                        <Text style={styles.subMenuTitle}>Màu</Text>
                         <View style={styles.themeOptions}>
                             {[ '#E4E5E7', '#F7A8B8', '#B8E6D1', '#f3ecd8'].map((color) => (
                                 <TouchableOpacity
@@ -730,14 +732,17 @@ const styles = StyleSheet.create({
     },
     playPauseButton: {
         marginHorizontal: 20,
-        backgroundColor: '#FFD700',
+        //backgroundColor: '#FFD700',
+        //fontSize: 20,
         padding: 15,
         borderRadius: 50,
     },
     buttonIcon: {
-        color: '#FFFFFF',
-        fontSize: 18,
+        //color: '#FFFFFF',
+        //color: '#FFD700',
+        fontSize: 30,
         textAlign: 'center',
+        borderRadius: 10
     },
     progressBar: {
         width: '90%',
@@ -807,6 +812,18 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontWeight: 'bold',
     },
+    saveButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginLeft: 20
+      },
+      icon: {
+        marginRight: 8,
+      },
+      saveText: {
+        fontSize: 16,
+        color: '#2c3e50',
+      },
 });
 
 export default RecapItemDetail;
