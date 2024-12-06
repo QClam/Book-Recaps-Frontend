@@ -209,7 +209,7 @@ function ContributorPayout() {
                                     <TableCell><Typography color='success'>Đã Hoàn thành</Typography></TableCell>
 
                                 ) : (
-                                    <TableCell><Typography color='error'>Lỗi</Typography></TableCell>
+                                    <TableCell><Typography color='error'>Chưa có quyết toán</Typography></TableCell>
 
                                 )}
                                 <TableCell>
