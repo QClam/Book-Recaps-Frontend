@@ -1239,7 +1239,7 @@ const StaffReviewNotes = () => {
               <h3 className="text-md font-bold text-gray-700">{review?.staff?.fullName}</h3>
               <span
                 className="text-sm text-gray-500"
-              >{note.createdAt ? new Date(note.createdAt).toLocaleDateString() : 'N/A'}</span>
+              >{note.createdAt ? new Date(note.createdAt + "Z").toLocaleDateString() : 'N/A'}</span>
             </div>
             <p className="text-gray-600 mt-2">{note.feedback}</p>
           </div>

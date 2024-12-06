@@ -43,7 +43,7 @@ const Payouts = () => {
 
       <SuspenseAwait
         resolve={payouts}
-        errorElement={<div className="alert alert-error">Error loading payout history!</div>}
+        errorElement={<div className="text-red-500 text-center">Error loading payout history!</div>}
         defaultLoadingMessage="Loading payout history..."
       >
         <PayoutChart/>
@@ -128,7 +128,7 @@ function PayoutsTable() {
             />
           </Table.Cell>
           <Table.Cell>
-            {p.createAt ? new Date(p.createAt).toLocaleString() : 'N/A'}
+            {p.createAt ? new Date(p.createAt + "Z").toLocaleString() : 'N/A'}
           </Table.Cell>
           <Table.Cell>
             <Link

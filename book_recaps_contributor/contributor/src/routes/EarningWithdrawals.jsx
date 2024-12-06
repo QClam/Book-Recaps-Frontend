@@ -7,6 +7,7 @@ import {
   Await,
   defer,
   json,
+  Link,
   redirect,
   useActionData,
   useAsyncValue,
@@ -27,6 +28,9 @@ import { routes } from "../routes";
 import { useAuth } from "../contexts/Auth";
 import { useToast } from "../contexts/Toast";
 import { cn } from "../utils/cn";
+import { Message } from "primereact/message";
+import { TbExclamationCircle } from "react-icons/tb";
+import Show from "../components/Show";
 
 const getWithdrawlsInfo = async (recapId, request) => {
   try {
@@ -245,6 +249,27 @@ const EarningWithdrawals = () => {
           <Modal.Wrapper>
             <Modal.Header title="Rút tiền" onClose={hide}/>
             <Modal.Body className="space-y-4">
+              <Show when={!user.profileData.bankAccount}>
+                <Message
+                  severity="warn"
+                  className="mb-4 !flex !justify-start"
+                  content={
+                    <div className="flex gap-2 w-full items-start">
+                      <div className="w-5">
+                        <TbExclamationCircle size={20}/>
+                      </div>
+                      <div className="flex-1">
+                        <p>
+                          Bạn chưa cập nhật thông tin tài khoản ngân hàng. Vui lòng cập nhật tài khoản ngân hàng <Link
+                          to={routes.profile} className="text-indigo-600 underline hover:text-indigo-700">tại đây</Link>.
+                        </p>
+                      </div>
+                    </div>
+                  }
+                />
+              </Show>
+
+
               <div className="p-4 bg-white rounded-md shadow-sm border border-gray-300">
                 <div className="text-lg font-semibold">Số dư hiện tại</div>
                 <Suspense fallback={
@@ -301,12 +326,20 @@ const EarningWithdrawals = () => {
                   )}
                 </Await>
               </Suspense>
+
+              <TextInput
+                label="Thông tin ngân hàng"
+                value={user.profileData.bankAccount || "N/A"}
+                disabled
+              />
+
               <div className="mb-4 flex items-start">
                 <input type="radio" className="mr-2 mt-1 cursor-default" defaultChecked readOnly/>
                 <div>
-                  <p>Nhận tiền trực tiếp</p>
-                  <p className="text-gray-600 text-sm">(Hiện tại hệ thống chỉ hỗ trợ rút tiền mặt trực tiếp tại chi
-                    nhánh)</p>
+                  <p>Chuyển khoản</p>
+                  <p className="text-gray-600 text-sm">
+                    (Hiện tại hệ thống chỉ hỗ trợ chuyển khoản qua tài khoản ngân hàng)
+                  </p>
                 </div>
               </div>
             </Modal.Body>
@@ -329,7 +362,7 @@ const EarningWithdrawals = () => {
                     <button
                       onClick={confirmWithdrawal}
                       className="text-white bg-indigo-600 rounded py-1.5 px-3 border font-semibold hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                      disabled={withdrawAmount < 50000 || withdrawAmount > resolvedWithdrawInfo.totalEarning || withdrawAmount % 1000 !== 0}
+                      disabled={withdrawAmount < 50000 || withdrawAmount > resolvedWithdrawInfo.totalEarning || withdrawAmount % 1000 !== 0 || !user.profileData.bankAccount}
                     >
                       Rút tiền
                     </button>
@@ -355,7 +388,11 @@ const EarningWithdrawals = () => {
               <div className="p-4 bg-white rounded-md shadow-sm border border-gray-300 space-y-4">
                 <div className="flex justify-between gap-9">
                   <p>Rút về:</p>
-                  <p className="font-semibold">Nhận tiền trực tiếp</p>
+                  <p className="font-semibold">Tài khoản ngân hàng</p>
+                </div>
+                <div className="flex justify-between gap-9">
+                  <p>Ngân hàng:</p>
+                  <p className="font-semibold">{user.profileData.bankAccount}</p>
                 </div>
                 <div className="flex justify-between gap-9">
                   <p>Số tiền:</p>
@@ -411,8 +448,8 @@ const EarningWithdrawals = () => {
                 <p className="font-semibold text-indigo-600">{withdrawAmount.toLocaleString('vi-VN')} VNĐ</p>
                 <Divider/>
                 <p>
-                  Vui lòng đến chi nhánh gần nhất để hoàn tất thủ tục rút tiền. <strong>Yêu cầu sẽ bị hủy sau 24
-                  tiếng.</strong>
+                  Chúng tôi sẽ duyệt yêu cầu rút tiền của bạn trong thời gian sớm nhất. <strong>Quá trình xét duyệt
+                  không quá 24 tiếng.</strong>
                 </p>
               </div>
             </Modal.Body>
@@ -483,7 +520,7 @@ function WithdrawRequestsTable() {
               }/>
           </Table.Cell>
           <Table.Cell>
-            {wd.createAt ? new Date(wd.createAt).toLocaleString() : 'N/A'}
+            {wd.createAt ? new Date(wd.createAt + "Z").toLocaleString() : 'N/A'}
           </Table.Cell>
         </Table.Row>
       ))}

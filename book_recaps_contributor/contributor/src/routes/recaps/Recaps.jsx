@@ -205,7 +205,7 @@ const RecapsList = () => {
             })}>{recap.isPublished ? "Công khai" : "Ẩn"}</span>
             </p>
             <p className="text-sm">
-              Ngày tạo: {recap.createdAt ? new Date(recap.createdAt).toLocaleDateString() : 'N/A'}
+              Ngày tạo: {recap.createdAt ? new Date(recap.createdAt + "Z").toLocaleDateString() : 'N/A'}
             </p>
             {/*<Form className="absolute bottom-0 right-0" method="delete">*/}
             {/*  <input type="hidden" name="recapId" value={recap.id}/>*/}

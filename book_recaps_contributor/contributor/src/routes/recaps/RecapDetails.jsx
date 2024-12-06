@@ -473,8 +473,8 @@ const ListRecapVersions = () => {
                           'danger'
                   }/>
               </Table.Cell>
-              <Table.Cell>{version.createdAt ? new Date(version.createdAt).toLocaleDateString() : 'N/A'}</Table.Cell>
-              <Table.Cell>{version.updatedAt ? new Date(version.updatedAt).toLocaleDateString() : 'N/A'}</Table.Cell>
+              <Table.Cell>{version.createdAt ? new Date(version.createdAt + "Z").toLocaleDateString() : 'N/A'}</Table.Cell>
+              <Table.Cell>{version.updatedAt ? new Date(version.updatedAt + "Z").toLocaleDateString() : 'N/A'}</Table.Cell>
               <Table.Cell>
                 <Form method="delete" onSubmit={(e) => {
                   e.preventDefault();

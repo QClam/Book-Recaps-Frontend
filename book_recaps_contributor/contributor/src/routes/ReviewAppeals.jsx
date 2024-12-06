@@ -80,7 +80,7 @@ const ReviewAppeals = () => {
               <Table.Cell isFirstCell={true}>
                 <div className="min-w-28">{appeal.reason}</div>
               </Table.Cell>
-              <Table.Cell>{appeal.createdAt ? new Date(appeal.createdAt).toLocaleString() : 'N/A'}</Table.Cell>
+              <Table.Cell>{appeal.createdAt ? new Date(appeal.createdAt + "Z").toLocaleString() : 'N/A'}</Table.Cell>
               <Table.Cell>
                 <div className="min-w-28">{appeal.response}</div>
               </Table.Cell>
@@ -95,7 +95,7 @@ const ReviewAppeals = () => {
                           'danger'
                   }/>
               </Table.Cell>
-              <Table.Cell>{appeal.updatedAt ? new Date(appeal.updatedAt).toLocaleString() : 'N/A'}</Table.Cell>
+              <Table.Cell>{appeal.updatedAt ? new Date(appeal.updatedAt + "Z").toLocaleString() : 'N/A'}</Table.Cell>
             </Table.Row>
           ))}
         </Table.Body>

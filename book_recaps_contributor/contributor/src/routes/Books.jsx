@@ -18,7 +18,7 @@ import { ProgressSpinner } from "primereact/progressspinner";
 import { Suspense, useEffect, useState } from "react";
 import { TbSearch } from "react-icons/tb";
 
-import { axiosInstance, axiosInstance2 } from "../utils/axios";
+import { axiosInstance } from "../utils/axios";
 import { handleFetchError } from "../utils/handleFetchError";
 import TextInput from "../components/form/TextInput";
 import Select from "../components/form/Select";
@@ -31,19 +31,23 @@ import Modal from "../components/modal";
 import Table from "../components/table";
 import Show from "../components/Show";
 import { Image } from "primereact/image";
+import { Tooltip } from 'primereact/tooltip';
 
-const getBooks = async (q, category, publisher, page, request) => {
+const getBooks = async (q, category, publisher, sortby, sortorder, page, request) => {
   try {
-    const response = await axiosInstance2.get('/books/search', {
+    const response = await axiosInstance.get('/api/book/getallbooksbyfilterforcontributor', {
       params: {
-        q,
-        category,
-        publisher,
-        page
+        SearchTerm: q,
+        CategoryId: category,
+        PublisherId: publisher,
+        PageNumber: page,
+        PageSize: 10,
+        SortBy: sortby,
+        SortOrder: sortorder
       },
       signal: request.signal
     });
-    return response.data;
+    return response.data.data;
   } catch (error) {
     const err = handleFetchError(error);
     throw json({ error: err.error }, { status: err.status });
@@ -86,8 +90,10 @@ export async function booksLoader({ request }) {
   const category = url.searchParams.get("category");
   const publisher = url.searchParams.get("publisher");
   const page = url.searchParams.get("page");
+  const sortby = url.searchParams.get("sortby") || "totalPublishedRecaps";
+  const sortorder = url.searchParams.get("sortorder") || "asc";
 
-  const booksPromise = getBooks(q, category, publisher, page, request);
+  const booksPromise = getBooks(q, category, publisher, sortby, sortorder, page, request);
   const categories = await getCategories(request);
   const publishers = await getPublishers(request);
 
@@ -99,13 +105,20 @@ export async function booksLoader({ request }) {
       q,
       category,
       publisher,
-      page
+      page,
+      sortby,
+      sortorder
     }
   });
 }
 
 const Books = () => {
-  const { booksPagination, categories, publishers, params: { q, category, publisher } } = useLoaderData();
+  const {
+    booksPagination,
+    categories,
+    publishers,
+    params: { q, category, publisher, sortby, sortorder }
+  } = useLoaderData();
   const actionData = useActionData();
   let [ , setSearchParams ] = useSearchParams();
   const navigation = useNavigation()
@@ -122,7 +135,9 @@ const Books = () => {
     document.getElementById("q").value = decodeURIComponent(q ?? "");
     document.getElementById("category").value = category ?? "";
     document.getElementById("publisher").value = publisher ?? "";
-  }, [ q, category, publisher ]);
+    document.getElementById("sortby").value = sortby ?? "";
+    document.getElementById("sortorder").value = sortorder ?? "";
+  }, [ q, category, publisher, sortby, sortorder ]);
 
   useEffect(() => {
     if (actionData?.error) {
@@ -230,7 +245,7 @@ const Books = () => {
           </p>
         </div>
       </Show>
-      <Form id="search-form" role="search" className="grid grid-cols-6 gap-1 my-3">
+      <Form id="search-form" role="search" className="grid grid-cols-8 gap-2 my-3">
         <div className="relative col-span-2">
           <TextInput
             id="q"
@@ -268,7 +283,33 @@ const Books = () => {
             defaultValue={publisher}
           />
         </div>
-        <div className="col-start-5 col-end-7 flex gap-2.5">
+        <div className="col-span-1">
+          <Select
+            id="sortby"
+            placeholder="Sắp xếp theo"
+            name="sortby"
+            options={[
+              { value: "title", label: "Tiêu đề" },
+              { value: "publisherName", label: "Nhà xuất bản" },
+              { value: "totalPublishedRecaps", label: "Số bài viết" },
+              { value: "contributorSharePercentage", label: "Doanh thu chia sẻ" }
+            ]}
+            defaultValue={sortby}
+          />
+        </div>
+        <div className="col-span-1">
+          <Select
+            id="sortorder"
+            // placeholder="Thứ tự"
+            name="sortorder"
+            options={[
+              { value: "desc", label: "Giảm dần" },
+              { value: "asc", label: "Tăng dần" },
+            ]}
+            defaultValue={sortorder}
+          />
+        </div>
+        <div className="col-span-2 flex gap-2.5">
           <button
             className={cn({
               "text-white bg-indigo-600 rounded py-1.5 px-3 border font-semibold hover:bg-indigo-700": true,
@@ -296,8 +337,9 @@ const Books = () => {
           'Tiêu đề',
           'Tác giả',
           'Thể loại',
-          'Năm xuất bản',
           'Nhà xuất bản',
+          'Số bài viết',
+          'Doanh thu chia sẻ',
           'Hành động'
         ]}/>
         <Suspense
@@ -344,11 +386,11 @@ const Books = () => {
 export default Books;
 
 function BooksTable({ handleClickCreate }) {
-  const paginationData = useAsyncValue();
+  const { data: { $values: items } } = useAsyncValue();
 
   return (
     <Table.Body
-      when={paginationData.items && paginationData.items.length > 0}
+      when={items && items.length > 0}
       fallback={
         <tr>
           <td className="h-32 text-center" colSpan="100">
@@ -359,7 +401,7 @@ function BooksTable({ handleClickCreate }) {
         </tr>
       }
     >
-      {paginationData.items.map((book) => (
+      {items.map((book) => (
         <Table.Row key={book.id}>
           <Table.Cell isFirstCell={true}>
             <div className="w-20">
@@ -373,34 +415,50 @@ function BooksTable({ handleClickCreate }) {
             </div>
           </Table.Cell>
           <Table.Cell>
-            <div className="min-w-60">
+            <div className="min-w-36">
               <Link
                 to={generatePath(routes.bookDetails, { bookId: book.id })}
-                className="min-w-full line-clamp-2 break-words hover:underline text-indigo-500 font-semibold"
+                className="min-w-full line-clamp-3 break-words hover:underline text-indigo-500 font-semibold"
               >
-                {book.title}
+                {book.title} ({book.publicationYear})
               </Link>
             </div>
           </Table.Cell>
           <Table.Cell>
             <div className="min-w-28">
-              <p className="min-w-full line-clamp-2 break-words">
-                {book.authors?.map((author) => author.name).join(", ")}
+              <p className="min-w-full line-clamp-3 break-words">
+                {book.authorNames?.$values.join(", ")}
               </p>
             </div>
           </Table.Cell>
           <Table.Cell>
             <div className="min-w-28">
-              <p className="min-w-full line-clamp-2 break-words">
-                {book.categories?.map((category) => category.name).join(", ")}
+              <p className="min-w-full line-clamp-3 break-words">
+                {book.categoryNames?.$values.join(", ")}
               </p>
             </div>
           </Table.Cell>
           <Table.Cell>
-            {book.publicationYear}
+            <p className="min-w-full line-clamp-3 break-words">
+              {book.publisherName}
+            </p>
           </Table.Cell>
           <Table.Cell>
-            {book.publisher?.name}
+            <Tooltip target=".tooltipppp" mouseTrack mouseTrackLeft={5} position="left" className="max-w-96"/>
+            <p
+              className="tooltipppp text-center font-semibold text-indigo-600 cursor-default"
+              data-pr-tooltip={"Sách hiện có " + book.totalPublishedRecaps + " bài viết tóm tắt"}
+            >
+              {book.totalPublishedRecaps}
+            </p>
+          </Table.Cell>
+          <Table.Cell>
+            <p
+              className="tooltipppp text-center font-semibold text-indigo-600 cursor-default"
+              data-pr-tooltip={"Bạn sẽ nhận được " + book.contributorSharePercentage.toFixed(1).replace(/(\.0)$/, '') + "% doanh thu mà platform có được từ mỗi lượt xem premium từ bài viết tóm tắt của bạn.\n\nVí dụ: Nếu bài viết tóm tắt của bạn cho quyển sách này có 100 lượt xem premium và doanh thu platform có được từ mỗi lượt xem premium là 5.000₫, bạn sẽ nhận được " + (book.contributorSharePercentage / 100 * 5000).toLocaleString("vi-VN") + "₫ cho mỗi lượt xem premium."}
+            >
+              {book.contributorSharePercentage.toFixed(1).replace(/(\.0)$/, '')}%
+            </p>
           </Table.Cell>
           <Table.Cell>
             <button
@@ -417,20 +475,30 @@ function BooksTable({ handleClickCreate }) {
 }
 
 const Pagination = () => {
-  const { totalItems, page, pageSize, lastPage } = useAsyncValue();
+  const { totalRecords: totalItems, pageNumber: page, pageSize, totalPages: lastPage } = useAsyncValue();
   let [ , setSearchParams ] = useSearchParams();
 
   const prev = () => {
-    setSearchParams({ page: String(Math.max(1, page - 1)) });
+    setSearchParams(searchParams => {
+      searchParams.set('page', String(Math.max(1, page - 1)));
+      return searchParams;
+    });
   };
 
   const next = () => {
-    setSearchParams({ page: String(Math.min(lastPage, page + 1)) });
+    setSearchParams(searchParams => {
+      searchParams.set('page', String(Math.min(lastPage, page + 1)));
+      return searchParams;
+    });
   };
 
   const setPage = (page) => {
-    setSearchParams({ page: String(Math.max(1, Math.min(lastPage, page))) });
+    setSearchParams(searchParams => {
+      searchParams.set('page', String(Math.max(1, Math.min(lastPage, page))));
+      return searchParams;
+    });
   };
+
   return (
     <>
       {totalItems > 0 && (
