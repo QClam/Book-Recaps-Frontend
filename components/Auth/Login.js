@@ -89,9 +89,9 @@ const Login = () => {
             <TouchableOpacity>
                 <Text style={styles.registerText}>Không có tài khoản? Đăng ký ngay</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={clearOnboarding} style={{ justifyContent: "center", alignItems: "center", marginTop: 20 }}>
+            {/* <TouchableOpacity onPress={clearOnboarding} style={{ justifyContent: "center", alignItems: "center", marginTop: 20 }}>
                 <Text>Clear Onboarding</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
         </View>
     );
 };
