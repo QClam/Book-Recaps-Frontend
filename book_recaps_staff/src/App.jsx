@@ -27,7 +27,7 @@ function App() {
       {!isLoginPage && <Sidebar />}
       <Routes>
       {/* Cần đăng nhập để vào route */}
-        <Route path="/" element={<PrivateRoute> <Dashboard /> </PrivateRoute>} />
+        <Route path="/" element={<PrivateRoute> <RecapVersions /> </PrivateRoute>} />
         <Route path="/recaps" element={<PrivateRoute> <RecapVersions /> </PrivateRoute>} />
         <Route path="/users" element={<PrivateRoute> <UsersList /> </PrivateRoute>} />
         <Route path="/withdrawl" element={<PrivateRoute> <WithdrawalList /> </PrivateRoute>} />
