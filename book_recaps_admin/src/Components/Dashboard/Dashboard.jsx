@@ -21,13 +21,6 @@ function Dashboard() {
 
     const chartRef = useRef(null);
     const chartInstanceRef = useRef(null);
-    const [packageData, setPackageData] = useState({
-        dailyStats: [],
-    });
-    const [viewData, setViewData] = useState({
-        dailyStats: [],
-    });
-    
 
     const fetchDashboardData = async (fromDate, toDate) => {
         try {
@@ -43,61 +36,42 @@ function Dashboard() {
         }
     };
 
-    const updateChart = (dailyStatsPackage, dailyStatsView) => {
-        if (!chartInstanceRef.current || !dailyStatsPackage || !dailyStatsView) return;
-    
-        // Tạo ánh xạ dữ liệu từ các dailyStats
-        const packageMap = new Map(dailyStatsPackage.map(stat => [dayjs(stat.date).format('DD-MM-YYYY'), stat.earning]));
-        const viewMap = new Map(dailyStatsView.map(stat => [dayjs(stat.date).format('DD-MM-YYYY'), stat.revenueEarning]));
-    
-        // Hợp nhất và sắp xếp các nhãn
-        const allLabels = Array.from(new Set([...packageMap.keys(), ...viewMap.keys()])).sort((a, b) =>
-            dayjs(a, 'DD-MM-YYYY').unix() - dayjs(b, 'DD-MM-YYYY').unix()
-        );
-    
-        // Xây dựng dữ liệu cho từng dataset
-        const packageData = allLabels.map(label => packageMap.get(label) || 0);
-        const viewData = allLabels.map(label => viewMap.get(label) || 0);
-    
-        // Cập nhật biểu đồ
-        chartInstanceRef.current.data.labels = allLabels;
-        chartInstanceRef.current.data.datasets[0].data = viewData;
-        chartInstanceRef.current.data.datasets[1].data = packageData;
-    
-        chartInstanceRef.current.update();
-    };    
-
-    const fetchPackageSale = async (fromDate, toDate) => {
+    const fetchDashboardChart = async (fromDate, toDate) => {
         try {
-            const response = await api.get('api/dashboard/package-sales', {
+            const response = await api.get('/api/dashboard/getadminchart', {
                 params: { fromDate, toDate },
-            });
-            const dailyStats = response.data.data.dailyStats.$values || [];
-            console.log("Package-Sale: ", dailyStats);
-            setPackageData({
-                dailyStats
-            });
-            updateChart(dailyStats, viewData.dailyStats); // Cập nhật biểu đồ với dữ liệu Package và View
+            })
+            const data = response.data.data;
+            const viewChart = data.dailyViewStats.$values.map((item) => ({
+                date: item.date,
+                value: item.revenueEarning,
+            }));
+            const packageChart = data.dailyPackageStats.$values.map((item) => ({
+                date: item.date,
+                value: item.earning,
+            }));
+            console.log("View: ", viewChart);
+            console.log("Package: ", packageChart);
+
+            updateChart(viewChart, packageChart);
+
         } catch (error) {
-            console.error("Error Fetching Package Sale", error);
+            console.error('Lỗi khi gọi API:', error);
+        }
+    }
+
+    const updateChart = (viewData, packageData) => {
+        if (chartInstanceRef.current) {
+            const labels = viewData.map((item) => dayjs(item.date).format('DD/MM/YYYY'));
+            const viewValues = viewData.map((item) => item.value);
+            const packageValues = packageData.map((item) => item.value);
+    
+            chartInstanceRef.current.data.labels = labels;
+            chartInstanceRef.current.data.datasets[0].data = viewValues;
+            chartInstanceRef.current.data.datasets[1].data = packageValues;
+            chartInstanceRef.current.update();
         }
     };
-    
-    const fetchViewRevenue = async (fromDate, toDate) => {
-        try {
-            const response = await api.get('api/dashboard/view-chart', {
-                params: { fromDate, toDate },
-            });
-            const dailyStats = response.data.data.dailyStats.$values || [];
-            console.log("View-Revenue: ", dailyStats);
-            setViewData({
-                dailyStats
-            });
-            updateChart(packageData.dailyStats, dailyStats); // Cập nhật biểu đồ với dữ liệu View và Package
-        } catch (error) {
-            console.error("Error Fetching Package Sale", error);
-        }
-    };    
 
     useEffect(() => {
         if (chartRef.current) {
@@ -149,8 +123,7 @@ function Dashboard() {
         const fromDate = dayjs(dateRange[0]).format("YYYY-MM-DD");
         const toDate = dayjs(dateRange[1]).format("YYYY-MM-DD");
         fetchDashboardData(fromDate, toDate);
-        fetchPackageSale(fromDate, toDate);
-        fetchViewRevenue(fromDate, toDate);
+        fetchDashboardChart(fromDate, toDate);
     }, [dateRange]); // Cập nhật khi dateRange thay đổi
 
     const handleDateChange = async (range) => {
@@ -162,8 +135,8 @@ function Dashboard() {
             console.log('From Date:', fromDate, 'To Date:', toDate);
 
             fetchDashboardData(fromDate, toDate);
-            fetchPackageSale(fromDate, toDate);
-            fetchViewRevenue(fromDate, toDate);
+            fetchDashboardChart(fromDate, toDate);
+
         }
     };
 

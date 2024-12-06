@@ -300,11 +300,11 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
                         )}
                     </Box>
                     {/* File inputs */}
-                    <Button variant="contained" component="label" sx={{ mt: 2 }}>
+                    <Button variant="contained" component="label" sx={{ mt: 2 }} disabled={loading}>
                         Chọn ảnh bìa sách
                         <input type="file" name="coverImage" hidden onChange={handleFileChange} />
                     </Button>
-                    <Button variant="contained" component="label" sx={{ mt: 2, ml: 2 }}>
+                    <Button variant="contained" component="label" sx={{ mt: 2, ml: 2 }} disabled={loading}>
                         Chọn ảnh tác giả
                         <input type="file" name="authorImages" hidden onChange={handleFileChange} />
                     </Button>

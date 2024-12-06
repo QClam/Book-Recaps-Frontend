@@ -296,9 +296,14 @@ function ContractDetail() {
                                             onChange={handleStartDateChange}
                                             InputLabelProps={{ shrink: true }}
                                             disabled={disableUpdate}
+                                            inputProps={{
+                                                // Disable past dates
+                                                min: new Date().toISOString().split("T")[0], // Chỉ lấy phần ngày (YYYY-MM-DD)
+                                            }}
                                         />
                                     </Box>
                                 </Grid>
+
                                 <Grid item xs={12} md={6}>
                                     <Box display="flex" alignItems="center">
                                         <Typography sx={{ width: 150 }}>Ngày kết thúc:</Typography>
@@ -309,6 +314,10 @@ function ContractDetail() {
                                             onChange={handleEndDateChange}
                                             InputLabelProps={{ shrink: true }}
                                             disabled={disableUpdate}
+                                            inputProps={{
+                                                // Disable past dates
+                                                min: new Date().toISOString().split("T")[0], // Chỉ lấy phần ngày (YYYY-MM-DD)
+                                            }}
                                         />
                                     </Box>
                                 </Grid>

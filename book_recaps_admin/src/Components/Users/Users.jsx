@@ -169,39 +169,77 @@ function Users() {
         });
     };
 
-    const handleDeleteUser = async (userId) => {
+    const handleLockUser = async (userId) => {
         Swal.fire({
-            title: "Bạn có chắc chắn muốn xóa?",
-            text: "Bạn không thể hoàn tác hành động này!",
+            title: "Bạn có chắc chắn muốn khóa?",
+            text: "Bạn sẽ khóa tài khoản này!",
             icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#d33",
             cancelButtonColor: "#3085d6",
-            confirmButtonText: "Xóa",
+            confirmButtonText: "Khóa",
             cancelButtonText: "Hủy",
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    const response = await api.delete(
-                        `/api/users/delete-user-account`,
+                    const response = await api.put(
+                        `/api/lock-user-account`, null ,
                         {
                             params: {
-                                userId: userId,
+                                userId ,
                             },
                         }
                     );
 
                     if (response && response.status === 200) {
-                        setUsers(users.filter((user) => user.userId !== userId));
-                        Swal.fire("Đã xóa!", "Người dùng đã được xóa", "success");
-                        fetchUsers();
+                        // setUsers(users.filter((user) => user.userId !== userId));
+                        Swal.fire("Đã khóa!", "Người dùng đã được khóa", "success");
+                        await fetchUsers();
                     } else {
                         console.error("Unexpected response:", response);
-                        Swal.fire("Thất bại", "Có lỗi xảy ra trong quá trình xóa", "error");
+                        Swal.fire("Thất bại", "Có lỗi xảy ra trong quá trình khóa", "error");
                     }
                 } catch (error) {
                     console.error("Error deleting user: ", error);
-                    Swal.fire("Thất bại", "Có lỗi xảy ra trong quá trình xóa", "error");
+                    Swal.fire("Thất bại", "Có lỗi xảy ra trong quá trình khóa", "error");
+                }
+            }
+        });
+    };
+
+    const handleUnlockUser = async (userId) => {
+        Swal.fire({
+            title: "Bạn có chắc chắn muốn mở khóa?",
+            text: "Bạn sẽ mở khóa tài khoản này!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Mở",
+            cancelButtonText: "Hủy",
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await api.put(
+                        `/api/unlock-user-account`, null ,
+                        {
+                            params: {
+                                userId ,
+                            },
+                        }
+                    );
+
+                    if (response && response.status === 200) {
+                        // setUsers(users.filter((user) => user.userId !== userId));
+                        Swal.fire("Đã mở khóa!", "Người dùng đã được mở khóa", "success");
+                        await fetchUsers();
+                    } else {
+                        console.error("Unexpected response:", response);
+                        Swal.fire("Thất bại", "Có lỗi xảy ra trong quá trình mở khóa", "error");
+                    }
+                } catch (error) {
+                    console.error("Error deleting user: ", error);
+                    Swal.fire("Thất bại", "Có lỗi xảy ra trong quá trình mở khóa", "error");
                 }
             }
         });
@@ -383,10 +421,20 @@ function Users() {
                 <MenuItem
                     onClick={() => {
                         handleMenuClose();
-                        handleDeleteUser(selectedUser.id);
+                        handleLockUser(selectedUser.id);
                     }}
+                    disabled={selectedUser?.isAccountLocked === true}
                 >
-                    Xóa
+                    Khóa tài khoản
+                </MenuItem>
+                <MenuItem
+                    onClick={() => {
+                        handleMenuClose();
+                        handleUnlockUser(selectedUser.id);
+                    }}
+                    disabled={selectedUser?.isAccountLocked === false}
+                >
+                    Mở khóa tài khoản
                 </MenuItem>
             </Menu>
 
