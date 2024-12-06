@@ -78,6 +78,7 @@ function DetailContributorPayout() {
                                         borderRadius: 2,
                                         border: '1px solid #ddd',
                                         width: '100%',
+                                        height: 160
                                     }}
                                 >
                                     <Box display="flex" justifyContent="space-between" mb={1}>
@@ -86,18 +87,24 @@ function DetailContributorPayout() {
                                         </Typography>
                                         <Typography variant="body1">{payoutData.contributor?.fullName}</Typography>
                                     </Box>
-                                    <Box display="flex" justifyContent="space-between">
+                                    <Box display="flex" justifyContent="space-between" mb={1}>
                                         <Typography variant="body1" fontWeight="bold">
                                             Thông tin liên hệ:
                                         </Typography>
                                         <Typography variant="body1">{payoutData.contributor?.email}</Typography>
                                     </Box>
-                                    {/* <Box display="flex" justifyContent="space-between">
+                                    <Box display="flex" justifyContent="space-between" mb={1}>
                                         <Typography variant="body1" fontWeight="bold">
                                             Số điện thoại:
                                         </Typography>
-                                        <Typography variant="body1">{payoutData.phoneNumber}</Typography>
-                                    </Box> */}
+                                        <Typography variant="body1">{payoutData.contributor?.phoneNumber}</Typography>
+                                    </Box>
+                                    <Box display="flex" justifyContent="space-between" mb={1}>
+                                        <Typography variant="body1" fontWeight="bold">
+                                            Số dư ví:
+                                        </Typography>
+                                        <Typography variant="body1">{(payoutData.contributor?.earning ?? 0).toLocaleString()} VND</Typography>
+                                    </Box>
                                 </Paper>
                             </Grid>
 
@@ -109,6 +116,7 @@ function DetailContributorPayout() {
                                         borderRadius: 2,
                                         border: '1px solid #ddd',
                                         width: '100%',
+                                        height: 160
                                     }}
                                 >
                                     <Box display="flex" justifyContent="space-between" mb={1}>
@@ -121,7 +129,7 @@ function DetailContributorPayout() {
                                         <Typography variant="body1" fontWeight="bold">
                                             Tổng chi:
                                         </Typography>
-                                        <Typography variant="body1">{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(payoutData.amount)}</Typography>
+                                        <Typography variant="body1">{(payoutData.amount ?? 0).toLocaleString()} VND</Typography>
                                     </Box>
                                     <Box display="flex" justifyContent="space-between">
                                         <Link href={payoutData.imageURL} underline="hover" target="_blank">Hình ảnh</Link>
@@ -137,6 +145,7 @@ function DetailContributorPayout() {
                                         borderRadius: 2,
                                         border: '1px solid #ddd',
                                         width: '100%',
+                                        height: 160,
                                     }}
                                 >
                                     <Box display="flex" justifyContent="space-between" mb={1}>
@@ -159,7 +168,7 @@ function DetailContributorPayout() {
 
                 {/* Books Table */}
                 <Box>
-                    <Box display="flex" gap={2}>
+                    <Box display="flex" gap={2} justifyContent='space-between'>
                         <Typography variant="h6" gutterBottom>Recaps</Typography>
                         <Button variant="contained" color="primary" onClick={handleExportExcel}>
                             Xuất Excel

@@ -12,7 +12,9 @@ import {
     TableBody,
     TableCell,
     TableContainer,
+    TableFooter,
     TableHead,
+    TablePagination,
     TableRow,
     TextField,
     Typography,
@@ -25,6 +27,10 @@ function PublisherList() {
     const [selectedPublisher, setSelectedPublisher] = useState(null);
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(true);
+    const [filteredUsers, setFilteredUsers] = useState([]);
+    const [searchTerm, setSearchTerm] = useState(""); // Nhập input ô search
+    const [page, setPage] = useState(0); // Trang hiện tại
+    const [rowsPerPage, setRowsPerPage] = useState(5); // Dòng mỗi trang    
 
     const fetchPublishers = async () => {
 
@@ -42,13 +48,13 @@ function PublisherList() {
     };
 
     const updatePublisher = async () => {
-        if (!selectedPublisher || !selectedPublisher.id) 
+        if (!selectedPublisher || !selectedPublisher.id)
             return;
 
         try {
             const response = await api.put(`/api/publisher/updatepublisherinfo/${selectedPublisher.id}`, selectedPublisher);
             console.log(response.data);
-            
+
             fetchPublishers();
             setOpen(false);
         } catch (error) {
@@ -59,6 +65,38 @@ function PublisherList() {
     useEffect(() => {
         fetchPublishers();
     }, []);
+
+    useEffect(() => {
+        let filteredData = publishers;
+
+        // Search filter
+        if (searchTerm) {
+            filteredData = filteredData.filter((item) =>
+                item.publisherName.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        setFilteredUsers(filteredData);
+
+        // Kiểm tra nếu page vượt quá tổng số trang
+        const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+        if (page >= totalPages) {
+            setPage(0);  // Reset page về 0 nếu vượt quá số trang
+        }
+    }, [searchTerm, publishers, page, rowsPerPage]);
+
+    const handleChangePage = (event, newPage) => {
+        // Kiểm tra xem trang có hợp lệ hay không
+        const totalPages = Math.ceil(filteredUsers.length / rowsPerPage);
+        if (newPage < totalPages && newPage >= 0) {
+            setPage(newPage);
+        }
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0); // Reset to first page when rows per page changes
+    };
 
     // Mở modal và lưu thông tin NXB được chọn
     const handleEditClick = (publisher) => {
@@ -95,8 +133,18 @@ function PublisherList() {
     }
 
     return (
-        <Box sx={{width: "80vw"}}>
-            <Typography variant="h5" sx={{margin: 2}}>Danh sách các NXB</Typography>
+        <Box sx={{ width: "80vw" }}>
+            <Typography variant="h5" sx={{ margin: 2 }}>Danh sách các NXB</Typography>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2, gap: 2 }}>
+            <TextField
+                    label="Tìm kiếm theo tên"
+                    variant="outlined"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    size="small"
+                    sx={{ width: "30%" }}
+                />
+            </Box>
             <TableContainer component={Paper}>
                 <Table>
                     <TableHead>
@@ -112,7 +160,7 @@ function PublisherList() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {publishers.map((item) => (
+                        {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
                             <TableRow key={item.id}>
                                 <TableCell>{item.publisherName}</TableCell>
                                 <TableCell>{item.contactInfo}</TableCell>
@@ -127,6 +175,24 @@ function PublisherList() {
                             </TableRow>
                         ))}
                     </TableBody>
+                    <TableFooter>
+                        <TableRow>
+                            <TablePagination
+                                count={filteredUsers.length} // Tổng số dòng sau khi lọc
+                                page={page} // Trang hiện tại
+                                onPageChange={handleChangePage} // Hàm xử lý thay đổi trang
+                                rowsPerPage={rowsPerPage} // Số dòng hiển thị mỗi trang
+                                onRowsPerPageChange={handleChangeRowsPerPage} // Hàm xử lý thay đổi số dòng mỗi trang
+                                rowsPerPageOptions={[5, 10, 25]} // Tùy chọn số dòng mỗi trang
+                                labelRowsPerPage="Số dòng mỗi trang:" // Văn bản tiếng Việt
+                                labelDisplayedRows={({ from, to, count }) =>
+                                    `${from}–${to} trên ${count !== -1 ? count : `nhiều hơn ${to}`}`
+                                }
+                                showFirstButton
+                                showLastButton
+                            />
+                        </TableRow>
+                    </TableFooter>
                 </Table>
             </TableContainer>
 

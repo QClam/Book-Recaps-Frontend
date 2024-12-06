@@ -289,6 +289,10 @@ function PublisherPayout() {
                         onChange={(e) => setEndDate(e.target.value)}
                         margin="normal"
                         InputLabelProps={{ shrink: true }}
+                        inputProps={{
+                            // Disable past dates
+                            min: startDate, // Chỉ lấy phần ngày (YYYY-MM-DD)
+                        }}
                     />
                     <Box display="flex" justifyContent="space-between" mt={2}>
                         <Button color="error" onClick={handleCloseModal}>

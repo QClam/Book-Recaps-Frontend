@@ -216,7 +216,7 @@ function ContractsList() {
                             {filteredContracts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
                                 <TableRow key={item.id}>
                                     <TableCell>{item.publisher?.publisherName}</TableCell>
-                                    <TableCell>{item.revenueSharePercentage}%</TableCell>
+                                    <TableCell><Typography color='primary'>{item.revenueSharePercentage}%</Typography></TableCell>
                                     <TableCell>{new Date(item.startDate).toLocaleDateString()}</TableCell>
                                     <TableCell>{new Date(item.endDate).toLocaleDateString()}</TableCell>
                                     <TableCell>{item.autoRenew === true ? (
@@ -225,7 +225,7 @@ function ContractsList() {
                                         <Typography color='error'>Không</Typography>
                                     )}</TableCell>
                                     <TableCell>{item.status === 0 ? (
-                                        <Typography color='warning'>Bản nháp</Typography>
+                                        <Typography color='secondary'>Bản nháp</Typography>
                                     ) : item.status === 1 ? (
                                         <Typography color='primary'>Đang xử lý</Typography>
                                     ) : item.status === 2 ? (
@@ -256,6 +256,8 @@ function ContractsList() {
                                     labelDisplayedRows={({ from, to, count }) =>
                                         `${from}–${to} trên ${count !== -1 ? count : `nhiều hơn ${to}`}`
                                     }
+                                    showFirstButton
+                                    showLastButton
                                 />
                             </TableRow>
                         </TableFooter>

@@ -77,6 +77,7 @@ function DetailPublihserPayout() {
                               borderRadius: 2,
                               border: '1px solid #ddd',
                               width: '100%',
+                              height: 120
                            }}
                         >
                            <Box display="flex" justifyContent="space-between" mb={1}>
@@ -108,6 +109,7 @@ function DetailPublihserPayout() {
                               borderRadius: 2,
                               border: '1px solid #ddd',
                               width: '100%',
+                              height: 120
                            }}
                         >
                            <Box display="flex" justifyContent="space-between" mb={1}>
@@ -136,6 +138,7 @@ function DetailPublihserPayout() {
                               borderRadius: 2,
                               border: '1px solid #ddd',
                               width: '100%',
+                              height: 120
                            }}
                         >
                            <Box display="flex" justifyContent="space-between" mb={1}>
@@ -158,7 +161,7 @@ function DetailPublihserPayout() {
 
             {/* Books Table */}
             <Box>
-               <Box display="flex" gap={2}>
+               <Box display="flex" gap={2} justifyContent='space-between'>
                   <Typography variant="h6" gutterBottom>Books</Typography>
                   <Button variant="contained" color="primary" onClick={handleExportExcel}>
                      Xuất Excel

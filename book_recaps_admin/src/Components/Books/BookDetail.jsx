@@ -97,7 +97,13 @@ function BookDetail() {
                         title: { display: true, text: 'Doanh thu theo thời gian' },
                     },
                     scales: {
-                        y: { beginAtZero: true },
+                        y: { 
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: "VND"
+                            } 
+                        },
                     },
                 },
             });
@@ -246,6 +252,11 @@ function BookDetail() {
                     <DateRangePicker
                         value={[new Date(dateRange[0]), new Date(dateRange[1])]}
                         onChange={handleDateChange}
+                        disabledDate={(date) => {
+                            const today = dayjs().endOf('day'); // Lấy ngày hiện tại (đến cuối ngày)
+                            return dayjs(date).isAfter(today); // Vô hiệu hóa các ngày sau ngày hiện tại
+                        }}
+                        cleanable={false}
                     />
                 </Box>
             </Box>

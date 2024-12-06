@@ -3,6 +3,8 @@ import { fetchContractDetail } from './ContractServices';
 import { Box, Button, Card, CardContent, Checkbox, CircularProgress, Grid, Modal, TextField, Typography } from '@mui/material';
 import api from '../Auth/AxiosInterceptors';
 
+import empty_image from "../../data/empty-image.png"
+
 function AddContractBooks({ contractId, disableUpdate, onUpdateContractBooks }) {
 
     const [open, setOpen] = useState(false);
@@ -93,7 +95,7 @@ function AddContractBooks({ contractId, disableUpdate, onUpdateContractBooks }) 
                             <Card variant="outlined" sx={{ width: '100%', height: 280 }}>
                                 <CardContent sx={{ padding: 2 }}>
                                     <Box sx={{ height: 150, display: 'flex', justifyContent: 'center', alignItems: 'center', mb: 2, overflow: 'hidden' }}>
-                                        <img src={item.coverImage} alt='Ảnh sách ở đây' style={{
+                                        <img src={item.coverImage || empty_image} alt='Ảnh sách ở đây' style={{
                                             maxWidth: '100%',
                                             maxHeight: '100%',
                                             objectFit: 'contain'

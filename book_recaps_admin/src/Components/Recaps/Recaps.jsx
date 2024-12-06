@@ -164,7 +164,7 @@ function Recaps() {
                             <TableCell><strong>Tên bản Recap</strong></TableCell>
                             <TableCell><strong>Tên cuốn sách</strong></TableCell>
                             <TableCell><strong>Tên Người đóng góp</strong></TableCell>
-                            <TableCell><strong>Ngày</strong></TableCell>
+                            <TableCell><strong>Ngày tạo</strong></TableCell>
                             <TableCell><strong>Trạng thái</strong></TableCell>
                             <TableCell></TableCell>
                         </TableRow>
@@ -184,7 +184,7 @@ function Recaps() {
                                     ) : item.currentVersion?.status === 3 ? (
                                         <Typography color='error' >Đã Từ chối</Typography>
                                     ) : (
-                                        <Typography color='warning' >Draft</Typography>
+                                        <Typography color='secondary' >Bản nháp</Typography>
                                     )}
                                 </TableCell>
                                 <TableCell><Button onClick={() => detailRecap(item.id)}><Visibility /></Button></TableCell>

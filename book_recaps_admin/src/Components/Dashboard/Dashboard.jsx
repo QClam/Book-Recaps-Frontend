@@ -45,10 +45,12 @@ function Dashboard() {
             const viewChart = data.dailyViewStats.$values.map((item) => ({
                 date: item.date,
                 value: item.revenueEarning,
+                count: item.viewCount
             }));
             const packageChart = data.dailyPackageStats.$values.map((item) => ({
                 date: item.date,
                 value: item.earning,
+                count: item.count
             }));
             console.log("View: ", viewChart);
             console.log("Package: ", packageChart);
@@ -65,7 +67,7 @@ function Dashboard() {
             const labels = viewData.map((item) => dayjs(item.date).format('DD/MM/YYYY'));
             const viewValues = viewData.map((item) => item.value);
             const packageValues = packageData.map((item) => item.value);
-    
+
             chartInstanceRef.current.data.labels = labels;
             chartInstanceRef.current.data.datasets[0].data = viewValues;
             chartInstanceRef.current.data.datasets[1].data = packageValues;
@@ -105,7 +107,13 @@ function Dashboard() {
                         title: { display: true, text: 'Doanh thu theo thời gian (Lượt xem và gói Premium)' },
                     },
                     scales: {
-                        y: { beginAtZero: true },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: "VND"
+                            }
+                        },
                     },
                 },
             });
@@ -164,7 +172,7 @@ function Dashboard() {
             case 'Doanh thu gói Package':
             case 'Doanh thu từ lượt View':
             case 'Số dư hiện tại':
-                return <AttachMoney sx={{ position: 'absolute', bottom: 8, right: 8 }} />;
+                return <AttachMoney sx={{ position: 'absolute', bottom: 8, right: 8, color: "#479500" }} />;
             case 'Số lượng Package đã bán':
                 return <LocalOffer sx={{ position: 'absolute', bottom: 8, right: 8 }} />;
             case 'Số bài viết mới':
@@ -172,7 +180,7 @@ function Dashboard() {
             case 'Tổng lượt View':
                 return <RemoveRedEye sx={{ position: 'absolute', bottom: 8, right: 8 }} />;
             default:
-                return <BarChart sx={{ position: 'absolute', bottom: 8, right: 8 }} />;
+                return <BarChart sx={{ position: 'absolute', bottom: 8, right: 8, color: '#4769d2' }} />;
         }
     };
 
@@ -210,6 +218,11 @@ function Dashboard() {
                     <DateRangePicker
                         value={dateRange}
                         onChange={handleDateChange}
+                        disabledDate={(date) => {
+                            const today = dayjs().endOf('day'); // Lấy ngày hiện tại (đến cuối ngày)
+                            return dayjs(date).isAfter(today); // Vô hiệu hóa các ngày sau ngày hiện tại
+                        }}
+                        cleanable={false}
                     />
                 </div>
             </div>
