@@ -40,7 +40,7 @@ export async function loginAction({ request }) {
     return {
       user: {
         email: decoded.email,
-        name: decoded[import.meta.env.VITE_CLAIMS_NAME],
+        name: profileResponse.data.fullName,
         role: "Contributor",
         id: decoded[import.meta.env.VITE_CLAIMS_IDENTIFIER],
         profileData: profileResponse.data,

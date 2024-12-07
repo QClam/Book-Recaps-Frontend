@@ -44,7 +44,7 @@ export function AuthProvider({ children }) {
         ) {
           setUser({
             email: decoded.email,
-            name: decoded[import.meta.env.VITE_CLAIMS_NAME],
+            name: response.data.fullName,
             role: "Contributor",
             id: userId,
             profileData: response.data,

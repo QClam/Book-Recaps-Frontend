@@ -104,6 +104,8 @@ const BookDetailsImpl = ({ dialogVisible, setDialogVisible }) => {
   const book = useAsyncValue();
   const { user } = useAuth();
 
+  const recaps = book.recaps?.$values.filter(recap => recap.isPublished) || [];
+
   return (
     <>
       <div className="p-6 max-w-4xl mx-auto bg-white shadow-md rounded-lg">
@@ -184,10 +186,10 @@ const BookDetailsImpl = ({ dialogVisible, setDialogVisible }) => {
         <Divider/>
 
         <h2 className="font-semibold mb-3 italic text-gray-700">
-          Các bài viết hiện có:
+          Các bài viết đang công khai:
         </h2>
-        {book.recaps && book.recaps.$values.length > 0 ? (
-          book.recaps.$values.map((recap) => {
+        {recaps.length > 0 ? (
+          recaps.map((recap) => {
             return (
               <a
                 key={recap.id}
@@ -237,7 +239,7 @@ const BookDetailsImpl = ({ dialogVisible, setDialogVisible }) => {
           })
         ) : (
           <p className="text-gray-400 text-center italic">
-            Sách chưa có Recap nào.
+            Sách chưa có Recap nào hiện đang công khai.
           </p>
         )}
       </div>

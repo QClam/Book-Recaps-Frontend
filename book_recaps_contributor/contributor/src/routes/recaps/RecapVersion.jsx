@@ -1,5 +1,15 @@
 import axios from "axios";
-import { Await, defer, generatePath, json, Link, useAsyncValue, useLoaderData, useNavigate } from "react-router-dom";
+import {
+  Await,
+  defer,
+  generatePath,
+  json,
+  Link,
+  redirect,
+  useAsyncValue,
+  useLoaderData,
+  useNavigate
+} from "react-router-dom";
 import { Fragment, Suspense, useEffect, useMemo, useState } from "react";
 import { useDebounce } from "react-use";
 import { TabPanel, TabView } from 'primereact/tabview';
@@ -46,6 +56,7 @@ import { useAuth } from "../../contexts/Auth";
 import TextArea from "../../components/form/TextArea";
 import BookInfo from "../../components/BookInfo";
 import { CgArrowsExpandLeft, CgClose } from "react-icons/cg";
+import { getCurrentUserInfo } from "../../utils/getCurrentUserInfo";
 
 const getRecapVersion = async (versionId, request) => {
   try {
@@ -125,8 +136,28 @@ const checkPlagiarism = async (versionId) => {
   }
 };
 
+const getRecapInfo = async (recapId, request) => {
+  try {
+    const response = await axiosInstance.get('/getrecapbyId/' + recapId, {
+      signal: request.signal
+    });
+
+    return response.data.data;
+  } catch (error) {
+    const err = handleFetchError(error);
+    throw json({ error: err.error }, { status: err.status });
+  }
+}
+
 export const recapVersionLoader = async ({ params, request }) => {
   const recapVersion = await getRecapVersion(params.versionId, request);
+  const recap = await getRecapInfo(recapVersion.recapId, request);
+
+  const user = getCurrentUserInfo();
+  if (recap.userId.toLowerCase() !== user.id.toLowerCase()) {
+    return redirect(routes.recaps);
+  }
+
   const bookInfo = getBookInfoByRecap(recapVersion.recapId, request);
   const keyIdeas = getKeyIdeas(params.versionId, request);
   const transcript = getTranscript(params.versionId, request);
@@ -1486,7 +1517,8 @@ const PlagiarismResults = () => {
                     style={{ width: `${result.similarity_score * 100}%` }}
                   ></div>
                 </div>
-                <p className="font-bold text-right">{Number(result.similarity_score * 100).toFixed(1).replace(/(\.0)$/, '')}%</p>
+                <p
+                  className="font-bold text-right">{Number(result.similarity_score * 100).toFixed(1).replace(/(\.0)$/, '')}%</p>
               </div>
             ))}
           </div>

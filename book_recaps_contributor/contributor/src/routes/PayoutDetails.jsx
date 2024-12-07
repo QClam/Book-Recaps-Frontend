@@ -1,4 +1,4 @@
-import { Await, defer, generatePath, json, Link, useAsyncValue, useLoaderData } from "react-router-dom";
+import { Await, defer, generatePath, json, Link, Navigate, useAsyncValue, useLoaderData } from "react-router-dom";
 import { axiosInstance } from "../utils/axios";
 import { handleFetchError } from "../utils/handleFetchError";
 import CustomBreadCrumb from "../components/CustomBreadCrumb";
@@ -9,6 +9,7 @@ import { ProgressSpinner } from "primereact/progressspinner";
 import * as XLSX from 'xlsx'
 import { cn } from "../utils/cn";
 import Table from "../components/table";
+import { useAuth } from "../contexts/Auth";
 
 const getPayoutDetails = async (payoutId, request) => {
   try {
@@ -73,6 +74,11 @@ const getPayoutStatusStr = (status) => {
 
 const PayoutDetailsImpl = () => {
   const payoutDetails = useAsyncValue();
+  const { user } = useAuth();
+
+  if (payoutDetails.contributor?.id.toLowerCase() !== user.id.toLowerCase()) {
+    return <Navigate to={routes.payouts} replace/>;
+  }
 
   const recapEarnings = payoutDetails.recapEarnings.$values;
 
@@ -209,7 +215,8 @@ const PayoutDetailsImpl = () => {
                 {recap.toDate ? new Date(recap.toDate).toLocaleDateString() : 'N/A'}
               </Table.Cell>
               <Table.Cell>
-                <p className="font-semibold text-indigo-600 text-lg">{recap.earningAmount.toLocaleString('vi-VN')}đ</p>
+                <p
+                  className="font-semibold text-indigo-600 text-lg">{recap.earningAmount.toLocaleString('vi-VN')}đ</p>
               </Table.Cell>
             </Table.Row>
           ))}

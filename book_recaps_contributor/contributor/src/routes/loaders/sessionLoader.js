@@ -29,7 +29,7 @@ export const sessionLoader = async () => {
   ) {
     return {
       email: decoded.email,
-      name: decoded[import.meta.env.VITE_CLAIMS_NAME],
+      name: response.data.fullName,
       role: "Contributor",
       id: userId,
       profileData: response.data,

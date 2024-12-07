@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/Auth";
 import { axiosInstance } from "../utils/axios";
 import { useToast } from "../contexts/Toast";
 import { routes } from "../routes";
 import { Dialog } from "primereact/dialog";
+import _ from "lodash";
 
 const Profile = () => {
   const { user, setUser } = useAuth();
@@ -32,6 +33,12 @@ const Profile = () => {
   });
   const [ currentTab, setCurrentTab ] = useState('profile');
   const { showToast } = useToast();
+
+  useEffect(() => {
+    if (!_.isEqual(user.profileData, profile)) {
+      navigate(routes.dashboard);
+    }
+  }, [user]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -67,7 +74,7 @@ const Profile = () => {
       setModalOpen(false); // Close modal
       setUser({
         ...user,
-        name: result.data.userName,
+        name: result.data.fullName,
         email: result.data.email,
         profileData: result.data
       })
@@ -109,14 +116,14 @@ const Profile = () => {
       const response = await axiosInstance.get('/api/personal/profile');
 
       const data = await response.data;
+      // Set profile data
+      setProfile(data);
       setUser({
         ...user,
-        name: data.userName,
+        name: data.fullName,
         email: data.email,
         profileData: data
       })
-      // Set profile data
-      setProfile(data);
       setUpdatedProfile({
         fullName: data.fullName || '',
         gender: data.gender || 0,

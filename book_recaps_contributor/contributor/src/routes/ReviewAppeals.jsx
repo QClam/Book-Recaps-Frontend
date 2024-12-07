@@ -1,10 +1,11 @@
-import { generatePath, json, useLoaderData } from "react-router-dom";
+import { generatePath, json, redirect, useLoaderData } from "react-router-dom";
 import { axiosInstance2 } from "../utils/axios";
 import { handleFetchError } from "../utils/handleFetchError";
 import CustomBreadCrumb from "../components/CustomBreadCrumb";
 import { routes } from "../routes";
 import { Badge } from "primereact/badge";
 import Table from "../components/table";
+import { getCurrentUserInfo } from "../utils/getCurrentUserInfo";
 
 const getReviewAppeals = async (reviewId, request) => {
   try {
@@ -20,6 +21,11 @@ const getReviewAppeals = async (reviewId, request) => {
 
 export const reviewAppealsLoader = async ({ params, request }) => {
   const data = await getReviewAppeals(params.reviewId, request);
+
+  const user = getCurrentUserInfo();
+  if (data.contributor_id.toLowerCase() !== user.id.toLowerCase()) {
+    return redirect(routes.recaps);
+  }
 
   return {
     review: data.review,

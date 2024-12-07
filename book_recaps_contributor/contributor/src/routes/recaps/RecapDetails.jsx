@@ -34,12 +34,14 @@ import Table from "../../components/table";
 import BookInfo from "../../components/BookInfo";
 import { Area, AreaChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import _ from "lodash";
+import { getCurrentUserInfo } from "../../utils/getCurrentUserInfo";
 
 const getRecapInfo = async (recapId, request) => {
   try {
     const response = await axiosInstance2.get('/recaps/' + recapId, {
       signal: request.signal
     });
+
     return response.data;
   } catch (error) {
     const err = handleFetchError(error);
@@ -194,6 +196,12 @@ const deleteVersion = async (request) => {
 
 export const recapDetailsLoader = async ({ params, request }) => {
   const recap = await getRecapInfo(params.recapId, request);
+
+  const user = getCurrentUserInfo();
+  if (recap.userId.toLowerCase() !== user.id.toLowerCase()) {
+    return redirect(routes.recaps);
+  }
+
   const recapVersions = getRecapVersions(params.recapId, request);
   const bookInfo = getBookInfoById(recap.bookId, request);
 
