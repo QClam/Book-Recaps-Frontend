@@ -136,8 +136,6 @@ function Login() {
           },
         });
 
-        const { isOnboarded, id } = profileResponse.data;
-
         const decoded = jwtDecode(accessToken)
         const userId = decoded[import.meta.env.VITE_CLAIMS_IDENTIFIER]
 
@@ -145,14 +143,14 @@ function Login() {
           profileResponse.data &&
           isValidToken(decoded) &&
           (isRoleMatched(decoded, "Contributor") || isRoleMatched(decoded, "Customer")) &&
-          id === userId
+          profileResponse.data.id === userId
         ) {
           login({
             email: decoded.email,
-            name: decoded[import.meta.env.VITE_CLAIMS_NAME],
+            name: profileResponse.data.fullName,
             id: userId,
             role: isRoleMatched(decoded, "Contributor") ? "Contributor" : "Customer",
-            isOnboarded,
+            isOnboarded: profileResponse.data.isOnboarded,
             profileData: profileResponse.data,
           }, accessToken);
         } else {

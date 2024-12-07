@@ -276,11 +276,15 @@ const RecapInfoSection = () => {
 const AudioAndTranscriptSection = () => {
   const { recap, promisedTranscript } = useLoaderData();
   const { user } = useAuth();
+  const hasSubscription = user?.profileData.subscriptions.$values.some((sub) => sub.status === 0);
 
   // Create view tracking when the transcript is loaded. Delayed by 3 seconds
-  useViewTracking(recap.id, user?.id, promisedTranscript);
-
-  const hasSubscription = user?.profileData.subscriptions.$values.some((sub) => sub.status === 0);
+  useViewTracking(
+    recap.id,
+    user?.id,
+    promisedTranscript,
+    recap.isPublished && ((recap.isPremium && hasSubscription) || !recap.isPremium)
+  );
 
   return (
     <MediaProvider>
@@ -504,16 +508,17 @@ const SvgIcons = () => (
   </svg>
 )
 
-const useViewTracking = (recapId, userId, promisedTranscript) => {
+const useViewTracking = (recapId, userId, promisedTranscript, shouldCreate) => {
   const currentViewTrackingId = useRef(null);
   const startTime = useRef(new Date().getTime());
+  const mounted = useRef(false);
 
   useEffect(() => {
     let timeoutId;
     const controller = new AbortController();
 
     // Create view tracking after the transcript is loaded. Delayed by 3 seconds
-    if (recapId && userId) {
+    if (recapId && userId && !mounted.current && shouldCreate) {
       promisedTranscript.then(() => {
         timeoutId = setTimeout(() => {
           createViewTracking(controller);
@@ -529,9 +534,15 @@ const useViewTracking = (recapId, userId, promisedTranscript) => {
         const endTime = new Date().getTime();
         const duration = (endTime - startTime.current) / 1000;
         updateViewTracking(currentViewTrackingId.current, duration);
+        currentViewTrackingId.current = null;
       }
     }
-  }, []);
+  }, [ userId, shouldCreate ]);
+
+  useEffect(() => {
+    if (mounted.current) window.location.reload();
+    mounted.current = true;
+  }, [ userId ]);
 
   const createViewTracking = async (request) => {
     try {

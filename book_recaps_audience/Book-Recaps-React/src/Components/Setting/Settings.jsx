@@ -6,6 +6,7 @@ import { useAuth } from "../../contexts/Auth";
 import { axiosInstance } from "../../utils/axios";
 import { toast } from "react-toastify";
 import { Dialog } from "primereact/dialog";
+import _ from "lodash";
 
 function Settings() {
   const navigate = useNavigate(); // Create a navigate function
@@ -36,6 +37,12 @@ function Settings() {
   const [ imageFile, setImageFile ] = useState(null); // New state to store selected image file
   const [ imageUploadLoading, setImageUploadLoading ] = useState(false);
   const [ subscriptionPackageName, setSubscriptionPackageName ] = useState('');
+
+  useEffect(() => {
+    if (!_.isEqual(user.profileData, profile)) {
+      navigate(routes.index);
+    }
+  }, [ user ]);
 
   // Handle tab change
   const handleTabChange = (tab) => {
@@ -91,7 +98,10 @@ function Settings() {
   // Handle profile update
   const handleUpdateProfile = async () => {
     // Log the form data to verify what is being sent
-    console.log('Updated profile data:', updatedProfile);
+    if (!updatedProfile.fullName) {
+      toast.error('Vui lòng nhập họ tên!');
+      return;
+    }
 
     try {
       const response = await axiosInstance.put('/api/personal/profile', {
@@ -110,7 +120,7 @@ function Settings() {
       setModalOpen(false); // Close modal
       setUser({
         ...user,
-        name: result.data.userName,
+        name: result.data.fullName,
         email: result.data.email,
         profileData: result.data
       })
@@ -151,14 +161,14 @@ function Settings() {
       const response = await axiosInstance.get('/api/personal/profile');
 
       const data = await response.data;
+      // Set profile data
+      setProfile(data);
       setUser({
         ...user,
-        name: data.userName,
+        name: data.fullName,
         email: data.email,
         profileData: data
       })
-      // Set profile data
-      setProfile(data);
       setUpdatedProfile({
         fullName: data.fullName || '',
         gender: data.gender || 0,
@@ -341,7 +351,16 @@ function Settings() {
 
             <Dialog
               visible={isModalOpen}
-              onHide={() => setModalOpen(false)}
+              onHide={() => {
+                setUpdatedProfile({
+                  fullName: user.profileData.fullName || '',
+                  gender: user.profileData.gender || 0,
+                  birthDate: user.profileData.birthDate || '',
+                  address: user.profileData.address || '',
+                  bankAccount: user.profileData.bankAccount || '',
+                })
+                setModalOpen(false)
+              }}
               content={({ hide }) => (
                 <div className="modal">
                   <div className="modal-content mx-auto">

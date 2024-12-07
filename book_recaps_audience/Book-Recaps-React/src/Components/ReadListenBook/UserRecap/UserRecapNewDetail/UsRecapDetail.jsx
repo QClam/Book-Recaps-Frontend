@@ -105,7 +105,7 @@ const UserRecapDetail = () => {
           <h2 className="font-semibold mb-3 italic text-gray-700">
             Các bài viết hiện có:
           </h2>
-          {book.recaps && book.recaps.$values.length > 0 ? (
+          {book.recaps && book.recaps.$values.filter((recap) => recap.isPublished).length > 0 ? (
             book.recaps.$values
               .filter((recap) => recap.isPublished)
               .map((recap) => {

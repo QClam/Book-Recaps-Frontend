@@ -1,14 +1,19 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { setSession } from "../utils/axios";
-import { Navigate, useLoaderData, useLocation, useMatch } from "react-router-dom";
+import { axiosInstance, getSession, isRoleMatched, isValidToken, setSession } from "../utils/axios";
+import { Navigate, useLoaderData, useLocation, useMatch, useNavigate } from "react-router-dom";
 import _ from "lodash";
 import { routes } from "../routes";
+import { jwtDecode } from "jwt-decode";
+import { toast } from "react-toastify";
+import { handleFetchError } from "../utils/handleFetchError";
 
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const loaderData = useLoaderData();
   const location = useLocation();
+  const navigate = useNavigate();
+
   const [ user, setUser ] = useState(loaderData); // { id, email, name, role, isOnboarded, profileData }
   const [ reCaptchaTokens ] = useState({ loginToken: "...", signupToken: "..." });
   const isAuthenticated = !!user;
@@ -18,8 +23,60 @@ export function AuthProvider({ children }) {
   const matchLogoutRoute = useMatch(routes.logout);
 
   useEffect(() => {
-    !_.isEqual(loaderData, user) && setUser(loaderData);
-  }, [ loaderData ]);
+    const handleFocus = async () => {
+      const token = getSession();
+      if (!token) {
+        navigate(routes.logout, { state: { from: location.pathname } });
+        return;
+      }
+
+      try {
+        const response = await axiosInstance.get("/api/personal/profile");
+
+        if (_.isEqual(user?.profileData, response.data)) return;
+
+        const decoded = jwtDecode(token)
+        const userId = decoded[import.meta.env.VITE_CLAIMS_IDENTIFIER]
+
+        if (
+          isValidToken(decoded) &&
+          (isRoleMatched(decoded, "Contributor") || isRoleMatched(decoded, "Customer")) &&
+          response.data?.id === userId
+        ) {
+          setUser({
+            email: decoded.email,
+            name: response.data.fullName,
+            role: isRoleMatched(decoded, "Contributor") ? "Contributor" : "Customer",
+            id: userId,
+            isOnboarded: response.data.isOnboarded,
+            profileData: response.data,
+          });
+          navigate(location.pathname, { replace: true });
+          return;
+        }
+        toast.error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
+        navigate(routes.logout, { state: { from: location.pathname } });
+      } catch
+        (error) {
+        const err = handleFetchError(error);
+        console.log("err", err);
+
+        if (err.status === 401) {
+          toast.error("Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại.");
+          navigate(routes.logout, { state: { from: location.pathname } });
+        }
+      }
+    };
+
+    window.addEventListener("focus", handleFocus);
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, [ location ]);
+
+  // useEffect(() => {
+  //   !_.isEqual(loaderData, user) && setUser(loaderData);
+  // }, [ loaderData ]);
 
   const login = (userData, accessToken) => {
     setUser(userData);

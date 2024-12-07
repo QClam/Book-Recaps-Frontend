@@ -21,7 +21,7 @@ function Sidebar() {
   const profileDropdownEl = useRef(null);
   const searchResultsDropdownEl = useRef(null);
 
-  const userName = user?.profileData.userName || user?.profileData.fullName || '';
+  const userName = user?.profileData.fullName  || user?.profileData.userName|| '';
   const imageUrl = user?.profileData.imageUrl?.replace("Files/Image/jpg/ad.jpg", "") || '/avatar-placeholder.png';
   const activeSubscription = user?.profileData.subscriptions.$values.find((sub) => sub.status === 0);
   const isPremium = !!activeSubscription;
@@ -241,7 +241,7 @@ function Sidebar() {
                 }>
                   <div className="user-profile" onClick={toggleLogout}>
                     <div className="text-sm">
-                      <p className="font-semibold">{userName}</p>
+                      <p className="font-semibold w-max max-w-44 line-clamp-1" title={userName}>{userName}</p>
                       <p className={cn("text-xs rounded-full px-2 py-0.5 w-max", {
                         "bg-[#FF6F61] text-white": isPremium,
                         "bg-gray-300 text-gray-700": !isPremium

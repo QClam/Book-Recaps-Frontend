@@ -82,7 +82,9 @@ const Application = () => {
               </Link>
             </td>
             <td>{ticket.category}</td>
-            <td>{ticket.description}</td>
+            <td>
+              <p className="max-w-60 break-words">{ticket.description}</p>
+            </td>
             <td>
               <p className={cn("status text-sm w-max", {
                 "open": ticket.status === 1,
@@ -91,7 +93,9 @@ const Application = () => {
                 {ticket.status === 1 ? 'Đang xử lí' : ticket.status === 2 ? 'Đã xử lí' : 'Chưa gửi'}
               </p>
             </td>
-            <td>{ticket.response}</td>
+            <td>
+              <p className="max-w-60 break-words">{ticket.response}</p>
+            </td>
             <td><p className="break-words">{new Date(ticket.createdAt + "Z").toLocaleString()}</p></td>
             <td>
               <p className="break-words">
