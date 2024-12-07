@@ -1,5 +1,5 @@
 
-.container {
+.containerner {
   background-color: #fff;
   border-radius: 30px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.35);
@@ -7,13 +7,15 @@
   overflow: hidden;
   width: 1004px;
   max-width: 70%;
-  min-height: 580px;
+  min-height: 500px;
   color: black;
   // margin-left: 10%;
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-left: 300px;
+  //margin-left: 250px;
+  //margin-top: 50px;
+  margin: 40px auto;
 
   p {
     font-size: 14px;
@@ -27,7 +29,7 @@
   }
 
   a {
-    color: #333;
+    color: #595656;
     font-size: 13px;
     text-decoration: none;
     margin: 15px 0 10px;
@@ -87,7 +89,7 @@
 
   &.active .toggle-container {
     transform: translateX(-100%);
-    border-radius: 0 150px 100px 0;
+    //border-radius: 0 150px 100px 0;
   }
 
   &.active .toggle {
@@ -158,7 +160,7 @@
   height: 100%;
   overflow: hidden;
   transition: all 0.6s ease-in-out;
-  border-radius: 150px 0 0 100px;
+  //border-radius: 150px 0 0 100px;
   z-index: 1000;
 }
 
@@ -175,7 +177,6 @@
   transition: all 0.6s ease-in-out;
 }
 
-
 .toggle-panel {
   position: absolute;
   width: 50%;
@@ -190,9 +191,6 @@
   transform: translateX(0);
   transition: all 0.6s ease-in-out;
 }
-.toggle-panel h1{
-  color: white;
-}
 
 .toggle-left {
   transform: translateX(-200%);
@@ -203,9 +201,12 @@
   transform: translateX(0);
 }
 
+.toggle-container p {
+  color: white;
+}
+
 .xuatban h5 {
   font-weight: bold;
   font-size: 25px;
   margin-bottom: 20px;
 }
-
