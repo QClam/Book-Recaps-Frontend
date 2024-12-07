@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { Form, Navigate, useActionData, useNavigate, useNavigation } from "react-router-dom";
-import "./Login.scss";
 import { useAuth } from "../../contexts/Auth";
 import { useToast } from "../../contexts/Toast";
 import { routes } from "../../routes";
@@ -32,7 +31,7 @@ function Login() {
 
   if (isAuthenticated) {
     // return <Navigate to={location.state?.from ? location.state.from : routes.dashboard} replace={true}/>
-    return <Navigate to={routes.dashboard} replace={true}/>
+    return <Navigate to={routes.index} replace={true}/>
   }
 
   return (
@@ -46,7 +45,7 @@ function Login() {
         </h2>
       </div>
 
-      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+      <div className="mt-6 sm:mx-auto sm:w-full sm:max-w-sm">
         {actionData?.error && <p style={{ color: 'red' }}>{actionData.error}</p>}
         <Form method="post" className="space-y-6">
           <input type="hidden" name="captchaToken" value="..."/>

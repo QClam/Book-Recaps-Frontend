@@ -1,12 +1,12 @@
-import React, { useState, useEffect }  from 'react';
+import { useEffect, useState } from 'react';
 import "../SidebarNavigation/css/Sidebar.scss"
-import { useNavigate } from "react-router-dom";
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from "react-router-dom";
 import { SidebarItems } from './SidebarItems'; // Import các mục điều hướng
 import LogoBR from "../../assets/removeBR.png";
+
 const Sidebar = () => {
   const navigate = useNavigate();
-  const [publisherName, setPublisherName] = useState(""); 
+  const [ publisherName, setPublisherName ] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -59,7 +59,6 @@ const Sidebar = () => {
     fetchData();
   }, []);
 
-
   const handleLogout = () => {
     // Perform logout logic here (e.g., clear tokens, redirect to login page)
     localStorage.removeItem('authToken'); // Example: remove auth token
@@ -68,8 +67,8 @@ const Sidebar = () => {
   };
   return (
     <div className="sidebar">
-      <div className="logo">  
-          <img src={LogoBR} alt="Logo" />       
+      <div className="logo">
+        <img src={LogoBR} alt="Logo"/>
       </div>
       <p className="publisher-name">{publisherName}</p>
       <ul className="nav-links">
@@ -80,7 +79,7 @@ const Sidebar = () => {
               {/* <span>{item.title}</span> */}
             </NavLink>
           </li>
-          
+
         ))}
         {/* Nút Logout */}
         <li onClick={handleLogout} className="logout">

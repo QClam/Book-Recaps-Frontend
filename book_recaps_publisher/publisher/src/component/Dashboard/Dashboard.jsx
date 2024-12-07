@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; 
+import { useState, useEffect } from 'react';
 import './Dashboard.scss';
 import { useNavigate } from 'react-router-dom';
 import emptyImage from "../../assets/empty-image.png";

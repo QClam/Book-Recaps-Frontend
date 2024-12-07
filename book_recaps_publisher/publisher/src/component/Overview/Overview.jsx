@@ -1,8 +1,7 @@
-import React from 'react';
 import { Link } from 'react-router-dom'; // Import Link để điều hướng
 import { Bar, Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement } from 'chart.js';
-import './Overview.scss';
+// import './Overview.scss';
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend, ArcElement);
 
