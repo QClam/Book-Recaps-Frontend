@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
-import { useNavigate } from "react-router-dom";
+import { useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/Auth";
 import { axiosInstance } from "../utils/axios";
 import { useToast } from "../contexts/Toast";
@@ -33,12 +33,15 @@ const Profile = () => {
   });
   const [ currentTab, setCurrentTab ] = useState('profile');
   const { showToast } = useToast();
+  const mounted = useRef(false);
+  const location = useLocation();
 
   useEffect(() => {
-    if (!_.isEqual(user.profileData, profile)) {
-      navigate(routes.dashboard);
+    if (!_.isEqual(user.profileData, profile) && mounted.current) {
+      window.location.reload();
     }
-  }, [user]);
+    mounted.current = true;
+  }, [ location ]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
