@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import "../History/History.scss";
-import { generatePath, Link } from 'react-router-dom';
+import { generatePath, Link, useLocation } from 'react-router-dom';
 import { axiosInstance } from "../../utils/axios";
 import { useAuth } from "../../contexts/Auth";
 import { routes } from "../../routes";
@@ -12,18 +12,25 @@ import Show from "../Show";
 
 const History = () => {
   const { user } = useAuth();
+  const location = useLocation();
 
   const [ viewTrackings, setViewTrackings ] = useState([]);
   const [ loading, setLoading ] = useState(true);
   const [ error, setError ] = useState(null);
   const [ page, setPage ] = useState(1);
   const totalPages = useRef(0);
+  const mounted = useRef(false);
 
   useEffect(() => {
-    fetchRecapData(page);
+    fetchViewHistory(page);
   }, [ page ]);
 
-  const fetchRecapData = async (pageNumber) => {
+  useEffect(() => {
+    if (mounted.current) fetchViewHistory(1);
+    mounted.current = true;
+  }, [ location ]);
+
+  const fetchViewHistory = async (pageNumber) => {
     setLoading(true);
     try {
       const response = await axiosInstance.get(`/api/viewtracking/getviewtrackingbyuserid/${user.id}?pageNumber=${pageNumber}&pageSize=5`);
@@ -124,6 +131,7 @@ const History = () => {
           nextLabel="Sau"
           breakLabel="..."
           pageCount={totalPages.current}
+          initialPage={page - 1}
           marginPagesDisplayed={1}
           pageRangeDisplayed={1}
           onPageChange={handleChangePage}

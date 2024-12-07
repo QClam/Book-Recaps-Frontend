@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './Settings.scss';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { routes } from "../../routes";
 import { useAuth } from "../../contexts/Auth";
 import { axiosInstance } from "../../utils/axios";
@@ -37,12 +37,15 @@ function Settings() {
   const [ imageFile, setImageFile ] = useState(null); // New state to store selected image file
   const [ imageUploadLoading, setImageUploadLoading ] = useState(false);
   const [ subscriptionPackageName, setSubscriptionPackageName ] = useState('');
+  const mounted = useRef(false);
+  const location = useLocation();
 
   useEffect(() => {
-    if (!_.isEqual(user.profileData, profile)) {
-      navigate(routes.index);
+    if (!_.isEqual(user.profileData, profile) && mounted.current) {
+      window.location.reload();
     }
-  }, [ user ]);
+    mounted.current = true;
+  }, [ location ]);
 
   // Handle tab change
   const handleTabChange = (tab) => {
@@ -122,9 +125,11 @@ function Settings() {
         ...user,
         name: result.data.fullName,
         email: result.data.email,
-        profileData: result.data
+        profileData: {
+          ...result.data,
+          subscriptions: { ...user.profileData.subscriptions }
+        }
       })
-
     } catch (error) {
       console.error('Error updating profile:', error);
       toast.error('Cập nhật thông tin thất bại!');
@@ -167,7 +172,10 @@ function Settings() {
         ...user,
         name: data.fullName,
         email: data.email,
-        profileData: data
+        profileData: {
+          ...data,
+          subscriptions: { ...user.profileData.subscriptions }
+        }
       })
       setUpdatedProfile({
         fullName: data.fullName || '',

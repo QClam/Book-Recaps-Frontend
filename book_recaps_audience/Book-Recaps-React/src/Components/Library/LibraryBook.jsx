@@ -9,8 +9,6 @@ const getPlaylists = async (request) => {
     const response = await axiosInstance.get("/api/playlists/my-playlists", {
       signal: request.signal
     });
-
-    console.log(response.data.data);
     return response.data.data?.$values || [];
   } catch (e) {
     const err = handleFetchError(e);

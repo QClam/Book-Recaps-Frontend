@@ -3,13 +3,14 @@ import "../Application/Application.scss";
 import { axiosInstance } from "../../../utils/axios";
 import { useAuth } from "../../../contexts/Auth";
 import { cn } from "../../../utils/cn";
-import { generatePath, Link } from "react-router-dom";
+import { generatePath, Link, useLocation } from "react-router-dom";
 import { routes } from "../../../routes";
 
 const Application = () => {
   const [ supportTickets, setSupportTickets ] = useState([]);
   const [ errorMessage, setErrorMessage ] = useState(null);
   const { user } = useAuth();
+  const location = useLocation();
 
   // Fetch support tickets by userId and get book title
   useEffect(() => {
@@ -51,7 +52,7 @@ const Application = () => {
       }
     }
     fetchSupportTickets();
-  }, []);
+  }, [ location ]);
 
   return (
     <div className="container mx-auto max-w-screen-xl p-5">

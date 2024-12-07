@@ -4,7 +4,7 @@ import { axiosInstance } from "../../../utils/axios";
 import { useAuth } from "../../../contexts/Auth";
 import { Divider } from "primereact/divider";
 import { BiPurchaseTag } from "react-icons/bi";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { routes } from "../../../routes";
 import { Message } from "primereact/message";
 import { TbExclamationCircle } from "react-icons/tb";
@@ -13,10 +13,11 @@ const SubscriptionHistory = () => {
   const [ subscriptionData, setSubscriptionData ] = useState(null);
   const [ loading, setLoading ] = useState(true);
   const { user } = useAuth();
+  const location = useLocation();
 
   useEffect(() => {
     fetchSubscriptionHistory();
-  }, []);
+  }, [ location ]);
 
   const fetchSubscriptionHistory = async () => {
     try {

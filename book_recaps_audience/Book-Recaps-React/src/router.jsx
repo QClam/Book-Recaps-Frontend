@@ -72,8 +72,8 @@ export const router = createBrowserRouter(createRoutesFromElements(
         <Route path={routes.viewHistory} element={<History/>}/>
         <Route path={routes.supportTickets} element={<Application/>}/>
         <Route path={routes.subscriptionHistory} element={<SubscriptionHistory/>}/>
-        <Route path={routes.becomeContributor} element={<ContributorTerm/>}/>
         <Route path={routes.profileSettings} element={<Settings/>}/>
+        <Route path={routes.becomeContributor} element={<ContributorTerm/>}/>
       </Route>
 
       {/*<Route path={routes.authorDetailProfile} element={<AuthorDetailProfile/>}/>*/}

@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import "../PlaylistBook/PlaylistBook.scss";
 import { generatePath, Link } from 'react-router-dom';
 import { axiosInstance } from "../../../utils/axios";
@@ -6,12 +6,18 @@ import { routes } from "../../../routes";
 import { useClickAway } from "react-use";
 import { Image } from "primereact/image";
 import { toast } from "react-toastify";
+import _ from "lodash";
 
 const PlaylistBook = ({ playlistsData }) => {
   const [ playlists, setPlaylists ] = useState(playlistsData);
   const [ showOptions, setShowOptions ] = useState(null);
   const deletePlaylistRef = useRef(null);
   const deletePlaylistItemRef = useRef(null);
+
+  useEffect(() => {
+    if (_.isEqual(playlists, playlistsData)) return;
+    setPlaylists(playlistsData);
+  }, [ playlistsData ]);
 
   useClickAway(deletePlaylistRef, () => {
     if (showOptions) setShowOptions(null);
