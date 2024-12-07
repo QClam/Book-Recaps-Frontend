@@ -2,12 +2,13 @@ import { useRef, useState } from "react";
 import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
 import Show from "./Show";
 import { useClickAway } from "react-use";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { routes } from "../routes";
 import { TbPlus } from "react-icons/tb";
 import { useAuth } from "../contexts/Auth";
 
 export const HeadBar = () => {
+  const location = useLocation();
   const [ isDropdownOpen, setIsDropdownOpen ] = useState(false);
   const { user } = useAuth()
   const dropdownEl = useRef(null);
@@ -56,6 +57,7 @@ export const HeadBar = () => {
               <Link
                 to={routes.logout}
                 className="block w-full px-4 py-2 text-left text-gray-700 hover:bg-gray-100"
+                state={{ from: location.pathname }}
               >
                 Logout
               </Link>

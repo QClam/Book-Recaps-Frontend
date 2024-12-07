@@ -46,6 +46,10 @@ const Profile = () => {
   };
 
   const handleUpdateProfile = async () => {
+    if (!updatedProfile.fullName) {
+      showToast({ severity: 'error', summary: 'Error', detail: 'Họ tên không được để trống!' });
+      return;
+    }
     try {
       const response = await axiosInstance.put('/api/personal/profile', {
         fullName: updatedProfile.fullName,
@@ -229,7 +233,16 @@ const Profile = () => {
 
             <Dialog
               visible={isModalOpen}
-              onHide={() => setModalOpen(false)}
+              onHide={() => {
+                setUpdatedProfile({
+                  fullName: user.profileData.fullName || '',
+                  gender: user.profileData.gender || 0,
+                  birthDate: user.profileData.birthDate || '',
+                  address: user.profileData.address || '',
+                  bankAccount: user.profileData.bankAccount || '',
+                })
+                setModalOpen(false)
+              }}
               content={({ hide }) => (
                 <div className="modal">
                   <div className="modal-content mx-auto">

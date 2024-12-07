@@ -1,10 +1,11 @@
-import { Form, Navigate, useActionData, useNavigate, useNavigation } from 'react-router-dom';
+import { Form, Navigate, useActionData, useLocation, useNavigate, useNavigation } from 'react-router-dom';
 import { useEffect } from "react";
 import { useAuth } from "../contexts/Auth";
 import { routes } from "../routes";
 import { useToast } from "../contexts/Toast";
 
 function Login() {
+  const location = useLocation();
   const navigate = useNavigate();
   const navigation = useNavigation();
   const actionData = useActionData();
@@ -32,6 +33,7 @@ function Login() {
   const loading = navigation.state === 'loading' || navigation.state === 'submitting';
 
   if (isAuthenticated) {
+    // return <Navigate to={location.state?.from ? location.state.from : routes.dashboard} replace={true}/>
     return <Navigate to={routes.dashboard} replace={true}/>
   }
 
