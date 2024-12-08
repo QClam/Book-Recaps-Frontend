@@ -26,7 +26,7 @@ export function AuthProvider({ children }) {
     const handleFocus = async () => {
       const token = getSession();
       if (!token) {
-        navigate(routes.logout, { state: { from: location.pathname } });
+        setUser(null);
         return;
       }
 
@@ -73,10 +73,6 @@ export function AuthProvider({ children }) {
       window.removeEventListener("focus", handleFocus);
     };
   }, [ location ]);
-
-  // useEffect(() => {
-  //   !_.isEqual(loaderData, user) && setUser(loaderData);
-  // }, [ loaderData ]);
 
   const login = (userData, accessToken) => {
     setUser(userData);

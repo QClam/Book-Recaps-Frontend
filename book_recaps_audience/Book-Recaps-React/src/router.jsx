@@ -7,10 +7,6 @@ import Application from "./Components/Setting/Application/Application";
 import Billing from "./Components/Setting/Billing/Billing";
 import LibraryBook, { playlistLoader } from "./Components/Library/LibraryBook";
 import Login from "./Components/Auth/Login";
-// import ExploreCategory from "./Components/Explore/ExploreCategory";
-// import BookListCategory from "./Components/Explore/BookApiCategory/BookListCategory/BookListCategory";
-// import AuthorBy from "./Components/Space/AuthorBy";
-// import AuthorBookApi from "./Components/Space/AuthorApi/AuthorBookApi/AuthorBookApi";
 import ConfirmEmail from "./Components/Auth/ConfirmEmail";
 import ForgetPassword from "./Components/Auth/ForgetPassword";
 import ContributorTerm from "./Components/Setting/BecomeContributor/ContributorTerm";
@@ -48,12 +44,6 @@ export const router = createBrowserRouter(createRoutesFromElements(
       <Route path={routes.index} element={<Homepage/>} loader={homepageLoader}/>
       <Route path={routes.explore} element={<Explore/>} loader={bookLoader}/>
 
-      {/*<Route path={routes.categories} element={<ExploreCategory/>}/>*/}
-      {/*<Route path={routes.categoryDetail} element={<BookListCategory/>}/>*/}
-
-      {/*<Route path={routes.authors} element={<AuthorBy/>}/>*/}
-      {/*<Route path={routes.authorBooks} element={<AuthorBookApi/>}/>*/}
-
       {/* Book details - recaps */}
       <Route path={routes.bookDetail} element={<UsRecapDetail/>} loader={bookDetailLoader}/>
       <Route path={routes.books} element={<BookFree/>}/>
@@ -65,7 +55,6 @@ export const router = createBrowserRouter(createRoutesFromElements(
       <Route path={routes.billingResult} element={<Result/>}/>
       <Route path={routes.confirmEmail} element={<ConfirmEmail/>}/>
 
-
       {/* Cần đăng nhập trước */}
       <Route element={<ProtectedRoute/>}>
         <Route path={routes.playlist} element={<LibraryBook/>} loader={playlistLoader}/>
@@ -75,13 +64,7 @@ export const router = createBrowserRouter(createRoutesFromElements(
         <Route path={routes.profileSettings} element={<Settings/>}/>
         <Route path={routes.becomeContributor} element={<ContributorTerm/>}/>
       </Route>
-
-      {/*<Route path={routes.authorDetailProfile} element={<AuthorDetailProfile/>}/>*/}
-      {/*<Route path={routes.authorsByCategory} element={<AuthorGenersDetail/>}/>*/}
-      {/*<Route path={routes.contributor} element={<RecapByContributor/>}/>*/}
-      {/* <Route path="/contributor-recaps/:userId" element={<ContributorRecaps />} /> */}
     </Route>
 
-    {/*<Route path="/help" element={<Report/>}/>*/}
   </Route>
 ));
