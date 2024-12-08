@@ -95,10 +95,6 @@ const BookList = () => {
     document.getElementById("contract").value = contract ?? "";
   }, [ q, category, contract ]);
 
-  // const handleNavigate = (contractId) => {
-  //   navigate(`/contract-detail/${contractId}`);
-  // };
-
   const resetFilter = () => {
     setSearchParams({});
   }
@@ -138,10 +134,9 @@ const BookList = () => {
         <div className="col-span-1">
           <Select
             id="contract"
-            placeholder="Tất cả"
+            placeholder="Tất cả hợp đồng"
             name="contract"
             options={[
-              { value: "", label: "Tất cả" },
               { value: "-1", label: "Chưa có hợp đồng" },
               { value: "0", label: "Bản nháp" },
               { value: "1", label: "Đang xử lý" },
@@ -307,7 +302,7 @@ function BooksTable() {
             {book.contracts?.map((contract) => (
               <div key={contract.id} className="flex gap-2 items-center max-w-80">
                 <Link
-                  to={contract.id}
+                  to={generatePath(routes.contractDetails, { id: contract.id })}
                   className="flex-1 line-clamp-1 hover:underline text-indigo-600">
                   {contract.id}
                 </Link>

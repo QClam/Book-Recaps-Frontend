@@ -10,9 +10,9 @@ import Show from "../Show";
 import { routes } from "../../routes";
 import { Image } from "primereact/image";
 
-const getBooksStats = async (contributorId, fromDate, toDate, request) => {
+const getBooksStats = async (publisherId, fromDate, toDate, request) => {
   try {
-    const response = await axiosInstance.get('/api/dashboard/getcontributorchart/' + contributorId, {
+    const response = await axiosInstance.get('/api/dashboard/getcontributorchart/' + publisherId, {
       params: { fromDate, toDate },
       signal: request.signal
     });
@@ -79,7 +79,7 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="bg-white p-6 rounded-md shadow-sm border border-gray-300 space-y-4">
-          <div className="text-lg font-semibold">Lượt xem</div>
+          <div className="text-lg font-semibold">Lượt xem tháng hiện tại</div>
           <div className="text-2xl font-bold mb-2">{views} views</div>
           <div>
             <div className="text-sm text-gray-500">Tháng trước</div>
@@ -90,7 +90,7 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="bg-white p-6 rounded-md shadow-sm border border-gray-300 space-y-4">
-          <div className="text-lg font-semibold">Số bài viết mới</div>
+          <div className="text-lg font-semibold">Số bài viết mới tháng hiện tại</div>
           <div className="text-2xl font-bold mb-2">{newPosts} bài viết</div>
           <div>
             <div className="text-sm text-gray-500">Tháng trước</div>
@@ -191,7 +191,7 @@ const TotalInfoChart = () => {
     setLoading(true);
     setController(newController);
 
-    const data = await getBooksStats(user.id, fromDate, toDate, newController);
+    const data = await getBooksStats(user.publisherData?.id, fromDate, toDate, newController);
 
     setStats(data);
     setLoading(false);

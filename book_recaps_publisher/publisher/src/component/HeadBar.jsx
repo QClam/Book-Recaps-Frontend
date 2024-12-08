@@ -27,7 +27,7 @@ export const HeadBar = () => {
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
             <div className="text-start hidden sm:block">
-              <p className="font-semibold">{user.name}</p>
+              <p className="font-semibold">{user.publisherData.publisherName || user.name}</p>
               <p className="text-sm text-gray-500 font-medium">
                 {user.role}
               </p>

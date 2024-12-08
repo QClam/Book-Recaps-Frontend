@@ -49,14 +49,14 @@ export const NavBar = () => {
 
         <NavbarLink
           href={routes.books}
-          icon={<TbNews/>}
+          icon={<TbBooks/>}
           text="Quản lý sách"
           isOpen={isOpen}
         />
 
         <NavbarLink
           href={routes.contracts}
-          icon={<TbBooks/>}
+          icon={<TbNews/>}
           text="Quản lý hợp đồng"
           isOpen={isOpen}
         />
