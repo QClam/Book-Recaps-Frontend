@@ -25,7 +25,7 @@ export function AuthProvider({ children }) {
     const handleFocus = async () => {
       const token = getSession();
       if (!token) {
-        navigate(routes.logout, { state: { from: location.pathname } });
+        setUser(null);
         return;
       }
 
