@@ -1,118 +1,26 @@
 import { useEffect, useState } from 'react';
 import "../Publisher/Publisher.scss";
-import { useNavigate } from 'react-router-dom';
+import { generatePath, Link } from 'react-router-dom';
+import { axiosInstance } from "../../utils/axios";
+import { useAuth } from "../../contexts/Auth";
+import { routes } from "../../routes";
 
 const FetchPublisherData = () => {
-  const [ profile, setProfile ] = useState(null); // Dữ liệu từ API đầu tiên
-  const [ publisherData, setPublisherData ] = useState(null); // Dữ liệu từ API thứ hai
+  const { user: { publisherData } } = useAuth();
+
   const [ payoutData, setPayoutData ] = useState(null); // Dữ liệu từ API lấy thông tin thanh toán
   const [ error, setError ] = useState(null);
-  const navigate = useNavigate();
-  const [ isImageLarge, setIsImageLarge ] = useState(false); // state để lưu trạng thái ảnh có lớn hay không
-
-  const handleImageClick = () => {
-    setIsImageLarge(!isImageLarge); // Toggle trạng thái khi click vào ảnh
-  };
 
   useEffect(() => {
     const fetchData = async () => {
-      const accessToken = localStorage.getItem('authToken');
       try {
-        // Gọi API đầu tiên để lấy `id`
-        const profileResponse = await fetch('https://bookrecaps.cloud/api/personal/profile', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        });
+        const publisherId = publisherData?.id
+        const payoutResponse = await axiosInstance.get(`/api/PublisherPayout/getlistpayoutinfobypublisherid/${publisherId}`,);
 
-        if (!profileResponse.ok) {
-          throw new Error("Failed to fetch profile data");
-        }
-
-        const profileData = await profileResponse.json();
-        console.log('Profile data:', profileData);
-
-        // Lấy `id` từ response API đầu tiên
-        const profileId = profileData?.id;
-        if (!profileId) {
-          throw new Error("Profile ID not found");
-        }
-
-        // Gọi API thứ hai với `id` để lấy dữ liệu nhà xuất bản
-        const publisherResponse = await fetch(
-          `https://bookrecaps.cloud/api/publisher/getbypublisheruser/${profileId}`,
-          {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-
-        if (!publisherResponse.ok) {
-          throw new Error("Failed to fetch publisher data");
-        }
-
-        const publisherData = await publisherResponse.json();
-        console.log('Publisher data:', publisherData);
-
-        // Lấy `publisherId` từ dữ liệu nhà xuất bản
-        const publisherId = publisherData?.id;
-        if (!publisherId) {
-          throw new Error("Publisher ID not found");
-        }
-
-        // Gọi API để lấy thông tin thanh toán của nhà xuất bản
-        const payoutResponse = await fetch(
-          `https://bookrecaps.cloud/api/PublisherPayout/getlistpayoutinfobypublisherid/${publisherId}`,
-          {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-
-        if (!payoutResponse.ok) {
-          throw new Error("Failed to fetch payout data");
-        }
-
-        const payoutData = await payoutResponse.json();
+        const payoutData = payoutResponse.data;
         console.log('Payout data:', payoutData);
 
-        // Gọi thêm API `getpayoutinfobyid` để lấy `imageURL`
-        const enrichedPayoutData = await Promise.all(
-          payoutData?.data?.$values.map(async (payout) => {
-            const payoutDetailResponse = await fetch(
-              `https://bookrecaps.cloud/api/PublisherPayout/getpayoutinfobyid/${payout.payoutId}`,
-              {
-                method: 'GET',
-                headers: {
-                  'Authorization': `Bearer ${accessToken}`,
-                  'Content-Type': 'application/json',
-                },
-              }
-            );
-
-            if (!payoutDetailResponse.ok) {
-              console.warn(`Failed to fetch payout detail for ID: ${payout.payoutId}`);
-              return { ...payout, imageURL: null };
-            }
-
-            const payoutDetail = await payoutDetailResponse.json();
-            return { ...payout, imageURL: payoutDetail.data.imageURL };
-          })
-        );
-
-        // Cập nhật state
-        setProfile(profileData);
-        setPublisherData(publisherData);
         setPayoutData(payoutData?.data?.$values || []); // Lọc dữ liệu payout
-        setPayoutData(enrichedPayoutData);
 
       } catch (err) {
         console.error('Error:', err);
@@ -122,11 +30,6 @@ const FetchPublisherData = () => {
 
     fetchData();
   }, []);
-
-  const handleDetailClick = (id) => {
-    // Navigate to the detail page with the selected payout ID
-    navigate(`/publisher-payout-detail/${id}`);
-  };
 
   return (
     <div className="publisherinfo">
@@ -144,15 +47,12 @@ const FetchPublisherData = () => {
       )}
 
       {payoutData && payoutData.length > 0 ? (
-        <div>
-          <h2>Doanh Thu</h2>
+        <div className="mt-6">
+          <h2>Quyết toán</h2>
           <table>
             <thead>
             <tr>
               <th>Nhà Xuất Bản</th>
-              {/* <th>Tỷ Lệ Chia Lợi Nhuận</th> */}
-              {/* <th>Hình Ảnh</th> */}
-
               <th>Thu nhập</th>
               <th>Trạng Thái</th>
               <th>Từ Ngày</th>
@@ -165,41 +65,26 @@ const FetchPublisherData = () => {
             {payoutData.map((payout) => (
               <tr key={payout.id}>
                 <td>{publisherData?.publisherName}</td>
-                {/* <td>{publisherData?.revenueSharePercentage}%</td>  */}
-                {/* <td>
-                                    <img
-                                src={payout.imageURL}
-                                alt="Doanh Thu"
-                                className={isImageLarge ? "large-image" : "small-image"}
-                                style={{ cursor: 'pointer' }}
-                                onClick={handleImageClick} 
-                                    />
-                                    </td> */}
-
-
                 <td className="earnings">
                   {new Intl.NumberFormat('vi-VN').format(payout.totalEarnings || 0)} <span
                   className="currency-symbol">đ</span>
                 </td>
-
                 <td>{payout.status}</td>
                 <td>{new Date(payout.fromDate).toLocaleDateString()}</td>
                 <td>{new Date(payout.toDate).toLocaleDateString()}</td>
                 <td>{payout.description}</td>
-                {/* <td className="chitiet">
-                                        <button onClick={() => handleDetailClick(payout.payoutId)}>Chi Tiết</button>
-                                    </td>      */}
                 <td className="chitiet">
-                  <button className="small-button" onClick={() => handleDetailClick(payout.payoutId)}>Chi Tiết</button>
+                  <Link
+                  to={generatePath(routes.payoutDetails, { id: payout.payoutId })}
+                  className="small-button"
+                  >
+                    Chi Tiết
+                  </Link>
                 </td>
-
               </tr>
-
             ))}
-
             </tbody>
           </table>
-
         </div>
       ) : (
         <p>Đang tải dữ liệu doanh thu...</p>

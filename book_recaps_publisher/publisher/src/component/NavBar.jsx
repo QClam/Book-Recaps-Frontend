@@ -68,7 +68,7 @@ export const NavBar = () => {
 
         <NavbarLink
           href={routes.payouts}
-          text="Doanh thu"
+          text="Quyết toán"
           icon={<HiOutlineCreditCard/>}
           isOpen={isOpen}
         />

@@ -12,7 +12,7 @@ import { Image } from "primereact/image";
 
 const getBooksStats = async (publisherId, fromDate, toDate, request) => {
   try {
-    const response = await axiosInstance.get('/api/dashboard/getcontributorchart/' + publisherId, {
+    const response = await axiosInstance.get('/api/dashboard/getpublisherchart/' + publisherId, {
       params: { fromDate, toDate },
       signal: request.signal
     });
@@ -167,7 +167,7 @@ const Dashboard = () => {
 export default Dashboard;
 
 const oneWeekAgo = new Date();
-oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+oneWeekAgo.setDate(oneWeekAgo.getDate() - 30);
 
 const TotalInfoChart = () => {
   const [ fromDate, setFromDate ] = useState(oneWeekAgo.toISOString().split('T')[0]);

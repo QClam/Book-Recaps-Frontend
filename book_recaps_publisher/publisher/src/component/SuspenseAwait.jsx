@@ -14,7 +14,7 @@ const SuspenseAwait = ({ children, resolve, errorElement, fallback, useDefaultLo
 
   return (
     <Suspense fallback={useDefaultLoading ? defaultLoading : fallback}>
-      <Await resolve={resolve} errorElement={errorElement}>
+      <Await resolve={resolve} errorElement={errorElement ? errorElement : <></>}>
         {children}
       </Await>
     </Suspense>

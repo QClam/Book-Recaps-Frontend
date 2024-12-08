@@ -1,236 +1,182 @@
-import { useState, useEffect } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { generatePath, Link } from 'react-router-dom';
 import "../ContractManager/ContractManager.scss";
+import { axiosInstance2 } from "../../../utils/axios";
+import { useAuth } from "../../../contexts/Auth";
+import { handleFetchError } from "../../../utils/handleFetchError";
+import Table from "../../table";
+import { routes } from "../../../routes";
+import { cn } from "../../../utils/cn";
+import { TbEye } from "react-icons/tb";
+import { Tooltip } from 'primereact/tooltip';
+import CustomBreadCrumb from "../../CustomBreadCrumb";
+import Select from "../../form/Select";
 
-const resolveRefs = (data) => {
-  const refMap = new Map();
-  const createRefMap = (obj) => {
-    if (typeof obj !== "object" || obj === null) return;
-    if (obj.$id) {
-      refMap.set(obj.$id, obj);
-    }
-    for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        createRefMap(obj[key]);
-      }
-    }
-  };
-  const resolveRef = (obj) => {
-    if (typeof obj !== "object" || obj === null) return obj;
-    if (obj.$ref) {
-      return refMap.get(obj.$ref);
-    }
-    for (const key in obj) {
-      if (obj.hasOwnProperty(key)) {
-        obj[key] = resolveRef(obj[key]);
-      }
-    }
-    return obj;
-  };
-  createRefMap(data);
-  return resolveRef(data);
-};
-  
 const Contracts = () => {
-  const [contracts, setContracts] = useState([]); 
-  const [loading, setLoading] = useState(true); 
-  const [error, setError] = useState(null); 
-  const [attachments, setAttachments] = useState({});
-  const navigate = useNavigate();
-  const accessToken = localStorage.getItem("authToken");
-  const [statusFilter, setStatusFilter] = useState('All');
-  const [userId, setUserId] = useState(null);
+  const { user } = useAuth();
+
+  const [ contracts, setContracts ] = useState([]);
+  const [ loading, setLoading ] = useState(true);
+  const [ error, setError ] = useState(null);
+  const [ controller, setController ] = useState(null);
+  const [ statusFilter, setStatusFilter ] = useState('All');
 
   useEffect(() => {
-    const fetchProfileData = async () => {
+    const getContracts = async () => {
+      const newController = new AbortController();
+      if (controller) controller.abort();
+
+      setController(newController);
+
       try {
-        const profileResponse = await fetch('https://bookrecaps.cloud/api/personal/profile', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
+        const response = await axiosInstance2.get('/contracts/by-publisher/' + user.publisherData?.id, {
+          signal: controller
         });
-
-        if (!profileResponse.ok) {
-          throw new Error("Failed to fetch profile data");
-        }
-
-        const profileData = await profileResponse.json();
-        setUserId(profileData?.id);
+        setContracts(response.data);
       } catch (error) {
-        setError(error.message);
-        setLoading(false);
+        const err = handleFetchError(error);
+        console.log("err", err);
+        setError(err.error);
       }
+      setController(null);
+      setLoading(false);
     };
 
-    fetchProfileData();
-  }, [accessToken]);
+    getContracts();
+    return () => controller?.abort();
+  }, []);
 
-  useEffect(() => {
-    const fetchContracts = async () => {
-      if (!userId) return;
-
-      try {
-        const response = await axios.get(
-          `https://bookrecaps.cloud/api/Contract/getallcontract`,
-          {
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-            },
-          }
-        );
-        // console.log("Raw contract data:", response.data);
-        
-        const result = resolveRefs(response.data);
-        // console.log("Resolved contract data:", result);
-        // Filter contracts based on the userId
-        const userContracts = result.data.$values.filter(contract => {
-          //console.log("Contract data:", contract); // Log từng hợp đồng
-          const publisher = contract.publisher;
-          return publisher && publisher.userId === userId;
-        });
-        
-        console.log("Filtered contracts:", userContracts); 
-        setContracts(userContracts);
-        setLoading(false);
-      } catch (error) {
-        setError(error.message);
-        setLoading(false);
-      }
-    };
-
-    fetchContracts();
-  }, [userId, accessToken]);
-
-
-  // Fetch attachments for each contract
-  useEffect(() => {
-    const fetchAttachments = async (contractId) => {
-      try {
-        const response = await axios.get(
-          `https://bookrecaps.cloud/api/contract-attachment/getallattachmentbycontractid/${contractId}`,
-          {
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-              'Content-Type': 'application/json',
-              'Accept': 'application/json',
-            },
-          }
-        );
-        const result = resolveRefs(response.data);
-        return result.data.$values;
-      } catch (error) {
-        console.error("Error fetching attachments", error);
-        return [];
-      }
-    };
-
-    // For each contract, fetch its attachments
-    const fetchAllAttachments = async () => {
-        const attachmentData = {};
-        for (const contract of contracts) {
-          const attachmentsForContract = await fetchAttachments(contract.id);
-          attachmentData[contract.id] = attachmentsForContract;
-        }
-        setAttachments(attachmentData);
-      };
-  
-      if (contracts.length > 0) {
-        fetchAllAttachments();
-      }
-    }, [contracts, accessToken]);
-
-    
   const getStatusLabel = (status) => {
     switch (status) {
-      case 0: return "Bản nháp";
-      case 1: return "Đang xử lý";
-      case 2: return "Chưa bắt đầu";
-      case 3: return "Đang kích hoạt";
-      case 4: return "Hết hạn";
-      case 5: return "Từ chối";
-      default: return "Unknown";
+      case 0:
+        return "Bản nháp";
+      case 1:
+        return "Đang xử lý";
+      case 2:
+        return "Chưa bắt đầu";
+      case 3:
+        return "Đã kích hoạt";
+      case 4:
+        return "Hết hạn";
+      case 5:
+        return "Từ chối";
+      default:
+        return "Unknown";
     }
   };
-  
-  // Filter contracts based on selected status
-  const filteredContracts = statusFilter === 'All' 
-  ? contracts 
-  : contracts.filter(contract => getStatusLabel(contract.status) === statusFilter);
 
-  
+  // Filter contracts based on selected status
+  const filteredContracts = statusFilter === 'All' ? contracts : contracts.filter(contract => getStatusLabel(contract.status) === statusFilter);
+
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
-  const handleDetailClick = (contractId) => {
-    navigate(`/contract-detail/${contractId}`);
-  };
 
   return (
-    <div className="contract-manager">
-      <h2>Danh sách hợp đồng</h2>
-      {/* Status filter controls */}
-      <div>
-                <label htmlFor="status-filter">Filter by Status:</label>
-                <select
-                    id="status-filter"
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value)}
-                >
-                    <option value="All">Tất cả</option>
-                    <option value="Bản nháp">Bản nháp</option>
-                    <option value="Đang xử lý">Đang xử lý</option>
-                    <option value="Chưa bắt đầu">Chưa bắt đầu</option>
-                    <option value="Đang kích hoạt">Đang kích hoạt</option>
-                    <option value="Hết hạn">Hết hạn</option>
-                    <option value="Từ chối">Từ chối</option>
+    <>
+      <CustomBreadCrumb items={[ { label: "Contracts" } ]}/>
 
-                </select>
-            </div>
+      <div className="flex justify-between items-end gap-4 mb-6">
+        <h2 className="text-2xl font-semibold text-gray-900">
+          Danh sách hợp đồng hiện có
+        </h2>
 
-      <table className="contract-table">
-        <thead>
-        <tr>
-        <th>ID</th>
-        <th>Nhà Xuất Bản</th>
-        <th>Chia Sẻ Doanh Thu</th>
-        <th>Ngày Bắt Đầu</th>
-        <th>Ngày Kết Thúc</th>
-        <th>Trạng Thái</th>
-        <th>Tên Tệp Đính Kèm</th>
-        <th>Hành Động</th>
-      </tr>
+        <Select
+          id="status"
+          name="status"
+          options={[
+            { value: "All", label: "Tất cả" },
+            { value: "Bản nháp", label: "Bản nháp" },
+            { value: "Đang xử lý", label: "Đang xử lý" },
+            { value: "Chưa bắt đầu", label: "Chưa bắt đầu" },
+            { value: "Đang kích hoạt", label: "Đang kích hoạt" },
+            { value: "Hết hạn", label: "Hết hạn" },
+            { value: "Từ chối", label: "Từ chối" },
+          ]}
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        />
+      </div>
 
-        </thead>
-        <tbody>
-          {filteredContracts.map((contract) => (
-            <tr key={contract.id}>
-              <td>{contract.id}</td>
-              <td>{contract.publisher.publisherName || ""}</td>
-              <td>{contract.revenueSharePercentage}%</td>
-              <td>{new Date(contract.startDate).toLocaleDateString()}</td>
-              <td>{new Date(contract.endDate).toLocaleDateString()}</td>
-              <td className={`status ${getStatusLabel(contract.status).toLowerCase()}`}>
-                {getStatusLabel(contract.status)}
-              </td>
-              <td>
-                {/* Display attachment names for the current contract */}
-                {attachments[contract.id]?.map((attachment, index) => (
-                  <div key={index}>{attachment.name}</div>
-                ))}
-              </td>
-
-              <td>
-              <button onClick={() => handleDetailClick(contract.id)} className="contract-button">Chi tiết</button>
+      <Table.Container>
+        <Table.Head columns={[
+          'ID',
+          'Tỷ lệ doanh thu',
+          'Bắt Đầu',
+          'Kết Thúc',
+          'Trạng Thái',
+          'Số Lượng Sách',
+          'Ngày Tạo',
+          ''
+        ]}/>
+        <Table.Body
+          when={filteredContracts && filteredContracts.length > 0 && !loading}
+          fallback={
+            <tr>
+              <td className="h-32 text-center" colSpan="100">
+                <div className="flex gap-2 justify-center items-center">
+                  <p>No contract found</p>
+                </div>
               </td>
             </tr>
+          }>
+          {filteredContracts.map((contract) => (
+            <Table.Row key={contract.id}>
+              <Table.Cell isFirstCell={true}>
+                <Link
+                  to={generatePath(routes.contractDetails, { id: contract.id })}
+                  className="max-w-sm line-clamp-1 hover:underline text-blue-600"
+                  title={contract.id}
+                >
+                  {contract.id}
+                </Link>
+              </Table.Cell>
+              <Table.Cell>
+                <Tooltip target=".tooltipppp" mouseTrack mouseTrackLeft={5} position="left" className="max-w-96"/>
+                <p
+                  className="tooltipppp font-semibold text-blue-600 cursor-help"
+                  data-pr-tooltip={"Bạn sẽ nhận được " + Number(contract.revenueSharePercentage).toFixed(1).replace(/(\.0)$/, '') + "% doanh thu mà platform có được từ mỗi lượt xem premium từ các bài viết tóm tắt cho sách này."}
+                >
+                  {Number(contract.revenueSharePercentage).toFixed(1).replace(/(\.0)$/, '')}%
+                </p>
+              </Table.Cell>
+              <Table.Cell>
+                {contract.startDate ? new Date(contract.startDate + "Z").toLocaleDateString() : 'N/A'}
+              </Table.Cell>
+              <Table.Cell>
+                {contract.endDate ? new Date(contract.endDate + "Z").toLocaleDateString() : 'N/A'}
+              </Table.Cell>
+              <Table.Cell>
+                <p className={cn("rounded-full w-max px-2 py-1 text-white text-sm font-semibold text-center", {
+                  "bg-gray-400": contract.status === 0,
+                  "bg-yellow-400": contract.status === 1,
+                  "bg-blue-400": contract.status === 2,
+                  "bg-green-400": contract.status === 3,
+                  "bg-red-400": contract.status === 4,
+                  "bg-red-600": contract.status === 5,
+                })}>
+                  {getStatusLabel(contract.status)}
+                </p>
+              </Table.Cell>
+              <Table.Cell>
+                {contract.bookCount} sách
+              </Table.Cell>
+              <Table.Cell>
+                {new Date(contract.createdAt + "Z").toLocaleDateString()}
+              </Table.Cell>
+              <Table.Cell>
+                <Link
+                  to={generatePath(routes.contractDetails, { id: contract.id })}
+                  className="block w-fit border rounded p-1 hover:bg-indigo-200 disabled:opacity-50 disabled:cursor-progress"
+                  title="View details"
+                >
+                  <span className="text-lg"><TbEye/></span>
+                </Link>
+              </Table.Cell>
+            </Table.Row>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </Table.Body>
+      </Table.Container>
+    </>
   );
 };
 

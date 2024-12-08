@@ -293,7 +293,7 @@ export const primeStyling = {
   },
   breadcrumb: {
     root: {
-      className: cn('overflow-x-auto', 'border border-gray-300 rounded-md p-4')
+      className: cn('overflow-x-auto', 'border border-gray-300 rounded-md py-4')
     },
     menu: 'm-0 p-0 list-none flex items-center flex-nowrap',
     action: {

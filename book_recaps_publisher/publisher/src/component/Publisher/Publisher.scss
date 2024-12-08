@@ -1,8 +1,8 @@
 .publisherinfo {
     font-family: 'Arial', sans-serif;
     margin: 20px auto; /* Căn giữa card */
-    padding: 40px 50px; /* Khoảng cách bên trong card */
-    max-width: 850px; /* Giới hạn chiều rộng */
+    padding: 40px; /* Khoảng cách bên trong card */
+    //max-width: 850px; /* Giới hạn chiều rộng */
     background-color: #ffffff; /* Màu nền trắng */
     border: 2px solid #8D82E0; /* Màu viền tím nhạt */
     border-radius: 12px; /* Bo góc mềm mại */
@@ -103,7 +103,7 @@ img {
 }
 
 
-.publisherinfo button {
+.publisherinfo a {
     background-color:  #3498db;;
     color: white;
     padding: 8px 14px;

@@ -1,7 +1,7 @@
 import { Suspense, useEffect, useState } from "react";
-import { Await, defer, json, useAsyncValue, useLoaderData } from "react-router-dom";
+import { Await, defer, generatePath, json, Link, useAsyncValue, useLoaderData } from "react-router-dom";
 import { handleFetchError } from "../../utils/handleFetchError";
-import { axiosInstance } from "../../utils/axios";
+import { axiosInstance, axiosInstance2 } from "../../utils/axios";
 import { Divider } from "primereact/divider";
 import { RiEyeLine, RiHeadphoneLine, RiThumbUpLine } from "react-icons/ri";
 import CustomBreadCrumb from "../CustomBreadCrumb";
@@ -12,6 +12,10 @@ import { cn } from "../../utils/cn";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import Show from "../Show";
 import SuspenseAwait from "../SuspenseAwait";
+import Table from "../table";
+import { useAuth } from "../../contexts/Auth";
+import { TbEye } from "react-icons/tb";
+import { Tooltip as Tooltipp } from 'primereact/tooltip';
 
 const getBookStats = async (bookId, fromDate, toDate, request) => {
   try {
@@ -52,7 +56,7 @@ const BookDetail = () => {
       <CustomBreadCrumb items={[ { label: "Books", path: routes.books }, { label: "Book details" } ]}/>
 
       <div className="flex gap-6 items-start">
-        <div className="flex-[3]">
+        <div className="flex-[3] space-y-4">
           <SuspenseAwait
             resolve={book}
             errorElement={
@@ -61,6 +65,10 @@ const BookDetail = () => {
               </div>
             }>
             <TotalInfoChart/>
+          </SuspenseAwait>
+
+          <SuspenseAwait resolve={book}>
+            <Contracts/>
           </SuspenseAwait>
         </div>
         <div className="flex-[2]">
@@ -319,7 +327,6 @@ const TotalInfoChart = () => {
     }
   }
 
-  console.log(stats)
   return (
     <div className="space-y-4">
       <Show when={stats}>
@@ -441,10 +448,142 @@ const TotalInfoChart = () => {
             </AreaChart>
           </ResponsiveContainer>
         </div>
-        <h1 className="text-lg font-semibold mb-4 italic text-center text-gray-600">
-          Thống số tổng hợp từ các bài viết của sách
+        <h1 className="text-lg font-semibold mb-4 mt-2 italic text-center text-gray-600">
+          Thông số tổng hợp từ các bài viết của sách
         </h1>
       </div>
+    </div>
+  )
+}
+
+const Contracts = () => {
+  const book = useAsyncValue();
+  const { user } = useAuth();
+  const [ contracts, setContracts ] = useState([]);
+  const [ loading, setLoading ] = useState(true);
+  const [ controller, setController ] = useState(null);
+
+  useEffect(() => {
+    const getContracts = async () => {
+      const newController = new AbortController();
+      if (controller) controller.abort();
+
+      setController(newController);
+
+      try {
+        const response = await axiosInstance2.get('/contracts/book/' + book.id + '/publisher/' + user.publisherData?.id, {
+          signal: controller
+        });
+        setContracts(response.data);
+      } catch (error) {
+        const err = handleFetchError(error);
+        console.log("err", err);
+      }
+      setController(null);
+      setLoading(false);
+    };
+
+    getContracts();
+    return () => controller?.abort();
+  }, []);
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case 0:
+        return "Bản nháp";
+      case 1:
+        return "Đang xử lý";
+      case 2:
+        return "Chưa bắt đầu";
+      case 3:
+        return "Đã kích hoạt";
+      case 4:
+        return "Hết hạn";
+      case 5:
+        return "Từ chối";
+      default:
+        return "Unknown";
+    }
+  };
+
+  return (
+    <div className="p-4 bg-white rounded-lg shadow-md border border-gray-300">
+      <h2 className="text-2xl font-semibold text-gray-900 mb-6">Các hợp đồng liên quan</h2>
+      <Table.Container>
+        <Table.Head columns={[
+          'ID',
+          'Tỷ lệ doanh thu',
+          'Bắt Đầu',
+          'Kết Thúc',
+          'Trạng Thái',
+          'Ngày Tạo',
+          ''
+        ]}/>
+        <Table.Body
+          when={contracts && contracts.length > 0 && !loading}
+          fallback={
+            <tr>
+              <td className="h-32 text-center" colSpan="100">
+                <div className="flex gap-2 justify-center items-center">
+                  <p>No contract found</p>
+                </div>
+              </td>
+            </tr>
+          }>
+          {contracts.map((contract) => (
+            <Table.Row key={contract.id}>
+              <Table.Cell isFirstCell={true}>
+                <Link
+                  to={generatePath(routes.contractDetails, { id: contract.id })}
+                  className="max-w-sm line-clamp-1 hover:underline text-blue-600"
+                  title={contract.id}
+                >
+                  {contract.id}
+                </Link>
+              </Table.Cell>
+              <Table.Cell>
+                <Tooltipp target=".tooltipppp" mouseTrack mouseTrackLeft={5} position="left" className="max-w-96"/>
+                <p
+                  className="tooltipppp font-semibold text-blue-600"
+                  data-pr-tooltip={"Bạn sẽ nhận được " + Number(contract.revenueSharePercentage).toFixed(1).replace(/(\.0)$/, '') + "% doanh thu mà platform có được từ mỗi lượt xem premium từ các bài viết tóm tắt cho sách này."}
+                >
+                  {Number(contract.revenueSharePercentage).toFixed(1).replace(/(\.0)$/, '')}%
+                </p>
+              </Table.Cell>
+              <Table.Cell>
+                {contract.startDate ? new Date(contract.startDate + "Z").toLocaleDateString() : 'N/A'}
+              </Table.Cell>
+              <Table.Cell>
+                {contract.endDate ? new Date(contract.endDate + "Z").toLocaleDateString() : 'N/A'}
+              </Table.Cell>
+              <Table.Cell>
+                <p className={cn("rounded-full w-max px-2 py-1 text-white text-sm font-semibold text-center", {
+                  "bg-gray-400": contract.status === 0,
+                  "bg-yellow-400": contract.status === 1,
+                  "bg-blue-400": contract.status === 2,
+                  "bg-green-400": contract.status === 3,
+                  "bg-red-400": contract.status === 4,
+                  "bg-red-600": contract.status === 5,
+                })}>
+                  {getStatusLabel(contract.status)}
+                </p>
+              </Table.Cell>
+              <Table.Cell>
+                {new Date(contract.createdAt + "Z").toLocaleDateString()}
+              </Table.Cell>
+              <Table.Cell>
+                <Link
+                  to={generatePath(routes.contractDetails, { id: contract.id })}
+                  className="block w-fit border rounded p-1 hover:bg-indigo-200 disabled:opacity-50 disabled:cursor-progress"
+                  title="View details"
+                >
+                  <span className="text-lg"><TbEye/></span>
+                </Link>
+              </Table.Cell>
+            </Table.Row>
+          ))}
+        </Table.Body>
+      </Table.Container>
     </div>
   )
 }
