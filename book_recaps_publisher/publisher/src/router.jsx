@@ -1,7 +1,7 @@
 import { createBrowserRouter, createRoutesFromElements, Route } from "react-router-dom";
 import Login from './component/Auth/Login';
 import MainLayout from './component/Layout/MainLayout';
-import BookList from './component/ListBook/BookList/BookList';
+import BookList, { booksLoader } from './component/ListBook/BookList/BookList';
 import Settings from './component/Setting/Settings';
 import ContractDetail from './component/Contract/ContractDetail/ContractDetail';
 import Dashboard from './component/Dashboard/Dashboard';
@@ -27,7 +27,7 @@ export const router = createBrowserRouter(createRoutesFromElements(
     <Route element={<ProtectedRoute/>}>
       <Route element={<MainLayout/>}>
         <Route path={routes.index} element={<Dashboard/>}/>
-        <Route path={routes.books} element={<BookList/>}/>
+        <Route path={routes.books} element={<BookList/>} loader={booksLoader}/>
         <Route path={routes.bookDetails} element={<DashboardDetail/>}/>
         <Route path={routes.contracts} element={<Contract/>}/>
         <Route path={routes.contractDetails} element={<ContractDetail/>}/>

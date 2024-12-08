@@ -42,6 +42,7 @@ export function AuthProvider({ children }) {
           isRoleMatched(decoded, "Publisher") &&
           response.data.id === userId
         ) {
+          localStorage.setItem("publisher", publisherRes.data.id);
           setUser({
             email: decoded.email,
             name: response.data.fullName,
@@ -89,6 +90,7 @@ export function AuthProvider({ children }) {
   const logout = async () => {
     setUser(null);
     setSession(null);
+    localStorage.removeItem("publisher");
   };
 
   const isAuthenticated = !!user;

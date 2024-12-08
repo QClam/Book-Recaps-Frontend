@@ -41,6 +41,7 @@ export async function loginAction({ request }) {
       },
     });
 
+    localStorage.setItem("publisher", publisherResponse.data.id);
     return {
       user: {
         email: decoded.email,

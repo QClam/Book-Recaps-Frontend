@@ -28,6 +28,7 @@ export const sessionLoader = async () => {
     isRoleMatched(decoded, "Publisher") &&
     responseId === userId
   ) {
+    localStorage.setItem("publisher", pub.id);
     return {
       email: decoded.email,
       name: profileData.fullName,
