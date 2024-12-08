@@ -140,6 +140,15 @@ const BookDetailsImpl = ({ dialogVisible, setDialogVisible }) => {
             )}
             <p className="text-gray-800 mb-4">{book.description}</p>
 
+            <div className="mb-3">
+              <p className="min-w-full line-clamp-2 break-words">
+                <strong>ISBN-10:</strong> {book.isbN_10 || "N/A"}
+              </p>
+              <p className="min-w-full line-clamp-2 break-words">
+                <strong>ISBN-13:</strong> {book.isbN_13 || "N/A"}
+              </p>
+            </div>
+
             {/* Authors Section */}
             {book.authors?.$values && book.authors.$values.length > 0 && (
               <div className="mb-3">
@@ -179,7 +188,6 @@ const BookDetailsImpl = ({ dialogVisible, setDialogVisible }) => {
                 </ul>
               </div>
             )}
-
           </div>
         </div>
 

@@ -418,10 +418,16 @@ function BooksTable({ handleClickCreate }) {
             <div className="min-w-36">
               <Link
                 to={generatePath(routes.bookDetails, { bookId: book.id })}
-                className="min-w-full line-clamp-3 break-words hover:underline text-indigo-500 font-semibold"
+                className="min-w-full line-clamp-3 break-words hover:underline text-indigo-500 font-semibold mb-2"
               >
                 {book.title} ({book.publicationYear})
               </Link>
+              <p className="min-w-full line-clamp-2 break-words">
+                <strong>ISBN-10:</strong> {book.isbN_10 || "N/A"}
+              </p>
+              <p className="min-w-full line-clamp-2 break-words">
+                <strong>ISBN-13:</strong> {book.isbN_13 || "N/A"}
+              </p>
             </div>
           </Table.Cell>
           <Table.Cell>
@@ -432,7 +438,7 @@ function BooksTable({ handleClickCreate }) {
             </div>
           </Table.Cell>
           <Table.Cell>
-            <div className="min-w-28">
+          <div className="min-w-28">
               <p className="min-w-full line-clamp-3 break-words">
                 {book.categoryNames?.$values.join(", ")}
               </p>
