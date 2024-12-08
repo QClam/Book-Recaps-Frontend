@@ -4,7 +4,7 @@ import api from '../Auth/AxiosInterceptors';
 import { Article } from '@mui/icons-material';
 import { fetchContractDetail } from './ContractServices';
 
-function AddContractAttachment({ contractId, disableUpdate, onUpdateAttachments  }) {
+function AddContractAttachment({ contractId, disableUpdate, onUpdateAttachments }) {
 
     const [open, setOpen] = useState(false);
 
@@ -71,10 +71,10 @@ function AddContractAttachment({ contractId, disableUpdate, onUpdateAttachments 
                     "Content-Type": "multipart/form-data",
                 },
             });
-            const newAttachment  = response.data.data;
+            const newAttachment = response.data.data;
 
-           // Cập nhật danh sách tài liệu đính kèm trong ContractDetail qua callback
-           onUpdateAttachments((prevAttachments) => [...prevAttachments, newAttachment]);
+            // Cập nhật danh sách tài liệu đính kèm trong ContractDetail qua callback
+            onUpdateAttachments((prevAttachments) => [...prevAttachments, newAttachment]);
             setLoading(false);
             // console.log("Hàng đính kèm: ", contractAttachment);
             handleClose();
@@ -83,6 +83,22 @@ function AddContractAttachment({ contractId, disableUpdate, onUpdateAttachments 
             console.error("Error Posting", error);
         }
     };
+
+    const handleDeleteContractAttachment = async (id) => {
+
+        setLoading(true);
+        try {
+            await api.delete(`/api/contract-attachment/delete/${id}`);
+
+            setLoading(false);
+            alert("Xóa thành công");
+
+            await getContractDetail(); // Gọi lại API để cập nhật contractBooks
+        } catch (error) {
+            console.error("Xóa thất bại", error);
+            alert("Xóa thất bại")
+        }
+    }
 
     return (
         <div >
@@ -104,6 +120,9 @@ function AddContractAttachment({ contractId, disableUpdate, onUpdateAttachments 
                                     <Typography variant="body2">Ngày tạo: {new Date(item.createdAt).toLocaleDateString()}</Typography>
                                     <Button href={item.attachmentURL} target="_blank" rel="noopener noreferrer">
                                         Chi tiết
+                                    </Button>
+                                    <Button color='error' onClick={() => handleDeleteContractAttachment(item.id)} disabled={loading}>
+                                        {loading ? <CircularProgress size={20} color='inherit' /> : "Xóa"}
                                     </Button>
 
                                 </CardContent>
