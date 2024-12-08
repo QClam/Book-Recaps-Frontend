@@ -5,6 +5,7 @@ import { useAuth } from "../../contexts/Auth";
 import { jwtDecode } from "jwt-decode";
 import { axiosInstance, isRoleMatched, isValidToken } from "../../utils/axios";
 import { routes } from "../../routes";
+import { toast } from "react-toastify";
 
 function Login() {
   const location = useLocation();
@@ -93,12 +94,13 @@ function Login() {
       const response = await axiosInstance.post("/api/register", newUser);
       console.log("Register Successfully", newUser);
       console.log("Link: ", response.data.message);
-      navigate(routes.confirmEmail, {
-        state: {
-          email: registerForm.email,
-          message: response.data.message,
-        },
-      });
+      // navigate(routes.confirmEmail, {
+      //   state: {
+      //     email: registerForm.email,
+      //     message: response.data.message,
+      //   },
+      // });
+      toast.success("Đăng ký thành công. Vui lòng kiểm tra email để xác nhận tài khoản.");
 
       setRegisterForm({
         fullName: "",
