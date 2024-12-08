@@ -12,7 +12,7 @@ export function ToastProvider({ children }) {
 
   return (
     <ToastContext.Provider value={{ showToast }}>
-      <Toast ref={toast} position="top-center"/>
+      <Toast ref={toast} position="top-right"/>
       {children}
     </ToastContext.Provider>
   );

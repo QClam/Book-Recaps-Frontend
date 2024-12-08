@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 import "../ContractDetail/ContractDetail.scss"
@@ -34,17 +34,16 @@ const resolveRefs = (data) => {
   return resolveRef(data);
 };
 
-
 const ContractDetail = () => {
   const { id } = useParams(); // Lấy ID từ URL
-  const [contract, setContract] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [isApproved, setIsApproved] = useState(false); // Track if approved
-  const [showConfirmModal, setShowConfirmModal] = useState(false); // Modal visibility state
-  const [books, setBooks] = useState([]); // State for books
-  const [showRejectModal, setShowRejectModal] = useState(false);
-  const [isRejected, setIsRejected] = useState(false); 
+  const [ contract, setContract ] = useState(null);
+  const [ loading, setLoading ] = useState(true);
+  const [ error, setError ] = useState(null);
+  const [ isApproved, setIsApproved ] = useState(false); // Track if approved
+  const [ showConfirmModal, setShowConfirmModal ] = useState(false); // Modal visibility state
+  const [ books, setBooks ] = useState([]); // State for books
+  const [ showRejectModal, setShowRejectModal ] = useState(false);
+  const [ isRejected, setIsRejected ] = useState(false);
   const accessToken = localStorage.getItem("authToken");
 
   useEffect(() => {
@@ -65,11 +64,11 @@ const ContractDetail = () => {
         // console.log(response.data.data.books?.$values || [])
         // console.log(response.data.data)
         setContract(contractDetail);
-       console.log(contractDetail);
+        console.log(contractDetail);
 
-       const bookContract = contractDetail.books?.$values || [];
-       console.log(bookContract);
-       setBooks(bookContract);
+        const bookContract = contractDetail.books?.$values || [];
+        console.log(bookContract);
+        setBooks(bookContract);
 
         setLoading(false);
       } catch (error) {
@@ -79,7 +78,7 @@ const ContractDetail = () => {
     };
 
     fetchContractDetail();
-  }, [id, accessToken]);
+  }, [ id, accessToken ]);
 
   // Hàm thay đổi trạng thái hợp đồng
   const handleStatusChange = async (newStatus) => {
@@ -116,15 +115,13 @@ const ContractDetail = () => {
     setIsApproved(true); // Đánh dấu đã "Chấp thuận"
     setIsRejected(false); // Vô hiệu hóa "Từ chối"
   };
-  
+
   const confirmReject = () => {
     handleStatusChange(5); // Set trạng thái "Từ chối"
     setShowRejectModal(false); // Đóng modal
     setIsRejected(true); // Đánh dấu đã "Từ chối"
     setIsApproved(false); // Vô hiệu hóa "Chấp thuận"
   };
-  
-
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
@@ -133,10 +130,10 @@ const ContractDetail = () => {
     <div className="contract-detail">
       <h2>Contract Detail</h2>
       <div className="info-box">
-       <p><strong>Tên Nhà xuất bản:</strong>{contract.publisher.publisherName || ""}</p> 
+        <p><strong>Tên Nhà xuất bản:</strong>{contract.publisher.publisherName || ""}</p>
         <p><strong>Mã Nhà xuất bản:</strong> {contract.publisherId}</p>
-         
-         <p><strong>Thông tin liên hệ:</strong> {contract.publisher.contactInfo || "N/A"}</p>
+
+        <p><strong>Thông tin liên hệ:</strong> {contract.publisher.contactInfo || "N/A"}</p>
         <p><strong>Tài khoản ngân hàng:</strong> {contract.publisher.bankAccount || "N/A"}</p>
         <p><strong>Phần trăm chia sẻ doanh thu:</strong> <span>{contract.revenueSharePercentage}%</span></p>
         <p><strong>Ngày tạo:</strong> {new Date(contract.startDate).toLocaleDateString()}</p>
@@ -144,33 +141,33 @@ const ContractDetail = () => {
         <p><strong>Ngày kết thúc:</strong> {new Date(contract.endDate).toLocaleDateString()}</p>
         <p><strong>Trạng thái:</strong> <span className="status">{getStatusLabel(contract.status)}</span></p>
         <div className="buttons">
-  <button
-    className="edit-btn"
-    onClick={() => setShowRejectModal(true)}
-    disabled={
-      contract?.status === 3 || // Đang kích hoạt
-      contract?.status === 2 || // Chưa bắt đầu
-      contract?.status === 5 || //Từ chối
-      isApproved || 
-      contract?.status === 2 // Nếu đã chấp thuận
-    }
-  >
-    Từ chối
-  </button>
+          <button
+            className="edit-btn"
+            onClick={() => setShowRejectModal(true)}
+            disabled={
+              contract?.status === 3 || // Đang kích hoạt
+              contract?.status === 2 || // Chưa bắt đầu
+              contract?.status === 5 || //Từ chối
+              isApproved ||
+              contract?.status === 2 // Nếu đã chấp thuận
+            }
+          >
+            Từ chối
+          </button>
 
-  <button
-    className="approve-btn"
-    onClick={() => setShowConfirmModal(true)}
-    disabled={
-      contract?.status === 3 || // Đang kích hoạt
-      contract?.status === 2 || // Chưa bắt đầu
-      isRejected || 
-      contract?.status === 5 // Nếu đã từ chối
-    }
-  >
-    Chấp thuận
-  </button>
-</div>
+          <button
+            className="approve-btn"
+            onClick={() => setShowConfirmModal(true)}
+            disabled={
+              contract?.status === 3 || // Đang kích hoạt
+              contract?.status === 2 || // Chưa bắt đầu
+              isRejected ||
+              contract?.status === 5 // Nếu đã từ chối
+            }
+          >
+            Chấp thuận
+          </button>
+        </div>
 
       </div>
       <div className="attachments">
@@ -181,10 +178,10 @@ const ContractDetail = () => {
               {/* <img src={attachment.attachmentURL || "placeholder.png"} alt="Preview" /> */}
               <div className="attachment-preview">
                 <a href={attachment.attachmentURL} target="_blank" rel="noopener noreferrer">
-                <FontAwesomeIcon icon={faPaperclip} size="1.9x" />
+                  <FontAwesomeIcon icon={faPaperclip} size="1.9x"/>
 
                 </a>
-                </div>
+              </div>
               <div className="doc-name">{attachment.name}</div>
               <div className="doc-date">Ngày tạo: {new Date(attachment.createdAt).toLocaleDateString()}</div>
 
@@ -194,43 +191,43 @@ const ContractDetail = () => {
 
 
       </div>
-          {/* Books Table */}
+      {/* Books Table */}
       <div className="books-section">
         <h3>Danh sách sách</h3>
         <table className="books-table">
           <thead>
-            <tr>
+          <tr>
             <th>Tên sách</th>
             <th>Tên gốc</th>
             <th>Mô tả</th>
             <th>Năm xuất bản</th>
             <th>Ảnh bìa</th>
-            </tr>
+          </tr>
           </thead>
           <tbody>
-            {books.map((book, index) => (
-              <tr key={index}>
-                <td>{book.title}</td>
-                <td>{book.originalTitle}</td>
-                <td>{book.description}</td>
-                <td>{book.publicationYear}</td>
-                <td>
-                  <img src={book.coverImage} alt={book.title} width="50" height="75" />
-                </td>
-              </tr>
-            ))}
+          {books.map((book, index) => (
+            <tr key={index}>
+              <td>{book.title}</td>
+              <td>{book.originalTitle}</td>
+              <td>{book.description}</td>
+              <td>{book.publicationYear}</td>
+              <td>
+                <img src={book.coverImage} alt={book.title} width="50" height="75"/>
+              </td>
+            </tr>
+          ))}
           </tbody>
         </table>
       </div>
 
 
-          
-       {/* Confirmation Modal */}
-       {showConfirmModal && (
+      {/* Confirmation Modal */}
+      {showConfirmModal && (
         <div className="modal-overlay">
           <div className="modal-content">
             <h3>Bạn chắc chắn?</h3>
-            <p>Tôi đã đọc lại văn bản cam kết ở trong tệp đính kèm và đồng ý toàn bộ nội dung trên, đồng thời ký, điểm chỉ vào văn bản cam kết này.</p>
+            <p>Tôi đã đọc lại văn bản cam kết ở trong tệp đính kèm và đồng ý toàn bộ nội dung trên, đồng thời ký, điểm
+              chỉ vào văn bản cam kết này.</p>
             <div className="modal-buttons">
               <button className="cancel-btn" onClick={() => setShowConfirmModal(false)}>
                 Hủy bỏ
@@ -263,19 +260,26 @@ const ContractDetail = () => {
 
     </div>
   );
-  
+
 };
 
 // Hàm để ánh xạ status thành tên
 const getStatusLabel = (status) => {
   switch (status) {
-    case 0: return "Bản nháp";
-    case 1: return "Đang xử lý";
-    case 2: return "Chưa bắt đầu";
-    case 3: return "Đang kích hoạt";
-    case 4: return "Hết hạn";
-    case 5: return "Từ chối";
-    default: return "Unknown";
+    case 0:
+      return "Bản nháp";
+    case 1:
+      return "Đang xử lý";
+    case 2:
+      return "Chưa bắt đầu";
+    case 3:
+      return "Đang kích hoạt";
+    case 4:
+      return "Hết hạn";
+    case 5:
+      return "Từ chối";
+    default:
+      return "Unknown";
   }
 };
 

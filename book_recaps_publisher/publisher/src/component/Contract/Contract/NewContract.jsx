@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from 'react';  
+import { useState, useEffect } from 'react';
 import axios from 'axios';
-//import './Contract.scss';
 import { useNavigate } from 'react-router-dom';
 import "../ContractManager/ContractManager.scss";
 
@@ -33,7 +32,7 @@ const resolveRefs = (data) => {
   return resolveRef(data);
 };
   
-const Contract = () => {
+const Contracts = () => {
   const [contracts, setContracts] = useState([]); 
   const [loading, setLoading] = useState(true); 
   const [error, setError] = useState(null); 
@@ -235,4 +234,4 @@ const Contract = () => {
   );
 };
 
-export default Contract;
+export default Contracts;

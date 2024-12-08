@@ -5,7 +5,7 @@ import BookList, { booksLoader } from './component/ListBook/BookList/BookList';
 import Settings from './component/Setting/Settings';
 import ContractDetail from './component/Contract/ContractDetail/ContractDetail';
 import Dashboard from './component/Dashboard/Dashboard';
-import Contract from './component/Contract/Contract/NewContract';
+import Contracts from './component/Contract/Contract/NewContract';
 import FetchPublisherData from './component/Publisher/Publisher';
 import PublisherPayout from './component/Publisher/PublisherPayout';
 import BookDetail, { bookDetailsLoader } from './component/Dashboard/BookDetail';
@@ -29,7 +29,7 @@ export const router = createBrowserRouter(createRoutesFromElements(
         <Route path={routes.index} element={<Dashboard/>}/>
         <Route path={routes.books} element={<BookList/>} loader={booksLoader}/>
         <Route path={routes.bookDetails} element={<BookDetail/>} loader={bookDetailsLoader}/>
-        <Route path={routes.contracts} element={<Contract/>}/>
+        <Route path={routes.contracts} element={<Contracts/>}/>
         <Route path={routes.contractDetails} element={<ContractDetail/>}/>
         <Route path={routes.payouts} element={<FetchPublisherData/>}/>
         <Route path={routes.payoutDetails} element={<PublisherPayout/>}/>
