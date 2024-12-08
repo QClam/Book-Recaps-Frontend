@@ -109,10 +109,20 @@ const PublisherPayout = () => {
                     <Link
                       to={generatePath(routes.bookDetails, { bookId: book.bookId })}
                       className="text-blue-600 hover:underline hover:text-blue-700"
-                      state={{
-                        fromDate: book.fromDate,
-                        toDate: book.toDate
-                      }}>
+                      state={(() => {
+                        let fDate = book.fromDate;
+
+                        if (fDate === "0001-01-01T00:00:00") {
+                          fDate = new Date(book.toDate);
+                          fDate.setDate(fDate.getDate() - 30);
+                          fDate = fDate.toISOString();
+                        }
+
+                        return {
+                          fromDate: fDate,
+                          toDate: book.toDate,
+                        }
+                      })()}>
                       {book.title}
                     </Link>
                   </td>

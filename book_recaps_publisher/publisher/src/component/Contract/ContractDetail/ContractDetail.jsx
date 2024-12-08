@@ -183,7 +183,7 @@ const ContractDetail = () => {
                   </p>
                 </div>
                 <div className="doc-name">{attachment.name}</div>
-                <div className="doc-date">Ngày tạo: {new Date(attachment.createdAt).toLocaleDateString()}</div>
+                <div className="doc-date">Ngày tạo: {new Date(attachment.createdAt + "Z").toLocaleDateString()}</div>
               </a>
             ))}
           </div>
