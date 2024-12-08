@@ -7,11 +7,14 @@ export const sessionLoader = async () => {
 
   let responseId = null;
   let profileData = null;
+  let pub = null;
 
   try {
     const response = await axiosInstance.get("/api/personal/profile");
+    const publisherRes = await axiosInstance.get("/api/publisher/getbypublisheruser/" + response.data?.id);
     responseId = response.data?.id || null;
     profileData = response.data;
+    pub = publisherRes.data;
   } catch (e) {
     console.error(e);
   }
@@ -20,7 +23,7 @@ export const sessionLoader = async () => {
   const userId = decoded[import.meta.env.VITE_CLAIMS_IDENTIFIER]
 
   if (
-    profileData &&
+    profileData && pub &&
     isValidToken(decoded) &&
     isRoleMatched(decoded, "Publisher") &&
     responseId === userId
@@ -31,6 +34,7 @@ export const sessionLoader = async () => {
       role: "Publisher",
       id: userId,
       profileData,
+      publisherData: pub,
     }
   }
   setSession(null)

@@ -11,7 +11,7 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const loaderData = useLoaderData()
-  const [ user, setUser ] = useState(loaderData); // { id, email, name, role, profileData }
+  const [ user, setUser ] = useState(loaderData); // { id, email, name, role, profileData, publisherData }
   const [ reCaptchaTokens ] = useState({ loginToken: "...", signupToken: "..." });
 
   const navigate = useNavigate();
@@ -22,7 +22,7 @@ export function AuthProvider({ children }) {
     const handleFocus = async () => {
       const token = getSession();
       if (!token) {
-        navigate(routes.logout, { state: { from: location.pathname } });
+        setUser(null);
         return;
       }
 
@@ -31,10 +31,13 @@ export function AuthProvider({ children }) {
 
         if (_.isEqual(user?.profileData, response.data)) return;
 
+        const publisherRes = await axiosInstance.get("/api/publisher/getbypublisheruser/" + response.data?.id);
+
         const decoded = jwtDecode(token)
         const userId = decoded[import.meta.env.VITE_CLAIMS_IDENTIFIER]
 
         if (
+          publisherRes.data &&
           isValidToken(decoded) &&
           isRoleMatched(decoded, "Publisher") &&
           response.data.id === userId
@@ -45,6 +48,7 @@ export function AuthProvider({ children }) {
             role: "Publisher",
             id: userId,
             profileData: response.data,
+            publisherData: publisherRes.data,
           });
           navigate(location.pathname, { replace: true });
           return;

@@ -35,6 +35,11 @@ export async function loginAction({ request }) {
         Authorization: `Bearer ${accessToken}`,
       },
     });
+    const publisherResponse = await axiosInstance.get("/api/publisher/getbypublisheruser/" + profileResponse.data?.id, {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
 
     return {
       user: {
@@ -43,6 +48,7 @@ export async function loginAction({ request }) {
         role: "Publisher",
         id: decoded[import.meta.env.VITE_CLAIMS_IDENTIFIER],
         profileData: profileResponse.data,
+        publisherData: publisherResponse.data,
       },
       token: accessToken
     };

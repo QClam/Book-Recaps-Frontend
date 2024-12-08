@@ -1,18 +1,14 @@
 import { createBrowserRouter, createRoutesFromElements, Route } from "react-router-dom";
 import Login from './component/Auth/Login';
 import MainLayout from './component/Layout/MainLayout';
-// import BookList from './component/ListBook/BookList/BookList';
-// import Settings from './component/Setting/Settings';
-// import AddBook from './component/ListBook/AddBook/AddBook';
-// import ContractDetail from './component/Contract/ContractDetail/ContractDetail';
+import BookList from './component/ListBook/BookList/BookList';
+import Settings from './component/Setting/Settings';
+import ContractDetail from './component/Contract/ContractDetail/ContractDetail';
 import Dashboard from './component/Dashboard/Dashboard';
-// import Contract from './component/Contract/Contract/NewContract';
-// import FetchPublisherData from './component/Publisher/Publisher';
-// import PublisherPayout from './component/Publisher/PublisherPayout';
-// import UpdateBook from './component/ListBook/UpdateBook/UpdateBook';
-// import DashboardDetail from './component/Dashboard/DashboardDetail';
-// import BookListDetail from './component/ListBook/BookList/BookListDetail';
-// import BookPayout from './component/Publisher/BookPayout';
+import Contract from './component/Contract/Contract/NewContract';
+import FetchPublisherData from './component/Publisher/Publisher';
+import PublisherPayout from './component/Publisher/PublisherPayout';
+import DashboardDetail from './component/Dashboard/DashboardDetail';
 import Logout from "./component/Auth/Logout";
 import ErrorRoute from "./component/ErrorRoute";
 import App from "./App";
@@ -31,17 +27,13 @@ export const router = createBrowserRouter(createRoutesFromElements(
     <Route element={<ProtectedRoute/>}>
       <Route element={<MainLayout/>}>
         <Route path={routes.index} element={<Dashboard/>}/>
-        {/*<Route path="/contractmanager" element={<Contract/>}/>*/}
-        {/*<Route path="/contract-detail/:id" element={<ContractDetail/>}/>*/}
-        {/*<Route path="/bookmanager" element={<BookList/>}/>*/}
-        {/*<Route path="/book-detail/:bookId" element={<BookListDetail/>}/>*/}
-        {/*<Route path="/addbook" element={<AddBook/>}/>*/}
-        {/*<Route path="/updatebook/:id" element={<UpdateBook/>}/>*/}
-        {/*<Route path="/settings" element={<Settings/>}/>*/}
-        {/*<Route path="/publisher-payout" element={<FetchPublisherData/>}/>*/}
-        {/*<Route path="/publisher-payout-detail/:id" element={<PublisherPayout/>}/>*/}
-        {/*<Route path="/book-dashboard/:bookId" element={<DashboardDetail/>}/>*/}
-        {/*<Route path="/book-payout/:bookId" element={<BookPayout/>}/>*/}
+        <Route path={routes.books} element={<BookList/>}/>
+        <Route path={routes.bookDetails} element={<DashboardDetail/>}/>
+        <Route path={routes.contracts} element={<Contract/>}/>
+        <Route path={routes.contractDetails} element={<ContractDetail/>}/>
+        <Route path={routes.payouts} element={<FetchPublisherData/>}/>
+        <Route path={routes.payoutDetails} element={<PublisherPayout/>}/>
+        <Route path={routes.settings} element={<Settings/>}/>
       </Route>
     </Route>
   </Route>
