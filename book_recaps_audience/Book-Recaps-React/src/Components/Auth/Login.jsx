@@ -6,6 +6,8 @@ import { jwtDecode } from "jwt-decode";
 import { axiosInstance, isRoleMatched, isValidToken } from "../../utils/axios";
 import { routes } from "../../routes";
 import { toast } from "react-toastify";
+import { cn } from "../../utils/cn";
+import { handleFetchError } from "../../utils/handleFetchError";
 
 function Login() {
   const location = useLocation();
@@ -24,6 +26,8 @@ function Login() {
   const [ email, setEmail ] = useState("");
   const [ password, setPassword ] = useState("");
   const [ error, setError ] = useState(null);
+
+  const [ submitting, setSubmitting ] = useState(false);
 
   const handleRegisterClick = () => {
     setIsActive(true);
@@ -81,7 +85,6 @@ function Login() {
     }
 
     try {
-
       const newUser = {
         fullName: registerForm.fullName,
         email: registerForm.email,
@@ -91,15 +94,17 @@ function Login() {
         captchaToken: "string",
       };
 
-      const response = await axiosInstance.post("/api/register", newUser);
-      console.log("Register Successfully", newUser);
-      console.log("Link: ", response.data.message);
+      setSubmitting(true);
+
+      await axiosInstance.post("/api/register", newUser);
+      // console.log("Link: ", response.data.message);
       // navigate(routes.confirmEmail, {
       //   state: {
       //     email: registerForm.email,
       //     message: response.data.message,
       //   },
       // });
+
       toast.success("Đăng ký thành công. Vui lòng kiểm tra email để xác nhận tài khoản.");
 
       setRegisterForm({
@@ -111,15 +116,18 @@ function Login() {
       });
       setError(null); // Reset error state
     } catch (error) {
-      console.error("Error registering user:", error);
-      setError("Đăng ký thất bại.");
+      const err = handleFetchError(error);
+      toast.error(err.error);
+      setError(err.error);
     }
+    setSubmitting(false);
   };
 
   const handleLogin = async (e) => {
     e.preventDefault();
 
     try {
+      setSubmitting(true);
       // Login request
       const response = await axiosInstance.post("/api/tokens", {
         email,
@@ -163,9 +171,12 @@ function Login() {
         setError("Không tìm thấy token trong phản hồi của API.");
       }
     } catch (error) {
-      console.error("Error logging in:", error.response ? error.response.data : error.message);
-      setError("Đăng nhập thất bại. Vui lòng kiểm tra lại tài khoản và mật khẩu.");
+      const err = handleFetchError(error);
+      toast.error(err.error);
+      setError(err.error);
     }
+
+    setSubmitting(false);
   };
 
   const forgetPasswordClick = () => {
@@ -178,14 +189,6 @@ function Login() {
         <div className="form-container sign-up">
           <form onSubmit={handleSignUp}>
             <h1>Đăng ký</h1>
-            {/* <div className="social-icons">
-              <a href="#" className="icon">
-                <i className="fa-brands fa-google"></i>
-              </a>
-              <a href="#" className="icon">
-                <i className="fa-brands fa-facebook"></i>
-              </a>
-            </div> */}
             <span>hoặc sử dụng email để đăng ký</span>
             <input
               required
@@ -227,22 +230,22 @@ function Login() {
               value={registerForm.phoneNumber}
               onChange={handleInputChange}
             />
-            <button type="submit">Đăng ký</button>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
+            <button
+              type="submit"
+              disabled={submitting}
+              className={cn("disabled:cursor-default disabled:opacity-70", {
+                "disabled:cursor-progress": submitting,
+              })}
+            >
+              Đăng ký
+            </button>
+            {error && <p className="text-red-500 text-center px-8">{error}</p>}
           </form>
         </div>
 
         <div className="form-container sign-in">
           <form onSubmit={handleLogin}>
             <h1>Đăng nhập</h1>
-            {/* <div className="social-icons">
-              <a href="#" className="icon">
-                <i className="fa-brands fa-google"></i>
-              </a>
-              <a href="#" className="icon">
-                <i className="fa-brands fa-facebook"></i>
-              </a>
-            </div> */}
             <span>hoặc sử dụng email để đăng nhập</span>
             <input
               type="email"
@@ -258,12 +261,18 @@ function Login() {
               required
               placeholder="Mật khẩu"
             />
-            <button type="submit">Đăng nhập</button>
+            <button
+              type="submit"
+              disabled={submitting}
+              className={cn("disabled:cursor-default disabled:opacity-70", {
+                "disabled:cursor-progress": submitting,
+              })}
+            >
+              Đăng nhập
+            </button>
             <a style={{ textDecoration: "none", cursor: "pointer" }} onClick={() => forgetPasswordClick()}>Forget
               password</a>
-            {error && <p style={{ color: 'red' }}>{error}</p>}
-
-
+            {error && <p className="text-red-500 text-center px-8">{error}</p>}
           </form>
         </div>
 
@@ -274,7 +283,7 @@ function Login() {
               <p>
                 Nhập thông tin cá nhân để sử dụng các chức năng của trang web
               </p>
-              <button id="login" onClick={handleLoginClick}>
+              <button id="login" onClick={handleLoginClick} disabled={submitting}>
                 Đăng nhập
               </button>
             </div>
@@ -283,10 +292,7 @@ function Login() {
               <p>
                 Đăng ký thông tin cá nhân để sử dụng các chức năng của trang web
               </p>
-              <button
-                id="register"
-                onClick={handleRegisterClick}
-              >
+              <button id="register" onClick={handleRegisterClick} disabled={submitting}>
                 Đăng ký
               </button>
             </div>

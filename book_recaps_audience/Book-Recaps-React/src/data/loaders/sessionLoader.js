@@ -6,14 +6,12 @@ export const sessionLoader = async () => {
   if (!token) return null;
 
   let responseId = null;
-  let isOnboarded = false;
   let profileData = null;
 
   try {
     const response = await axiosInstance.get("/api/personal/profile");
     profileData = response.data;
     responseId = response.data.id || null;
-    isOnboarded = response.data.isOnboarded || false;
   } catch (e) {
     console.error(e);
   }
@@ -32,7 +30,7 @@ export const sessionLoader = async () => {
       name: profileData.fullName,
       id: userId,
       role: isRoleMatched(decoded, "Contributor") ? "Contributor" : "Customer",
-      isOnboarded,
+      isOnboarded: profileData.isOnboarded,
       profileData,
     }
   }

@@ -22,6 +22,11 @@ export function AuthProvider({ children }) {
   const matchLoginRoute = useMatch(routes.login);
   const matchLogoutRoute = useMatch(routes.logout);
 
+  // Revalidation ở page onboarding. Nếu user đã onboarded thì revalidate để cập nhật onboarding và redirect về index
+  useEffect(() => {
+    if (!_.isEqual(user, loaderData)) setUser(loaderData);
+  }, [ loaderData ]);
+
   useEffect(() => {
     const handleFocus = async () => {
       const token = getSession();

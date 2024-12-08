@@ -1,12 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { InfinitySpin } from "react-loader-spinner";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { routes } from "../../routes";
 import { axiosInstance } from "../../utils/axios";
 import Show from "../Show";
 
 function ConfirmEmail() {
-  const location = useLocation();
   const navigate = useNavigate();
   // const email = location.state?.email || "unknown@example.com";
   // const confirmationLink = location.state?.message || ""; // lấy link từ message đc truyền qua
@@ -15,10 +14,9 @@ function ConfirmEmail() {
   const [ isConfirmed, setIsConfirmed ] = useState(false);
   const [ countdown, setCountdown ] = useState(3);
   const [ searchParams ] = useSearchParams();
+  const timerRef = useRef(null);
 
   useEffect(() => {
-    let timer = null;
-
     const confirmEmail = async () => {
       const userId = searchParams.get('userId');
       const token = searchParams.get('token');
@@ -40,10 +38,6 @@ function ConfirmEmail() {
         if (response.status === 200) {
           setMessage('Xác nhận email thành công!');
           setIsConfirmed(true);
-          timer = setTimeout(() => {
-            setCountdown(countdown - 1);
-            navigate(routes.login, { replace: true }); // Điều hướng về trang đăng nhập sau 3 giây
-          }, 4000);
         } else {
           setMessage('Xác nhận email thất bại. Vui lòng thử lại.');
         }
@@ -63,9 +57,20 @@ function ConfirmEmail() {
     confirmEmail();
 
     return () => {
-      if (timer) clearTimeout(timer);
+      if (timerRef.current) clearTimeout(timerRef.current);
     }
-  }, [ location ]);
+  }, []);
+
+  useEffect(() => {
+    if (isConfirmed && countdown > 0) {
+      timerRef.current = setTimeout(() => {
+        setCountdown(countdown - 1);
+      }, 1000);
+    }
+    if (countdown === 0) {
+      navigate(routes.login, { replace: true });
+    }
+  }, [ isConfirmed, countdown ]);
 
   return (
     <div className="container mx-auto max-w-screen-lg p-5">
@@ -84,7 +89,7 @@ function ConfirmEmail() {
           <>
             <p>{message}</p>
             <Show when={isConfirmed}>
-              <p>Chuyển hướng về trang đăng nhập sau {countdown} giây...</p>
+              <p className="mt-2">Chuyển hướng về trang đăng nhập sau <strong>{countdown} giây</strong>...</p>
             </Show>
           </>
         )}

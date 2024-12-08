@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
-import { Link, useRevalidator } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { useRevalidator } from "react-router-dom";
 import { useAuth } from "../../../contexts/Auth";
 import { axiosInstance2 } from "../../../utils/axios";
 import Show from "../../Show";
 import { ProgressSpinner } from "primereact/progressspinner";
-import { routes } from "../../../routes";
 
 const postOnboardingFinish = async (userId, categories, authors, books, controller) => {
   try {
@@ -31,13 +30,16 @@ const postOnboardingFinish = async (userId, categories, authors, books, controll
 
 const ThankYouStep = ({ userId = '', categories = [], authors = [], books = [] }) => {
   const { user } = useAuth();
+  const revalidator = useRevalidator()
   const [ loading, setLoading ] = useState(true);
   const [ error, setError ] = useState(null);
   const [ success, setSuccess ] = useState(null);
-  const revalidator = useRevalidator();
+  const [ countdown, setCountdown ] = useState(5);
+  const timerRef = useRef(null);
 
   useEffect(() => {
     const controller = new AbortController();
+    timerRef.current = null;
 
     const fetchData = async () => {
       setLoading(true);
@@ -55,33 +57,33 @@ const ThankYouStep = ({ userId = '', categories = [], authors = [], books = [] }
 
     return () => {
       controller.abort();
+      if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, [ userId, categories, authors, books ]);
 
   // Delay 3 seconds before redirecting to the home page
   useEffect(() => {
-    if (!success) return;
-
-    const timer = setTimeout(() => {
-      revalidator.revalidate(); // Revalidate the data (sessionLoader) after finishing onboarding
-    }, 5000);
-
-    return () => {
-      clearTimeout(timer);
-    };
-  }, [ success ]);
+    if (success && countdown > 0) {
+      timerRef.current = setTimeout(() => {
+        setCountdown(countdown - 1);
+      }, 1000);
+    }
+    if (countdown === 0) {
+      revalidator.revalidate();
+    }
+  }, [ success, countdown ]);
 
   return (
     <div className="thank-you">
-      <h2>Cám ơn bạn, {user.name}!</h2>
-      <h2>Khảo sát hoàn tất!</h2>
-      <p>Chúng tôi sẽ điều chỉnh trải nghiệm của bạn dựa trên kết quả khảo sát</p>
-      <div className="summary text-sm">
-        <h3 className="font-semibold text-lg">Lựa chọn của bạn:</h3>
-        <p><strong>Danh mục sách:</strong> {categories.map(c => c.name).join(', ')}</p>
-        <p><strong>Tác giả:</strong> {authors.map(a => a.name).join(', ')}</p>
-        <p><strong>Những cuốn sách bạn có hứng thú:</strong> {books.map(b => b.title).join(', ')}</p>
-      </div>
+      <h1 className="text-green-600 text-2xl">Cám ơn bạn, {user.name}!</h1>
+      <h2 className="!text-green-600 !text-2xl mb-3">Khảo sát hoàn tất!</h2>
+      <p className="">Chúng tôi sẽ điều chỉnh trải nghiệm của bạn dựa trên kết quả khảo sát</p>
+      {/*<div className="summary !text-sm">*/}
+      {/*  <h3 className="font-semibold text-lg">Lựa chọn của bạn:</h3>*/}
+      {/*  <p><strong>Danh mục sách:</strong> {categories.map(c => c.name).join(', ')}</p>*/}
+      {/*  <p><strong>Tác giả:</strong> {authors.map(a => a.name).join(', ')}</p>*/}
+      {/*  <p><strong>Những cuốn sách bạn có hứng thú:</strong> {books.map(b => b.title).join(', ')}</p>*/}
+      {/*</div>*/}
       {error && <p className="error-message">{error}</p>}
       <Show when={success}>
         <p className="success-message">{success}</p>
@@ -89,11 +91,11 @@ const ThankYouStep = ({ userId = '', categories = [], authors = [], books = [] }
           <div>
             <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"/>
           </div>
-          <p>Chuyển hướng về trang chủ sau 5 giây...</p>
+          <p>Chuyển hướng về trang chủ sau <strong>{countdown} giây</strong>...</p>
         </div>
         <div>
-          Hoặc <Link to={routes.index} className="text-indigo-600 underline hover:bg-indigo-700">bấm vào đây</Link> nếu
-          không muốn chờ đợi
+          Hoặc <a href="/" className="text-indigo-600 underline hover:text-indigo-700">bấm vào đây</a> nếu không muốn
+          chờ đợi
         </div>
       </Show>
       {loading && <p className="loading-message">Loading...</p>}
