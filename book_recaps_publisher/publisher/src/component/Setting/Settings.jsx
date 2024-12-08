@@ -1,16 +1,23 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './Settings.scss';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import _ from "lodash";
+import { axiosInstance } from "../../utils/axios";
+import { useAuth } from "../../contexts/Auth";
+import { useToast } from "../../contexts/Toast";
+import { routes } from "../../routes";
 
 function Settings() {
   const navigate = useNavigate(); // Create a navigate function
-  const [ profile, setProfile ] = useState(null); // State to store profile data
+  const { user, setUser } = useAuth();
+  const { showToast } = useToast();
+  const [ profile, setProfile ] = useState(user.profileData); // State to store profile data
   const [ isModalOpen, setModalOpen ] = useState(false); // Modal state
   const [ updatedProfile, setUpdatedProfile ] = useState({
-    fullName: '',
-    gender: '',
-    birthDate: '',
-    address: '',
+    fullName: user.profileData.fullName || '',
+    gender: user.profileData.gender || 0,
+    birthDate: user.profileData.birthDate || '',
+    address: user.profileData.address || '',
   });
 
   const [ phoneUpdateModalOpen, setPhoneUpdateModalOpen ] = useState(false);
@@ -29,66 +36,34 @@ function Settings() {
   const [ imageUpdateModalOpen, setImageUpdateModalOpen ] = useState(false)
   const [ imageFile, setImageFile ] = useState(null); // New state to store selected image file
   const [ imageUploadLoading, setImageUploadLoading ] = useState(false);
-  const [ publisher, setPublisher ] = useState(null);
+  const [ publisher, setPublisher ] = useState(user.publisherData);
   const [ updatePublisherModalOpen, setUpdatePublisherModalOpen ] = useState(false);
   const [ publisherUpdate, setPublisherUpdate ] = useState({
-    publisherName: '',
-    contactInfo: '',
-    bankAccount: '',
-    revenueSharePercentage: '',
+    publisherName: user.publisherData.publisherName || '',
+    contactInfo: user.publisherData.contactInfo || '',
+    bankAccount: user.publisherData.bankAccount || '',
+    revenueSharePercentage: user.publisherData.revenueSharePercentage || 0,
   });
+  const [ passwordVisible, setPasswordVisible ] = useState(false); // State để quản lý xem mật khẩu
+  const [ password, setPassword ] = useState(""); // State để lưu mật khẩu
+  const mounted = useRef(false);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (!_.isEqual(user.profileData, profile) && mounted.current) {
+      window.location.reload();
+    }
+    mounted.current = true;
+  }, [ location ]);
 
   // Handle tab change
   const handleTabChange = (tab) => {
     setCurrentTab(tab);
   };
 
-  const [ passwordVisible, setPasswordVisible ] = useState(false); // State để quản lý xem mật khẩu
-  const [ password, setPassword ] = useState(""); // State để lưu mật khẩu
-
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
   };
-
-  // Fetch user profile data
-  useEffect(() => {
-    const fetchProfile = async () => {
-      const accessToken = localStorage.getItem('authToken');
-      try {
-        const response = await fetch('https://bookrecaps.cloud/api/personal/profile', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
-        }
-
-        const data = await response.json();
-        console.log('Fetched profile data:', data); // Log the data to inspect its structure
-
-        if (data) { // Check if data exists
-          setProfile(data); // Set profile directly
-          setUpdatedProfile({
-            fullName: data.fullName || '', // Access properties directly
-            gender: data.gender || '',
-            birthDate: data.birthDate || '',
-            address: data.address || '',
-          });
-        } else {
-          console.error('Profile data is not available');
-        }
-
-      } catch (error) {
-        console.error("Error fetching profile:", error);
-      }
-    };
-
-    fetchProfile();
-  }, []);
 
   // Handle form input changes
   const handleInputChange = (e) => {
@@ -99,25 +74,15 @@ function Settings() {
     }));
   };
   const handleUpdatePublisherInfo = async () => {
-    const accessToken = localStorage.getItem('authToken');
     try {
-      const response = await fetch(`https://bookrecaps.cloud/api/publisher/updatepublisherinfo/${publisher.id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(publisherUpdate),
-      });
+      const response = await axiosInstance.put(`/api/publisher/updatepublisherinfo/${publisher.id}`, publisherUpdate);
 
-      if (response.ok) {
-        const updatedPublisher = await response.json();
-        console.log('Publisher updated:', updatedPublisher);
-        setPublisher(updatedPublisher); // Cập nhật state với thông tin mới
-        setUpdatePublisherModalOpen(false); // Đóng modal
-      } else {
-        console.error('Error updating publisher:', await response.text());
-      }
+      const updatedPublisher = response.data;
+      console.log('Publisher updated:', updatedPublisher);
+
+      setPublisher(updatedPublisher); // Cập nhật state với thông tin mới
+      setUser({ ...user, publisherData: updatedPublisher }); // Cập nhật thông tin NXB trong user context
+      setUpdatePublisherModalOpen(false); // Đóng modal
     } catch (error) {
       console.error('Error updating publisher info:', error);
     }
@@ -125,37 +90,48 @@ function Settings() {
 
   // Handle profile update
   const handleUpdateProfile = async () => {
-    const accessToken = localStorage.getItem('authToken');
-
-    // Log the form data to verify what is being sent
-    console.log('Updated profile data:', updatedProfile);
+    if (!updatedProfile.fullName) {
+      showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Full Name is required',
+      });
+      return;
+    }
 
     try {
-      const response = await fetch('https://bookrecaps.cloud/api/personal/profile', {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          fullName: updatedProfile.fullName,
-          gender: parseInt(updatedProfile.gender, 10), // Ensure gender is sent as an integer
-          birthDate: updatedProfile.birthDate, // Ensure correct date format
-          address: updatedProfile.address,
-        }),
+      const response = await axiosInstance.put('/api/personal/profile', {
+        fullName: updatedProfile.fullName,
+        gender: parseInt(updatedProfile.gender, 10), // Ensure gender is sent as an integer
+        birthDate: updatedProfile.birthDate || null, // Ensure correct date format
+        address: updatedProfile.address || null,
       });
 
-      const result = await response.json();
+      const result = response.data;
 
-      if (response.ok) {
-        console.log('Profile updated successfully!', result);
-        setProfile(result.data); // Update profile in state
-        setModalOpen(false); // Close modal
-      } else {
-        console.error('Error updating profile:', result.message || 'Unknown error');
-      }
+      showToast({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Profile updated successfully!',
+      });
+      setProfile({ ...result.data, imageUrl: profile.imageUrl }); // Update profile in state
+      setModalOpen(false); // Close modal
+      setUser({
+        ...user,
+        name: result.data.fullName,
+        email: result.data.email,
+        profileData: {
+          ...result.data,
+          subscriptions: { ...user.profileData.subscriptions }
+        }
+      })
     } catch (error) {
       console.error('Error updating profile:', error);
+      showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to update profile. Please try again.',
+      });
     }
   };
 
@@ -167,113 +143,50 @@ function Settings() {
       [name]: value,
     }));
   };
-  useEffect(() => {
-    const fetchData = async () => {
-      const accessToken = localStorage.getItem('authToken');
-
-      try {
-        // Fetch profile data
-        const profileResponse = await fetch('https://bookrecaps.cloud/api/personal/profile', {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!profileResponse.ok) {
-          throw new Error("Failed to fetch profile data");
-        }
-
-        const profileData = await profileResponse.json();
-        setProfile(profileData);
-
-        // Fetch publisher data using the profile ID
-        const publisherResponse = await fetch(
-          `https://bookrecaps.cloud/api/publisher/getbypublisheruser/${profileData.id}`,
-          {
-            method: 'GET',
-            headers: {
-              'Authorization': `Bearer ${accessToken}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-
-        if (!publisherResponse.ok) {
-          throw new Error("Failed to fetch publisher data");
-        }
-
-        const publisherData = await publisherResponse.json();
-        setPublisher(publisherData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   // Handle phone update
   const handleUpdatePhone = async () => {
-    const accessToken = localStorage.getItem('authToken');
-
     try {
-      const response = await fetch('https://bookrecaps.cloud/api/personal/update-phone', {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(phoneUpdate),
+      await axiosInstance.put('/api/personal/update-phone', phoneUpdate);
+      console.log('Phone number updated successfully!');
+      showToast({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Phone number updated successfully!',
       });
+      setPhoneUpdateModalOpen(false); // Close phone update modal
 
-      // Check if the response is JSON or text
-      const contentType = response.headers.get('content-type');
-      let result;
-      if (contentType && contentType.includes('application/json')) {
-        result = await response.json();
-      } else {
-        result = await response.text();
-        console.log('Response is not JSON:', result);  // Log the success message
-      }
-
-      if (response.ok) {
-        console.log('Phone number updated successfully!');
-        setPhoneUpdateModalOpen(false); // Close phone update modal
-
-        // Refetch the profile to update the state with the correct data
-        await fetchProfile();  // Ensure the latest profile data is fetched
-      } else {
-        console.error('Error updating phone number:', result);
-      }
+      // Refetch the profile to update the state with the correct data
+      await fetchProfile();  // Ensure the latest profile data is fetched
     } catch (error) {
       console.error('Error updating phone number:', error);
+      showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to update phone number!',
+      });
     }
   };
+
   const fetchProfile = async () => {
-    const accessToken = localStorage.getItem('authToken');
     try {
-      const response = await fetch('https://bookrecaps.cloud/api/personal/profile', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      const response = await axiosInstance.get('/api/personal/profile');
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const data = await response.json();
-      console.log('Fetched profile data:', data);
-
+      const data = await response.data;
       // Set profile data
       setProfile(data);
+      setUser({
+        ...user,
+        name: data.fullName,
+        email: data.email,
+        profileData: {
+          ...data,
+          subscriptions: { ...user.profileData.subscriptions }
+        }
+      })
       setUpdatedProfile({
         fullName: data.fullName || '',
-        gender: data.gender || '',
+        gender: data.gender || 0,
         birthDate: data.birthDate || '',
         address: data.address || '',
       });
@@ -293,44 +206,26 @@ function Settings() {
 
   // Handle password update
   const handleUpdatePassword = async () => {
-    const accessToken = localStorage.getItem('authToken');
     try {
-      const response = await fetch('https://bookrecaps.cloud/api/personal/update-password', {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(passwordData) // Đảm bảo passwordData là đúng
-      });
-
-      // Kiểm tra xem response có ok không
-      if (!response.ok) {
-        const errorText = await response.text(); // Đọc phản hồi như là text
-        console.error('Error response text:', errorText); // Ghi log lỗi để kiểm tra
-        throw new Error(errorText); // Ném ra lỗi với nội dung phản hồi
-      }
+      await axiosInstance.put('/api/personal/update-password', passwordData);
 
       // Nếu không có lỗi, thông báo thành công
-      alert('Thay đổi mật khẩu thành công! Vui lòng đăng nhập lại.');
-
-      // Clear auth token from localStorage
-      localStorage.removeItem('authToken');
-
-      // Navigate to login page
-      navigate('/login');
-
-      // Đăng xuất khỏi các phiên làm việc cũ, nếu có
-      await fetch('https://bookrecaps.cloud/api/personal/logout', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-        }
+      showToast({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Password updated successfully! Please login again.',
       });
 
+      // Đăng xuất khỏi các phiên làm việc cũ, nếu có
+      await axiosInstance.post('/api/personal/logout');
+      navigate(routes.logout);
     } catch (error) {
       console.error('Error updating password:', error);
-      // alert('Cập nhật mật khẩu thất bại: ' + error.message);
+      showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to update password!',
+      });
     }
   };
 
@@ -342,46 +237,45 @@ function Settings() {
 
   // Handle Image Upload
   const handleUpdateImage = async () => {
-    const accessToken = localStorage.getItem('authToken');
-    const userId = profile?.userId || ''; // Assuming `userId` is part of the profile data
-
     if (!imageFile) {
-      alert('Please select an image file first!');
+      showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Please select an image file first!',
+      });
       return;
     }
 
     const formData = new FormData();
-    formData.append('UserId', userId);
+    formData.append('UserId', user.id);
     formData.append('Image', imageFile); // Add the image file
     formData.append('DeleteCurrentImage', false); // Modify based on your logic
 
     try {
       setImageUploadLoading(true);
-      const response = await fetch('https://bookrecaps.cloud/api/personal/update-avatar', {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${accessToken}`,
-        },
-        body: formData,
+      await axiosInstance.put('/api/personal/update-avatar', formData);
+      showToast({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Profile image updated successfully!',
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        console.log('Profile image updated successfully!', result);
-        // Gọi lại fetchProfile để cập nhật lại thông tin profile sau khi ảnh được cập nhật
-        await fetchProfile();
+      // Gọi lại fetchProfile để cập nhật lại thông tin profile sau khi ảnh được cập nhật
+      await fetchProfile();
 
-        // // Cập nhật profile trong state
-        // setProfile(result.data);
+      // // Cập nhật profile trong state
+      // setProfile(result.data);
 
-      } else {
-        const errorText = await response.text();
-        console.error('Error updating image:', errorText);
-      }
     } catch (error) {
       console.error('Error updating profile image:', error);
+      showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Failed to update profile image!',
+      });
     } finally {
       setImageUploadLoading(false);
+      setImageUpdateModalOpen(false);
     }
   };
 
@@ -441,7 +335,7 @@ function Settings() {
                 </div>
                 <div className="info-item">
                   <label>Giới tính</label>
-                  <span>{profile.gender === 0 ? "Female" : profile.gender === 1 ? "Male" : "Other"}</span>
+                  <span>{profile.gender === 0 ? "Nữ" : profile.gender === 1 ? "Nam" : "Khác"}</span>
                 </div>
                 <div className="info-item">
                   <label>Ngày tháng năm sinh</label>
@@ -669,16 +563,6 @@ function Settings() {
                   name="bankAccount"
                   value={publisherUpdate.bankAccount}
                   onChange={(e) => setPublisherUpdate({ ...publisherUpdate, bankAccount: e.target.value })}
-                />
-              </div>
-
-              <div className="form-group">
-                <label>Phần trăm chia sẻ doanh thu</label>
-                <input
-                  type="number"
-                  name="revenueSharePercentage"
-                  value={publisherUpdate.revenueSharePercentage}
-                  onChange={(e) => setPublisherUpdate({ ...publisherUpdate, revenueSharePercentage: e.target.value })}
                 />
               </div>
 
