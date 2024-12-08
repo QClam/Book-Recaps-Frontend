@@ -1,49 +1,29 @@
 import { useEffect, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { generatePath, Link, useParams } from 'react-router-dom';
 import "../Publisher/PublisherPayout.scss";
 import defaultImage from "../../assets/empty-image.png";
+import { axiosInstance } from "../../utils/axios";
+import { routes } from "../../routes";
 
 const PublisherPayout = () => {
   const { id } = useParams(); // Get the payout ID from the URL
+
   const [ payoutDetail, setPayoutDetail ] = useState(null);
   const [ error, setError ] = useState(null);
   const [ detailedBooks, setDetailedBooks ] = useState([]);
-  const navigate = useNavigate(); // Initialize navigate hook
   const [ isModalOpen, setModalOpen ] = useState(false);
 
   useEffect(() => {
     const fetchPayoutDetail = async () => {
-      const accessToken = localStorage.getItem('authToken');
       try {
-        const response = await fetch(`https://bookrecaps.cloud/api/PublisherPayout/getpayoutinfobyid/${id}`, {
-          method: 'GET',
-          headers: {
-            'Authorization': `Bearer ${accessToken}`,
-            'Content-Type': 'application/json',
-          },
-        });
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch payout detail");
-        }
-
-        const data = await response.json();
+        const response = await axiosInstance.get(`/api/PublisherPayout/getpayoutinfobyid/${id}`);
+        const data = response.data;
         setPayoutDetail(data);
 
         // Fetch detailed book information for each book ID in the payout details
         const detailedBooksPromises = data?.data?.bookEarnings?.$values?.map(async (earning) => {
-          const bookResponse = await fetch(
-            `https://bookrecaps.cloud/api/book/getbookbyid/${earning.bookId}`,
-            {
-              method: 'GET',
-              headers: {
-                'Authorization': `Bearer ${accessToken}`,
-                'Content-Type': 'application/json',
-              },
-            }
-          );
-          if (!bookResponse.ok) throw new Error(`Failed to fetch book details for ID: ${earning.bookId}`);
-          const bookData = await bookResponse.json();
+          const bookResponse = await axiosInstance.get(`/api/book/getbookbyid/${earning.bookId}`);
+          const bookData = bookResponse.data;
           return { ...earning, ...bookData.data }; // Combine book data with earnings info
         });
 
@@ -57,25 +37,13 @@ const PublisherPayout = () => {
     fetchPayoutDetail();
   }, [ id ]);
 
-  const handleBookClick = (bookId, earningAmount, fromDate, toDate) => {
-    navigate(`/book-payout/${bookId}`, {
-      state: {
-        earningAmount,
-        fromDate,
-        toDate,
-      },
-    });
-  };
-
   return (
     <div className="thanhtoanv1">
       {error && <p style={{ color: 'red' }}>Lỗi: {error}</p>}
       {payoutDetail ? (
         <div>
           <div className="card-container">
-
             <div className="card-header">Chi Tiết Thanh Toán</div>
-
             <div className="payout-info">
               <div className="left">
                 <p><strong>Tên Nhà Xuất Bản:</strong> {payoutDetail?.data?.publisher?.publisherName}</p>
@@ -99,14 +67,12 @@ const PublisherPayout = () => {
                 <p><strong>Tỷ Lệ Chia Lợi Nhuận:</strong> {payoutDetail?.data?.publisher?.revenueSharePercentage}%</p>
                 <p><strong>Số Tiền:</strong> {new Intl.NumberFormat('vi-VN').format(payoutDetail?.data?.amount)} <span
                   className="currency-symbol">₫</span></p>
-                {/* <p><strong>Trạng Thái:</strong> {payoutDetail?.data?.status === 1 ? "Đã Thanh Toán" : "Chưa Thanh Toán"}</p> */}
                 <p>
                   <strong>Trạng Thái:</strong>{" "}
                   <span className={payoutDetail?.data?.status === 1 ? "paid" : "unpaid"}>
-                                {payoutDetail?.data?.status === 1 ? "Đã Thanh Toán" : "Chưa Thanh Toán"}
-                            </span>
+                      {payoutDetail?.data?.status === 1 ? "Đã Thanh Toán" : "Chưa Thanh Toán"}
+                  </span>
                 </p>
-
               </div>
             </div>
 
@@ -139,21 +105,17 @@ const PublisherPayout = () => {
               <tbody>
               {detailedBooks?.map((book, index) => (
                 <tr key={index}>
-                  <td
-                    onClick={() => handleBookClick(
-                      book.bookId,
-                      book.earningAmount,
-                      book.fromDate,
-                      book.toDate
-                    )}
-                    style={{ cursor: 'pointer', color: 'blue' }}
-                  >
-                    {book.title}
+                  <td>
+                    <Link
+                      to={generatePath(routes.bookDetails, { bookId: book.bookId })}
+                      className="text-blue-600 hover:underline hover:text-blue-700"
+                      state={{
+                        fromDate: book.fromDate,
+                        toDate: book.toDate
+                      }}>
+                      {book.title}
+                    </Link>
                   </td>
-
-                  {/* <td>
-                                            <img src={book.coverImage} alt={book.title} width="50" />
-                                        </td> */}
                   <td>
                     <img
                       src={book.coverImage || defaultImage}
@@ -170,7 +132,6 @@ const PublisherPayout = () => {
                   <td>{new Date(book.toDate).toLocaleDateString()}</td>
                 </tr>
               ))}
-
               </tbody>
             </table>
           </div>

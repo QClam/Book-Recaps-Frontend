@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useState } from "react";
-import { Await, defer, generatePath, json, Link, useAsyncValue, useLoaderData } from "react-router-dom";
+import { Await, defer, generatePath, json, Link, useAsyncValue, useLoaderData, useLocation } from "react-router-dom";
 import { handleFetchError } from "../../utils/handleFetchError";
 import { axiosInstance, axiosInstance2 } from "../../utils/axios";
 import { Divider } from "primereact/divider";
@@ -276,8 +276,9 @@ oneWeekAgo.setDate(oneWeekAgo.getDate() - 30);
 
 const TotalInfoChart = () => {
   const book = useAsyncValue();
-  const [ fromDate, setFromDate ] = useState(oneWeekAgo.toISOString().split('T')[0]);
-  const [ toDate, setToDate ] = useState(new Date().toISOString().split('T')[0]);
+  const location = useLocation();
+  const [ fromDate, setFromDate ] = useState((location.state?.fromDate || oneWeekAgo.toISOString()).split('T')[0]);
+  const [ toDate, setToDate ] = useState((location.state?.toDate || new Date().toISOString()).split('T')[0]);
   const [ stats, setStats ] = useState(null);
   const [ loading, setLoading ] = useState(true);
   const [ activeTab, setActiveTab ] = useState('views');
@@ -508,7 +509,7 @@ const Contracts = () => {
 
   return (
     <div className="p-4 bg-white rounded-lg shadow-md border border-gray-300">
-      <h2 className="text-2xl font-semibold text-gray-900 mb-6">Các hợp đồng liên quan</h2>
+      <h2 className="text-2xl font-semibold text-gray-900 mb-6">Hợp đồng gán với sách</h2>
       <Table.Container>
         <Table.Head columns={[
           'ID',

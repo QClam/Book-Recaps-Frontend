@@ -32,8 +32,8 @@ export const router = createBrowserRouter(createRoutesFromElements(
         <Route path={routes.contracts} element={<Contracts/>}/>
         <Route path={routes.contractDetails} element={<ContractDetail/>}/>
         <Route path={routes.payouts} element={<FetchPublisherData/>}/>
-
         <Route path={routes.payoutDetails} element={<PublisherPayout/>}/>
+
         <Route path={routes.settings} element={<Settings/>}/>
       </Route>
     </Route>

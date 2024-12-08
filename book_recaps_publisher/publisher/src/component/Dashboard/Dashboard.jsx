@@ -60,8 +60,6 @@ const Dashboard = () => {
     fetchData();
   }, []);
 
-  const bookItems = books.slice(0, 5) || [];
-
   return (
     <>
       <div className="grid grid-cols-3 gap-4 my-6">
@@ -111,17 +109,16 @@ const Dashboard = () => {
           <div className="space-y-4 bg-white rounded-md border border-gray-300 p-2">
             <div className="mt-2 mx-2 relative flex justify-between items-center">
               <p className="text-xl font-semibold">Sách hiện có</p>
-              <Link to={routes.books}
-                    className="bg-blue-500 text-white font-semibold py-1.5 px-3 rounded-md">
-                All books
+              <Link to={routes.books} className="bg-blue-500 text-white font-semibold py-1.5 px-3 rounded-md">
+                Thông tin chi tiết
               </Link>
             </div>
             <Divider/>
-            <Show when={bookItems.length > 0} fallback={
+            <Show when={books.length > 0} fallback={
               <div className="text-center text-gray-500">No books found</div>
             }>
               <div className="max-h-[505px] overflow-y-auto">
-                {bookItems.map((book, index) => (
+                {books.map((book, index) => (
                   <Fragment key={index}>
                     <Show when={index !== 0}>
                       <Divider/>
