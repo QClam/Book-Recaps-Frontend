@@ -281,8 +281,15 @@ function AppealList() {
                                 <TableRow key={val.id}>
                                     <TableCell>{val.contributor?.fullName}</TableCell>
                                     <TableCell>{val.staff?.fullName || "Chưa có Staff phản hồi"}</TableCell>
-                                    <TableCell>{val.reason}</TableCell>
-                                    <TableCell>{val.response || "Chưa có phản hồi từ Staff"}</TableCell>
+                                    <TableCell>{val.reason.length > 30
+                                        ? `${val.reason.slice(0, 30)}...`
+                                        : val.reason}</TableCell>
+                                    <TableCell>{val.response
+                                        ? (val.response.length > 30
+                                            ? `${val.response.slice(0, 30)}...`
+                                            : val.response
+                                        ) : "Chưa có phản hồi từ Staff"}
+                                    </TableCell>
                                     <TableCell>{new Date(val.createdAt).toLocaleDateString()}</TableCell>
                                     <TableCell>{val.updatedAt === "0001-01-01T00:00:00" || !val.updatedAt
                                         ? "Chưa phản hồi"
@@ -384,9 +391,9 @@ function AppealList() {
                         sx={{ marginTop: 2 }}
                         slotProps={{
                             input: {
-                              readOnly: true,
+                                readOnly: true,
                             },
-                          }}
+                        }}
                     />
                 </DialogContent>
                 <DialogActions>
