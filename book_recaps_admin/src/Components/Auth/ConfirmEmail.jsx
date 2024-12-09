@@ -1,3 +1,4 @@
+import { Box, Grid, Link, Typography } from "@mui/material";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { InfinitySpin } from "react-loader-spinner";
@@ -11,57 +12,6 @@ function ConfirmEmail() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
-
-  // Lấy params từ URL
-  //   const getQueryParams = () => {
-  //     const params = new URLSearchParams(location.search);
-  //     console.log("Link params: ", params);
-  //     const userId = params.get('userId');
-  //     const token = params.get('token');
-  //     return { userId, token };
-  //   };
-
-  //   useEffect(() => {
-  //     const confirmEmail = async () => {
-  //       const { userId, token } = getQueryParams();
-  //       if (!userId || !token) {
-  //         setMessage('Link xác nhận không hợp lệ.');
-  //         setLoading(false);
-  //         return;
-  //       }
-
-  //       try {
-  //         // Gửi yêu cầu xác nhận email tới API bằng phương thức GET
-  //         const response = await axios.get('https://160.25.80.100:7124/api/confirm-email', {
-  //           params: {
-  //             userId, // Truyền userId từ URL
-  //             token,  // Truyền token từ URL
-  //           },
-  //         });
-
-  //         if (response.status === 200) {
-  //           setMessage('Xác nhận email thành công!');
-  //           setTimeout(() => {
-  //             navigate('/login'); // Điều hướng về trang đăng nhập sau 3 giây
-  //           }, 3000);
-  //         } else {
-  //           setMessage('Xác nhận email thất bại. Vui lòng thử lại.');
-  //         }
-  //       } catch (error) {
-  //         // Cải thiện thông báo lỗi dựa trên trạng thái
-  //         if (error.response) {
-  //           setMessage(`Xác nhận email thất bại. Lỗi: ${error.response.data.message || 'Vui lòng thử lại.'}`);
-  //         } else {
-  //           setMessage('Xác nhận email thất bại. Vui lòng kiểm tra kết nối.');
-  //         }
-  //         console.error('Error confirming email:', error);
-  //       } finally {
-  //         setLoading(false);
-  //       }
-  //     };
-
-  //     confirmEmail();
-  //   }, [location, navigate]);
 
   const handleLinkClick = (e) => {
     e.preventDefault(); // Prevent default link action
@@ -77,50 +27,59 @@ function ConfirmEmail() {
         icon: "success",
         confirmButtonText: "OK",
       }).then(() => {
-        navigate("/userss"); // Redirect after SweetAlert is confirmed
+        navigate("/users"); // Redirect after SweetAlert is confirmed
       });
     }, 3000);
   };
 
   return (
-    <div style={{width: "70vw"}}>
+    <Box sx={{ mx: "auto", mt: 4, width: "70vw" }}>
       {loading ? (
-        <div>
-          <div className="center">
+        <Grid
+          container
+          spacing={2}
+          direction="column"
+          justifyContent="center"
+          alignItems="center"
+          textAlign="center"
+        >
+          <Grid item>
             <InfinitySpin
               visible={true}
               width="200"
               color="#4fa94d"
               ariaLabel="infinity-spin-loading"
             />
-          </div>
-          <div>
-            <p style={{textAlign: "center"}}>
-              Chúng tôi đang xác nhận Email {email}, vui lòng chờ trong giây
-              lát...
-            </p>
-            <p className="center">
-              {confirmationLink ? (
-                <a
-                  href={confirmationLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={handleLinkClick}
-                  style={{ color: "blue", cursor: "pointer" }}
-                >
-                  Bấm vào đây để xác nhận Email
-                </a>
-              ) : (
-                "Link not available"
-              )}
-            </p>{" "}
-            {/* Hyperlink for confirmation */}
-          </div>
-        </div>
+          </Grid>
+          <Grid item>
+            <Typography variant="body1">
+              Chúng tôi đang xác nhận Email {email}, vui lòng chờ trong giây lát...
+            </Typography>
+          </Grid>
+          <Grid item>
+            {confirmationLink ? (
+              <Link
+                href={confirmationLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={handleLinkClick}
+                sx={{ color: "blue", cursor: "pointer" }}
+              >
+                Bấm vào đây để xác nhận Email
+              </Link>
+            ) : (
+              <Typography variant="body2" color="textSecondary">
+                Link not available
+              </Typography>
+            )}
+          </Grid>
+        </Grid>
       ) : (
-        <p>{message}</p>
+        <Typography variant="body1" textAlign="center">
+          {message}
+        </Typography>
       )}
-    </div>
+    </Box>
   );
 }
 

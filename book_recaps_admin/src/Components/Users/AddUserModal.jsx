@@ -9,6 +9,7 @@ import {
     Button,
     TextField,
     Typography,
+    CircularProgress,
 } from '@mui/material';
 import api from '../Auth/AxiosInterceptors';
 
@@ -17,6 +18,7 @@ function AddUserModal({ open, onClose, onUpdate}) {
     const navigate = useNavigate();
     const { executeRecaptcha } = useGoogleReCaptcha();
     const [error, setError] = useState(null); // Error state
+    const [loading, setLoading] = useState(false);
 
     const [registerForm, setRegisterForm] = useState({
         fullName: "",
@@ -80,6 +82,8 @@ function AddUserModal({ open, onClose, onUpdate}) {
     };
 
     const handleAddUser = async (e) => {
+        setLoading(true);
+
         e.preventDefault();
 
         if (!validateForm()) {
@@ -107,8 +111,7 @@ function AddUserModal({ open, onClose, onUpdate}) {
                 "/api/register",
                 newUser
             );
-            console.log("Register Successfully", newUser);
-            console.log("Link: ", response.data.message);
+            setLoading(false);
             navigate("/auth/confirm-email", {
                 state: {
                     email: registerForm.email,
@@ -188,11 +191,11 @@ function AddUserModal({ open, onClose, onUpdate}) {
                 )}
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose} color="secondary">
+                <Button onClick={onClose} color="secondary" disabled={loading}>
                     Hủy
                 </Button>
-                <Button onClick={handleAddUser} color="primary" variant="contained">
-                    Thêm
+                <Button onClick={handleAddUser} color="primary" variant="contained" disabled={loading}>
+                    {loading ? <CircularProgress size={20} color='inherit'/> : "Thêm"}
                 </Button>
             </DialogActions>
         </Dialog>
