@@ -1470,7 +1470,7 @@ const PlagiarismResults = () => {
           </div>
         ) : plagiResults ? plagiResults.length === 0 ? (
           <div className="my-4 text-center">
-            <p className="text-center">Không phát hiện vi phạm</p>
+            <p className="text-center">Không phát hiện nội dung trùng lặp</p>
           </div>
         ) : (
           <div className="my-4">

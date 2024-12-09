@@ -214,7 +214,7 @@ const Profile = () => {
                 </div>
                 <div className="info-item">
                   <label>Giới tính</label>
-                  <span>{profile.gender === 0 ? "Female" : profile.gender === 1 ? "Male" : "Other"}</span>
+                  <span>{profile.gender === 0 ? "Nữ" : profile.gender === 1 ? "Nam" : "Other"}</span>
                 </div>
                 <div className="info-item">
                   <label>Ngày sinh</label>
