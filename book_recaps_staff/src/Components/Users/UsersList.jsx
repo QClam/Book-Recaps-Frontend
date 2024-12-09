@@ -15,7 +15,7 @@ function UsersList() {
     const [users, setUsers] = useState([]);
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [page, setPage] = useState(0); // Trang hiện tại
-    const [rowsPerPage, setRowsPerPage] = useState(4); // Dòng mỗi trang    
+    const [rowsPerPage, setRowsPerPage] = useState(5); // Dòng mỗi trang    
     const [searchTerm, setSearchTerm] = useState(""); // Nhập input ô search
     const [loading, setLoading] = useState(true);
     const [selectedUser, setSelectedUser] = useState(null);
@@ -136,7 +136,7 @@ function UsersList() {
                     <TableFooter>
                         <TableRow>
                             <TablePagination
-                                rowsPerPageOptions={[4, 10, 15]}
+                                rowsPerPageOptions={[5, 10, 15]}
                                 count={filteredUsers.length}
                                 rowsPerPage={rowsPerPage}
                                 page={page}
@@ -146,6 +146,8 @@ function UsersList() {
                                 labelDisplayedRows={({ from, to, count }) =>
                                     `${from}–${to} trong tổng số ${count !== -1 ? count : `nhiều hơn ${to}`}`
                                 }
+                                showFirstButton
+                                showLastButton
                             />
                         </TableRow>
                     </TableFooter>

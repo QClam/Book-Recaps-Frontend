@@ -250,6 +250,8 @@ function RecapVersions() {
                                 labelDisplayedRows={({ from, to, count }) =>
                                     `${from}–${to} trên ${count !== -1 ? count : `nhiều hơn ${to}`}`
                                 }
+                                showFirstButton
+                                showLastButton
                             />
                         </TableRow>
                     </TableFooter>

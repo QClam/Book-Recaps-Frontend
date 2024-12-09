@@ -21,6 +21,7 @@ import {
     TablePagination,
     Table,
 } from "@mui/material";
+import { Visibility } from '@mui/icons-material';
 import Swal from 'sweetalert2';
 
 import { fetchProfile } from "../Auth/Profile";
@@ -62,6 +63,7 @@ function AppealList() {
     const [filteredAppeal, setFilteredAppeal] = useState([]);
     const [selectedAppeal, setSelectedAppeal] = useState(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
     const [responseText, setResponseText] = useState("");
     const [profile, setProfile] = useState([]);
     const [staffId, setStaffId] = useState("");
@@ -147,12 +149,18 @@ function AppealList() {
 
     const closeDialog = () => {
         setIsDialogOpen(false);
+        setIsDetailDialogOpen(false);
         setSelectedAppeal(null);
         setResponseText("");
     };
 
     const handleResponseChange = (e) => {
         setResponseText(e.target.value);
+    };
+
+    const openDetailDialog = (appeal) => {
+        setSelectedAppeal(appeal);
+        setIsDetailDialogOpen(true);
     };
 
     useEffect(() => {
@@ -255,15 +263,16 @@ function AppealList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell sx={{width: 120}}><strong>Tên</strong></TableCell>
-                            <TableCell sx={{width: 120}}><strong>Nhân viên </strong></TableCell>
+                            <TableCell sx={{ width: 120 }}><strong>Tên</strong></TableCell>
+                            <TableCell sx={{ width: 120 }}><strong>Nhân viên </strong></TableCell>
                             <TableCell><strong>Nội dung </strong> </TableCell>
                             <TableCell><strong>Phản hồi từ Staff </strong></TableCell>
                             <TableCell><strong>Ngày tạo</strong></TableCell>
-                            <TableCell sx={{width: 150}}><strong>Ngày Phản hồi</strong></TableCell>
+                            <TableCell sx={{ width: 150 }}><strong>Ngày Phản hồi</strong></TableCell>
                             <TableCell><strong>Bản Review</strong></TableCell>
                             <TableCell><strong>Phản hồi Kháng cáo</strong></TableCell>
                             <TableCell><strong>Trạng Thái</strong></TableCell>
+                            <TableCell></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -310,6 +319,13 @@ function AppealList() {
                                             <Button>Unknow</Button>
                                         )}
                                     </TableCell>
+                                    <TableCell><Button
+                                        disabled={val.appealStatus === 1}
+                                        onClick={() => openDetailDialog(val)}
+                                    >
+                                        <Visibility />
+                                    </Button>
+                                    </TableCell>
                                 </TableRow>
                             ))
                         }
@@ -352,6 +368,29 @@ function AppealList() {
                 <DialogActions>
                     <Button onClick={closeDialog} color="secondary">Đóng</Button>
                     <Button color="primary" onClick={handleResponse}>Gửi Phản hồi</Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={isDetailDialogOpen} onClose={closeDialog} fullWidth>
+                <DialogTitle>Chi tiết Report</DialogTitle>
+                <DialogContent>
+                    <Typography variant="subtitle1"><strong>Nội dung:</strong> {selectedAppeal?.reason}</Typography>
+                    <TextField
+                        label="Phản hồi của bạn"
+                        multiline
+                        rows={4}
+                        fullWidth
+                        value={selectedAppeal?.response}
+                        sx={{ marginTop: 2 }}
+                        slotProps={{
+                            input: {
+                              readOnly: true,
+                            },
+                          }}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={closeDialog} color="secondary">Đóng</Button>
                 </DialogActions>
             </Dialog>
         </Box >

@@ -4,6 +4,7 @@ import api from '../Auth/AxiosInterceptors';
 import { handleFetchError } from '../../utils/handleError';
 import { json } from 'react-router-dom';
 import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Pagination, Paper, Select, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
+import { Visibility } from '@mui/icons-material';
 import Swal from 'sweetalert2';
 
 import "./Report.scss"
@@ -45,6 +46,7 @@ function ReportList() {
     const [selectedReport, setSelectedReport] = useState(null);
     const [users, setUsers] = useState([]);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [isDetailDialogOpen, setIsDetailDialogOpen] = useState(false);
     const [responseText, setResponseText] = useState("");
     const [page, setPage] = useState(0); // Trang hiện tại
     const [rowsPerPage, setRowsPerPage] = useState(5); // Dòng mỗi trang    
@@ -89,12 +91,18 @@ function ReportList() {
 
     const closeDialog = () => {
         setIsDialogOpen(false);
+        setIsDetailDialogOpen(false);
         setSelectedReport(null);
         setResponseText("");
     };
 
     const handleResponseChange = (e) => {
         setResponseText(e.target.value);
+    };
+
+    const openDetailDialog = (report) => {
+        setSelectedReport(report);
+        setIsDetailDialogOpen(true);
     };
 
     const handleResponse = async (id) => {
@@ -228,26 +236,33 @@ function ReportList() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell sx={{width: 120}}><strong>Bản Recap</strong></TableCell>
-                            <TableCell sx={{width: 120}}><strong>Cuốn sách</strong></TableCell>
+                            <TableCell ><strong>Bản Recap</strong></TableCell>
+                            {/* <TableCell ><strong>Cuốn sách</strong></TableCell> */}
                             <TableCell><strong>Tên</strong></TableCell>
                             <TableCell><strong>Nội dung</strong></TableCell>
                             <TableCell><strong>Phản hồi từ Staff</strong></TableCell>
-                            <TableCell sx={{width: 150}}><strong>Ngày tạo</strong></TableCell>
-                            <TableCell sx={{width: 150}}><strong>Ngày Phản hồi</strong></TableCell>
+                            <TableCell ><strong>Ngày tạo</strong></TableCell>
+                            <TableCell ><strong>Ngày Phản hồi</strong></TableCell>
                             <TableCell><strong>Phản hồi</strong></TableCell>
                             <TableCell><strong>Trạng Thái</strong></TableCell>
+                            <TableCell></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
                         {filteredReports.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             .map((val) => (
                                 <TableRow key={val.id}>
-                                    <TableCell>{val.recaps?.name}</TableCell>
-                                    <TableCell>{val.recaps?.book?.title}</TableCell>
+                                    <TableCell sx={{ width: 120 }}>{val.recaps?.name}</TableCell>
+                                    {/* <TableCell sx={{width: 120}}>{val.recaps?.book?.title}</TableCell> */}
                                     <TableCell>{getUserNamebyId(val.userId)}</TableCell>
-                                    <TableCell>{val.description}</TableCell>
-                                    <TableCell>{val.response || "Chưa có phản hồi từ staff"}</TableCell>
+                                    <TableCell>{val.description.length > 30
+                                        ? `${val.description.slice(0, 30)}...`
+                                        : val.description}</TableCell>
+                                    <TableCell>{val.response
+                                        ? (val.response.length > 30
+                                            ? `${val.response.slice(0, 30)}...`
+                                            : val.response)
+                                        : "Chưa có phản hồi từ staff"}</TableCell>
                                     <TableCell>{new Date(val.createdAt).toLocaleDateString()}</TableCell>
                                     <TableCell>{val.updatedAt === "0001-01-01T00:00:00" || !val.updatedAt
                                         ? "Chưa phản hồi"
@@ -269,6 +284,13 @@ function ReportList() {
                                     ) : (
                                         <Typography color="warning" >Đã mở</Typography>
                                     )}</TableCell>
+                                    <TableCell><Button
+                                        disabled={val.status === 1}
+                                        onClick={() => openDetailDialog(val)}
+                                    >
+                                        <Visibility />
+                                    </Button>
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         {reports.length === 0 && (
@@ -310,12 +332,36 @@ function ReportList() {
                         fullWidth
                         value={responseText}
                         onChange={handleResponseChange}
-                        sx={{marginTop: 2}}
+                        sx={{ marginTop: 2 }}
                     />
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={closeDialog} color="secondary">Đóng</Button>
                     <Button color="primary" onClick={() => handleResponse(selectedReport?.id)}>Gửi Phản hồi</Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={isDetailDialogOpen} onClose={closeDialog} fullWidth>
+                <DialogTitle>Chi tiết Report</DialogTitle>
+                <DialogContent>
+                    <Typography variant="subtitle1"><strong>Bản Recap:</strong> {selectedReport?.recaps?.name}</Typography>
+                    <Typography variant="subtitle1"><strong>Nội dung:</strong> {selectedReport?.description}</Typography>
+                    <TextField
+                        label="Phản hồi của bạn"
+                        multiline
+                        rows={4}
+                        fullWidth
+                        value={selectedReport?.response}
+                        sx={{ marginTop: 2 }}
+                        slotProps={{
+                            input: {
+                              readOnly: true,
+                            },
+                          }}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={closeDialog} color="secondary">Đóng</Button>
                 </DialogActions>
             </Dialog>
         </Box>
