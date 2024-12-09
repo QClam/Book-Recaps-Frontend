@@ -2,10 +2,11 @@ import React, { useEffect, useState } from 'react'
 import { Box, Button, MenuItem, Chip, Paper, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
 import { Hourglass } from 'react-loader-spinner';
 import { useNavigate } from "react-router-dom";
-import { Visibility } from "@mui/icons-material";
+import { Delete, Visibility } from "@mui/icons-material";
 
 import api from '../Auth/AxiosInterceptors';
 import './Contract.scss'
+import Swal from 'sweetalert2';
 
 const resolveRefs = (data) => {
     const refMap = new Map();
@@ -133,6 +134,32 @@ function ContractsList() {
         navigate(`/contract/${id}`);
     }
 
+    const handleDeleteContract = (id) => {
+        Swal.fire({
+            title: "Bạn có chắc chắn muốn xóa?",
+            text: "Bạn không thể hoàn tác hành động này!",
+            icon: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#d33",
+            cancelButtonColor: "#3085d6",
+            confirmButtonText: "Xóa",
+            cancelButtonText: "Hủy",
+        }).then(async (result) => {
+            if (result.isConfirmed) {
+                try {
+                    const response = await api.delete(`/api/Contract/delete/${id}`);
+                    if (response && response.status === 200) {
+                        setContracts(contracts.filter((contract) => contract.id !== id))
+                        Swal.fire("Đã xóa!", "Hợp đồng đã được xóa", "success");
+                        await fetchContracts();
+                    }
+                } catch (error) {
+                    Swal.fire("Thất bại", "Có lỗi xảy ra trong quá trình xóa", "error");
+                }
+            }
+        })
+    }
+
     const handleMouseEnter = () => {
         setIsHover(true);
     }
@@ -215,8 +242,8 @@ function ContractsList() {
                         <TableBody>
                             {filteredContracts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
                                 <TableRow key={item.id}>
-                                    <TableCell>{item.publisher?.publisherName}</TableCell>
-                                    <TableCell><Typography color='primary'>{item.revenueSharePercentage}%</Typography></TableCell>
+                                    <TableCell>{item.publisher?.publisherName || "Hợp đồng này là bản nháp và đang đợi chỉnh sửa"}</TableCell>
+                                    <TableCell><Typography color='primary'>{item.revenueSharePercentage || 0}%</Typography></TableCell>
                                     <TableCell>{new Date(item.startDate).toLocaleDateString()}</TableCell>
                                     <TableCell>{new Date(item.endDate).toLocaleDateString()}</TableCell>
                                     <TableCell>{item.autoRenew === true ? (
@@ -239,7 +266,13 @@ function ContractsList() {
                                     ) : (
                                         <Button variant="contained">Unknow</Button>
                                     )}</TableCell>
-                                    <TableCell><Button onClick={() => handleDetail(item.id)}><Visibility /></Button></TableCell>
+                                    <TableCell>
+                                        <Box display='flex'>
+
+                                        <Button onClick={() => handleDetail(item.id)}><Visibility /></Button>
+                                        <Button onClick={() => handleDeleteContract(item.id)} disabled={item.status !== 0 && item.status !== 4} color='error'><Delete /></Button>
+                                        </Box>
+                                    </TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>

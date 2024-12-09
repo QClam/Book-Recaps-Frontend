@@ -294,7 +294,7 @@ function BookList() {
                                             <Visibility />
                                         </Button>
                                         <Button onClick={() => handleDeleteBook(book.id)}>
-                                            <Delete />
+                                            <Delete color='error'/>
                                         </Button>
                                     </Box>
                                 </TableCell>
