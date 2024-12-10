@@ -508,7 +508,11 @@ function Review() {
                   <Typography color="error" >Lỗi</Typography>
                )}
             </Box>
-            <Typography>Nhân viên Review: {contentItem.staffName}</Typography>
+            <Box display="flex" gap={1}>
+            <Typography>Nhân viên Review:</Typography>
+            <Typography color='success'>{contentItem.staffName}</Typography>
+            </Box>
+
             <div className='button-group'>
                <Chip
                   onClick={() => handleChangeMode('comment')}
