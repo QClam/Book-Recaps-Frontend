@@ -25,3 +25,4 @@ docker-compose.yml
 *.njsproj
 *.sln
 *.sw?
+staff.zip
