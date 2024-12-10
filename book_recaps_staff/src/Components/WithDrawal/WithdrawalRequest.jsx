@@ -56,13 +56,16 @@ function WithdrawalRequest({ open, onClose, drawalId, onUpdate }) {
             return;
         }
 
-        if (!selectedImage) {
+        if (withdrawalStatus === 1 && !selectedImage) {
             alert('Vui lòng chọn ảnh trước khi gửi!');
+            setLoading(false);
             return;
         }
 
         const formData = new FormData();
-        formData.append('ImageURL', selectedImage);
+        if (selectedImage) {
+            formData.append('ImageURL', selectedImage); // Chỉ gửi ảnh nếu có
+        }
         formData.append('Description', responseText);
         formData.append('Status', withdrawalStatus);
 
@@ -74,13 +77,14 @@ function WithdrawalRequest({ open, onClose, drawalId, onUpdate }) {
                     }
                 }
             )
-            alert("Cập nhật thành công!");
+           
+            alert("Phản hồi thành công!");
             setLoading(false);
             onClose();
             if (onUpdate) onUpdate(); // Gọi lại để cập nhật danh sách
         } catch (error) {
             console.error("Error updating withdrawal request:", error);
-            alert("Đã xảy ra lỗi khi cập nhật!");
+            alert("Đã xảy ra lỗi khi phản hồi!");
             setLoading(false);
         }
     }
@@ -240,7 +244,7 @@ function WithdrawalRequest({ open, onClose, drawalId, onUpdate }) {
                     color="primary"
                     disabled={loading}                   
                 >
-                    {loading ? <CircularProgress size={20} color="inherit" /> : "Chấp nhận" }
+                    {loading ? <CircularProgress size={20} color="inherit" /> : "Phản hồi" }
                 </Button>
             </DialogActions>
         </Dialog>
