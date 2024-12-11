@@ -2,14 +2,14 @@ import ForUser from './ForUser/ForUser';
 import { useAuth } from "../../contexts/Auth";
 import Show from "../Show";
 import { getCurrentUserInfo } from "../../utils/getCurrentUserInfo";
-import { axiosInstance2 } from "../../utils/axios";
+import { axiosInstance3 } from "../../utils/axios";
 import { defer, json, useLoaderData } from "react-router-dom";
 import { handleFetchError } from "../../utils/handleFetchError";
 
 const getForYouRecaps = async (userId, request) => {
   if (!userId) return null;
   try {
-    const response = await axiosInstance2.get('/ml/recommendations/for-you?user=' + userId, {
+    const response = await axiosInstance3.get('/recommendations/for-you?user=' + userId, {
       signal: request.signal
     })
 
@@ -22,7 +22,7 @@ const getForYouRecaps = async (userId, request) => {
 
 const getTopRecaps = async (request) => {
   try {
-    const response = await axiosInstance2.get('/ml/recommendations/top-recaps', {
+    const response = await axiosInstance3.get('/recommendations/top-recaps', {
       signal: request.signal
     })
 
@@ -35,7 +35,7 @@ const getTopRecaps = async (request) => {
 
 const getRecentlyAddedRecaps = async (request) => {
   try {
-    const response = await axiosInstance2.get('/ml/recommendations/recently-added-recaps', {
+    const response = await axiosInstance3.get('/recommendations/recently-added-recaps', {
       signal: request.signal
     })
 

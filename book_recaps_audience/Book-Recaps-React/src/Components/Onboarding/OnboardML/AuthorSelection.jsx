@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react';
 import { Button, TextField } from '@mui/material';
-import { axiosInstance2 } from "../../../utils/axios";
+import { axiosInstance3 } from "../../../utils/axios";
 
 const getAuthors = async (query, categories, page, controller) => {
   try {
-    const response = await axiosInstance2.get('/ml/onboarding/authors', {
+    const response = await axiosInstance3.get('/onboarding/authors', {
       params: {
         categories: categories.map(c => c.id).join(','),
         q: query,

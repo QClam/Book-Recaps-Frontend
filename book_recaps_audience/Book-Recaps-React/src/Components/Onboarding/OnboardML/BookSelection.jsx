@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { Button } from "@mui/material";
-import { axiosInstance2 } from "../../../utils/axios";
+import { axiosInstance3 } from "../../../utils/axios";
 import { LuThumbsDown, LuThumbsUp } from "react-icons/lu";
 import { Image } from "primereact/image";
 
 const getBooks = async (categories, authors, controller) => {
   try {
-    const response = await axiosInstance2.get("/ml/onboarding/books", {
+    const response = await axiosInstance3.get("/onboarding/books", {
       params: {
         categories: categories.map(c => c.id).join(','),
         authors: authors.map(a => a.id).join(',')

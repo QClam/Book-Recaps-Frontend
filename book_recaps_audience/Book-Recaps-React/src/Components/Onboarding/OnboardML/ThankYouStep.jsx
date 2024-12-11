@@ -1,13 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useRevalidator } from "react-router-dom";
 import { useAuth } from "../../../contexts/Auth";
-import { axiosInstance2 } from "../../../utils/axios";
+import { axiosInstance3 } from "../../../utils/axios";
 import Show from "../../Show";
 import { ProgressSpinner } from "primereact/progressspinner";
 
 const postOnboardingFinish = async (userId, categories, authors, books, controller) => {
   try {
-    const response = await axiosInstance2.post('/ml/onboarding/finish', {
+    const response = await axiosInstance3.post('/onboarding/finish', {
       user_id: userId,
       category_ids: categories.map(c => c.id),
       author_ids: authors.map(a => a.id),
