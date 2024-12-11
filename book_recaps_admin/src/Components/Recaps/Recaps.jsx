@@ -77,9 +77,9 @@ function Recaps() {
         // Search filter
         if (searchTerm) {
             filteredData = filteredData.filter((item) =>
-                item.recapName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.bookTitle.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.contributorName.toLowerCase().includes(searchTerm.toLowerCase())
+                (item.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                 item.book?.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                 item.contributor?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()))
             );
         }
 
