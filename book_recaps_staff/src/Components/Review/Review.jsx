@@ -190,7 +190,7 @@ function Review() {
             }
          );
          setRecapVersion(response.data);
-
+         await fetchData();
          const id = recapVersionId;
          const postPlagirism = await axios.post("https://ai.bookrecaps.net/plagiarism/add-recap-versions", [id])
       } catch (error) {
@@ -235,6 +235,7 @@ function Review() {
             }
          );
          setRecapVersion(response.data);
+         await fetchData();
       } catch (error) {
          Swal.fire('Error', 'Failed to update status.', 'error');
       }
@@ -509,8 +510,8 @@ function Review() {
                )}
             </Box>
             <Box display="flex" gap={1}>
-            <Typography>Nhân viên Review:</Typography>
-            <Typography color='success'>{contentItem.staffName}</Typography>
+               <Typography>Nhân viên Review:</Typography>
+               <Typography color='success'>{contentItem.staffName}</Typography>
             </Box>
 
             <div className='button-group'>
