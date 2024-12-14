@@ -78,13 +78,13 @@ function WithdrawalRequest({ open, onClose, drawalId, onUpdate }) {
                 }
             )
            
-            alert("Phản hồi thành công!");
+            alert("Giao dịch đã hoàn tất!");
             setLoading(false);
             onClose();
             if (onUpdate) onUpdate(); // Gọi lại để cập nhật danh sách
         } catch (error) {
             console.error("Error updating withdrawal request:", error);
-            alert("Đã xảy ra lỗi khi phản hồi!");
+            alert("Đã xảy ra lỗi khi thực hiện giao dịch! Hãy kiểm tra đã có ảnh và thay đổi trạng thái hay chưa");
             setLoading(false);
         }
     }
@@ -118,10 +118,10 @@ function WithdrawalRequest({ open, onClose, drawalId, onUpdate }) {
 
                             <Box display="flex" justifyContent="space-between">
                                 <Typography>
-                                    Rút về:
+                                    Hình thức:
                                 </Typography>
                                 <Typography>
-                                    <strong>Nhận trực tiếp</strong>
+                                    <strong>Chuyển khoản</strong>
                                 </Typography>
                             </Box>
 
@@ -131,6 +131,15 @@ function WithdrawalRequest({ open, onClose, drawalId, onUpdate }) {
                                 </Typography>
                                 <Typography>
                                     <strong>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(withdrawalDetails.contributor?.earning)}</strong>
+                                </Typography>
+                            </Box>
+
+                            <Box display="flex" justifyContent="space-between">
+                                <Typography>
+                                    <strong>Tài khoản Ngân Hàng:</strong>
+                                </Typography>
+                                <Typography>
+                                    <strong>{withdrawalDetails.contributor?.bankAccount}</strong>
                                 </Typography>
                             </Box>
 
@@ -244,7 +253,7 @@ function WithdrawalRequest({ open, onClose, drawalId, onUpdate }) {
                     color="primary"
                     disabled={loading}                   
                 >
-                    {loading ? <CircularProgress size={20} color="inherit" /> : "Phản hồi" }
+                    {loading ? <CircularProgress size={20} color="inherit" /> : "Hoàn tất" }
                 </Button>
             </DialogActions>
         </Dialog>
