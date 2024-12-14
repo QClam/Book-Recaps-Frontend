@@ -95,9 +95,9 @@ function DetailContributorPayout() {
                                     </Box>
                                     <Box display="flex" justifyContent="space-between" mb={1}>
                                         <Typography variant="body1" fontWeight="bold">
-                                            Số điện thoại:
+                                            Tài khoản ngân hàng:
                                         </Typography>
-                                        <Typography variant="body1">{payoutData.contributor?.phoneNumber}</Typography>
+                                        <Typography variant="body1">{payoutData.contributor?.bankAccount}</Typography>
                                     </Box>
                                     <Box display="flex" justifyContent="space-between" mb={1}>
                                         <Typography variant="body1" fontWeight="bold">

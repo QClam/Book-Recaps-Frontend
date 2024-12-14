@@ -102,11 +102,17 @@ function CreateContributorPayout() {
                                         </Typography>
                                         <Typography variant="body1">{contributor.contributorName || 'N/A'}</Typography>
                                     </Box>
-                                    <Box display="flex" justifyContent="space-between">
+                                    <Box display="flex" justifyContent="space-between" mb={1}>
                                         <Typography variant="body1" fontWeight="bold">
                                             Thông tin liên hệ:
                                         </Typography>
                                         <Typography variant="body1">{contributor.email || 'N/A'}</Typography>
+                                    </Box>
+                                    <Box display="flex" justifyContent="space-between">
+                                        <Typography variant="body1" fontWeight="bold">
+                                            Tài khoản ngân hàng:
+                                        </Typography>
+                                        <Typography variant="body1">{contributor.bankAccount || 'N/A'}</Typography>
                                     </Box>
                                 </Paper>
                             </Grid>
