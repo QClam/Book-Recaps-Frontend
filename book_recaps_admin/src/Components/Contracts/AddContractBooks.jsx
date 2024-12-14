@@ -84,6 +84,7 @@ function AddContractBooks({ contractId, disableUpdate, onUpdateContractBooks }) 
     return (
         <div style={{ marginTop: 20 }}>
             <Typography variant="h6" gutterBottom>Các cuốn sách xin cấp bản quyền</Typography>
+            <Typography variant="body2" gutterBottom>Số lượng Sách được thêm: {contractBooks.length} quyển</Typography>
             <Button color='primary' variant='outlined' onClick={handleOpen} sx={{ margin: 1 }} disabled={disableUpdate}>
                 Cập nhật sách
             </Button>

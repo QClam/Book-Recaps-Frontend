@@ -35,6 +35,8 @@ function ContractDetail() {
     const [endDate, setEndDate] = useState("");
     const [publishers, setPublishsers] = useState([]);
     const [isCheckbox, setIsCheckbox] = useState(false);
+    const [isEdited, setIsEdited] = useState(false);
+    const [isSaved, setIsSaved] = useState(false);
     const [loading, setLoading] = useState(true);
 
     const [contractForm, setContractForm] = useState({
@@ -84,6 +86,7 @@ function ContractDetail() {
             ...prevForm,
             publisherId: e.target.value,
         }));
+        setIsEdited(true); // Cập nhật trạng thái đã chỉnh sửa
     };
 
     const handleRevenueShareChange = (e) => {
@@ -100,8 +103,9 @@ function ContractDetail() {
                     ...prevForm,
                     revenueSharePercentage: numberValue,
                 }));
+                setIsEdited(true); // Cập nhật trạng thái đã chỉnh sửa
             } else {
-                console.log("Phần trăm chia sẻ doanh thu phải từ 0 đến 100");
+                alert("Phần trăm chia sẻ doanh thu phải từ 0 đến 100");
             }
         } else {
             console.log("Vui lòng nhập một số hợp lệ");
@@ -113,6 +117,7 @@ function ContractDetail() {
             ...prevForm,
             startDate: e.target.value,
         }));
+        setIsEdited(true); // Cập nhật trạng thái đã chỉnh sửa
     };
 
     const handleEndDateChange = (e) => {
@@ -120,6 +125,7 @@ function ContractDetail() {
             ...prevForm,
             endDate: e.target.value,
         }));
+        setIsEdited(true); // Cập nhật trạng thái đã chỉnh sửa
     };
 
     const handleAutoRenewChange = (e) => {
@@ -127,6 +133,7 @@ function ContractDetail() {
             ...prevForm,
             autoRenew: e.target.value,
         }));
+        setIsEdited(true); // Cập nhật trạng thái đã chỉnh sửa
     };
 
     const handleCheckboxChange = (e) => {
@@ -150,9 +157,11 @@ function ContractDetail() {
             const contract = response.data.data;
             setContractForm(contract);
             console.log(contract);
+            setIsEdited(false);
+            setIsSaved(true);
             alert("Lưu thành công");
         } catch (error) {
-            alert("Ngày kết thúc phải lớn hơn ngày bắt đầu.")
+            alert("Không thể lưu chỉnh sửa do chưa điền đầy đủ thông tin, hãy kiểm tra lại. ")
         }
     }
 
@@ -208,6 +217,7 @@ function ContractDetail() {
     };
 
     useEffect(() => {
+        setIsSaved(false) // Reset trạng thái khi lần đầu vào trang
         getContractDetail();
         fetchPublishers();
     }, [contractId])
@@ -251,7 +261,7 @@ function ContractDetail() {
 
                                 <Grid item xs={12} md={6}>
                                     <Box display="flex" alignItems="center">
-                                        <Typography sx={{ width: 150 }}>Publisher:</Typography>
+                                        <Typography sx={{ width: 150 }}>Nhà Xuất Bản:</Typography>
                                         <Select
                                             variant="outlined"
                                             sx={{ width: 360 }}
@@ -261,7 +271,7 @@ function ContractDetail() {
                                             disabled={disableUpdate}
                                         >
                                             <MenuItem value="" disabled>
-                                                Chọn Publisher
+                                                Chọn Nhà Xuất Bản
                                             </MenuItem>
                                             {publishers.map((publisher) => (
                                                 <MenuItem key={publisher.id} value={publisher.id}>
@@ -346,11 +356,11 @@ function ContractDetail() {
                                             variant="contained"
                                             color="secondary"
                                             onClick={handleSendContract}
-                                            disabled={!isCheckbox || disableUpdate}
+                                            disabled={!isSaved || !isCheckbox || disableUpdate || isEdited}
                                         >
                                             Kích hoạt hợp đồng
                                         </Button>
-                                        <Button variant="contained" color="primary" onClick={handleSendContract} disabled={disableUpdate || isCheckbox}>
+                                        <Button variant="contained" color="primary" onClick={handleSendContract} disabled={disableUpdate || isCheckbox || isEdited || !isSaved}>
                                             Gửi
                                         </Button>
                                         <Tooltip title="Hãy nhấn Lưu chỉnh sửa mỗi khi thay đổi thông tin, thêm tài liệu hoặc sách">

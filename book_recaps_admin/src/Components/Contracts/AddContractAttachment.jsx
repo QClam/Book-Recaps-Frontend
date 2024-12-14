@@ -121,7 +121,7 @@ function AddContractAttachment({ contractId, disableUpdate, onUpdateAttachments 
                                     <Button href={item.attachmentURL} target="_blank" rel="noopener noreferrer">
                                         Chi tiết
                                     </Button>
-                                    <Button color='error' onClick={() => handleDeleteContractAttachment(item.id)} disabled={loading}>
+                                    <Button color='error' onClick={() => handleDeleteContractAttachment(item.id)} disabled={loading || disableUpdate}>
                                         {loading ? <CircularProgress size={20} color='inherit' /> : "Xóa"}
                                     </Button>
 

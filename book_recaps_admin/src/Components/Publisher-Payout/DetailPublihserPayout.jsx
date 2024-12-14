@@ -43,7 +43,7 @@ function DetailPublihserPayout() {
             toDate: payoutData.toDate
          }
       })
-  }
+   }
 
    const handleExportExcel = () => {
       const bookData = bookEarnings.map(item => ({
@@ -138,7 +138,9 @@ function DetailPublihserPayout() {
                               borderRadius: 2,
                               border: '1px solid #ddd',
                               width: '100%',
-                              height: 120
+                              height: 120,
+                              display: 'flex',
+                              flexDirection: 'column',
                            }}
                         >
                            <Box display="flex" justifyContent="space-between" mb={1}>
@@ -147,11 +149,11 @@ function DetailPublihserPayout() {
                               </Typography>
                               <Typography variant="body1">{payoutData.description}</Typography>
                            </Box>
-                           <Box display="flex" justifyContent="space-between" mb={1}>
+                           <Box display="flex" justifyContent="space-between" mb={1} mt='auto'>
                               <Typography variant="body1" fontWeight="bold">
                                  Trạng thái:
                               </Typography>
-                              <Typography variant="body1">Hoàn thành</Typography>
+                              <Typography variant="body1" color='success'>Hoàn thành</Typography>
                            </Box>
                         </Paper>
                      </Grid>

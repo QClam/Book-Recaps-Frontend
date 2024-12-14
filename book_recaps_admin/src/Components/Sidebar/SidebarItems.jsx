@@ -48,7 +48,7 @@ export const SidebarItems = [
         link: "/recaps",
     },
     {
-        title: "Hợp đồng",
+        title: "Quản lý Hợp đồng",
         icon: <LibraryBooks />,
         link: "/contracts",
     },

@@ -59,6 +59,7 @@ function ContractsList() {
         try {
             const response = await api.get('/api/Contract/getallcontract')
             const contracts = resolveRefs(response.data.data.$values);
+            contracts.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
             setContracts(contracts);
             setFilteredContracts(contracts)
             // console.log(contracts);
@@ -154,7 +155,7 @@ function ContractsList() {
                         await fetchContracts();
                     }
                 } catch (error) {
-                    Swal.fire("Thất bại", "Có lỗi xảy ra trong quá trình xóa", "error");
+                    Swal.fire("Thất bại", "Có lỗi xảy ra trong quá trình xóa, hãy chắc rằng không có tệp đính kèm nào đang ở trong bản hợp đồng", "error");
                 }
             }
         })
@@ -230,7 +231,7 @@ function ContractsList() {
                     <Table>
                         <TableHead>
                             <TableRow>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Tên Publisher</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}>Nhà xuất bản</TableCell>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Phần trăm doanh thu được chia sẽ</TableCell>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Từ ngày</TableCell>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Đến ngày</TableCell>
@@ -242,7 +243,7 @@ function ContractsList() {
                         <TableBody>
                             {filteredContracts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
                                 <TableRow key={item.id}>
-                                    <TableCell>{item.publisher?.publisherName || "Hợp đồng này là bản nháp và đang đợi chỉnh sửa"}</TableCell>
+                                    <TableCell>{item.publisher?.publisherName || "Hợp đồng này đang đợi chỉnh sửa"}</TableCell>
                                     <TableCell><Typography color='primary'>{item.revenueSharePercentage || 0}%</Typography></TableCell>
                                     <TableCell>{new Date(item.startDate).toLocaleDateString()}</TableCell>
                                     <TableCell>{new Date(item.endDate).toLocaleDateString()}</TableCell>

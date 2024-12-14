@@ -54,7 +54,7 @@ function DetailContributorPayout() {
     }
 
     const detailRecap = async (id) => {
-        navigate(`/recap/${id}`,{
+        navigate(`/recap/${id}`, {
             state: {
                 fromDate: payoutData.fromDate,
                 toDate: payoutData.toDate
@@ -116,7 +116,9 @@ function DetailContributorPayout() {
                                         borderRadius: 2,
                                         border: '1px solid #ddd',
                                         width: '100%',
-                                        height: 160
+                                        height: 160,
+                                        display: 'flex',
+                                        flexDirection: 'column',
                                     }}
                                 >
                                     <Box display="flex" justifyContent="space-between" mb={1}>
@@ -125,15 +127,15 @@ function DetailContributorPayout() {
                                         </Typography>
                                         <Typography variant="body1">{dayjs(payoutData.fromDate).format('DD/MM/YYYY')} - {dayjs(payoutData.toDate).format('DD/MM/YYYY')}</Typography>
                                     </Box>
-                                    <Box display="flex" justifyContent="space-between" mb={1}>
+                                    <Box display="flex" justifyContent="space-between" mb={1} mt='auto'>
                                         <Typography variant="body1" fontWeight="bold">
                                             Tổng chi:
                                         </Typography>
                                         <Typography variant="body1">{(payoutData.amount ?? 0).toLocaleString()} VND</Typography>
                                     </Box>
-                                    <Box display="flex" justifyContent="space-between">
+                                    {/* <Box display="flex" justifyContent="space-between">
                                         <Link href={payoutData.imageURL} underline="hover" target="_blank">Hình ảnh</Link>
-                                    </Box>
+                                    </Box> */}
                                 </Paper>
                             </Grid>
 
@@ -146,6 +148,8 @@ function DetailContributorPayout() {
                                         border: '1px solid #ddd',
                                         width: '100%',
                                         height: 160,
+                                        display: 'flex',
+                                        flexDirection: 'column',
                                     }}
                                 >
                                     <Box display="flex" justifyContent="space-between" mb={1}>
@@ -154,11 +158,11 @@ function DetailContributorPayout() {
                                         </Typography>
                                         <Typography variant="body1">{payoutData.description}</Typography>
                                     </Box>
-                                    <Box display="flex" justifyContent="space-between" mb={1}>
+                                    <Box display="flex" justifyContent="space-between" mb={1} mt='auto'>
                                         <Typography variant="body1" fontWeight="bold">
                                             Trạng thái:
                                         </Typography>
-                                        <Typography variant="body1">Hoàn thành</Typography>
+                                        <Typography variant="body1" color='success'>Hoàn thành</Typography>
                                     </Box>
                                 </Paper>
                             </Grid>
