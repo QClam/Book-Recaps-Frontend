@@ -59,6 +59,8 @@ function Recaps() {
         try {
             const response = await api.get('/api/recap/Getallrecap');
             const recapVersions = resolveRefs(response.data.data.$values);
+            console.log("Recap: ", recapVersions);
+            
             setRecapVersions(recapVersions);
             setFilteredVersions(recapVersions); // Initialize filtered data
             setLoading(false);
@@ -85,7 +87,7 @@ function Recaps() {
 
         // Status filter
         if (filterStatus) {
-            filteredData = filteredData.filter((item) => item.status === filterStatus);
+            filteredData = filteredData.filter((item) => item.currentVersion?.status === filterStatus);
         }
 
         setFilteredVersions(filteredData);
@@ -151,9 +153,9 @@ function Recaps() {
                     sx={{ width: '20%' }}
                 >
                     <MenuItem value="">Tất cả</MenuItem>
-                    <MenuItem value="Pending">Đang xử lý</MenuItem>
-                    <MenuItem value="Approved">Chấp nhận</MenuItem>
-                    <MenuItem value="Rejected">Từ chối</MenuItem>
+                    <MenuItem value={1}>Đang xử lý</MenuItem>
+                    <MenuItem value={2}>Đã Chấp nhận</MenuItem>
+                    <MenuItem value={3}>Đã Từ chối</MenuItem>
                 </TextField>
             </Box>
 
