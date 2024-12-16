@@ -77,7 +77,7 @@ function WithdrawalRequest({ open, onClose, drawalId, onUpdate }) {
                     }
                 }
             )
-           
+
             alert("Giao dịch đã hoàn tất!");
             setLoading(false);
             onClose();
@@ -105,7 +105,7 @@ function WithdrawalRequest({ open, onClose, drawalId, onUpdate }) {
                                 padding: 2,
                                 borderRadius: 2,
                                 border: '1px solid #ddd',
-                                width: 350,
+                                width: 400,
                             }}>
                             <Box display="flex" justifyContent="space-between">
                                 <Typography>
@@ -184,6 +184,19 @@ function WithdrawalRequest({ open, onClose, drawalId, onUpdate }) {
                             onChange={handleResponseChange}
                         />
 
+                        <Box display="flex" alignItems="center">
+                            <Typography sx={{ width: 100 }}><strong>Trạng thái</strong></Typography>
+                            <Select
+                                value={withdrawalStatus}
+                                onChange={handleStatusChange}
+                                displayEmpty
+                                renderValue={(selected) => selected ? `${selected === 1 ? "Hoàn tất" : "Hủy"}` : "Đang mở"}
+                            >
+                                <MenuItem value={1}>Hoàn tất</MenuItem>
+                                <MenuItem value={2}>Hủy</MenuItem>
+                            </Select>
+                        </Box>
+
                         <Typography>
                             <strong>Hình ảnh:</strong>
                         </Typography>
@@ -226,18 +239,6 @@ function WithdrawalRequest({ open, onClose, drawalId, onUpdate }) {
                                 />
                             </Button>
                         </Box>
-                        <Box display="flex" alignItems="center">
-                            <Typography sx={{ width: 100 }}><strong>Trạng thái</strong></Typography>
-                            <Select
-                                value={withdrawalStatus}
-                                onChange={handleStatusChange}
-                                displayEmpty
-                                renderValue={(selected) => selected ? `${selected === 1 ? "Hoàn tất" : "Hủy"}` : "Đang mở"}
-                            >
-                                <MenuItem value={1}>Hoàn tất</MenuItem>
-                                <MenuItem value={2}>Hủy</MenuItem>
-                            </Select>
-                        </Box>
                     </Box>
                 ) : (
                     <Typography>Đang tải dữ liệu...</Typography>
@@ -251,9 +252,9 @@ function WithdrawalRequest({ open, onClose, drawalId, onUpdate }) {
                     onClick={responseWithdrawal}
                     variant="contained"
                     color="primary"
-                    disabled={loading}                   
+                    disabled={loading}
                 >
-                    {loading ? <CircularProgress size={20} color="inherit" /> : "Hoàn tất" }
+                    {loading ? <CircularProgress size={20} color="inherit" /> : "Hoàn tất"}
                 </Button>
             </DialogActions>
         </Dialog>
