@@ -218,10 +218,10 @@ function Dashboard() {
                     <DateRangePicker
                         value={dateRange}
                         onChange={handleDateChange}
-                        disabledDate={(date) => {
-                            const today = dayjs().endOf('day'); // Lấy ngày hiện tại (đến cuối ngày)
-                            return dayjs(date).isAfter(today); // Vô hiệu hóa các ngày sau ngày hiện tại
-                        }}
+                        // disabledDate={(date) => {
+                        //     const today = dayjs().endOf('day'); // Lấy ngày hiện tại (đến cuối ngày)
+                        //     return dayjs(date).isAfter(today); // Vô hiệu hóa các ngày sau ngày hiện tại
+                        // }}
                         cleanable={false}
                     />
                 </div>

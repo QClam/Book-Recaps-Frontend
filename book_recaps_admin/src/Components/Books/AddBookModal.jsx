@@ -57,7 +57,7 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
         const stringFields = ['Title', 'OriginalTitle'];
         stringFields.forEach(field => {
             if (!/^[A-Z]/.test(formData[field])) {
-                errors[field] = `${field} Phải bắt đầu bằng chữ viết hoa.`;
+                errors[field] = `Tiêu đề hoặc Tiêu đề gốc phải bắt đầu bằng chữ viết hoa.`;
             }
         });
 
@@ -148,6 +148,7 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
         const validationErrors = validateForm();
         if (Object.keys(validationErrors).length > 0) {
             setErrors(validationErrors);
+            setLoading(false);
             return;
         }
 
@@ -197,7 +198,7 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
                         { name: 'ISBN_10', label: 'ISBN_10', tooltip: 'Mã ISBN_10 của cuốn sách' },
                         { name: 'Description', label: 'Mô tả', multiline: true, rows: 4, tooltip: 'Mô tả ngắn gọn nội dung sách.' },
                         { name: 'PublicationYear', label: 'Năm xuất bản', tooltip: 'Năm xuất bản sách. Lưu ý: Chỉ nhập năm, không nhập ngày và tháng. Sẽ có lúc Tự động điền sẽ điền cả ngày tháng năm, xin vui lòng xóa ngày và tháng nếu có.' },
-                        { name: 'AgeLimit', type:'number', label: 'Giới hạn tuổi', tooltip: 'Nhập độ tuổi tối thiểu phù hợp với nội dung sách.' },
+                        { name: 'AgeLimit', type: 'number', label: 'Giới hạn tuổi', tooltip: 'Nhập độ tuổi tối thiểu phù hợp với nội dung sách.' },
                     ].map(field => (
                         <Tooltip key={field.name} title={field.tooltip || ''} placement="top" arrow>
                             <TextField

@@ -13,7 +13,7 @@ import {
 } from '@mui/material';
 import api from '../Auth/AxiosInterceptors';
 
-function AddUserModal({ open, onClose, onUpdate}) {
+function AddUserModal({ open, onClose, onUpdate }) {
 
     const navigate = useNavigate();
     const { executeRecaptcha } = useGoogleReCaptcha();
@@ -87,11 +87,14 @@ function AddUserModal({ open, onClose, onUpdate}) {
         e.preventDefault();
 
         if (!validateForm()) {
+            setLoading(false);
             return; // Nếu form không hợp lệ, dừng lại
+
         }
 
         if (!executeRecaptcha) {
             setError("reCAPTCHA chưa được khởi tạo");
+            setLoading(false);
             return;
         }
 
@@ -195,7 +198,7 @@ function AddUserModal({ open, onClose, onUpdate}) {
                     Hủy
                 </Button>
                 <Button onClick={handleAddUser} color="primary" variant="contained" disabled={loading}>
-                    {loading ? <CircularProgress size={20} color='inherit'/> : "Thêm"}
+                    {loading ? <CircularProgress size={20} color='inherit' /> : "Thêm"}
                 </Button>
             </DialogActions>
         </Dialog>

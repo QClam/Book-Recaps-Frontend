@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import {
     TableContainer, Table, TableHead, TableRow, TableCell, TableBody,
     Paper, Typography, Button, Box, Modal, TextField, MenuItem,
-    Chip
+    Chip,
+    TablePagination,
+    TableFooter
 } from '@mui/material';
 import { CalendarMonth, Visibility } from '@mui/icons-material'
 import { useNavigate } from 'react-router-dom';
@@ -44,6 +46,10 @@ function ContributorPayout() {
     const [openModal, setOpenModal] = useState(false);
     const [selectedContributor, setSelectedContributor] = useState('');
     const [selectedContributorName, setSelectedContributorName] = useState('');
+    const [filteredPayouts, setFilteredPayouts] = useState([]);
+    const [page, setPage] = useState(0); // Trang hiện tại
+    const [rowsPerPage, setRowsPerPage] = useState(5); // Dòng mỗi trang    
+    const [searchTerm, setSearchTerm] = useState(""); // Nhập input ô search  
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState(dayjs().format('YYYY-MM-DD'));
     const [payouts, setPayouts] = useState([]);
@@ -76,6 +82,38 @@ function ContributorPayout() {
             console.error("Error Fetching", error);
         }
     }
+
+    useEffect(() => {
+        let filteredData = payouts;
+
+        // Search filter
+        if (searchTerm) {
+            filteredData = filteredData.filter((item) =>
+                item.contributorName.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        setFilteredPayouts(filteredData);
+
+        // Kiểm tra nếu page vượt quá tổng số trang
+        const totalPages = Math.ceil(filteredData.length / rowsPerPage);
+        if (page >= totalPages) {
+            setPage(0);  // Reset page về 0 nếu vượt quá số trang
+        }
+    }, [searchTerm, payouts, page, rowsPerPage]);
+
+    const handleChangePage = (event, newPage) => {
+        // Kiểm tra xem trang có hợp lệ hay không
+        const totalPages = Math.ceil(filteredPayouts.length / rowsPerPage);
+        if (newPage < totalPages && newPage >= 0) {
+            setPage(newPage);
+        }
+    };
+
+    const handleChangeRowsPerPage = (event) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0); // Reset to first page when rows per page changes
+    };
 
     useEffect(() => {
         fetchPayoutList();
@@ -178,15 +216,23 @@ function ContributorPayout() {
     return (
         <Box sx={{ padding: '24px', width: '80vw' }}>
             <Typography variant="h5">Quyết toán thu nhập cho Người đóng góp</Typography>
-            <Box display="flex" justifyContent="flex-end" mt={2} padding={2}>
+            <Box display="flex" justifyContent="space-between" mt={2} padding={2}>
+                <TextField
+                    label="Tìm kiếm theo tên"
+                    variant="outlined"
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    size="small"
+                    sx={{ width: "30%" }}
+                />
                 <Chip
                     label="Tạo mới quyết toán"
                     variant={isHover ? "contained" : "outlined"}
                     color="primary"
-                    onClick={handleOpenModal} 
+                    onClick={handleOpenModal}
                     onMouseEnter={handleMouseEnter}
                     onMouseLeave={handleMouseLeave}
-                    />
+                />
             </Box>
             <TableContainer component={Paper}>
                 <Table>
@@ -200,7 +246,7 @@ function ContributorPayout() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {payouts.map((item) => (
+                        {filteredPayouts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
                             <TableRow key={item.contributorId}>
                                 <TableCell>{item.contributorName}</TableCell>
                                 <TableCell> {new Date(item.fromdate).toLocaleDateString('en-GB')} - {new Date(item.todate).toLocaleDateString('en-GB')}</TableCell>
@@ -237,6 +283,24 @@ function ContributorPayout() {
                             </TableRow>
                         ))}
                     </TableBody>
+                    <TableFooter>
+                        <TableRow>
+                            <TablePagination
+                                count={filteredPayouts.length} // Tổng số dòng sau khi lọc
+                                page={page} // Trang hiện tại
+                                onPageChange={handleChangePage} // Hàm xử lý thay đổi trang
+                                rowsPerPage={rowsPerPage} // Số dòng hiển thị mỗi trang
+                                onRowsPerPageChange={handleChangeRowsPerPage} // Hàm xử lý thay đổi số dòng mỗi trang
+                                rowsPerPageOptions={[5, 10, 25]} // Tùy chọn số dòng mỗi trang
+                                labelRowsPerPage="Số dòng mỗi trang:" // Văn bản tiếng Việt
+                                labelDisplayedRows={({ from, to, count }) =>
+                                    `${from}–${to} trên ${count !== -1 ? count : `nhiều hơn ${to}`}`
+                                }
+                                showFirstButton
+                                showLastButton
+                            />
+                        </TableRow>
+                    </TableFooter>
                 </Table>
             </TableContainer>
 

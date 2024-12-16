@@ -180,7 +180,7 @@ function BookList() {
     }
 
     return (
-        <Box sx={{ width: "80vw" }}>
+        <Box width='80vw'>
             <Typography variant='h5' margin={1}>Danh sách những cuốn sách</Typography>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 2 }}>
                 <TextField
@@ -238,8 +238,8 @@ function BookList() {
                             <TableCell></TableCell>
                             <TableCell><strong>Tên</strong></TableCell>
                             <TableCell><strong>Thể loại</strong></TableCell>
-                            <TableCell><strong>Mã ISBN</strong></TableCell>
-                            <TableCell><strong>Xuất bản</strong></TableCell>
+                            {/* <TableCell><strong>Mã ISBN</strong></TableCell> */}
+                            {/* <TableCell><strong>Xuất bản</strong></TableCell> */}
                             <TableCell><strong>Tác giả</strong></TableCell>
                             <TableCell><strong>Độ tuổi</strong></TableCell>
                             <TableCell><strong>Hợp đồng kèm theo</strong></TableCell>
@@ -258,17 +258,21 @@ function BookList() {
                                         e.currentTarget.src = empty_image; // Đặt lại ảnh nếu lỗi
                                     }}
                                 /></TableCell>
-                                <TableCell sx={{ width: 180 }}>{book.title}</TableCell>
-                                <TableCell sx={{ width: 120 }}>
+                                <TableCell>
+                                    <Typography variant='subtitle2'><strong>{book.title} ({book.publicationYear})</strong></Typography>
+                                    <Typography variant='body2'><strong>ISBN_10:</strong> {book.isbN_10 || "N/A"}</Typography>
+                                    <Typography variant='body2'><strong>ISBN_13:</strong> {book.isbN_13 || "N/A"}</Typography>
+                                </TableCell>
+                                <TableCell>
                                     {book.categories.$values ? book.categories.$values.map(cate => cate.name).join(", ") : "N/A"}
                                 </TableCell>
-                                <TableCell sx={{width: 240}}>
+                                {/* <TableCell sx={{width: 240}}>
                                     <Box>
                                         <Typography>ISBN_10: {book.isbN_10 || "Hệ thống chưa gắn mã ISBN"}</Typography>
                                         <Typography>ISBN_13: {book.isbN_13 || "Hệ thống chưa gắn mã ISBN"}</Typography>
                                     </Box>
-                                </TableCell>
-                                <TableCell>{book.publicationYear}</TableCell>
+                                </TableCell> */}
+                                {/* <TableCell>{book.publicationYear}</TableCell> */}
                                 <TableCell>{book.authors.$values ? book.authors.$values.map(author => author.name).join(", ") : "N/A"}</TableCell>
                                 <TableCell>{book.ageLimit} tuổi</TableCell>
                                 <TableCell>
@@ -281,7 +285,7 @@ function BookList() {
                                                 style={{ marginRight: '8px', textTransform: 'none' }}
                                                 sx={{ display: "flex", textAlign: 'start' }}
                                             >
-                                                Hợp đồng {contract.publisher?.publisherName}
+                                                {contract.publisher?.publisherName}
                                             </Button>
                                         ))
                                     ) : (
@@ -294,7 +298,7 @@ function BookList() {
                                             <Visibility />
                                         </Button>
                                         <Button onClick={() => handleDeleteBook(book.id)}>
-                                            <Delete color='error'/>
+                                            <Delete color='error' />
                                         </Button>
                                     </Box>
                                 </TableCell>

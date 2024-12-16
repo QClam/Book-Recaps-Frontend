@@ -62,6 +62,7 @@ function UpdateUserModal({ open, onClose, selectedUser, onUpdate }) {
                             name="gender"
                             value={formData.gender}
                             onChange={handleInputChange}
+                            label="Giới tính"
                         >
                             <MenuItem value={0}>Nữ</MenuItem>
                             <MenuItem value={1}>Nam</MenuItem>

@@ -232,7 +232,7 @@ function ContractsList() {
                         <TableHead>
                             <TableRow>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Nhà xuất bản</TableCell>
-                                <TableCell sx={{ fontWeight: 'bold' }}>Phần trăm doanh thu được chia sẽ</TableCell>
+                                <TableCell sx={{ fontWeight: 'bold' }}>Doanh thu chia sẻ</TableCell>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Từ ngày</TableCell>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Đến ngày</TableCell>
                                 <TableCell sx={{ fontWeight: 'bold' }}>Tự động gia hạn</TableCell>

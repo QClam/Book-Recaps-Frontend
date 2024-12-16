@@ -71,16 +71,25 @@ function AddContractAttachment({ contractId, disableUpdate, onUpdateAttachments 
                     "Content-Type": "multipart/form-data",
                 },
             });
-            const newAttachment = response.data.data;
-
-            // Cập nhật danh sách tài liệu đính kèm trong ContractDetail qua callback
-            onUpdateAttachments((prevAttachments) => [...prevAttachments, newAttachment]);
-            setLoading(false);
-            // console.log("Hàng đính kèm: ", contractAttachment);
-            handleClose();
-            await getContractDetail(); // Gọi lại API để cập nhật contractBooks
+            const newAttachment = response.data.data;         
+                // Cập nhật danh sách tài liệu đính kèm trong ContractDetail qua callback
+                onUpdateAttachments((prevAttachments) => [...prevAttachments, newAttachment]);
+                setLoading(false);
+                // console.log("Hàng đính kèm: ", contractAttachment);
+                handleClose();
+                await getContractDetail(); // Gọi lại API để cập nhật contractBooks           
         } catch (error) {
-            console.error("Error Posting", error);
+            if(error.response) {
+                const {status, data} = error.response
+
+                if(status === 413) {
+                    alert("Tệp đính kèm lớn hơn cho phép (50mb)")
+                }
+            } else {
+                alert("Tệp đính kèm lớn hơn cho phép (50mb)")
+            }
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -176,6 +185,11 @@ function AddContractAttachment({ contractId, disableUpdate, onUpdateAttachments 
                                     fullWidth
                                     onChange={handleFileChange}
                                     type="file"
+                                    inputProps={
+                                        {
+                                            accept: "application/pdf"
+                                        }
+                                    }
                                 />
                             </Box>
                         </Grid>

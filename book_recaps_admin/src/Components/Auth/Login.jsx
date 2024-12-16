@@ -42,7 +42,7 @@ function Login() {
       localStorage.setItem("refresh_token", refreshToken);
       
       if (isRoleMatched(decoded, "SuperAdmin")) {
-        navigate("/users")
+        navigate("/dashboard")
         console.log("Login successfully", response.data);
       } else {
         setError("Hãy dùng tài khoản của Admin để đăng nhập");
