@@ -67,6 +67,8 @@ function ContractsList() {
 
         } catch (error) {
             console.error("Error Fetching", error);
+        } finally {
+            setLoading(false);
         }
     }
 
@@ -241,41 +243,48 @@ function ContractsList() {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {filteredContracts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
-                                <TableRow key={item.id}>
-                                    <TableCell>{item.publisher?.publisherName || "Hợp đồng này đang đợi chỉnh sửa"}</TableCell>
-                                    <TableCell><Typography color='primary'>{item.revenueSharePercentage || 0}%</Typography></TableCell>
-                                    <TableCell>{new Date(item.startDate).toLocaleDateString()}</TableCell>
-                                    <TableCell>{new Date(item.endDate).toLocaleDateString()}</TableCell>
-                                    <TableCell>{item.autoRenew === true ? (
-                                        <Typography color='success'>Có</Typography>
-                                    ) : (
-                                        <Typography color='error'>Không</Typography>
-                                    )}</TableCell>
-                                    <TableCell>{item.status === 0 ? (
-                                        <Typography color='secondary'>Bản nháp</Typography>
-                                    ) : item.status === 1 ? (
-                                        <Typography color='primary'>Đang xử lý</Typography>
-                                    ) : item.status === 2 ? (
-                                        <Typography color='info'>Chưa bắt đầu</Typography>
-                                    ) : item.status === 3 ? (
-                                        <Typography color='success'>Đang kích hoạt</Typography>
-                                    ) : item.status === 4 ? (
-                                        <Typography color='error'>Hết hạn</Typography>
-                                    ) : item.status === 5 ? (
-                                        <Typography color='error'>Từ chối</Typography>
-                                    ) : (
-                                        <Button variant="contained">Unknow</Button>
-                                    )}</TableCell>
-                                    <TableCell>
-                                        <Box display='flex'>
+                            {filteredContracts.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={6} align="center">
+                                            Không có dữ liệu
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    filteredContracts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
+                                        <TableRow key={item.id}>
+                                            <TableCell>{item.publisher?.publisherName || "Hợp đồng này đang đợi chỉnh sửa"}</TableCell>
+                                            <TableCell><Typography color='primary'>{item.revenueSharePercentage || 0}%</Typography></TableCell>
+                                            <TableCell>{new Date(item.startDate).toLocaleDateString()}</TableCell>
+                                            <TableCell>{new Date(item.endDate).toLocaleDateString()}</TableCell>
+                                            <TableCell>{item.autoRenew === true ? (
+                                                <Typography color='success'>Có</Typography>
+                                            ) : (
+                                                <Typography color='error'>Không</Typography>
+                                            )}</TableCell>
+                                            <TableCell>{item.status === 0 ? (
+                                                <Typography color='secondary'>Bản nháp</Typography>
+                                            ) : item.status === 1 ? (
+                                                <Typography color='primary'>Đang xử lý</Typography>
+                                            ) : item.status === 2 ? (
+                                                <Typography color='info'>Chưa bắt đầu</Typography>
+                                            ) : item.status === 3 ? (
+                                                <Typography color='success'>Đang kích hoạt</Typography>
+                                            ) : item.status === 4 ? (
+                                                <Typography color='error'>Hết hạn</Typography>
+                                            ) : item.status === 5 ? (
+                                                <Typography color='error'>Từ chối</Typography>
+                                            ) : (
+                                                <Button variant="contained">Unknow</Button>
+                                            )}</TableCell>
+                                            <TableCell>
+                                                <Box display='flex'>
 
-                                        <Button onClick={() => handleDetail(item.id)}><Visibility /></Button>
-                                        <Button onClick={() => handleDeleteContract(item.id)} disabled={item.status !== 0 && item.status !== 4} color='error'><Delete /></Button>
-                                        </Box>
-                                    </TableCell>
-                                </TableRow>
-                            ))}
+                                                    <Button onClick={() => handleDetail(item.id)}><Visibility /></Button>
+                                                    <Button onClick={() => handleDeleteContract(item.id)} disabled={item.status !== 0 && item.status !== 4} color='error'><Delete /></Button>
+                                                </Box>
+                                            </TableCell>
+                                        </TableRow>
+                                    )))}
                         </TableBody>
                         <TableFooter>
                             <TableRow>

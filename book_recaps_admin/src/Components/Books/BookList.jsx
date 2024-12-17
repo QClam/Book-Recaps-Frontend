@@ -67,7 +67,8 @@ function BookList() {
             setLoading(false);
         } catch (error) {
             console.error("Error fetching books", error);
-            setLoading(false);
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -247,63 +248,70 @@ function BookList() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filteredBooks.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((book) => (
-                            <TableRow key={book.id}>
-                                <TableCell><img
-                                    src={book.coverImage || empty_image}
-                                    alt="Book Cover"
-                                    style={{ width: 60, height: 100 }}
-                                    onError={(e) => {
-                                        e.currentTarget.onerror = null; // Đảm bảo không lặp lại sự kiện
-                                        e.currentTarget.src = empty_image; // Đặt lại ảnh nếu lỗi
-                                    }}
-                                /></TableCell>
-                                <TableCell>
-                                    <Typography variant='subtitle2'><strong>{book.title} ({book.publicationYear})</strong></Typography>
-                                    <Typography variant='body2'><strong>ISBN_10:</strong> {book.isbN_10 || "N/A"}</Typography>
-                                    <Typography variant='body2'><strong>ISBN_13:</strong> {book.isbN_13 || "N/A"}</Typography>
-                                </TableCell>
-                                <TableCell>
-                                    {book.categories.$values ? book.categories.$values.map(cate => cate.name).join(", ") : "N/A"}
-                                </TableCell>
-                                {/* <TableCell sx={{width: 240}}>
+                        {filteredBooks.length === 0 ? (
+                                <TableRow>
+                                    <TableCell colSpan={6} align="center">
+                                        Không có dữ liệu
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                filteredBooks.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((book) => (
+                                    <TableRow key={book.id}>
+                                        <TableCell><img
+                                            src={book.coverImage || empty_image}
+                                            alt="Book Cover"
+                                            style={{ width: 60, height: 100 }}
+                                            onError={(e) => {
+                                                e.currentTarget.onerror = null; // Đảm bảo không lặp lại sự kiện
+                                                e.currentTarget.src = empty_image; // Đặt lại ảnh nếu lỗi
+                                            }}
+                                        /></TableCell>
+                                        <TableCell>
+                                            <Typography variant='subtitle2'><strong>{book.title} ({book.publicationYear})</strong></Typography>
+                                            <Typography variant='body2'><strong>ISBN_10:</strong> {book.isbN_10 || "N/A"}</Typography>
+                                            <Typography variant='body2'><strong>ISBN_13:</strong> {book.isbN_13 || "N/A"}</Typography>
+                                        </TableCell>
+                                        <TableCell>
+                                            {book.categories.$values ? book.categories.$values.map(cate => cate.name).join(", ") : "N/A"}
+                                        </TableCell>
+                                        {/* <TableCell sx={{width: 240}}>
                                     <Box>
                                         <Typography>ISBN_10: {book.isbN_10 || "Hệ thống chưa gắn mã ISBN"}</Typography>
                                         <Typography>ISBN_13: {book.isbN_13 || "Hệ thống chưa gắn mã ISBN"}</Typography>
                                     </Box>
                                 </TableCell> */}
-                                {/* <TableCell>{book.publicationYear}</TableCell> */}
-                                <TableCell>{book.authors.$values ? book.authors.$values.map(author => author.name).join(", ") : "N/A"}</TableCell>
-                                <TableCell>{book.ageLimit} tuổi</TableCell>
-                                <TableCell>
-                                    {book.contracts?.$values?.length > 0 ? (
-                                        book.contracts.$values.map((contract) => (
-                                            <Button
-                                                key={contract.id}
-                                                color="primary"
-                                                onClick={() => navigate(`/contract/${contract.id}`)}
-                                                style={{ marginRight: '8px', textTransform: 'none' }}
-                                                sx={{ display: "flex", textAlign: 'start' }}
-                                            >
-                                                {contract.publisher?.publisherName}
-                                            </Button>
-                                        ))
-                                    ) : (
-                                        <Typography>Chưa có hợp đồng</Typography>
-                                    )}
-                                </TableCell>
-                                <TableCell>
-                                    <Box display='flex'>
-                                        <Button onClick={() => detailBook(book.id)}>
-                                            <Visibility />
-                                        </Button>
-                                        <Button onClick={() => handleDeleteBook(book.id)}>
-                                            <Delete color='error' />
-                                        </Button>
-                                    </Box>
-                                </TableCell>
-                            </TableRow>
-                        ))}
+                                        {/* <TableCell>{book.publicationYear}</TableCell> */}
+                                        <TableCell>{book.authors.$values ? book.authors.$values.map(author => author.name).join(", ") : "N/A"}</TableCell>
+                                        <TableCell>{book.ageLimit} tuổi</TableCell>
+                                        <TableCell>
+                                            {book.contracts?.$values?.length > 0 ? (
+                                                book.contracts.$values.map((contract) => (
+                                                    <Button
+                                                        key={contract.id}
+                                                        color="primary"
+                                                        onClick={() => navigate(`/contract/${contract.id}`)}
+                                                        style={{ marginRight: '8px', textTransform: 'none' }}
+                                                        sx={{ display: "flex", textAlign: 'start' }}
+                                                    >
+                                                        {contract.publisher?.publisherName}
+                                                    </Button>
+                                                ))
+                                            ) : (
+                                                <Typography>Chưa có hợp đồng</Typography>
+                                            )}
+                                        </TableCell>
+                                        <TableCell>
+                                            <Box display='flex'>
+                                                <Button onClick={() => detailBook(book.id)}>
+                                                    <Visibility />
+                                                </Button>
+                                                <Button onClick={() => handleDeleteBook(book.id)}>
+                                                    <Delete color='error' />
+                                                </Button>
+                                            </Box>
+                                        </TableCell>
+                                    </TableRow>
+                                )))}
                     </TableBody>
                     <TableFooter>
                         <TableRow>

@@ -60,12 +60,14 @@ function Recaps() {
             const response = await api.get('/api/recap/Getallrecap');
             const recapVersions = resolveRefs(response.data.data.$values);
             console.log("Recap: ", recapVersions);
-            
+
             setRecapVersions(recapVersions);
             setFilteredVersions(recapVersions); // Initialize filtered data
             setLoading(false);
         } catch (error) {
             console.error("Error Fetching RecapVersions", error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -79,9 +81,9 @@ function Recaps() {
         // Search filter
         if (searchTerm) {
             filteredData = filteredData.filter((item) =>
-                (item.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                 item.book?.title?.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                 item.contributor?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()))
+            (item.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.book?.title?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item.contributor?.fullName?.toLowerCase().includes(searchTerm.toLowerCase()))
             );
         }
 
@@ -129,7 +131,7 @@ function Recaps() {
             </Box>
         );
     }
-    
+
     return (
         <Box sx={{ width: "80vw" }}>
             <Typography variant='h5' margin={1}>Danh sách các Recap Version</Typography>
@@ -172,26 +174,38 @@ function Recaps() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filteredVersions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
-                            <TableRow key={item.id}>
-                                <TableCell>{item.name}</TableCell>
-                                <TableCell>{item.book?.title}</TableCell>
-                                <TableCell>{item.contributor?.fullName}</TableCell>
-                                <TableCell>{dayjs(item.createdAt).format("DD-MM-YYYY")}</TableCell>
-                                <TableCell>
-                                    {item.currentVersion?.status === 1 ? (
-                                        <Typography color="primary">Đang xử lý</Typography>
-                                    ) : item.currentVersion?.status === 2 ? (
-                                        <Typography color="success" >Đã Chấp thuận</Typography>
-                                    ) : item.currentVersion?.status === 3 ? (
-                                        <Typography color='error' >Đã Từ chối</Typography>
-                                    ) : (
-                                        <Typography color='secondary' >Bản nháp</Typography>
-                                    )}
+                        {filteredVersions.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={6} align="center">
+                                    Không có dữ liệu
                                 </TableCell>
-                                <TableCell><Button onClick={() => detailRecap(item.id)}><Visibility /></Button></TableCell>
                             </TableRow>
-                        ))}
+                        ) : (
+                            filteredVersions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
+                                <TableRow key={item.id}>
+                                    <TableCell>{item.name}</TableCell>
+                                    <TableCell>{item.book?.title}</TableCell>
+                                    <TableCell>{item.contributor?.fullName}</TableCell>
+                                    <TableCell>{dayjs(item.createdAt).format("DD-MM-YYYY")}</TableCell>
+                                    <TableCell>
+                                        {item.currentVersion?.status === 1 ? (
+                                            <Typography color="primary">Đang xử lý</Typography>
+                                        ) : item.currentVersion?.status === 2 ? (
+                                            <Typography color="success">Đã Chấp thuận</Typography>
+                                        ) : item.currentVersion?.status === 3 ? (
+                                            <Typography color="error">Đã Từ chối</Typography>
+                                        ) : (
+                                            <Typography color="secondary">Bản nháp</Typography>
+                                        )}
+                                    </TableCell>
+                                    <TableCell>
+                                        <Button onClick={() => detailRecap(item.id)}>
+                                            <Visibility />
+                                        </Button>
+                                    </TableCell>
+                                </TableRow>
+                            ))
+                        )}
                     </TableBody>
                     <TableFooter>
                         <TableRow>

@@ -44,6 +44,8 @@ function PublisherList() {
             setLoading(false)
         } catch (error) {
             console.error("Error Fetching Publishers", error);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -160,7 +162,14 @@ function PublisherList() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
+                        {filteredUsers.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={6} align="center">
+                                    Không có dữ liệu
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                        filteredUsers.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
                             <TableRow key={item.id}>
                                 <TableCell>{item.publisherName}</TableCell>
                                 <TableCell>{item.contactInfo}</TableCell>
@@ -173,7 +182,7 @@ function PublisherList() {
                                     </Button>
                                 </TableCell>
                             </TableRow>
-                        ))}
+                        )))}
                     </TableBody>
                     <TableFooter>
                         <TableRow>

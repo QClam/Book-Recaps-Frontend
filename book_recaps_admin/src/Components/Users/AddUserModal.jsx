@@ -137,6 +137,8 @@ function AddUserModal({ open, onClose, onUpdate }) {
                 console.error("Error registering user:", error);
                 setError("Đăng ký thất bại.");
             }
+        } finally {
+            setLoading(false);
         }
     };
 

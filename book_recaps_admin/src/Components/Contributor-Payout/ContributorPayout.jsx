@@ -80,6 +80,8 @@ function ContributorPayout() {
             setLoading(false);
         } catch (error) {
             console.error("Error Fetching", error);
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -246,7 +248,14 @@ function ContributorPayout() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filteredPayouts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
+                        {filteredPayouts.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={6} align="center">
+                                    Không có dữ liệu
+                                </TableCell>
+                            </TableRow>
+                        ) : (                      
+                        filteredPayouts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
                             <TableRow key={item.contributorId}>
                                 <TableCell>{item.contributorName}</TableCell>
                                 <TableCell> {new Date(item.fromdate).toLocaleDateString('en-GB')} - {new Date(item.todate).toLocaleDateString('en-GB')}</TableCell>
@@ -281,7 +290,7 @@ function ContributorPayout() {
                                     </Box>
                                 </TableCell>
                             </TableRow>
-                        ))}
+                        )))}
                     </TableBody>
                     <TableFooter>
                         <TableRow>

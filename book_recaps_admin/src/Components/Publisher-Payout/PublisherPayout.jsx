@@ -73,6 +73,8 @@ function PublisherPayout() {
             setLoading(false);
         } catch (error) {
             console.error("Error Fetching", error);
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -215,7 +217,14 @@ function PublisherPayout() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {payouts.map((item) => (
+                        {payouts.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={6} align="center">
+                                    Không có dữ liệu
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                        payouts.map((item) => (
                             <TableRow key={item.id}>
                                 <TableCell>{item.publisherName}</TableCell>
                                 <TableCell>{new Date(item.fromdate).toLocaleDateString('en-GB')} - {new Date(item.todate).toLocaleDateString('en-GB')}</TableCell>
@@ -244,7 +253,7 @@ function PublisherPayout() {
                                     </Box>
                                 </TableCell>
                             </TableRow>
-                        ))}
+                        )))}
                     </TableBody>
                 </Table>
             </TableContainer>
