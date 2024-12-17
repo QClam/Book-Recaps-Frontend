@@ -114,7 +114,14 @@ function UsersList() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filteredUsers
+                        {filteredUsers.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={4} align="center">
+                                    Không có dữ liệu
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                        filteredUsers
                             .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             .map((val) => (
                                 <TableRow key={val.id}>
@@ -131,7 +138,7 @@ function UsersList() {
                                     <TableCell>{val.phoneNumber}</TableCell>
                                     <TableCell><Button onClick={() => detailUser(val.id)}><Visibility /></Button></TableCell>
                                 </TableRow>
-                            ))}
+                            )))}
                     </TableBody>
                     <TableFooter>
                         <TableRow>

@@ -96,6 +96,8 @@ function AppealList() {
             setLoading(false);
         } catch (error) {
             console.error("Error Fetching", error);
+        } finally {
+            setLoading(false)
         }
     };
 
@@ -276,7 +278,14 @@ function AppealList() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filteredAppeal.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                        {filteredAppeal.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={9} align="center">
+                                    Không có dữ liệu
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                        filteredAppeal.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             .map((val) => (
                                 <TableRow key={val.id}>
                                     <TableCell>{val.contributor?.fullName}</TableCell>
@@ -334,7 +343,7 @@ function AppealList() {
                                     </Button>
                                     </TableCell>
                                 </TableRow>
-                            ))
+                            )))
                         }
                     </TableBody>
                     <TableFooter>

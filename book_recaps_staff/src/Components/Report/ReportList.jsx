@@ -68,6 +68,8 @@ function ReportList() {
         } catch (error) {
             const err = handleFetchError(error)
             throw json({ error: err.error }, { status: err.status });
+        } finally {
+            setLoading(false)
         }
     };
 
@@ -249,7 +251,14 @@ function ReportList() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filteredReports.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                        {filteredReports.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={8} align="center">
+                                    Không có dữ liệu
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                        filteredReports.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                             .map((val) => (
                                 <TableRow key={val.id}>
                                     <TableCell sx={{ width: 120 }}>{val.recaps?.name}</TableCell>
@@ -292,14 +301,7 @@ function ReportList() {
                                     </Button>
                                     </TableCell>
                                 </TableRow>
-                            ))}
-                        {reports.length === 0 && (
-                            <TableRow>
-                                <TableCell colSpan="8" style={{ textAlign: 'center' }}>
-                                    Hiện tại không có kháng cáo
-                                </TableCell>
-                            </TableRow>
-                        )}
+                            )))}
                     </TableBody>
                     <TableFooter>
                         <TableRow>

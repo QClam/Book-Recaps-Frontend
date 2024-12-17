@@ -66,6 +66,8 @@ function WithdrawalList() {
             setLoading(false)
         } catch (error) {
             console.error("Error Fetching Withdrawls", error);
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -153,7 +155,14 @@ function WithdrawalList() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filteredWithdrawals.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
+                        {filteredWithdrawals.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={5} align="center">
+                                    Không có dữ liệu
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                        filteredWithdrawals.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
                             <TableRow key={item.drawalId}>
                                 <TableCell>{item.contributorName}</TableCell>
                                 <TableCell>{new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(item.totalEarnings || 0)}</TableCell>
@@ -196,7 +205,7 @@ function WithdrawalList() {
                                     )}
                                 </TableCell>
                             </TableRow>
-                        ))}
+                        )))}
                     </TableBody>
                     <TableFooter>
                         <TableRow>

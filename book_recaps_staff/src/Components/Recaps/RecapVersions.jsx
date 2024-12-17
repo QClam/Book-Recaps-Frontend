@@ -42,6 +42,8 @@ function RecapVersions() {
             setLoading(false);
         } catch (error) {
             console.error("Error Fetching RecapVersions", error);
+        } finally {
+            setLoading(false)
         }
     };
 
@@ -192,7 +194,14 @@ function RecapVersions() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {filteredVersions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
+                        {filteredVersions.length === 0 ? (
+                            <TableRow>
+                                <TableCell colSpan={8} align="center">
+                                    Không có dữ liệu
+                                </TableCell>
+                            </TableRow>
+                        ) : (
+                        filteredVersions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
                             <TableRow key={item.recapVersionId}>
                                 <TableCell sx={{width: 180}}>{item.recapVersionId}</TableCell>
                                 <TableCell>{item.versionName}</TableCell>
@@ -235,7 +244,7 @@ function RecapVersions() {
                                     )}
                                 </TableCell>
                             </TableRow>
-                        ))}
+                        )))}
                     </TableBody>
                     <TableFooter>
                         <TableRow>
