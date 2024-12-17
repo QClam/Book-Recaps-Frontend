@@ -131,7 +131,7 @@ function AddContractBooks({ contractId, disableUpdate, onUpdateContractBooks }) 
                     }}
                 >
 
-                    <Box sx={{ maxHeight: 300, overflowY: 'auto' }}>
+                    <Box sx={{ maxHeight: 600, overflowY: 'auto' }}>
                         <Typography id="modal-title" variant="h6" component="h2">
                             Thêm sách xin bản quyền
                         </Typography>
@@ -149,6 +149,12 @@ function AddContractBooks({ contractId, disableUpdate, onUpdateContractBooks }) 
                                 <Box display="flex" alignItems="center" sx={{ mb: 1 }} key={`${book.id}-${index}`}>
                                     <Checkbox checked={selectedBookIds.includes(book.id)}
                                         onChange={() => handleSelectBook(book.id)} />
+                                        <img src={book.coverImage || empty_image} alt='Ảnh sách ở đây' style={{
+                                            maxWidth: 60,
+                                            maxHeight: 120,
+                                            objectFit: 'contain',
+                                            marginRight: 10
+                                        }} />
                                     <Typography variant="body1">{book.title}</Typography>
                                 </Box>
                             ))}
