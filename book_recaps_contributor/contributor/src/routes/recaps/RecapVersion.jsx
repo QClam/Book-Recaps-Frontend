@@ -10,7 +10,7 @@ import {
   useLoaderData,
   useNavigate
 } from "react-router-dom";
-import { Fragment, Suspense, useEffect, useMemo, useState } from "react";
+import { Fragment, Suspense, useEffect, useMemo, useRef, useState } from "react";
 import { useDebounce } from "react-use";
 import { TabPanel, TabView } from 'primereact/tabview';
 import { ProgressSpinner } from "primereact/progressspinner";
@@ -52,11 +52,12 @@ import { getBookInfoByRecap } from "../fetch";
 import CustomBreadCrumb from "../../components/CustomBreadCrumb";
 import { RecapVersionProvider, useRecapVersion } from "../../contexts/RecapVersion";
 import Modal from "../../components/modal";
-import { useAuth } from "../../contexts/Auth";
-import TextArea from "../../components/form/TextArea";
 import BookInfo from "../../components/BookInfo";
 import { CgArrowsExpandLeft, CgClose } from "react-icons/cg";
 import { getCurrentUserInfo } from "../../utils/getCurrentUserInfo";
+import { AiOutlineQuestionCircle } from "react-icons/ai";
+import { Tooltip } from "primereact/tooltip";
+import CreateAppealDialog from "../../components/CreateAppealDialog";
 
 const getRecapVersion = async (versionId, request) => {
   try {
@@ -249,13 +250,13 @@ const handleClickForHighlight = (targetId, appliedClasses = [], targetClassName 
 const getRecapVersionStatusStr = (status) => {
   switch (status) {
     case 0:
-      return "Draft";
+      return "Bản nháp";
     case 1:
-      return "Pending review";
+      return "Đang chờ duyệt";
     case 2:
-      return "Approved";
+      return "Đã duyệt";
     case 3:
-      return "Rejected";
+      return "Từ chối";
     case 4:
       return "Superseded";
     default:
@@ -301,7 +302,7 @@ const MainPanel = () => {
           </Await>
         </Suspense>
       </TabPanel>
-      <TabPanel header="Kiểm tra trùng lặp nội dung">
+      <TabPanel header="Kiểm tra trùng lặp">
         <Suspense fallback={<SuspenseFallback message="Loading key ideas..."/>}>
           <Await
             resolve={keyIdeas}
@@ -344,7 +345,7 @@ const RightSidePanel = () => {
 }
 
 const RecapVersionDetails = () => {
-  const { recapVersion, setRecapVersion, isKeyIdeasEmpty, isKeyIdeasChanged, setIsKeyIdeasChanged } = useRecapVersion();
+  const { recapVersion, setRecapVersion, isKeyIdeasEmpty } = useRecapVersion();
   const navigate = useNavigate();
   const { showToast } = useToast();
 
@@ -367,7 +368,6 @@ const RecapVersionDetails = () => {
 
             if (result.transcriptStatus !== 1) {
               setRecapVersion({ ...result });
-              setIsKeyIdeasChanged(false);
               clearInterval(interval);
             }
           } catch (error) {
@@ -393,6 +393,25 @@ const RecapVersionDetails = () => {
 
   const handleUploadAudio = async (event) => {
     if (uploadingAudio) return;
+
+    if (event.target.files[0].type !== 'audio/wav') {
+      showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Tệp âm thanh phải là tệp .wav',
+      });
+      return;
+    }
+
+    // check if the file is larger than 50MB
+    if (event.target.files[0].size > 50 * 1024 * 1024) {
+      showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Kích thước tập tin phải nhỏ hơn 50MB',
+      });
+      return;
+    }
 
     try {
       setUploadingAudio(true);
@@ -430,7 +449,7 @@ const RecapVersionDetails = () => {
       showToast({
         severity: 'error',
         summary: 'Error',
-        detail: 'Key ideas cannot be empty',
+        detail: 'Không thể tạo audio khi không có ý chính',
       });
       return;
     }
@@ -540,7 +559,7 @@ const RecapVersionDetails = () => {
   return (
     <>
       <div className="mb-4">
-        <h2 className="text-2xl font-bold text-gray-900">Recap Version</h2>
+        <h2 className="text-2xl font-bold text-gray-900">Phiên bản tóm tắt</h2>
 
         <Show when={loading}>
           <div className="flex gap-2 items-center mt-3">
@@ -554,11 +573,11 @@ const RecapVersionDetails = () => {
       </div>
       {/* Version name */}
       <div className="mb-4">
-        <label className="block text-sm font-medium text-gray-700 mb-1">Version name</label>
+        <label className="block text-sm font-medium text-gray-700 mb-1">Tên phiên bản</label>
         <div className="flex items-center gap-2">
           <input
             type="text"
-            placeholder="Version name"
+            placeholder="Tên phiên bản"
             value={recapVersion.versionName || ''}
             onChange={(e) => setRecapVersion((prevData) => ({ ...prevData, versionName: e.target.value }))}
             disabled={loading}
@@ -569,14 +588,14 @@ const RecapVersionDetails = () => {
             disabled={loading}
             onClick={handleUpdateName}
             className="px-4 py-2 text-white border bg-blue-500 rounded-md hover:bg-blue-600 focus:outline-none focus:ring focus:ring-blue-300 disabled:opacity-50">
-            Save&nbsp;name
+            Lưu&nbsp;tên
           </button>
         </div>
       </div>
 
       {/* Status */}
       <div className="mb-4">
-        <span className="text-sm font-medium text-gray-700 mr-1">Status:</span>
+        <span className="text-sm font-medium text-gray-700 mr-1">Trạng thái:</span>
         <span className="font-semibold">
             <Badge
               value={getRecapVersionStatusStr(recapVersion.status)}
@@ -642,7 +661,7 @@ const RecapVersionDetails = () => {
               className="text-blue-500 hover:underline p-0 text-start"
               onClick={() => setPreviewDialogVisible(true)}
             >
-              Preview audio and transcript
+              Xem trước audio và transcript
             </button>
           </div>
 
@@ -665,20 +684,21 @@ const RecapVersionDetails = () => {
 
       <Show when={recapVersion.status === 0 && recapVersion.transcriptStatus !== 1}>
         <>
-          {/* Generate Audio Button */}
-          <div className="mb-4">
-            <button
-              type="button"
-              disabled={loading || isKeyIdeasEmpty}
-              onClick={handleGenerateAudio}
-              className="w-full px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300 disabled:opacity-50">
-              Generate audio
-            </button>
-            <p className="block text-xs text-gray-500 mt-2">Generate audio using AI (recommended)</p>
-            <p className="block text-center text-xs text-gray-500 mt-2">Or</p>
-          </div>
+      {/* Generate Audio Button */}
+        <div className="mb-2">
+          <button
+            type="button"
+            disabled={loading || isKeyIdeasEmpty}
+            onClick={handleGenerateAudio}
+            className="w-full px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300 disabled:opacity-50">
+            Tạo audio mới
+          </button>
+          <p className="block text-sm font-semibold text-gray-500 mt-2 italic">Sử dụng Google Text-to-Speech</p>
+        </div>
 
-          <div className="relative mb-4">
+        <p className="block text-sm text-gray-600 mt-3">Hoặc:</p>
+        <div className="mb-4 flex gap-2 items-center">
+          <div className="relative flex-1">
             <input
               type="file"
               accept="audio/wav, .wav"
@@ -691,28 +711,29 @@ const RecapVersionDetails = () => {
               className="w-full px-4 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-400 focus:outline-none disabled:opacity-50"
               disabled={loading || isKeyIdeasEmpty}
             >
-              Upload audio
+              Tải lên audio
             </button>
           </div>
+          <Tooltip target=".tooltipppp" position="left" className="max-w-96"/>
+          <div className="tooltipppp text-gray-500"
+               data-pr-tooltip={"Hiện tại, hệ thống chỉ hỗ trợ 1 giọng đọc. Nếu audio có 2 giọng trở lên, hoặc chứa tạp âm thì sẽ ảnh hưởng tới độ chính xác và thời gian chạy của transcript.\n\nTệp âm thanh phải ở định dạng .wav và nhỏ hơn 50MB"}>
+            <AiOutlineQuestionCircle size={20}/>
+          </div>
+        </div>
 
-          <Divider/>
-          <div>
-            <Show when={isKeyIdeasChanged}>
-              <p className="block text-sm text-red-500 mb-2">
-                Key ideas have been changed. Please run generate or upload new audio before submitting for review.
-              </p>
-            </Show>
-            <Show when={isKeyIdeasEmpty}>
-              <p className="block text-sm text-red-500 mb-2">Key ideas cannot be empty.</p>
-            </Show>
-            <button
-              type="button"
-              disabled={loading || isKeyIdeasEmpty || isKeyIdeasChanged}
-              onClick={handleSubmitForReview}
-              className="w-full px-4 py-2 text-white bg-indigo-500 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring focus:ring-indigo-300 disabled:opacity-50">
-              Submit for review
-            </button>
-          </div>
+        <Divider/>
+        <div>
+          <Show when={isKeyIdeasEmpty}>
+            <p className="block text-sm text-red-500 mb-2">Không thể gửi xét duyệt khi không có ý chính</p>
+          </Show>
+          <button
+            type="button"
+            disabled={loading || isKeyIdeasEmpty}
+            onClick={handleSubmitForReview}
+            className="w-full px-4 py-2 text-white bg-indigo-500 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring focus:ring-indigo-300 disabled:opacity-50">
+            Gửi xét duyệt
+          </button>
+        </div>
         </>
       </Show>
     </>
@@ -744,16 +765,17 @@ const ListKeyIdeas = () => {
               <p><strong>Lưu ý:</strong></p>
               <ul className={cn("list-disc", { "hidden": !openMessage, "ml-4": openMessage })}>
                 <li>
-                  Sau khi thêm hoặc chỉnh sửa key ideas, nhấn <strong>&#34;Generate
-                  audio&#34;</strong> hoặc <strong>&#34;Upload audio&#34;</strong> để cập nhật audio và transcript.
-                </li>
-                <li>
-                  Chỉ có thể <strong>&#34;Apply for review&#34;</strong> khi audio và transcript đã được cập nhật nội
-                  dung mới nhất.
+                  Sau khi thêm hoặc chỉnh sửa key ideas, nhấn <strong>&#34;Tạo audio
+                  mới&#34;</strong> hoặc <strong>&#34;Tải lên audio&#34;</strong> để cập nhật audio và transcript mới
+                  nhất.
                 </li>
                 <li>
                   Không thể chỉnh sửa nội dung sau khi gửi review, chỉ chỉnh sửa được khi nội dung ở trạng
-                  thái <strong>&#34;Draft&#34;</strong>.
+                  thái <strong>&#34;Bản nháp&#34;</strong>.
+                </li>
+                <li>
+                  Hiện tại, hệ thống chỉ hỗ trợ 1 giọng đọc. Nếu audio có 2 giọng trở lên, hoặc chứa tạp âm thì sẽ ảnh
+                  hưởng tới độ chính xác và thời gian chạy của transcript.
                 </li>
               </ul>
             </div>
@@ -776,7 +798,7 @@ const ListKeyIdeas = () => {
       ))}
 
       <Show when={keyIdeas.length === 0}>
-        <p className="text-center text-gray-500 mt-4">No key idea found</p>
+        <p className="text-center text-gray-500 mt-4">Chưa có ý chính nào</p>
       </Show>
 
       <Show when={recapVersion.status === 0}>
@@ -784,7 +806,7 @@ const ListKeyIdeas = () => {
           <button
             onClick={addNewKeyIdea}
             className="px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300">
-            Add new key idea
+            Thêm ý chính
           </button>
         </div>
       </Show>
@@ -793,7 +815,7 @@ const ListKeyIdeas = () => {
 }
 
 const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
-  const { setPlagiarismResults, setKeyIdeaById, removeKeyIdeaById, setIsKeyIdeasChanged } = useRecapVersion();
+  const { setPlagiarismResults, setKeyIdeaById, removeKeyIdeaById } = useRecapVersion();
   const { showToast } = useToast();
   const [ formData, setFormData ] = useState({
     Title: keyIdea.title,
@@ -802,6 +824,7 @@ const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
     Order: keyIdea.order,
     RecapVersionId: keyIdea.recapVersionId
   });
+  const imageRef = useRef(null);
 
   const [ , cancel ] = useDebounce(async () => {
       if (keyIdea.isSaving || recapVersionStatus !== 0) return;
@@ -898,7 +921,6 @@ const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
         isNewKeyIdea: false,
         isSaving: false,
       });
-      setIsKeyIdeasChanged(true);
       setPlagiarismResults(null);
 
     } catch (error) {
@@ -974,7 +996,7 @@ const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
               onClick={onClickRemoveKeyIdea}
               disabled={keyIdea.isSaving || recapVersionStatus !== 0}
             >
-              Remove
+              Xóa
             </button>
           </Show>
         </div>
@@ -991,7 +1013,7 @@ const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
       <Show when={keyIdea.image}>
         <div>
           <div className="flex gap-2 items-center mt-3">
-            <p className="font-semibold">Image:</p>
+            <p className="font-semibold">Hình ảnh:</p>
             <Show when={recapVersionStatus === 0}>
               <button
                 type="button"
@@ -1000,13 +1022,15 @@ const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
                 disabled={keyIdea.isSaving || recapVersionStatus !== 0}
                 className="text-red-500 hover:text-red-700 hover:underline"
               >
-                (Remove)
+                (Xóa hình ảnh)
               </button>
             </Show>
           </div>
-          <p className={cn({
-            "text-gray-500 line-through": formData.RemoveImage
-          })}>
+          <Image src={keyIdea.image || "/empty-image.jpg"} className="hidden" preview ref={imageRef}/>
+          <p
+            className={cn("cursor-pointer hover:text-blue-500 hover:underline", { "text-gray-500 line-through": formData.RemoveImage })}
+            onClick={() => imageRef.current?.show()}
+          >
             {keyIdea.image}
           </p>
         </div>
@@ -1014,7 +1038,7 @@ const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
       <Show when={recapVersionStatus === 0}>
         <Show when={!keyIdea.image}>
           <div>
-            <p className="font-semibold mt-3">Image <span className="font-normal">(optional)</span>:</p>
+            <p className="font-semibold mt-3">Hình ảnh <span className="font-normal">(nếu có)</span>:</p>
             <div className="flex gap-2 items-center">
               <input
                 type="file"
@@ -1038,116 +1062,13 @@ const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
               </div>
             </Show>
             <p className='italic font-semibold text-gray-500'>
-              {keyIdea.isNewKeyIdea ? "Not saved yet" : keyIdea.isSaving ? 'Saving...' :
-                <span className="text-green-600">Saved</span>}
+              {keyIdea.isNewKeyIdea ? "Chưa lưu" : keyIdea.isSaving ? 'Đang lưu...' :
+                <span className="text-green-600">Đã lưu</span>}
             </p>
           </div>
         </div>
       </Show>
     </div>
-  )
-}
-
-const CreateAppealDialog = ({ dialogVisible, setDialogVisible, reviewId }) => {
-  const { user } = useAuth();
-  const { showToast } = useToast();
-  const [ reason, setReason ] = useState('');
-  const [ isCreatingAppeal, setIsCreatingAppeal ] = useState(false);
-
-  const onCreateAppeal = async () => {
-    if (isCreatingAppeal) return;
-    if (!reason) {
-      showToast({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Vui lòng nhập nội dung kháng cáo',
-      });
-      return;
-    }
-
-    if (!confirm("Bạn có chắc chắn muốn tạo đơn kháng cáo?")) return;
-
-    setIsCreatingAppeal(true);
-    try {
-      await axiosInstance.post('/api/appeal/createappeal', {
-        reviewId,
-        contributorId: user.id,
-        reason
-      });
-
-      showToast({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Đơn kháng cáo đã được tạo thành công',
-      });
-
-      setDialogVisible(false);
-      setIsCreatingAppeal(false);
-    } catch (error) {
-      console.error(error);
-      const err = handleFetchError(error);
-      showToast({
-        severity: 'error',
-        summary: 'Error',
-        detail: err.error,
-      });
-
-      setIsCreatingAppeal(false);
-    }
-  }
-  return (
-    <Dialog
-      visible={dialogVisible}
-      onHide={() => {
-        if (!dialogVisible) return;
-        setDialogVisible(false);
-        setReason('');
-      }}
-      content={({ hide }) => (
-        <Modal.Wrapper>
-          <Modal.Header title="Tạo đơn kháng cáo" onClose={hide}/>
-          <Modal.Body className="pb-0">
-            <div className="flex flex-col gap-1">
-              <TextArea
-                id="reason"
-                label="Nội dung:"
-                name="reason"
-                placeholder="Nội dung đơn"
-                required
-                onKeyPress={(e) => e.key === 'Enter' && onCreateAppeal()}
-                onChange={(e) => setReason(e.target.value)}
-                disabled={isCreatingAppeal}
-              />
-              <Modal.Footer className="-mx-5 mt-5 justify-end gap-3 text-sm">
-                <button
-                  className={cn({
-                    "bg-gray-200 rounded py-1.5 px-3 border font-semibold hover:bg-gray-300": true,
-                    "opacity-50 cursor-not-allowed": isCreatingAppeal
-                  })}
-                  type="button"
-                  onClick={hide}
-                  disabled={isCreatingAppeal}
-                >
-                  Hủy
-                </button>
-
-                <button
-                  className={cn({
-                    "text-white bg-indigo-600 rounded py-1.5 px-3 border font-semibold hover:bg-indigo-700": true,
-                    "opacity-50 cursor-not-allowed": isCreatingAppeal
-                  })}
-                  type="button"
-                  disabled={isCreatingAppeal}
-                  onClick={onCreateAppeal}
-                >
-                  {isCreatingAppeal ? "Loading..." : "Gửi"}
-                </button>
-              </Modal.Footer>
-            </div>
-          </Modal.Body>
-        </Modal.Wrapper>
-      )}
-    />
   )
 }
 
@@ -1491,16 +1412,16 @@ const PlagiarismResults = () => {
                     />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-lg mb-2">{result.existing_recap_metadata?.book_title}</h3>
-                    <p>Bài viết: <a
+                    <h3 className="text-lg mb-2"><a
                       href={import.meta.env.VITE_AUDIENCE_ENDPOINT + '/recap/' + result.existing_recap_metadata?.recap_id}
                       rel="noopener noreferrer"
                       target="_blank"
                       onClick={(e) => e.stopPropagation()}
                       className="font-bold hover:underline text-indigo-600">{result.existing_recap_metadata?.recap_name}</a>
+                    </h3>
+                    <p>Của: <span className="font-bold">{result.existing_recap_metadata?.contributor_full_name}</span>
                     </p>
-                    <p>Của: <span
-                      className="font-bold">{result.existing_recap_metadata?.contributor_full_name}</span></p>
+                    <p>Sách: <strong>{result.existing_recap_metadata?.book_title}</strong></p>
                   </div>
                 </div>
                 <Divider/>

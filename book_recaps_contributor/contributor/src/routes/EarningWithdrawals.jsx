@@ -318,7 +318,7 @@ const EarningWithdrawals = () => {
                       value={turnNumberToVNDStr(withdrawAmount)}
                       onChange={(e) => setWithdrawAmount(turnVNDStrToNumber(e.target.value))}
                       error={
-                        withdrawAmount && withdrawAmount < 50000 ? "Số tiền rút tối thiểu là 50,000₫" :
+                        withdrawAmount && withdrawAmount < 10000 ? "Số tiền rút tối thiểu là 10,000₫" :
                           withdrawAmount > resolvedWithdrawInfo.totalEarning ? "Số tiền vượt quá số dư hiện tại" :
                             withdrawAmount % 1000 !== 0 ? "Số tiền phải là bội số của 1,000₫" : ""
                       }
@@ -362,7 +362,7 @@ const EarningWithdrawals = () => {
                     <button
                       onClick={confirmWithdrawal}
                       className="text-white bg-indigo-600 rounded py-1.5 px-3 border font-semibold hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                      disabled={withdrawAmount < 50000 || withdrawAmount > resolvedWithdrawInfo.totalEarning || withdrawAmount % 1000 !== 0 || !user.profileData.bankAccount}
+                      disabled={withdrawAmount < 10000 || withdrawAmount > resolvedWithdrawInfo.totalEarning || withdrawAmount % 1000 !== 0 || !user.profileData.bankAccount}
                     >
                       Rút tiền
                     </button>

@@ -1,8 +1,7 @@
 import { useState } from "react";
 import Show from "./Show";
 import { cn } from "../utils/cn";
-import { Link, NavLink, useMatch } from "react-router-dom";
-import { RiArrowDownSLine, RiArrowUpSLine } from "react-icons/ri";
+import { Link, NavLink } from "react-router-dom";
 import { TbApps, TbArrowBarLeft, TbArrowBarRight, TbBooks, TbNews, TbUser } from "react-icons/tb";
 import { HiOutlineCreditCard } from "react-icons/hi2";
 import { routes } from "../routes";
@@ -23,7 +22,7 @@ export const NavBar = () => {
       >
         <img src="/icon.png" className="block h-10" alt="logo"/>
         <span className={cn("font-bold text-2xl", !isOpen && "hidden")}>
-          Dashboard
+          Contributor
         </span>
       </Link>
 
@@ -52,14 +51,14 @@ export const NavBar = () => {
         <NavbarLink
           href={routes.recaps}
           icon={<TbNews/>}
-          text="Recaps"
+          text="Bài viết"
           isOpen={isOpen}
         />
 
         <NavbarLink
           href={routes.books}
           icon={<TbBooks/>}
-          text="Books"
+          text="Sách hiện có"
           isOpen={isOpen}
           end
         />
@@ -77,21 +76,21 @@ export const NavBar = () => {
 
         <NavbarLink
           href={routes.profile}
-          text="Profile"
+          text="Tài khoản"
           icon={<TbUser/>}
           isOpen={isOpen}
         />
 
         <NavbarLink
           href={routes.payouts}
-          text="Payouts"
+          text="Quyết toán"
           icon={<HiOutlineCreditCard/>}
           isOpen={isOpen}
         />
 
         <NavbarLink
           href={routes.earningWithdrawals}
-          text="Withdraw&nbsp;earnings"
+          text="Rút tiền"
           icon={<GrMoney/>}
           isOpen={isOpen}
         />
@@ -142,45 +141,45 @@ const NavbarLink = (props) => {
   );
 };
 
-const NavbarDropDown = (props) => {
-  const { href, isOpen, icon, text, defaultOpen } = props;
-  const [ isDropdownOpen, setDropdownOpen ] = useState(defaultOpen === undefined ? true : defaultOpen);
-  const exactMatch = useMatch(href);
-
-  return (
-    <>
-      <li className="w-full relative">
-        <NavLink
-          to={href}
-          className={({ isActive }) => cn({
-            "text-gray-600 flex flex-row items-center py-2 px-[11px] gap-2 rounded w-full font-semibold z-20": true,
-            "py-[11px]": !isOpen,
-            "bg-[#EFEFFD] text-indigo-600": isDropdownOpen && isOpen,
-            "bg-indigo-600 text-white": !!exactMatch || (isActive && (!isOpen || !isDropdownOpen)),
-            "hover:bg-[#EFEFFD] hover:text-indigo-600": !isActive,
-          })}
-          title={text}
-        >
-          <Show when={icon}>{<span className="text-lg">{icon}</span>}</Show>
-          <span className={cn(!isOpen && "hidden")}>{text}</span>
-        </NavLink>
-        <Show when={isOpen}>
-          <button
-            onClick={() => setDropdownOpen(!isDropdownOpen)}
-            className="rounded p-1 text-lg hover:bg-indigo-300 absolute right-[11px] top-1/2 -translate-y-1/2"
-          >
-              <span className="text-lg">
-                <Show
-                  when={!isDropdownOpen}
-                  fallback={<RiArrowUpSLine/>}
-                >
-                  <RiArrowDownSLine/>
-                </Show>
-              </span>
-          </button>
-        </Show>
-      </li>
-      <Show when={isOpen && isDropdownOpen}>{props.children}</Show>
-    </>
-  );
-};
+// const NavbarDropDown = (props) => {
+//   const { href, isOpen, icon, text, defaultOpen } = props;
+//   const [ isDropdownOpen, setDropdownOpen ] = useState(defaultOpen === undefined ? true : defaultOpen);
+//   const exactMatch = useMatch(href);
+//
+//   return (
+//     <>
+//       <li className="w-full relative">
+//         <NavLink
+//           to={href}
+//           className={({ isActive }) => cn({
+//             "text-gray-600 flex flex-row items-center py-2 px-[11px] gap-2 rounded w-full font-semibold z-20": true,
+//             "py-[11px]": !isOpen,
+//             "bg-[#EFEFFD] text-indigo-600": isDropdownOpen && isOpen,
+//             "bg-indigo-600 text-white": !!exactMatch || (isActive && (!isOpen || !isDropdownOpen)),
+//             "hover:bg-[#EFEFFD] hover:text-indigo-600": !isActive,
+//           })}
+//           title={text}
+//         >
+//           <Show when={icon}>{<span className="text-lg">{icon}</span>}</Show>
+//           <span className={cn(!isOpen && "hidden")}>{text}</span>
+//         </NavLink>
+//         <Show when={isOpen}>
+//           <button
+//             onClick={() => setDropdownOpen(!isDropdownOpen)}
+//             className="rounded p-1 text-lg hover:bg-indigo-300 absolute right-[11px] top-1/2 -translate-y-1/2"
+//           >
+//               <span className="text-lg">
+//                 <Show
+//                   when={!isDropdownOpen}
+//                   fallback={<RiArrowUpSLine/>}
+//                 >
+//                   <RiArrowDownSLine/>
+//                 </Show>
+//               </span>
+//           </button>
+//         </Show>
+//       </li>
+//       <Show when={isOpen && isDropdownOpen}>{props.children}</Show>
+//     </>
+//   );
+// };

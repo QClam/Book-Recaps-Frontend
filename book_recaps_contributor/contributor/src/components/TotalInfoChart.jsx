@@ -79,7 +79,7 @@ const TotalInfoChart = () => {
     <div className={cn("p-4 bg-white rounded-lg shadow-md border border-gray-300", { "cursor-progress": loading })}>
       <div className="flex gap-4 mb-4 justify-start">
         <div className="flex items-center gap-4">
-          <label className="block font-semibold">From:</label>
+          <label className="block font-semibold">Từ:</label>
           <input
             type="date"
             value={fromDate}
@@ -89,7 +89,7 @@ const TotalInfoChart = () => {
           />
         </div>
         <div className="flex items-center gap-4">
-          <label className="block font-semibold">To:</label>
+          <label className="block font-semibold">Tới:</label>
           <input
             type="date"
             value={toDate}

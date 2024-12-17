@@ -53,7 +53,7 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="bg-white p-6 rounded-md shadow-sm border border-gray-300 space-y-4">
-          <div className="text-lg font-semibold">Lượt xem</div>
+          <div className="text-lg font-semibold">Tổng lượt xem tháng này</div>
           <div className="text-2xl font-bold mb-2">{data.newViewCount} views</div>
           <div>
             <div className="text-sm text-gray-500">Tháng trước</div>
@@ -64,7 +64,7 @@ const Dashboard = () => {
           </div>
         </div>
         <div className="bg-white p-6 rounded-md shadow-sm border border-gray-300 space-y-4">
-          <div className="text-lg font-semibold">Số bài viết mới</div>
+          <div className="text-lg font-semibold">Số bài viết mới tháng này</div>
           <div className="text-2xl font-bold mb-2">{data.newRecapsCount} bài viết</div>
           <div>
             <div className="text-sm text-gray-500">Tháng trước</div>
@@ -137,7 +137,9 @@ const Dashboard = () => {
         {/* Most Views in Last Month Section */}
         <div className="flex-1">
           <div className="space-y-4 bg-white rounded-md border border-gray-300 p-2">
-            <div className="text-xl font-semibold mt-2 mx-2">Most views in last month</div>
+            <div className="text-xl font-semibold mt-2 mx-2">
+              Xem nhiều nhất tháng trước
+            </div>
             <Divider/>
             <Show when={data.mostViewedRecaps.$values.slice(0, 3).length > 0} fallback={
               <div className="text-center text-gray-500">No recaps found</div>

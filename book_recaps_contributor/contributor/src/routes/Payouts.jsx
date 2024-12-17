@@ -39,8 +39,7 @@ const Payouts = () => {
     <>
       <CustomBreadCrumb items={[ { label: "Payouts" } ]}/>
 
-      <h1 className="mt-4 mb-6 text-xl font-semibold text-gray-900">Lịch sử quyết toán</h1>
-
+      <h1 className="mt-4 mb-6 text-xl font-semibold text-gray-900">Biếu đồ quyết toán theo giờ gian</h1>
       <SuspenseAwait
         resolve={payouts}
         errorElement={<div className="text-red-500 text-center">Error loading payout history!</div>}
@@ -49,6 +48,7 @@ const Payouts = () => {
         <PayoutChart/>
       </SuspenseAwait>
 
+      <h2 className="mt-4 mb-6 text-xl font-semibold text-gray-900">Lịch sử quyết toán</h2>
       <Table.Container>
         <Table.Head columns={[
           'Từ ngày',

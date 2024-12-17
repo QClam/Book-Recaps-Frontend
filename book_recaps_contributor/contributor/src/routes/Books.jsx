@@ -90,8 +90,8 @@ export async function booksLoader({ request }) {
   const category = url.searchParams.get("category");
   const publisher = url.searchParams.get("publisher");
   const page = url.searchParams.get("page");
-  const sortby = url.searchParams.get("sortby") || "totalPublishedRecaps";
-  const sortorder = url.searchParams.get("sortorder") || "asc";
+  const sortby = url.searchParams.get("sortby") || "";
+  const sortorder = url.searchParams.get("sortorder") || "desc";
 
   const booksPromise = getBooks(q, category, publisher, sortby, sortorder, page, request);
   const categories = await getCategories(request);

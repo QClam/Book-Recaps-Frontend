@@ -1,4 +1,4 @@
-import { generatePath, json, redirect, useLoaderData } from "react-router-dom";
+import { generatePath, json, Link, redirect, useLoaderData, useRevalidator } from "react-router-dom";
 import { axiosInstance2 } from "../utils/axios";
 import { handleFetchError } from "../utils/handleFetchError";
 import CustomBreadCrumb from "../components/CustomBreadCrumb";
@@ -6,6 +6,8 @@ import { routes } from "../routes";
 import { Badge } from "primereact/badge";
 import Table from "../components/table";
 import { getCurrentUserInfo } from "../utils/getCurrentUserInfo";
+import { useEffect, useState } from "react";
+import CreateAppealDialog from "../components/CreateAppealDialog";
 
 const getReviewAppeals = async (reviewId, request) => {
   try {
@@ -26,6 +28,7 @@ export const reviewAppealsLoader = async ({ params, request }) => {
   if (data.contributor_id.toLowerCase() !== user.id.toLowerCase()) {
     return redirect(routes.recaps);
   }
+  console.log(data);
 
   return {
     review: data.review,
@@ -48,9 +51,29 @@ const getAppealStatusStr = (status) => {
 
 const ReviewAppeals = () => {
   const { appeals, review } = useLoaderData();
+  const revalidator = useRevalidator();
+  const [ dialogVisible, setDialogVisible ] = useState(false);
+
+  useEffect(() => {
+    const handleFocus = async () => {
+      revalidator.revalidate();
+    };
+
+    window.addEventListener("focus", handleFocus);
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, []);
 
   return (
     <>
+      <CreateAppealDialog
+        reviewId={review.id}
+        dialogVisible={dialogVisible}
+        setDialogVisible={setDialogVisible}
+        onSubmitted={() => revalidator.revalidate()}
+      />
+
       <CustomBreadCrumb items={[
         { label: "Recaps", path: routes.recaps },
         {
@@ -60,7 +83,14 @@ const ReviewAppeals = () => {
         { label: "Review appeals" }
       ]}/>
 
-      <Table.Container title="Lịch sử xử lý đơn kháng cáo">
+      <Table.Container title="Lịch sử xử lý đơn kháng cáo" addButton={
+        <button
+          className="px-4 py-2 text-white bg-indigo-500 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring focus:ring-indigo-600"
+          onClick={() => setDialogVisible(true)}
+        >
+          Tạo kháng cáo mới
+        </button>
+      }>
         <Table.Head columns={[
           'Nội dung',
           'Ngày tạo',
@@ -106,6 +136,14 @@ const ReviewAppeals = () => {
           ))}
         </Table.Body>
       </Table.Container>
+      <div className="mt-4 px-2">
+        <Link
+          to={generatePath(routes.recapVersionDetails, { versionId: review.recapVersionId })}
+          className="text-blue-500 underline p-0 text-start hover:text-blue-700"
+        >
+          Quay lại chi tiết phiên bản
+        </Link>
+      </div>
     </>
   );
 }

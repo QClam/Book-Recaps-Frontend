@@ -343,7 +343,7 @@ const RecapDetails = () => {
               onClick={() => setActiveTab('versions')}
               disabled={activeTab === 'versions'}
             >
-              Versions
+              Phiên bản
             </button>
             <button
               type="button"
@@ -351,7 +351,7 @@ const RecapDetails = () => {
               onClick={() => setActiveTab('income')}
               disabled={activeTab === 'income'}
             >
-              Thu nhập
+              Thống kê
             </button>
           </div>
 
@@ -409,13 +409,13 @@ const ListRecapVersions = () => {
   const getStatusStr = (status) => {
     switch (status) {
       case 0:
-        return "Draft";
+        return "Bản nháp";
       case 1:
-        return "Pending review";
+        return "Đang chờ duyệt";
       case 2:
-        return "Approved";
+        return "Đã duyệt";
       case 3:
-        return "Rejected";
+        return "Từ chối";
       case 4:
         return "Superseded";
       default:
@@ -426,8 +426,8 @@ const ListRecapVersions = () => {
   return (
     <Table.Container>
       <Table.Head columns={[
-        'Tên version',
-        'Version number',
+        'Tên phiên bản',
+        'Số phiên bản',
         'Trạng thái',
         'Ngày tạo',
         'Ngày cập nhật',
@@ -614,7 +614,7 @@ const RecapVersionStats = () => {
 
       <div className="flex gap-4 mb-4 justify-end">
         <div className="flex items-center gap-4">
-          <label className="block mb-1 font-semibold">From:</label>
+          <label className="block mb-1 font-semibold">Từ:</label>
           <input
             type="date"
             value={fromDate}
@@ -624,7 +624,7 @@ const RecapVersionStats = () => {
           />
         </div>
         <div className="flex items-center gap-4">
-          <label className="block mb-1 font-semibold">To:</label>
+          <label className="block mb-1 font-semibold">Tới:</label>
           <input
             type="date"
             value={toDate}
@@ -766,7 +766,7 @@ const RightSidePanel = () => {
 
         {/* Recap name */}
         <div>
-          <label className="block font-medium text-gray-700 mb-1">Name</label>
+          <label className="block font-medium text-gray-700 mb-1">Tên bài viết</label>
           <div className="flex items-center gap-2">
             <input
               type="text"
@@ -783,10 +783,10 @@ const RightSidePanel = () => {
 
         {/* Recap status */}
         <div className="flex items-center gap-3">
-          <p className="font-medium text-gray-700 mr-1">Status:</p>
+          <p className="font-medium text-gray-700 mr-1">Trạng thái:</p>
           <div className="font-semibold flex items-center">
             <Badge
-              value={recapData.isPublished ? 'Published' : 'Private'}
+              value={recapData.isPublished ? 'Công khai' : 'Đang ẩn'}
               severity={recapData.isPublished ? 'success' : 'danger'}
             />
             <input type="hidden" name="isPublished" value={recapData.isPublished}/>
@@ -798,7 +798,9 @@ const RightSidePanel = () => {
 
         {/*  Premium*/}
         <div className="flex items-center gap-3">
-          <p className="font-medium text-gray-700 mr-1">Premium:</p>
+          <p className="font-medium text-gray-700 mr-1">
+            Premium:
+          </p>
           <div className="font-semibold flex items-center">
             <Badge
               value={recapData.isPremium ? 'True' : 'False'}
@@ -814,7 +816,9 @@ const RightSidePanel = () => {
         {/* Current Version */}
 
         <div>
-          <label className="block font-medium text-gray-700 mb-1">Current version:</label>
+          <label className="block font-medium text-gray-700 mb-1">
+            Phiên bản hiện tại:
+          </label>
           <input type="hidden" name="currentVersionId" value={recapData.currentVersionId || ''}/>
           <div className="flex items-center gap-2">
             <Suspense
@@ -839,7 +843,7 @@ const RightSidePanel = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring focus:ring-blue-300 disabled:bg-gray-100"
                     disabled={loading || recap.isPublished}
                   >
-                    <option value="">Select version</option>
+                    <option value="">Chọn phiên bản</option>
                     {versions.map((version) => (
                       <option
                         key={version.id}
