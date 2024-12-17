@@ -59,7 +59,7 @@ function BookList() {
             const books = resolveRefs(response.data.data.$values);
             const contracts = books.map((book) => book.contracts?.$values || []);
             const categories = books.map((book) => book.categories?.$values || [])
-            // console.log("Books: ", books);
+            console.log("Books: ", books);
             // console.log("Contracts: ", contracts);
             // console.log("Cate: ", categories);
             setBooks(books);
@@ -76,7 +76,7 @@ function BookList() {
         fetchBooks();
     }, [])
 
-    const publishers = [...new Set(books.flatMap(book => book.contracts?.$values?.map(author => author.publisher?.publisherName)))];
+    const publishers = [...new Set(books.flatMap(book => book.contracts?.$values?.map(publisher => publisher.publisher?.publisher)))];
     const categories = [...new Set(books.flatMap(book => book.categories?.$values?.map(category => category.name)))];
 
     useEffect(() => {
@@ -243,7 +243,7 @@ function BookList() {
                             {/* <TableCell><strong>Xuất bản</strong></TableCell> */}
                             <TableCell><strong>Tác giả</strong></TableCell>
                             <TableCell><strong>Độ tuổi</strong></TableCell>
-                            <TableCell><strong>Hợp đồng kèm theo</strong></TableCell>
+                            <TableCell><strong>Hợp đồng</strong></TableCell>
                             <TableCell></TableCell>
                         </TableRow>
                     </TableHead>
@@ -293,7 +293,7 @@ function BookList() {
                                                         style={{ marginRight: '8px', textTransform: 'none' }}
                                                         sx={{ display: "flex", textAlign: 'start' }}
                                                     >
-                                                        {contract.publisher?.publisherName}
+                                                        {contract.publisher?.publisher}
                                                     </Button>
                                                 ))
                                             ) : (

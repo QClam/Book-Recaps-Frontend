@@ -89,7 +89,7 @@ function UpdateUserModal({ open, onClose, selectedUser, onUpdate }) {
                         onChange={handleInputChange}
                     />
                     <DialogActions>
-                        <Button onClick={onClose} color="primary">
+                        <Button onClick={onClose} color="error">
                             Hủy
                         </Button>
                         <Button type="submit" color="primary">
