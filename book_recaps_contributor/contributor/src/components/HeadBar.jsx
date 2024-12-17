@@ -13,6 +13,8 @@ export const HeadBar = () => {
   const { user } = useAuth()
   const dropdownEl = useRef(null);
 
+  const imageUrl = user?.profileData.imageUrl?.replace("Files/Image/jpg/ad.jpg", "") || '/avatar-placeholder.png';
+
   useClickAway(dropdownEl, () => {
     if (isDropdownOpen) setIsDropdownOpen(false);
   });
@@ -34,6 +36,9 @@ export const HeadBar = () => {
             className="rounded-full flex items-center justify-center gap-3"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
+            <div className="w-10 h-10">
+              <img src={imageUrl} alt="User Avatar" className="w-full h-full object-cover rounded-full"/>
+            </div>
             <div className="text-start hidden sm:block">
               <p className="font-semibold">{user.name}</p>
               <p className="text-sm text-gray-500 font-medium">

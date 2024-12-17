@@ -195,7 +195,7 @@ media-volume-range {
 
 .update-button {
     padding: 10px 20px;
-    background-color: #4de328;
+    background-color: #3498db;
     color: white;
     border: none;
     border-radius: 4px;
@@ -207,7 +207,7 @@ media-volume-range {
 }
 
 .update-button:hover {
-    background-color: #22ce44;
+    background-color: #3498db;
 }
 
 .skills-section {
