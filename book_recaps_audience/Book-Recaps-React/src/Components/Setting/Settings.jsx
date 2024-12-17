@@ -24,7 +24,7 @@ function Settings() {
   const [ phoneUpdateModalOpen, setPhoneUpdateModalOpen ] = useState(false);
   const [ phoneUpdate, setPhoneUpdate ] = useState({
     userId: '',
-    phoneNumber: '',
+    phoneNumber: user.profileData.phoneNumber || '',
     password: '',
   });
   const [ passwordData, setPasswordData ] = useState({
@@ -537,7 +537,7 @@ function Settings() {
                 <h3>Cập nhật ảnh đại diện</h3>
                 <input type="file" accept="image/*" onChange={handleImageChange}/>
 
-                <div className="flex gap-2 items-center justify-end !mb-0">
+                <div className="flex gap-2 items-center justify-end !mb-0 mt-4">
                   <button
                     className="bg-gray-200 rounded py-1.5 px-3 border font-semibold hover:bg-gray-300"
                     onClick={hide}

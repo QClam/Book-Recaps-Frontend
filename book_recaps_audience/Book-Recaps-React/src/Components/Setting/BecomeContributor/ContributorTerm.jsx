@@ -20,7 +20,7 @@ const ContributorTerm = () => {
   const { user, setUser } = useAuth();
 
   useEffect(() => {
-    if (user.role === 'Contributor') {
+    if (user?.role === 'Contributor') {
       toast.error("Bạn đã là Contributor rồi.");
     }
   }, []);
@@ -49,7 +49,7 @@ const ContributorTerm = () => {
     }
   };
 
-  if (!submitted && user.role === 'Contributor') {
+  if (!submitted && user?.role === 'Contributor') {
     return <Navigate to={routes.index} replace={true}/>;
   }
 

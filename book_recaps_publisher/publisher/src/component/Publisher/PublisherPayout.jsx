@@ -10,12 +10,14 @@ const PublisherPayout = () => {
 
   const [ payoutDetail, setPayoutDetail ] = useState(null);
   const [ error, setError ] = useState(null);
+  const [ loading, setLoading ] = useState(false);
   const [ detailedBooks, setDetailedBooks ] = useState([]);
   const [ isModalOpen, setModalOpen ] = useState(false);
 
   useEffect(() => {
     const fetchPayoutDetail = async () => {
       try {
+        setLoading(true);
         const response = await axiosInstance.get(`/api/PublisherPayout/getpayoutinfobyid/${id}`);
         const data = response.data;
         setPayoutDetail(data);
@@ -32,6 +34,7 @@ const PublisherPayout = () => {
       } catch (err) {
         setError(err.message);
       }
+      setLoading(false);
     };
 
     fetchPayoutDetail();
@@ -40,7 +43,8 @@ const PublisherPayout = () => {
   return (
     <div className="thanhtoanv1">
       {error && <p style={{ color: 'red' }}>Lỗi: {error}</p>}
-      {payoutDetail ? (
+      {loading && <p>Đang tải chi tiết thanh toán...</p>}
+      {payoutDetail && (
         <div>
           <div className="card-container">
             <div className="card-header">Chi Tiết Thanh Toán</div>
@@ -64,7 +68,6 @@ const PublisherPayout = () => {
               <div className="right">
                 <p><strong>Từ Ngày:</strong> {new Date(payoutDetail?.data?.fromDate).toLocaleDateString()}</p>
                 <p><strong>Đến Ngày:</strong> {new Date(payoutDetail?.data?.toDate).toLocaleDateString()}</p>
-                <p><strong>Tỷ Lệ Chia Lợi Nhuận:</strong> {payoutDetail?.data?.publisher?.revenueSharePercentage}%</p>
                 <p><strong>Số Tiền:</strong> {new Intl.NumberFormat('vi-VN').format(payoutDetail?.data?.amount)} <span
                   className="currency-symbol">₫</span></p>
                 <p>
@@ -146,8 +149,6 @@ const PublisherPayout = () => {
             </table>
           </div>
         </div>
-      ) : (
-        <p>Đang tải chi tiết thanh toán...</p>
       )}
     </div>
   );

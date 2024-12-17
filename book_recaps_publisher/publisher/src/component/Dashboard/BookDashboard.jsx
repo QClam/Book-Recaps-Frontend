@@ -92,7 +92,6 @@ const BookDashboard = () => {
                         <div className="right">
                             <p><strong>Từ Ngày:</strong> {new Date(payoutDetail?.data?.fromDate).toLocaleDateString()}</p>
                             <p><strong>Đến Ngày:</strong> {new Date(payoutDetail?.data?.toDate).toLocaleDateString()}</p>
-                            <p><strong>Tỷ Lệ Chia Lợi Nhuận:</strong> {payoutDetail?.data?.publisher?.revenueSharePercentage}%</p>
                             <p><strong>Số Tiền:</strong> {new Intl.NumberFormat('vi-VN').format(payoutDetail?.data?.amount)} <span className="currency-symbol">₫</span></p>
                             {/* <p><strong>Trạng Thái:</strong> {payoutDetail?.data?.status === 1 ? "Đã Thanh Toán" : "Chưa Thanh Toán"}</p> */}
                             <p>

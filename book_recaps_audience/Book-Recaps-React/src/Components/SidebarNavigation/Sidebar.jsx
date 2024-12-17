@@ -279,7 +279,7 @@ function Sidebar() {
                       to={routes.profileSettings}>
                       Cài đặt tài khoản
                     </Link>
-                    <Show when={user.role !== "Contributor"}>
+                    <Show when={user?.role !== "Contributor"}>
                       <Link
                         className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20 decoration-0"
                         to={routes.becomeContributor}>

@@ -4,12 +4,14 @@ import { generatePath, Link } from 'react-router-dom';
 import { axiosInstance } from "../../utils/axios";
 import { useAuth } from "../../contexts/Auth";
 import { routes } from "../../routes";
+import Show from "../Show";
 
 const FetchPublisherData = () => {
   const { user: { publisherData } } = useAuth();
 
   const [ payoutData, setPayoutData ] = useState(null); // Dữ liệu từ API lấy thông tin thanh toán
   const [ error, setError ] = useState(null);
+  const [ loading, setLoading ] = useState(true)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -18,7 +20,7 @@ const FetchPublisherData = () => {
         const payoutResponse = await axiosInstance.get(`/api/PublisherPayout/getlistpayoutinfobypublisherid/${publisherId}`,);
 
         const payoutData = payoutResponse.data;
-        console.log('Payout data:', payoutData);
+        // console.log('Payout data:', payoutData);
 
         setPayoutData(payoutData?.data?.$values || []); // Lọc dữ liệu payout
 
@@ -26,6 +28,7 @@ const FetchPublisherData = () => {
         console.error('Error:', err);
         setError(err.message);
       }
+      setLoading(false)
     };
 
     fetchData();
@@ -45,8 +48,11 @@ const FetchPublisherData = () => {
       ) : (
         <p>Đang tải dữ liệu nhà xuất bản...</p>
       )}
+      <Show when={loading}>
+        <p>Đang tải dữ liệu doanh thu...</p>
+      </Show>
 
-      {payoutData && payoutData.length > 0 ? (
+      {payoutData && payoutData.length > 0 && (
         <div className="mt-6">
           <h2>Quyết toán</h2>
           <table>
@@ -58,7 +64,7 @@ const FetchPublisherData = () => {
               <th>Từ Ngày</th>
               <th>Đến Ngày</th>
               <th>Nội dung</th>
-              <th>Hành Động</th>
+              <th></th>
             </tr>
             </thead>
             <tbody>
@@ -75,10 +81,10 @@ const FetchPublisherData = () => {
                 <td>{payout.description}</td>
                 <td className="chitiet">
                   <Link
-                  to={generatePath(routes.payoutDetails, { id: payout.payoutId })}
-                  className="small-button"
+                    to={generatePath(routes.payoutDetails, { id: payout.payoutId })}
+                    className="small-button"
                   >
-                    Chi Tiết
+                    Chi&nbsp;Tiết
                   </Link>
                 </td>
               </tr>
@@ -86,8 +92,6 @@ const FetchPublisherData = () => {
             </tbody>
           </table>
         </div>
-      ) : (
-        <p>Đang tải dữ liệu doanh thu...</p>
       )}
     </div>
   );

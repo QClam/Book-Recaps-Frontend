@@ -21,7 +21,7 @@ export const NavBar = () => {
       >
         <img src="/icon.png" className="block h-10" alt="logo"/>
         <span className={cn("font-bold text-2xl", !isOpen && "hidden")}>
-          Dashboard
+          Publisher
         </span>
       </Link>
 
