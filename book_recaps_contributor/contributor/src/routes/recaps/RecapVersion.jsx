@@ -684,56 +684,56 @@ const RecapVersionDetails = () => {
 
       <Show when={recapVersion.status === 0 && recapVersion.transcriptStatus !== 1}>
         <>
-      {/* Generate Audio Button */}
-        <div className="mb-2">
-          <button
-            type="button"
-            disabled={loading || isKeyIdeasEmpty}
-            onClick={handleGenerateAudio}
-            className="w-full px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300 disabled:opacity-50">
-            Tạo audio mới
-          </button>
-          <p className="block text-sm font-semibold text-gray-500 mt-2 italic">Sử dụng Google Text-to-Speech</p>
-        </div>
-
-        <p className="block text-sm text-gray-600 mt-3">Hoặc:</p>
-        <div className="mb-4 flex gap-2 items-center">
-          <div className="relative flex-1">
-            <input
-              type="file"
-              accept="audio/wav, .wav"
-              className="absolute inset-0 opacity-0 cursor-pointer"
-              onChange={handleUploadAudio}
-              disabled={loading || isKeyIdeasEmpty}
-            />
+          {/* Generate Audio Button */}
+          <div className="mb-2">
             <button
               type="button"
-              className="w-full px-4 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-400 focus:outline-none disabled:opacity-50"
               disabled={loading || isKeyIdeasEmpty}
-            >
-              Tải lên audio
+              onClick={handleGenerateAudio}
+              className="w-full px-4 py-2 text-white bg-green-500 rounded-md hover:bg-green-600 focus:outline-none focus:ring focus:ring-green-300 disabled:opacity-50">
+              Tạo audio mới
+            </button>
+            <p className="block text-sm font-semibold text-gray-500 mt-2 italic">Sử dụng Google Text-to-Speech</p>
+          </div>
+
+          <p className="block text-sm text-gray-600 mt-3">Hoặc:</p>
+          <div className="mb-4 flex gap-2 items-center">
+            <div className="relative flex-1">
+              <input
+                type="file"
+                accept="audio/wav, .wav"
+                className="absolute inset-0 opacity-0 cursor-pointer"
+                onChange={handleUploadAudio}
+                disabled={loading || isKeyIdeasEmpty}
+              />
+              <button
+                type="button"
+                className="w-full px-4 py-2 text-gray-500 bg-white border border-gray-300 rounded-md hover:bg-gray-400 focus:outline-none disabled:opacity-50"
+                disabled={loading || isKeyIdeasEmpty}
+              >
+                Tải lên audio
+              </button>
+            </div>
+            <Tooltip target=".tooltipppp" position="left" className="max-w-96"/>
+            <div className="tooltipppp text-gray-500"
+                 data-pr-tooltip={"Hiện tại, hệ thống chỉ hỗ trợ 1 giọng đọc. Nếu audio có 2 giọng trở lên, hoặc chứa tạp âm thì sẽ ảnh hưởng tới độ chính xác và thời gian chạy của transcript.\n\nTệp âm thanh phải ở định dạng .wav và nhỏ hơn 50MB"}>
+              <AiOutlineQuestionCircle size={20}/>
+            </div>
+          </div>
+
+          <Divider/>
+          <div>
+            <Show when={isKeyIdeasEmpty}>
+              <p className="block text-sm text-red-500 mb-2">Không thể gửi xét duyệt khi không có ý chính</p>
+            </Show>
+            <button
+              type="button"
+              disabled={loading || isKeyIdeasEmpty}
+              onClick={handleSubmitForReview}
+              className="w-full px-4 py-2 text-white bg-indigo-500 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring focus:ring-indigo-300 disabled:opacity-50">
+              Gửi xét duyệt
             </button>
           </div>
-          <Tooltip target=".tooltipppp" position="left" className="max-w-96"/>
-          <div className="tooltipppp text-gray-500"
-               data-pr-tooltip={"Hiện tại, hệ thống chỉ hỗ trợ 1 giọng đọc. Nếu audio có 2 giọng trở lên, hoặc chứa tạp âm thì sẽ ảnh hưởng tới độ chính xác và thời gian chạy của transcript.\n\nTệp âm thanh phải ở định dạng .wav và nhỏ hơn 50MB"}>
-            <AiOutlineQuestionCircle size={20}/>
-          </div>
-        </div>
-
-        <Divider/>
-        <div>
-          <Show when={isKeyIdeasEmpty}>
-            <p className="block text-sm text-red-500 mb-2">Không thể gửi xét duyệt khi không có ý chính</p>
-          </Show>
-          <button
-            type="button"
-            disabled={loading || isKeyIdeasEmpty}
-            onClick={handleSubmitForReview}
-            className="w-full px-4 py-2 text-white bg-indigo-500 rounded-md hover:bg-indigo-600 focus:outline-none focus:ring focus:ring-indigo-300 disabled:opacity-50">
-            Gửi xét duyệt
-          </button>
-        </div>
         </>
       </Show>
     </>
@@ -741,7 +741,7 @@ const RecapVersionDetails = () => {
 }
 
 const ListKeyIdeas = () => {
-  const { keyIdeas, addNewKeyIdea, recapVersion } = useRecapVersion();
+  const { keyIdeas, addNewKeyIdea, recapVersion, setActiveIndex } = useRecapVersion();
   const [ openMessage, setOpenMessage ] = useState(true);
 
   if (!keyIdeas) {
@@ -776,6 +776,12 @@ const ListKeyIdeas = () => {
                 <li>
                   Hiện tại, hệ thống chỉ hỗ trợ 1 giọng đọc. Nếu audio có 2 giọng trở lên, hoặc chứa tạp âm thì sẽ ảnh
                   hưởng tới độ chính xác và thời gian chạy của transcript.
+                </li>
+                <li>
+                  Nền tảng khuyến khích Contributor chủ động sử dụng tính năng <strong
+                  className="hover:text-blue-500 underline" onClick={() => setActiveIndex(2)}>&#34;Kiểm tra trùng
+                  lặp&#34;</strong> trước khi gửi xét duyệt. Các bài viết tóm tắt trùng lặp đáng kể với bài viết hiện có
+                  có thể bị từ chối.
                 </li>
               </ul>
             </div>
