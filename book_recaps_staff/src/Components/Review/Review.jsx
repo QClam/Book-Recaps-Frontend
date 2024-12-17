@@ -317,6 +317,7 @@ function Review() {
          setCurrentComment('');
          setShowInput(false);
       } catch (error) {
+         alert("Bạn không phải nhân viên Review Recap này, vui lòng chọn Recap khác")
          console.error('Error saving comment:', error);
       }
    };
