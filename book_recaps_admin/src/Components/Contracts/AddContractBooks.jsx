@@ -57,13 +57,13 @@ function AddContractBooks({ contractId, disableUpdate, onUpdateContractBooks }) 
         setLoading(true);
 
         try {
-            const response = await api.put(`/api/Contract/addbooktocontract/${contractId}`, { bookIds: selectedBookIds });  
+            const response = await api.put(`/api/Contract/addbooktocontract/${contractId}`, { bookIds: selectedBookIds });
             const updatedBooks = response.data.data;
 
             onUpdateContractBooks((preBooks) => [...preBooks, updatedBooks]);
 
             console.log("Sách đính kèm: ", updatedBooks);
-            
+
             await getContractDetail(); // Gọi lại API để cập nhật contractBooks
             setLoading(false);
             handleClose();
@@ -144,17 +144,23 @@ function AddContractBooks({ contractId, disableUpdate, onUpdateContractBooks }) 
                             value={searchBook}
                             onChange={(e) => setSearchBook(e.target.value)}
                         />
+                        <Box display='flex' justifyContent='flex-end'>
+
+                            <Button color="secondary" variant="contained" onClick={() => setSelectedBookIds([])}>
+                                Bỏ chọn tất cả
+                            </Button>
+                        </Box>
                         <Box sx={{ mt: 2 }}>
                             {filteredBooks.map((book, index) => (
                                 <Box display="flex" alignItems="center" sx={{ mb: 1 }} key={`${book.id}-${index}`}>
                                     <Checkbox checked={selectedBookIds.includes(book.id)}
                                         onChange={() => handleSelectBook(book.id)} />
-                                        <img src={book.coverImage || empty_image} alt='Ảnh sách ở đây' style={{
-                                            maxWidth: 60,
-                                            maxHeight: 120,
-                                            objectFit: 'contain',
-                                            marginRight: 10
-                                        }} />
+                                    <img src={book.coverImage || empty_image} alt='Ảnh sách ở đây' style={{
+                                        maxWidth: 60,
+                                        maxHeight: 120,
+                                        objectFit: 'contain',
+                                        marginRight: 10
+                                    }} />
                                     <Typography variant="body1">{book.title}</Typography>
                                 </Box>
                             ))}
@@ -166,7 +172,7 @@ function AddContractBooks({ contractId, disableUpdate, onUpdateContractBooks }) 
                             Đóng
                         </Button>
                         <Button color="primary" variant="contained" onClick={handleAddBook} disabled={loading}>
-                            {loading ? <CircularProgress size={20} color='inherit'/> : "Chỉnh sửa"}
+                            {loading ? <CircularProgress size={20} color='inherit' /> : "Chỉnh sửa"}
                         </Button>
                     </Box>
                 </Box>
