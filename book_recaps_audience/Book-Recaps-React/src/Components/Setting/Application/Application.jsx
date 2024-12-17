@@ -42,7 +42,7 @@ const Application = () => {
               }
             }
           }
-          setSupportTickets([ ...tickets ]);
+          setSupportTickets([ ...tickets ].reverse());
         } else {
           setErrorMessage('Failed to fetch support tickets');
         }

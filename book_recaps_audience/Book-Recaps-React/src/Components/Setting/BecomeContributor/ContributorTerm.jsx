@@ -17,13 +17,13 @@ const ContributorTerm = () => {
   });
   const [ submitted, setSubmitted ] = useState(false);
   const [ error, setError ] = useState(null);
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
 
   useEffect(() => {
     if (user.role === 'Contributor') {
-      toast.warning("Bạn đã là Contributor rồi.");
+      toast.error("Bạn đã là Contributor rồi.");
     }
-  }, [ user ]);
+  }, []);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -40,6 +40,8 @@ const ContributorTerm = () => {
       const response = await axiosInstance.put('/api/self-update-role', { role: 'contributor' });
       console.log("API response:", response.data);
       setSubmitted(true);
+      setUser({ ...user, role: 'Contributor' });
+      toast.success("Chúc mừng! Bạn đã trở thành Contributor.", { position: "top-right" });
     } catch (error) {
       console.error("Error during submission:", error);
       setError("An error occurred. Please try again.");
@@ -47,7 +49,7 @@ const ContributorTerm = () => {
     }
   };
 
-  if (user.role === 'Contributor') {
+  if (!submitted && user.role === 'Contributor') {
     return <Navigate to={routes.index} replace={true}/>;
   }
 
@@ -55,96 +57,120 @@ const ContributorTerm = () => {
     <div className="container mx-auto max-w-screen-xl p-5">
       <div className="terms-container">
         {submitted ? (
-          <div className="welcome-message">
+          <div className="welcome-message space-y-4 text-center">
             <img src="/logo-transparent.png" alt="Logo"/>
-            <h1>Congratulations on becoming an contributor!</h1>
-            <p>You've successfully created an account. We think this calls for a little celebration.</p>
-            <p>Now, are you ready to explore?</p>
-            <a href={import.meta.env.VITE_CONTRIBUTOR_ENDPOINT + "/login"} className="explore-button">Take me to Book
-              Recaps</a>
+            <h1 className="text-lg font-bold text-green-600">
+              Chúc mừng! Bạn đã trở thành Contributor.
+            </h1>
+            <p>Bây giờ bạn có thể tạo và gửi các bản tóm tắt sách để xuất bản trên nền tảng.</p>
+            <p>Bắt đầu ngay bằng cách đăng nhập vào web Contributor.</p>
+            <a
+              href={import.meta.env.VITE_CONTRIBUTOR_ENDPOINT}
+              className="inline-block px-3 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+              rel="noopener noreferrer"
+            >
+              Đăng nhập vào web Contributor
+            </a>
           </div>
         ) : (
           <>
-            <h1 className="terms-title">Terms and Conditions</h1>
-            <p className="terms-subtitle">Please read and submit below</p>
+            <h1 className="terms-title">Điều Khoản và Điều Kiện</h1>
+            <p className="terms-subtitle">Vui lòng đọc và chấp thuận điều khoản bên dưới</p>
             <hr className="terms-divider"/>
 
             {/* (Your Terms sections and form go here, as in your original code) */}
             <div className="terms-section">
-              <h2>1. Acceptance of Terms</h2>
-              <p>By accessing or using our services, you agree to be bound by these Terms and Conditions. If you do not
-                agree with any part of these terms, you may not access or use our services.
-              </p>
+              <h2>1. Giới Thiệu</h2>
+              <p>Chào mừng bạn đến với BookRecaps! Bằng việc đăng ký trở thành cộng tác viên, bạn đồng ý tạo và gửi các
+                bản tóm tắt sách chất lượng cao để xét duyệt và xuất bản trên nền tảng. Các điều khoản và điều kiện sau
+                đây sẽ quy định trách nhiệm và quyền lợi của cộng tác viên.</p>
             </div>
             <div className="terms-section">
-              <h2>2. Description of Platform</h2>
-              <p>Our services provide audiences with convenient access to concise book recaps in both text and audio
-                formats, delivering a time-saving way to capture essential insights from a book. These recaps offer
-                accessible, summarized content that distills the essence of popular titles, making it easy for readers
-                to
-                explore a variety of topics quickly and effectively.</p>
-              <p>Contributors are empowered to create high-quality recaps and earn income based on content performance.
-                Our staff reviews each recap to ensure it meets high standards, verifying content quality, accuracy, and
-                adherence to community guidelines. We also ensure compliance with contractual terms established with
-                publishers, guaranteeing that recaps align with publisher agreements and are free from inappropriate
-                language or violations of community standards.
-              </p>
+              <h2>2. Điều Kiện Tham Gia</h2>
+              <p>Để trở thành cộng tác viên, bạn cần:</p>
+              <ul>
+                <li>Đủ 18 tuổi trở lên.</li>
+                <li>Tuân thủ các nguyên tắc và tiêu chuẩn nội dung của nền tảng.</li>
+              </ul>
             </div>
 
             <div className="terms-section">
-              <h2>3. Copyright</h2>
-              <p>The exclusive, legally-secured right to, among other things, reproduce and distribute works of original
-                expression. Expression is your own unique way of expressing an idea, telling a story, or creating a work
-                of art. Under copyright law, creators hold copyright in a book or other literary work from the moment
-                they
-                put the words down on paper, into a computer file, or into some other tangible medium.</p>
+              <h2>3. Hướng Dẫn Nộp Nội Dung</h2>
+              <p>Khi gửi bản tóm tắt sách, bạn cam kết:</p>
+              <ul>
+                <li>Cung cấp nội dung gốc do bạn tạo ra và có quyền sở hữu hợp pháp.</li>
+                <li>Đảm bảo nội dung đúng cấu trúc yêu cầu (ý chính, tiêu đề, hình ảnh nếu có, và âm thanh).</li>
+                <li>Không sao chép, hoặc gửi nội dung có ngôn ngữ không phù hợp, vi phạm tiêu chuẩn cộng đồng.</li>
+              </ul>
+              <p><strong>3.1 Xét Duyệt Nội Dung</strong></p>
+              <ul>
+                <li>Tất cả bản tóm tắt sẽ được đội ngũ kiểm duyệt đánh giá về chất lượng, tính chính xác, và tuân thủ
+                  quy định.
+                </li>
+                <li>Nội dung đạt yêu cầu sẽ được phê duyệt và có thể bắt đầu công khai trên nền tảng.</li>
+                <li>Nội dung bị từ chối sẽ nhận phản hồi cụ thể và có thể gửi đơn yêu cầu xét duyệt lại.</li>
+              </ul>
+              <p><strong>3.2 Kiểm Tra Trùng Lặp</strong></p>
+              <p>BookRecaps sẽ tiến hành kiểm tra trùng lặp nội dung. Bản tóm tắt trùng lặp quá nhiều với nội dung đã có
+                sẽ bị từ chối.</p>
             </div>
 
             <div className="terms-section">
-              <h2>4. Contract/Publishing Agreement</h2>
-              <p>A legal document detailing a contributor or illustrator agreement to sell to a publisher some or all
-                rights to a creative work. Contracts specify what rights under copyright are being granted, the
-                contributor and publisher respective obligations under the agreement, the contributor compensation, and
-                other provisions.</p>
+              <h2>4. Chính Sách Kiếm Tiền và Thanh Toán</h2>
+              <ul>
+                <li>Các bản tóm tắt được phê duyệt sẽ đủ điều kiện kiếm tiền dựa trên các chỉ số hiệu suất lượt xem
+                  premium
+                </li>
+                <li>Thu nhập sẽ được tính toán và thanh toán hàng tháng. Số dư thanh toán tối thiểu có thể được áp dụng
+                  để yêu cầu rút tiền.
+                </li>
+                <li>Cộng tác viên cần cung cấp thông tin thanh toán và chịu trách nhiệm với các khoản thuế liên quan
+                  (nếu có).
+                </li>
+              </ul>
             </div>
 
             <div className="terms-section">
-              <h2>5. Permissions </h2>
-              <p>Agreements from copyright holders granting the right to someone else to reproduce their work.
-                Contributors who want to excerpt someone else's work in their own book may be obligated under copyright
-                law to secure permissions.
-              </p>
+              <h2>5. Bản Quyền và Quyền Sở Hữu</h2>
+              <ul>
+                <li>Cộng tác viên giữ quyền sở hữu với nội dung đã gửi.</li>
+                <li>Bằng việc gửi nội dung, bạn cấp cho BookRecaps quyền không độc quyền để xuất bản, phân phối, và
+                  quảng bá nội dung đó trên nền tảng.
+                </li>
+                <li>Bạn cam kết không gửi nội dung vi phạm bản quyền hoặc không có sự cho phép từ tác giả/nắm giữ bản
+                  quyền.
+                </li>
+              </ul>
             </div>
 
             <div className="terms-section">
-              <h2>6. User Conduct</h2>
-              <p>You agree not to use our services for any unlawful purpose or in any way that violates these Terms and
-                Conditions. You also agree not to:
-                Harass, abuse, or harm other users
-                Violate the rights of third parties
-                Interfere with or disrupt the operation of our services
-                Use our services for commercial solicitation without our prior written consent
-              </p>
+              <h2>6. Tiêu Chuẩn Cộng Đồng</h2>
+              <p>Cộng tác viên cần tuân thủ:</p>
+              <ul>
+                <li>Tôn trọng quyền sở hữu trí tuệ và luật bản quyền.</li>
+                <li>Không gửi nội dung chứa ngôn ngữ tục tĩu, bạo lực hoặc nội dung phản cảm.</li>
+                <li>Tương tác lịch sự và tuân thủ các nguyên tắc cộng đồng của nền tảng.</li>
+              </ul>
             </div>
 
             <div className="terms-section">
-              <h2>7. Indemnification </h2>
-              <p>You agree to indemnify and hold Book Recaps, its affiliates, officers, directors, employees, and agents
-                harmless from and against any and all claims, liabilities, damages, losses, or expenses arising out of
-                or
-                in any way connected with your use of our services.
-              </p>
+              <h2>7. Tạm Dừng hoặc Chấm Dứt Tài Khoản</h2>
+              <ul>
+                <li>BookRecaps có quyền tạm dừng hoặc chấm dứt tài khoản cộng tác viên vi phạm các điều khoản này.</li>
+                <li>Việc gửi nội dung chất lượng thấp, sao chép hoặc vi phạm nhiều lần sẽ dẫn đến đình chỉ tài khoản.
+                </li>
+              </ul>
             </div>
 
 
             <div className="terms-section">
-              <h2>8. Changes to Terms and Conditions </h2>
-              <p>We reserve the right to update or modify these Terms and Conditions at any time without prior notice.
-                Your continued use of our services after any such changes constitutes your acceptance of the new Terms
-                and
-                Conditions.</p>
+              <h2>8. Thay Đổi Điều Khoản</h2>
+              <p>BookRecaps có thể cập nhật các điều khoản này khi cần thiết. Chúng tôi sẽ thông báo khi có thay đổi và
+                bạn đồng ý rằng việc tiếp tục tham gia đồng nghĩa với việc chấp nhận các điều khoản mới.</p>
             </div>
 
+            <p><strong>Bằng việc nhấn “Đồng ý” và tiếp tục, bạn xác nhận đã đọc, hiểu và chấp nhận các điều khoản và
+              điều kiện trên.</strong></p>
 
             <form className="terms-form" onSubmit={handleSubmit}>
               {/* Your form fields here */}
@@ -158,12 +184,12 @@ const ContributorTerm = () => {
                   required
                 />
                 <label htmlFor="agree">
-                  I agree to <a href="/terms" target="_blank">terms & conditions</a>.
+                  Tôi đồng ý với các điều khoản và điều kiện trên
                 </label>
               </div>
 
               {error && <p className="error-message">{error}</p>}
-              <button type="submit" className="submit-button">Submit</button>
+              <button type="submit" className="submit-button">Đồng ý</button>
             </form>
           </>
         )}

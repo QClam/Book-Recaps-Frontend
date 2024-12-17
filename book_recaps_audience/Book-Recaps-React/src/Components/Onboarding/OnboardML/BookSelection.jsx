@@ -34,6 +34,12 @@ const BookSelection = ({ onNext, onBookSelect, selectedAuthors, selectedCategori
       setLoading(true);
       const data = await getBooks(selectedCategories, selectedAuthors, controller);
 
+      if (data.length === 0) {
+        setLoading(false);
+        onNext();
+        return;
+      }
+
       setBooks(data);
       setLoading(false);
     }

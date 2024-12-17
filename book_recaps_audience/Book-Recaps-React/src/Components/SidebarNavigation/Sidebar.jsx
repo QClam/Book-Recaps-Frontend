@@ -21,7 +21,7 @@ function Sidebar() {
   const profileDropdownEl = useRef(null);
   const searchResultsDropdownEl = useRef(null);
 
-  const userName = user?.profileData.fullName  || user?.profileData.userName|| '';
+  const userName = user?.profileData.fullName || user?.profileData.userName || '';
   const imageUrl = user?.profileData.imageUrl?.replace("Files/Image/jpg/ad.jpg", "") || '/avatar-placeholder.png';
   const activeSubscription = user?.profileData.subscriptions.$values.find((sub) => sub.status === 0);
   const isPremium = !!activeSubscription;
@@ -279,11 +279,13 @@ function Sidebar() {
                       to={routes.profileSettings}>
                       Cài đặt tài khoản
                     </Link>
-                    <Link
-                      className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20 decoration-0"
-                      to={routes.becomeContributor}>
-                      Trở thành contributor
-                    </Link>
+                    <Show when={user.role !== "Contributor"}>
+                      <Link
+                        className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20 decoration-0"
+                        to={routes.becomeContributor}>
+                        Trở thành Contributor
+                      </Link>
+                    </Show>
                     <Link
                       className="block px-3 py-2 text-sm text-gray-700 rounded-sm hover:bg-[#FF6F61]/20 decoration-0"
                       to={routes.logout}

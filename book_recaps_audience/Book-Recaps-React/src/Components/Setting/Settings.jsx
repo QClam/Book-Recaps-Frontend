@@ -275,7 +275,7 @@ function Settings() {
             <Link to={routes.supportTickets}>Đơn báo cáo</Link>
           </li>
           <li>
-            <Link to={routes.becomeContributor}>Trở thành contributor</Link>
+            <Link to={routes.becomeContributor}>Trở thành Contributor</Link>
           </li>
         </ul>
       </div>
