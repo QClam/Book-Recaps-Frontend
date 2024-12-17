@@ -648,7 +648,7 @@ function Review() {
                            <ul key={comment.id}>
                               <li>{new Date(comment.createdAt).toLocaleDateString()}</li>
                               <li>Câu: {comment.targetText}</li>
-                              <li>Ghi chú: {comment.feedback}</li>
+                              <li><strong>Ghi chú: {comment.feedback}</strong></li>
                               <br />
                            </ul>
                         ))
