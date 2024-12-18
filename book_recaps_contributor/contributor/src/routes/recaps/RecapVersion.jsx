@@ -772,12 +772,12 @@ const ListKeyIdeas = () => {
               <p><strong>Lưu ý:</strong></p>
               <ul className={cn("list-disc", { "hidden": !openMessage, "ml-4": openMessage })}>
                 <li>
-                  Sau khi thêm hoặc chỉnh sửa key ideas, nhấn <strong>&#34;Tạo audio
+                  Sau khi thêm hoặc chỉnh sửa nội dung, nhấn <strong>&#34;Tạo audio
                   mới&#34;</strong> hoặc <strong>&#34;Tải lên audio&#34;</strong> để cập nhật audio và transcript mới
-                  nhất.
+                  nhất trước khi gửi xét duyệt.
                 </li>
                 <li>
-                  Không thể chỉnh sửa nội dung sau khi gửi review, chỉ chỉnh sửa được khi nội dung ở trạng
+                  Không thể chỉnh sửa nội dung sau khi gửi xét duyệt, chỉ chỉnh sửa được khi nội dung ở trạng
                   thái <strong>&#34;Bản nháp&#34;</strong>.
                 </li>
                 <li>
@@ -786,7 +786,7 @@ const ListKeyIdeas = () => {
                 </li>
                 <li>
                   Nền tảng khuyến khích Contributor chủ động sử dụng tính năng <strong
-                  className="hover:text-blue-500 underline" onClick={() => setActiveIndex(2)}>&#34;Kiểm tra trùng
+                  className="hover:text-blue-500 underline cursor-pointer" onClick={() => setActiveIndex(2)}>&#34;Kiểm tra trùng
                   lặp&#34;</strong> trước khi gửi xét duyệt. Các bài viết tóm tắt trùng lặp đáng kể với bài viết hiện có
                   có thể bị từ chối.
                 </li>
