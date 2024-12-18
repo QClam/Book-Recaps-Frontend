@@ -97,13 +97,6 @@ function Login() {
       setSubmitting(true);
 
       await axiosInstance.post("/api/register", newUser);
-      // console.log("Link: ", response.data.message);
-      // navigate(routes.confirmEmail, {
-      //   state: {
-      //     email: registerForm.email,
-      //     message: response.data.message,
-      //   },
-      // });
 
       toast.success("Đăng ký thành công. Vui lòng kiểm tra email để xác nhận tài khoản.");
 
@@ -237,7 +230,7 @@ function Login() {
                 "disabled:cursor-progress": submitting,
               })}
             >
-              Đăng ký
+              {submitting ? "Đang xử lý..." : "Đăng ký"}
             </button>
             {error && <p className="text-red-500 text-center px-8">{error}</p>}
           </form>
@@ -268,7 +261,7 @@ function Login() {
                 "disabled:cursor-progress": submitting,
               })}
             >
-              Đăng nhập
+              {submitting ? "Đang xử lý..." : "Đăng nhập"}
             </button>
             <a style={{ textDecoration: "none", cursor: "pointer" }} onClick={() => forgetPasswordClick()}>Forget
               password</a>
