@@ -5,12 +5,8 @@
   text-align: center;
 } */
 
-main {
-  flex-grow: 1; /* Nội dung chính chiếm phần còn lại của chiều cao */
-  display: flex;
-  margin-left: 250px;
-}
-
-.grecaptcha-badge { 
-  visibility: hidden !important;
-}
+/*main {*/
+/*  flex-grow: 1; !* Nội dung chính chiếm phần còn lại của chiều cao *!*/
+/*  display: flex;*/
+/*  margin-left: 250px;*/
+/*}*/
