@@ -9,7 +9,7 @@ export const fetchProfile = async (token, setProfile) => {
             },
         });
         setProfile(response.data);
-        console.log("User Profile: ", response.data);
+        // console.log("User Profile: ", response.data);
     } catch (error) {
         console.log("Error fetching profile", error);
     }

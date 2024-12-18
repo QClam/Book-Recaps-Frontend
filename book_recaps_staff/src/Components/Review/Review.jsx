@@ -648,7 +648,7 @@ function Review() {
                            <ul key={comment.id}>
                               <li>{new Date(comment.createdAt).toLocaleDateString()}</li>
                               <li>Câu: {comment.targetText}</li>
-                              <li>Ghi chú: {comment.feedback}</li>
+                              <li><strong>Ghi chú: {comment.feedback}</strong></li>
                               <br />
                            </ul>
                         ))
@@ -715,7 +715,7 @@ function Review() {
                                     {plagiarismResults.map((result, index) => (
                                        <div key={index} className='plagiarism-result'>
                                           <p><strong>Câu:</strong> {result.sentence}</p>
-                                          <p><strong>Câu tương tự:</strong> {result.existing_sentence}</p>
+                                          <p><strong>Câu tương tự: {result.existing_sentence}</strong></p>
                                           <div className="progress-container">
                                              <div className="progress-bar">
                                                 <div className="progress" style={{ width: `${result.similarity_score * 100}%` }}><span className="percentage">
@@ -725,6 +725,7 @@ function Review() {
                                           </div>
                                           {metadata && metadata.length > 0 && (
                                              <>
+                                                <p><strong>Recap: {metadata[0].recap_name}</strong></p>
                                                 <p><strong>Người đóng góp:</strong> {metadata[0].contributor_full_name}</p>
                                                 <p><strong>Tên cuốn sách:</strong> {metadata[0].book_title}</p>
                                              </>

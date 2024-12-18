@@ -43,6 +43,6 @@ export const SidebarItems = [
   {
     title: "Quản lý rút tiền",
     icon: <CurrencyExchange />,
-    link: "/withdrawl",
+    link: "/withdrawals",
   },
 ];
