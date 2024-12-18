@@ -1,66 +1,47 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
-import { useNavigate } from "react-router-dom";
-import { jwtDecode } from "jwt-decode";
-
-import { isRoleMatched } from "../../utils/matchRole";
+import { useEffect, useState } from "react";
+import { Form, Navigate, useActionData, useNavigate } from "react-router-dom";
 import "./Login.scss";
+import { useAuth } from "../../contexts/Auth";
+import { toast } from "react-toastify";
+import { routes } from "../../routes";
 
 function Login() {
-  const [isActive, setIsActive] = useState(false);
+  const [ isActive ] = useState(false);
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
-  const { executeRecaptcha } = useGoogleReCaptcha();
+  const { login, isAuthenticated } = useAuth();
+  const actionData = useActionData();
+  const [ email, setEmail ] = useState("");
+  const [ password, setPassword ] = useState("");
+  const [ error, setError ] = useState(null);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-
-    if (!executeRecaptcha) {
-      setError("reCAPTCHA chưa được khởi tạo");
-      return;
+  useEffect(() => {
+    if (actionData?.error) {
+      toast.error(actionData.error);
     }
+  }, [ actionData ]);
 
-    try {
-      // Thực hiện reCAPTCHA
-      const token = await executeRecaptcha("login");
-
-      const response = await axios.post(
-        "https://bookrecaps.cloud/api/tokens",
-        {
-          email,
-          password,
-          captchaToken: token,
-        }
-      );
-
-      const { accessToken, refreshToken } = response.data.message.token;
-      const decoded = jwtDecode(accessToken);
-      localStorage.setItem("access_token", accessToken);
-      localStorage.setItem("refresh_token", refreshToken);
-      
-      if (isRoleMatched(decoded, "SuperAdmin")) {
-        navigate("/dashboard")
-        console.log("Login successfully", response.data);
-      } else {
-        setError("Hãy dùng tài khoản của Admin để đăng nhập");
-        console.error("Role mismatch: Access denied");
-      }
-    } catch (error) {
-      setError("Đăng nhập thất bại", error);
+  useEffect(() => {
+    if (actionData?.user && actionData?.token) {
+      login(actionData.user, actionData.token);
     }
-  };
+  }, [ actionData, login, navigate ]);
+
+  const loading = navigation.state === 'loading' || navigation.state === 'submitting';
+
+  if (isAuthenticated) {
+    // return <Navigate to={location.state?.from ? location.state.from : routes.dashboard} replace={true}/>
+    return <Navigate to={routes.index} replace={true}/>
+  }
 
   return (
-    <div className="login-page">
+    <div className="h-screen grid place-items-center">
       <div className={`container ${isActive ? "active" : ""}`} id="container">
         <div className="form-container sign-in">
-          <form onSubmit={handleLogin}>
-            <h1>Đăng nhập</h1>
+          <Form method="post" className="space-y-6">
+            <h1 className="font-bold">Đăng nhập</h1>
             <input
               type="email"
+              name="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -69,15 +50,21 @@ function Login() {
             />
             <input
               type="password"
+              name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
               placeholder="Mật khẩu"
               onFocus={() => setError(null)}
             />
-            <button type="submit">Đăng nhập</button>
+            <button
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? "Đang xử lý..." : "Đăng nhập"}
+            </button>
             {error && <p style={{ color: "red" }}>{error}</p>}
-          </form>
+          </Form>
         </div>
 
         <div className="toggle-container">
@@ -85,11 +72,11 @@ function Login() {
             <div className="toggle-panel toggle-left">
             </div>
             <div className="toggle-panel toggle-right">
-              <h1>Xin chào</h1>
+              <h1 className="font-bold">Xin chào</h1>
               <p>
-                Nhập thông tin để sử dụng các chức năng dành cho  
+                Nhập thông tin để sử dụng các chức năng dành cho
               </p>
-              <h3>QUẢN TRỊ VIÊN</h3>
+              <h3 className="font-semibold">QUẢN TRỊ VIÊN</h3>
             </div>
           </div>
         </div>

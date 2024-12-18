@@ -1,5 +1,4 @@
 import React, { useState } from 'react'
-import { useGoogleReCaptcha } from 'react-google-recaptcha-v3';
 import { useNavigate } from 'react-router-dom'
 import {
     Dialog,
@@ -16,7 +15,6 @@ import api from '../Auth/AxiosInterceptors';
 function AddUserModal({ open, onClose, onUpdate }) {
 
     const navigate = useNavigate();
-    const { executeRecaptcha } = useGoogleReCaptcha();
     const [error, setError] = useState(null); // Error state
     const [loading, setLoading] = useState(false);
 
@@ -78,7 +76,7 @@ function AddUserModal({ open, onClose, onUpdate }) {
             phoneNumber: "",
         });
         setError(null);
-        setEditingUserId(null); // Reset user đang chỉnh sửa khi đóng modal
+        // setEditingUserId(null); // Reset user đang chỉnh sửa khi đóng modal
     };
 
     const handleAddUser = async (e) => {
@@ -92,22 +90,14 @@ function AddUserModal({ open, onClose, onUpdate }) {
 
         }
 
-        if (!executeRecaptcha) {
-            setError("reCAPTCHA chưa được khởi tạo");
-            setLoading(false);
-            return;
-        }
-
         try {
-            const token = await executeRecaptcha("signup");
-
             const newUser = {
                 fullName: registerForm.fullName,
                 email: registerForm.email,
                 password: registerForm.password,
                 confirmPassword: registerForm.confirmPassword,
                 phoneNumber: registerForm.phoneNumber,
-                captchaToken: token,
+                captchaToken: "...",
             };
 
             const response = await api.post(
