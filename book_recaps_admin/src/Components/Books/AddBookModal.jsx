@@ -56,8 +56,8 @@ const AddBookModal = ({ isOpen, onClose, onBookAdded }) => {
 
         const stringFields = ['Title', 'OriginalTitle'];
         stringFields.forEach(field => {
-            if (!/^[A-Z]/.test(formData[field])) {
-                errors[field] = `Tiêu đề hoặc Tiêu đề gốc phải bắt đầu bằng chữ viết hoa.`;
+            if (!/^\p{Lu}/u.test(formData[field])) {
+                errors[field] = "Tiêu đề hoặc Tiêu đề gốc phải bắt đầu bằng chữ viết hoa.";
             }
         });
 
