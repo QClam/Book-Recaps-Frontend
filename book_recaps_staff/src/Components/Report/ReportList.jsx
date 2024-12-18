@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Hourglass } from 'react-loader-spinner';
 import api from '../Auth/AxiosInterceptors';
 import { handleFetchError } from '../../utils/handleError';
-import { json } from 'react-router-dom';
+import { json, useNavigate } from 'react-router-dom';
 import { Box, Button, Chip, Dialog, DialogActions, DialogContent, DialogTitle, FormControl, InputLabel, MenuItem, Pagination, Paper, Select, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TablePagination, TableRow, TextField, Typography } from '@mui/material';
 import { Visibility } from '@mui/icons-material';
 import Swal from 'sweetalert2';
@@ -53,6 +53,8 @@ function ReportList() {
     const [searchTerm, setSearchTerm] = useState(""); // Nhập input ô search
     const [filterStatus, setFilterStatus] = useState(""); // Lọc trạng thái
     const [hoverState, setHoverState] = useState({});
+
+    const navigate = useNavigate();
 
     const fetchReports = async () => {
         try {
@@ -245,6 +247,7 @@ function ReportList() {
                             <TableCell><strong>Phản hồi từ Staff</strong></TableCell>
                             <TableCell ><strong>Ngày tạo</strong></TableCell>
                             <TableCell ><strong>Ngày Phản hồi</strong></TableCell>
+                            <TableCell ><strong>Chi tiết</strong></TableCell>
                             <TableCell><strong>Phản hồi</strong></TableCell>
                             <TableCell><strong>Trạng Thái</strong></TableCell>
                             <TableCell></TableCell>
@@ -258,50 +261,62 @@ function ReportList() {
                                 </TableCell>
                             </TableRow>
                         ) : (
-                        filteredReports.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                            .map((val) => (
-                                <TableRow key={val.id}>
-                                    <TableCell sx={{ width: 120 }}>{val.recaps?.name}</TableCell>
-                                    {/* <TableCell sx={{width: 120}}>{val.recaps?.book?.title}</TableCell> */}
-                                    <TableCell>{getUserNamebyId(val.userId)}</TableCell>
-                                    <TableCell>{val.description.length > 30
-                                        ? `${val.description.slice(0, 30)}...`
-                                        : val.description}</TableCell>
-                                    <TableCell>{val.response
-                                        ? (val.response.length > 30
-                                            ? `${val.response.slice(0, 30)}...`
-                                            : val.response)
-                                        : "Chưa có phản hồi từ staff"}</TableCell>
-                                    <TableCell>{new Date(val.createdAt).toLocaleDateString()}</TableCell>
-                                    <TableCell>{val.updatedAt === "0001-01-01T00:00:00" || !val.updatedAt
-                                        ? "Chưa phản hồi"
-                                        : new Date(val.updatedAt).toLocaleDateString()}</TableCell>
-                                    <TableCell>
-                                        <Chip onClick={() => openDialog(val)}
-                                            disabled={val.status === 2}
-                                            variant={hoverState[val.id] ? 'contained' : 'outlined'}
-                                            color='error'
-                                            label="Phản hồi"
-                                            onMouseEnter={() => handleMouseEnter(val.id)}
-                                            onMouseLeave={() => handleMouseLeave(val.id)}
-                                        />
-                                    </TableCell>
-                                    <TableCell width={120}>{val.status === 1 ? (
-                                        <Typography color="primary" >Đang xử lý</Typography>
-                                    ) : val.status === 2 ? (
-                                        <Typography color="success" >Đã phản hồi</Typography>
-                                    ) : (
-                                        <Typography color="warning" >Đã mở</Typography>
-                                    )}</TableCell>
-                                    <TableCell><Button
-                                        disabled={val.status === 1}
-                                        onClick={() => openDetailDialog(val)}
-                                    >
-                                        <Visibility />
-                                    </Button>
-                                    </TableCell>
-                                </TableRow>
-                            )))}
+                            filteredReports.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                .map((val) => (
+                                    <TableRow key={val.supportTicketId}>
+                                        <TableCell sx={{ width: 120 }}>{val.recapName}</TableCell>
+                                        {/* <TableCell sx={{width: 120}}>{val.recaps?.book?.title}</TableCell> */}
+                                        <TableCell>{getUserNamebyId(val.userId)}</TableCell>
+                                        <TableCell>{val.description.length > 30
+                                            ? `${val.description.slice(0, 30)}...`
+                                            : val.description}</TableCell>
+                                        <TableCell>{val.response
+                                            ? (val.response.length > 30
+                                                ? `${val.response.slice(0, 30)}...`
+                                                : val.response)
+                                            : "Chưa có phản hồi từ staff"}</TableCell>
+                                        <TableCell>{new Date(val.createdAt).toLocaleDateString()}</TableCell>
+                                        <TableCell>{val.updatedAt === "0001-01-01T00:00:00" || !val.updatedAt
+                                            ? "Chưa phản hồi"
+                                            : new Date(val.updatedAt).toLocaleDateString()}</TableCell>
+                                        <TableCell>
+                                            <Chip
+                                                label="Xem Review"
+                                                color="info"
+                                                // variant={hoverState[val.currentVersion?.review?.reviewId] ? 'contained' : 'outlined'}
+                                                onClick={() =>
+                                                    navigate(`/review/content_version/${val.currentVersion?.review?.reviewId}`)
+                                                }
+                                                // onMouseEnter={() => handleMouseEnter(val.currentVersion?.review?.reviewId)}
+                                                // onMouseLeave={() => handleMouseLeave(val.currentVersion?.review?.reviewId)}
+                                            />
+                                        </TableCell>
+                                        <TableCell>
+                                            <Chip onClick={() => openDialog(val)}
+                                                disabled={val.status === 2}
+                                                variant={hoverState[val.supportTicketId] ? 'contained' : 'outlined'}
+                                                color='error'
+                                                label="Phản hồi"
+                                                onMouseEnter={() => handleMouseEnter(val.supportTicketId)}
+                                                onMouseLeave={() => handleMouseLeave(val.supportTicketId)}
+                                            />
+                                        </TableCell>
+                                        <TableCell width={120}>{val.status === 1 ? (
+                                            <Typography color="primary" >Đang xử lý</Typography>
+                                        ) : val.status === 2 ? (
+                                            <Typography color="success" >Đã phản hồi</Typography>
+                                        ) : (
+                                            <Typography color="warning" >Đã mở</Typography>
+                                        )}</TableCell>
+                                        <TableCell><Button
+                                            disabled={val.status === 1}
+                                            onClick={() => openDetailDialog(val)}
+                                        >
+                                            <Visibility />
+                                        </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                )))}
                     </TableBody>
                     <TableFooter>
                         <TableRow>
@@ -357,9 +372,9 @@ function ReportList() {
                         sx={{ marginTop: 2 }}
                         slotProps={{
                             input: {
-                              readOnly: true,
+                                readOnly: true,
                             },
-                          }}
+                        }}
                     />
                 </DialogContent>
                 <DialogActions>
