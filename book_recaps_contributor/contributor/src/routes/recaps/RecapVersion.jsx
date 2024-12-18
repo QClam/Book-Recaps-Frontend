@@ -551,6 +551,12 @@ const RecapVersionDetails = () => {
       if (err.status === 401) {
         navigate(routes.logout, { replace: true });
       }
+
+      showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: err.error,
+      });
     }
   }
 
