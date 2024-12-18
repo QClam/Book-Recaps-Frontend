@@ -283,7 +283,7 @@ const AudioAndTranscriptSection = () => {
     recap.id,
     user?.id,
     promisedTranscript,
-    recap.isPublished && ((recap.isPremium && hasSubscription) || !recap.isPremium)
+    recap.isPublished && ((recap.isPremium && hasSubscription) || !recap.isPremium) && recap.currentVersion?.status === 2
   );
 
   return (
@@ -292,37 +292,45 @@ const AudioAndTranscriptSection = () => {
         <Show when={recap && recap.isPublished} fallback={
           <div className="rounded-lg bg-white p-5 shadow-[0px_0px_8px_rgba(0,0,0,0.1)]">
             <div className="premium-message">
-              This recap is not published yet. Please wait for the author to publish it.
+              Bài viết này chưa được công khai. Vui lòng quay lại sau.
             </div>
           </div>
         }>
-          <Show when={(recap.isPremium && hasSubscription) || !recap.isPremium} fallback={
+          <Show when={recap.currentVersion?.status !== 2} fallback={
             <div className="rounded-lg bg-white p-5 shadow-[0px_0px_8px_rgba(0,0,0,0.1)]">
               <div className="premium-message">
-                This recap is premium. Please upgrade to a premium subscription.
-                <Link to={routes.billing}>Upgrade</Link>
+                Bài viết này đang được xem xét. Vui lòng quay lại sau.
               </div>
             </div>
           }>
-            <SuspenseAwait
-              resolve={promisedTranscript}
-              errorElement={<p>No transcript available or failed to load transcript.</p>}
-              useDefaultLoading={true}
-              defaultLoadingMessage="Loading transcript..."
-            >
-              {(transcript) => (
-                <Transcriptv2
-                  transcriptData={transcript}
-                  // handleSentenceClick={handleSentenceClick}
-                  userId={user?.id}
-                  recapVersionId={recap?.currentVersion?.id}
-                  // currentTime={currentTime}
-                  isGenAudio={recap?.currentVersion?.isGenAudio || false}
-                />
-              )}
-            </SuspenseAwait>
+            <Show when={(recap.isPremium && hasSubscription) || !recap.isPremium} fallback={
+              <div className="rounded-lg bg-white p-5 shadow-[0px_0px_8px_rgba(0,0,0,0.1)]">
+                <div className="premium-message">
+                  Bài viết này yêu cầu tài khoản Premium. Vui lòng nâng cấp tài khoản để nghe bài viết này.
+                  <Link to={routes.billing}>Nâng cấp ngay</Link>
+                </div>
+              </div>
+            }>
+              <SuspenseAwait
+                resolve={promisedTranscript}
+                errorElement={<p>Không có transcript hoặc không thể tải transcript.</p>}
+                useDefaultLoading={true}
+                defaultLoadingMessage="Loading transcript..."
+              >
+                {(transcript) => (
+                  <Transcriptv2
+                    transcriptData={transcript}
+                    // handleSentenceClick={handleSentenceClick}
+                    userId={user?.id}
+                    recapVersionId={recap?.currentVersion?.id}
+                    // currentTime={currentTime}
+                    isGenAudio={recap?.currentVersion?.isGenAudio || false}
+                  />
+                )}
+              </SuspenseAwait>
 
-            <AudioPlayer audioURL={recap.currentVersion?.audioURL}/>
+              <AudioPlayer audioURL={recap.currentVersion?.audioURL}/>
+            </Show>
           </Show>
         </Show>
       </div>
