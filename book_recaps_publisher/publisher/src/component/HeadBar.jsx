@@ -28,14 +28,14 @@ export const HeadBar = () => {
             className="rounded-full flex items-center justify-center gap-3"
             onClick={() => setIsDropdownOpen(!isDropdownOpen)}
           >
+            <div className="w-10 h-10">
+              <img src={imageUrl} alt="User Avatar" className="w-full h-full object-cover rounded-full"/>
+            </div>
             <div className="text-start hidden sm:block">
               <p className="font-semibold">{user.publisherData.publisherName || user.name}</p>
               <p className="text-sm text-gray-500 font-medium">
                 {user.role}
               </p>
-            </div>
-            <div className="w-10 h-10">
-              <img src={imageUrl} alt="User Avatar" className="w-full h-full object-cover rounded-full"/>
             </div>
             <span className="text-lg hidden sm:block">
               <Show
