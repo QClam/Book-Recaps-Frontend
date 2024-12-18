@@ -518,7 +518,7 @@ const useViewTracking = (recapId, userId, promisedTranscript, shouldCreate) => {
     const controller = new AbortController();
 
     // Create view tracking after the transcript is loaded. Delayed by 3 seconds
-    if (recapId && userId && !mounted.current && shouldCreate) {
+    if (recapId && !mounted.current && shouldCreate) {
       promisedTranscript.then(() => {
         timeoutId = setTimeout(() => {
           createViewTracking(controller);
@@ -551,12 +551,13 @@ const useViewTracking = (recapId, userId, promisedTranscript, shouldCreate) => {
         signal: request.signal,
         params: {
           recapid: recapId,
-          deviceType
+          deviceType,
+          userId
         }
       });
       // console.log('View tracking response:', response.data.data);
 
-      currentViewTrackingId.current = response.data.data.id;
+      currentViewTrackingId.current = response.data.data?.id;
     } catch (error) {
       const err = handleFetchError(error);
       console.log('Error tracking view:', err);

@@ -244,11 +244,11 @@ const BookApi = () => {
                   to={generatePath(routes.bookDetail, { id: book.id })}
                   className="bg-white border border-gray-300 rounded-lg overflow-hidden flex flex-col transition-transform duration-200 ease-in-out hover:-translate-y-1 hover:shadow-lg"
                 >
-                  <div className="block bg-gray-200">
+                  <div className="block p-2">
                     <img
                       src={book.coverImage || "/empty-image.jpg"}
                       alt={book.title}
-                      className="block overflow-hidden shadow-md aspect-[3/4] object-cover w-full bg-gray-50"
+                      className="block overflow-hidden shadow-md aspect-[3/4] object-cover w-full bg-gray-200"
                     />
                   </div>
                   <div className="p-5 flex-1 flex flex-col items-start">
