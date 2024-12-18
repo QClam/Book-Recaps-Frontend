@@ -382,7 +382,7 @@ const RecapVersionDetails = () => {
             isRequestActive = false; // Reset flag after request completes
           }
         }
-      }, 1500);
+      }, 1000);
     }
 
     return () => {
@@ -838,7 +838,7 @@ const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
 
       await handleSave();
     },
-    1000, [ formData.Title, formData.Body ]);
+    500, [ formData.Title, formData.Body ]);
 
   // Save key idea when the image is changed
   useEffect(() => {
@@ -1308,7 +1308,7 @@ const PlagiarismResults = () => {
             isRequestActive = false;
           }
         }
-      }, 1500);
+      }, 1000);
     }
 
     if (recapVersion.plagiarismCheckStatus === 2) fetchPlagiarismResults(controller);
