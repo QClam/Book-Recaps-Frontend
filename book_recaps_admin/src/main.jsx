@@ -4,7 +4,7 @@ import { PrimeReactProvider } from "primereact/api";
 import { RouterProvider } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import { primeStyling } from "./primeStyling";
-// import 'rsuite/dist/rsuite.min.css';
+import 'rsuite/dist/rsuite.min.css';
 import './App.css'
 import './index.css'
 import { router } from "./router";

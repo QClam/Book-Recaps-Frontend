@@ -31,7 +31,7 @@ function MainLayout() {
               </p>
             </div>
           }>
-            <div className={cn("min-w-[1024px] pb-6 px-6 h-fit", {
+            <div className={cn("min-w-[1024px] pb-6 px-6 h-fit mt-5", {
               // "mt-10": !matchRecapDetails
             })}>
               <Outlet/>
