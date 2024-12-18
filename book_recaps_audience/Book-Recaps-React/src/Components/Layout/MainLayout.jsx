@@ -14,7 +14,7 @@ function MainLayout() {
         <Outlet/>
       </div>
       <div className="footer">
-        ©{new Date().getFullYear()} BookRecaps {import.meta.env.VITE_WEB_NAME}. All rights reserved
+        ©{new Date().getFullYear()} BookRecaps. All rights reserved
       </div>
     </div>
   );

@@ -34,7 +34,7 @@ function MainLayout() {
             </div>
           </Suspense>
           <div className="text-center min-w-[1024px] py-2 text-gray-400">
-            ©{new Date().getFullYear()} BookRecaps {import.meta.env.VITE_WEB_NAME}. All rights reserved
+            ©{new Date().getFullYear()} BookRecaps. All rights reserved
           </div>
         </div>
       </div>

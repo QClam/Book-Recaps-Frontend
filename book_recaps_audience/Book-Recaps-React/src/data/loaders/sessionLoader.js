@@ -11,7 +11,7 @@ export const sessionLoader = async () => {
   try {
     const response = await axiosInstance.get("/api/personal/profile");
     profileData = response.data;
-    responseId = response.data.id || null;
+    responseId = response.data?.id || null;
   } catch (e) {
     console.error(e);
   }
