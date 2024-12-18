@@ -5,7 +5,7 @@ import api from '../Auth/AxiosInterceptors';
 
 import empty_image from "../../data/empty-image.png"
 
-function AddContractBooks({ contractId, disableUpdate, onUpdateContractBooks }) {
+function AddContractBooks({ contractId, disableUpdate, onUpdateContractBooks, publisherId }) {
 
     const [open, setOpen] = useState(false);
 
@@ -57,7 +57,7 @@ function AddContractBooks({ contractId, disableUpdate, onUpdateContractBooks }) 
         setLoading(true);
 
         try {
-            const response = await api.put(`/api/Contract/addbooktocontract/${contractId}`, { bookIds: selectedBookIds });
+            const response = await api.put(`/api/Contract/addbooktocontract/${contractId}?publisherId=${publisherId}`, { bookIds: selectedBookIds });
             const updatedBooks = response.data.data;
 
             onUpdateContractBooks((preBooks) => [...preBooks, updatedBooks]);
@@ -69,6 +69,9 @@ function AddContractBooks({ contractId, disableUpdate, onUpdateContractBooks }) 
             handleClose();
         } catch (error) {
             console.error("Error Adding", error);
+            alert('Lỗi khi chỉnh sửa sách')
+        } finally {
+            setLoading(false);
         }
     }
 

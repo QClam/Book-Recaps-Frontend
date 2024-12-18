@@ -413,6 +413,7 @@ function ContractDetail() {
                     contractId={contractId}
                     disableUpdate={disableUpdate}
                     onUpdateContractBooks={setContractBooks}
+                    publisherId={contractForm.publisherId}
                 />
 
             </Box>
