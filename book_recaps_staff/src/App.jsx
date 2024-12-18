@@ -30,7 +30,7 @@ function App() {
         <Route path="/" element={<PrivateRoute> <RecapVersions /> </PrivateRoute>} />
         <Route path="/recaps" element={<PrivateRoute> <RecapVersions /> </PrivateRoute>} />
         <Route path="/users" element={<PrivateRoute> <UsersList /> </PrivateRoute>} />
-        <Route path="/withdrawl" element={<PrivateRoute> <WithdrawalList /> </PrivateRoute>} />
+        <Route path="/withdrawals" element={<PrivateRoute> <WithdrawalList /> </PrivateRoute>} />
         <Route path="/dashboard" element={<Dashboard /> } />
         <Route path="/appeals" element={<PrivateRoute> <AppealList /> </PrivateRoute> } />
         <Route path="/reports" element={<PrivateRoute> <ReportList /> </PrivateRoute> } />

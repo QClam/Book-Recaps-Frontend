@@ -29,7 +29,7 @@ function UsersList() {
                 const filterdUsers = users.filter(user => user.roleType === 2);
                 setUsers(filterdUsers);
                 setFilteredUsers(filterdUsers);
-                console.log("Users: ", filterdUsers);
+                // console.log("Users: ", filterdUsers);
             } catch (error) {
                 console.log("Error fetching", error);
             } finally {

@@ -37,6 +37,8 @@ function RecapVersions() {
         try {
             const response = await api.get('/api/recap/get-all-versionnotdraft');
             const recapVersions = response.data.data.$values;
+            console.log(recapVersions);
+
             setRecapVersions(recapVersions);
             setFilteredVersions(recapVersions); // Initialize filtered data
             setLoading(false);
@@ -183,10 +185,10 @@ function RecapVersions() {
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell><strong>ID</strong></TableCell>
+                            <TableCell><strong>Staff đang Review</strong></TableCell>
                             <TableCell><strong>Bản Recap</strong></TableCell>
                             <TableCell><strong>Cuốn sách</strong></TableCell>
-                            <TableCell sx={{width: 120}}><strong>Tên</strong></TableCell>
+                            <TableCell><strong>Tên</strong></TableCell>
                             <TableCell><strong>Ngày</strong></TableCell>
                             <TableCell><strong>Duyệt</strong></TableCell>
                             <TableCell><strong>Chi tiết</strong></TableCell>
@@ -201,50 +203,54 @@ function RecapVersions() {
                                 </TableCell>
                             </TableRow>
                         ) : (
-                        filteredVersions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
-                            <TableRow key={item.recapVersionId}>
-                                <TableCell sx={{width: 180}}>{item.recapVersionId}</TableCell>
-                                <TableCell>{item.versionName}</TableCell>
-                                <TableCell>{item.bookTitle}</TableCell>
-                                <TableCell>{item.contributorName}</TableCell>
-                                <TableCell>{new Date(item.createAt).toLocaleDateString()}</TableCell>
-                                <TableCell>
-                                    <Chip
-                                        variant={hoverState[item.recapVersionId] ? 'contained' : 'outlined'}
-                                        label="Duyệt"
-                                        color='primary'
-                                        disabled={!!item.reviewId}
-                                        onClick={() => createReview(item.recapVersionId)}
-                                        onMouseEnter={() => handleMouseEnter(item.recapVersionId)}
-                                        onMouseLeave={() => handleMouseLeave(item.recapVersionId)} />
-                                </TableCell>
-                                <TableCell>{item.reviewId ? (
-                                    <Chip
-                                        variant={hoverDetailState[item.recapVersionId] ? 'contained' : 'outlined'}
-                                        color='success'
-                                        label="Xem chi tiết"
-                                        onClick={() => navigate(`/review/content_version/${item.reviewId}`)}
-                                        onMouseEnter={() => handleDetailMouseEnter(item.recapVersionId)}
-                                        onMouseLeave={() => handleMouseLeave(item.recapVersionId)}
-                                    />
-                                ) : (
-                                    <Typography variant="body2" color="textSecondary">
-                                        Chưa có Review
-                                    </Typography>
-                                )}</TableCell>
-                                <TableCell>
-                                    {item.status === "Pending" ? (
-                                        <Typography color="primary" >Đang xử lý</Typography>
-                                    ) : item.status === "Approved" ? (
-                                        <Typography color="success" >Đã Chấp thuận</Typography>
-                                    ) : item.status === "Rejected" ? (
-                                        <Typography color='error' >Đã Từ chối</Typography>
+                            filteredVersions.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((item) => (
+                                <TableRow key={item.recapVersionId}>
+                                    <TableCell>{item.staffName ? (
+                                        <Typography variant='subtitle2'>{item.staffName}</Typography>
                                     ) : (
-                                        <Typography sx={{ color: "#bdbfbe" }} >Unknown</Typography>
-                                    )}
-                                </TableCell>
-                            </TableRow>
-                        )))}
+                                        <Typography color='error' variant='subtitle2'>Hiện chưa có Staff Review</Typography>
+                                    )}</TableCell>
+                                    <TableCell>{item.versionName}</TableCell>
+                                    <TableCell>{item.bookTitle}</TableCell>
+                                    <TableCell>{item.contributorName}</TableCell>
+                                    <TableCell>{new Date(item.createAt).toLocaleDateString()}</TableCell>
+                                    <TableCell>
+                                        <Chip
+                                            variant={hoverState[item.recapVersionId] ? 'contained' : 'outlined'}
+                                            label="Duyệt"
+                                            color='primary'
+                                            disabled={!!item.reviewId}
+                                            onClick={() => createReview(item.recapVersionId)}
+                                            onMouseEnter={() => handleMouseEnter(item.recapVersionId)}
+                                            onMouseLeave={() => handleMouseLeave(item.recapVersionId)} />
+                                    </TableCell>
+                                    <TableCell>{item.reviewId ? (
+                                        <Chip
+                                            variant={hoverDetailState[item.recapVersionId] ? 'contained' : 'outlined'}
+                                            color='success'
+                                            label="Xem chi tiết"
+                                            onClick={() => navigate(`/review/content_version/${item.reviewId}`)}
+                                            onMouseEnter={() => handleDetailMouseEnter(item.recapVersionId)}
+                                            onMouseLeave={() => handleMouseLeave(item.recapVersionId)}
+                                        />
+                                    ) : (
+                                        <Typography variant="body2" color="textSecondary">
+                                            Chưa có Review
+                                        </Typography>
+                                    )}</TableCell>
+                                    <TableCell>
+                                        {item.status === "Pending" ? (
+                                            <Typography color="primary" variant='subtitle2'>Đang xử lý</Typography>
+                                        ) : item.status === "Approved" ? (
+                                            <Typography color="success" variant='subtitle2'>Đã Chấp thuận</Typography>
+                                        ) : item.status === "Rejected" ? (
+                                            <Typography color='error' variant='subtitle2'>Đã Từ chối</Typography>
+                                        ) : (
+                                            <Typography sx={{ color: "#bdbfbe" }} >Unknown</Typography>
+                                        )}
+                                    </TableCell>
+                                </TableRow>
+                            )))}
                     </TableBody>
                     <TableFooter>
                         <TableRow>

@@ -1,25 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    Button,
-    TextField,
-    MenuItem,
-    Box,
-    Typography,
-    TableContainer,
-    Paper,
-    TableHead,
-    TableRow,
-    TableCell,
-    TableBody,
-    Chip,
-    TableFooter,
-    TablePagination,
-    Table,
+    Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField, MenuItem, Box, Typography, TableContainer,
+    Paper, TableHead, TableRow, TableCell, TableBody, Chip, TableFooter, TablePagination, Table, Select
 } from "@mui/material";
 import { Visibility } from '@mui/icons-material';
 import Swal from 'sweetalert2';
@@ -74,7 +57,8 @@ function AppealList() {
     const [loading, setLoading] = useState(true);
     const [hoverState, setHoverState] = useState({});
     const [hoverDetailState, setHoverDetailState] = useState({});
-
+    const [recapStatus, setRecapStatus] = useState(3);
+    
     const [responseForm, setResponseForm] = useState({
         id: "",
         staffId: "",
@@ -112,6 +96,11 @@ function AppealList() {
         });
     }, [token]);
 
+    // Xử lý khi thay đổi trạng thái
+    const handleStatusChange = (e) => {
+        setRecapStatus(e.target.value);
+    };
+
     const handleResponse = async () => {
 
         closeDialog();
@@ -133,7 +122,7 @@ function AppealList() {
                         staffId: profile.id,
                         response: responseText,
                     };
-                    await api.put("/api/appeal/responseappealbystaff", responseForm);
+                    await api.put(`/api/appeal/responseappealbystaff?recapVersionStatus=${recapStatus}`, responseForm);
                     Swal.fire('Thành công!', 'Phản hồi của bạn đã được gửi.', 'success');
                     fetchAppeals();
                 } catch (error) {
@@ -285,65 +274,65 @@ function AppealList() {
                                 </TableCell>
                             </TableRow>
                         ) : (
-                        filteredAppeal.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                            .map((val) => (
-                                <TableRow key={val.id}>
-                                    <TableCell>{val.contributor?.fullName}</TableCell>
-                                    <TableCell>{val.staff?.fullName || "Chưa có Staff phản hồi"}</TableCell>
-                                    <TableCell>{val.reason.length > 30
-                                        ? `${val.reason.slice(0, 30)}...`
-                                        : val.reason}</TableCell>
-                                    <TableCell>{val.response
-                                        ? (val.response.length > 30
-                                            ? `${val.response.slice(0, 30)}...`
-                                            : val.response
-                                        ) : "Chưa có phản hồi từ Staff"}
-                                    </TableCell>
-                                    <TableCell>{new Date(val.createdAt).toLocaleDateString()}</TableCell>
-                                    <TableCell>{val.updatedAt === "0001-01-01T00:00:00" || !val.updatedAt
-                                        ? "Chưa phản hồi"
-                                        : new Date(val.updatedAt).toLocaleDateString()}</TableCell>
-                                    <TableCell>
-                                        <Chip
-                                            label="Xem Review"
-                                            color="info"
-                                            variant={hoverState[val.id] ? 'contained' : 'outlined'}
-                                            onClick={() =>
-                                                navigate(`/review/content_version/${val.reviewId}`)
-                                            }
-                                            onMouseEnter={() => handleMouseEnter(val.id)}
-                                            onMouseLeave={() => handleMouseLeave(val.id)} />
-                                    </TableCell>
-                                    <TableCell>
-                                        <Chip onClick={() => openDialog(val)}
-                                            disabled={val.appealStatus === 2 || val.review?.staffId !== staffId}
-                                            variant={hoverDetailState[val.id] ? 'contained' : 'outlined'}
-                                            label="Phản hồi"
-                                            color="error"
-                                            onMouseEnter={() => handleDetailMouseEnter(val.id)}
-                                            onMouseLeave={() => handleMouseLeave(val.id)}
-                                        />
-                                    </TableCell>
-                                    <TableCell width={120}>
-                                        {val.appealStatus === 1 ? (
-                                            <Typography color="primary">Đang xử lý</Typography>
-                                        ) : val.appealStatus === 2 ? (
-                                            <Typography color="success">Đã phản hồi</Typography>
-                                        ) : val.appealStatus === 0 ? (
-                                            <Typography color="warning">Đang mở</Typography>
-                                        ) : (
-                                            <Button>Unknow</Button>
-                                        )}
-                                    </TableCell>
-                                    <TableCell><Button
-                                        disabled={val.appealStatus === 1}
-                                        onClick={() => openDetailDialog(val)}
-                                    >
-                                        <Visibility />
-                                    </Button>
-                                    </TableCell>
-                                </TableRow>
-                            )))
+                            filteredAppeal.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                                .map((val) => (
+                                    <TableRow key={val.id}>
+                                        <TableCell>{val.contributor?.fullName}</TableCell>
+                                        <TableCell>{val.staff?.fullName || "Chưa có Staff phản hồi"}</TableCell>
+                                        <TableCell>{val.reason.length > 30
+                                            ? `${val.reason.slice(0, 30)}...`
+                                            : val.reason}</TableCell>
+                                        <TableCell>{val.response
+                                            ? (val.response.length > 30
+                                                ? `${val.response.slice(0, 30)}...`
+                                                : val.response
+                                            ) : "Chưa có phản hồi từ Staff"}
+                                        </TableCell>
+                                        <TableCell>{new Date(val.createdAt).toLocaleDateString()}</TableCell>
+                                        <TableCell>{val.updatedAt === "0001-01-01T00:00:00" || !val.updatedAt
+                                            ? "Chưa phản hồi"
+                                            : new Date(val.updatedAt).toLocaleDateString()}</TableCell>
+                                        <TableCell>
+                                            <Chip
+                                                label="Xem Review"
+                                                color="info"
+                                                variant={hoverState[val.id] ? 'contained' : 'outlined'}
+                                                onClick={() =>
+                                                    navigate(`/review/content_version/${val.reviewId}`)
+                                                }
+                                                onMouseEnter={() => handleMouseEnter(val.id)}
+                                                onMouseLeave={() => handleMouseLeave(val.id)} />
+                                        </TableCell>
+                                        <TableCell>
+                                            <Chip onClick={() => openDialog(val)}
+                                                disabled={val.appealStatus === 2 || val.review?.staffId !== staffId}
+                                                variant={hoverDetailState[val.id] ? 'contained' : 'outlined'}
+                                                label="Phản hồi"
+                                                color="error"
+                                                onMouseEnter={() => handleDetailMouseEnter(val.id)}
+                                                onMouseLeave={() => handleMouseLeave(val.id)}
+                                            />
+                                        </TableCell>
+                                        <TableCell width={120}>
+                                            {val.appealStatus === 1 ? (
+                                                <Typography color="primary">Đang xử lý</Typography>
+                                            ) : val.appealStatus === 2 ? (
+                                                <Typography color="success">Đã phản hồi</Typography>
+                                            ) : val.appealStatus === 0 ? (
+                                                <Typography color="warning">Đang mở</Typography>
+                                            ) : (
+                                                <Button>Unknow</Button>
+                                            )}
+                                        </TableCell>
+                                        <TableCell><Button
+                                            disabled={val.appealStatus === 1}
+                                            onClick={() => openDetailDialog(val)}
+                                        >
+                                            <Visibility />
+                                        </Button>
+                                        </TableCell>
+                                    </TableRow>
+                                )))
                         }
                     </TableBody>
                     <TableFooter>
@@ -380,6 +369,18 @@ function AppealList() {
                         onChange={handleResponseChange}
                         sx={{ marginTop: 2 }}
                     />
+                    <Box display="flex" alignItems="center" marginTop={2} gap={1}>
+                        <Typography><strong>Trạng thái Recap</strong></Typography>
+                        <Select
+                        value={recapStatus}
+                        onChange={handleStatusChange}
+                        displayEmpty
+                        renderValue={(selected) => selected ? `${selected === 2 ? "Chấp thuận" : "Từ chối"}` : "Từ chối"}
+                        >
+                            <MenuItem value={2}>Chấp thuận</MenuItem>
+                            <MenuItem value={3}>Từ chối</MenuItem>
+                        </Select>
+                    </Box>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={closeDialog} color="secondary">Đóng</Button>
