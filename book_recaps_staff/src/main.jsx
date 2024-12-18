@@ -13,7 +13,7 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <PrimeReactProvider value={{ unstyled: true, pt: primeStyling }}>
       <RouterProvider router={router}/>
-      <ToastContainer position="top-right" autoClose={1400} theme="colored" closeOnClick={true}/>
+      <ToastContainer position="top-center" autoClose={1400} theme="colored" closeOnClick={true}/>
     </PrimeReactProvider>
   </StrictMode>,
 )
