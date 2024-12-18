@@ -519,12 +519,12 @@ const RecapVersionDetails = () => {
       showToast({
         severity: 'error',
         summary: 'Error',
-        detail: 'Audio and transcript must be ready before submitting for review',
+        detail: 'Cần có Audio và transcript trước khi gửi để xét duyệt',
       });
       return;
     }
 
-    if (!confirm("Are you sure you want to submit this version for review? You won't be able to change this version anymore."))
+    if (!confirm("Bạn có chắc chắn muốn gửi phiên bản này để xét duyệt? Bạn sẽ không thể thay đổi phiên bản này nữa."))
       return;
 
     setUploadingAudio(true);
@@ -537,7 +537,8 @@ const RecapVersionDetails = () => {
       showToast({
         severity: 'success',
         summary: 'Success',
-        detail: 'Version submitted for review successfully',
+        // detail: 'Version submitted for review successfully',
+        detail: 'Phiên bản đã được gửi để xét duyệt',
       });
 
       setRecapVersion({ ...response.data.data });
