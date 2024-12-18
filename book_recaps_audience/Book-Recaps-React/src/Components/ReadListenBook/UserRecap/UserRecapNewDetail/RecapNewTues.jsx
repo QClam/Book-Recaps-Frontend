@@ -296,7 +296,7 @@ const AudioAndTranscriptSection = () => {
             </div>
           </div>
         }>
-          <Show when={recap.currentVersion?.status !== 2} fallback={
+          <Show when={recap.currentVersion?.status === 2} fallback={
             <div className="rounded-lg bg-white p-5 shadow-[0px_0px_8px_rgba(0,0,0,0.1)]">
               <div className="premium-message">
                 Bài viết này đang được xem xét. Vui lòng quay lại sau.
