@@ -2,8 +2,9 @@ import { useState } from "react";
 import Show from "./Show";
 import { cn } from "../utils/cn";
 import { Link, NavLink } from "react-router-dom";
-import { TbApps, TbArrowBarLeft, TbArrowBarRight, TbBooks, TbNews } from "react-icons/tb";
+import { TbArrowBarLeft, TbArrowBarRight, TbLogout, TbMessage, TbMessageReport, TbNews, TbUsers } from "react-icons/tb";
 import { routes } from "../routes";
+import { GrMoney } from "react-icons/gr";
 
 export const NavBar = () => {
   const [ isOpen, setIsOpen ] = useState(true)
@@ -41,36 +42,47 @@ export const NavBar = () => {
 
         <NavbarLink
           href={routes.recaps}
-          icon={<TbApps/>}
+          icon={<TbNews/>}
           text="Duyệt bài viết"
           isOpen={isOpen}
         />
 
         <NavbarLink
           href={routes.users}
-          icon={<TbBooks/>}
+          icon={<TbUsers/>}
           text="Contributors"
           isOpen={isOpen}
         />
 
         <NavbarLink
           href={routes.appeals}
-          icon={<TbNews/>}
+          icon={<TbMessage/>}
           text="Kháng cáo"
           isOpen={isOpen}
         />
 
         <NavbarLink
           href={routes.reports}
-          icon={<TbNews/>}
+          icon={<TbMessageReport/>}
           text="Khiếu nại"
           isOpen={isOpen}
         />
 
         <NavbarLink
           href={routes.withdrawals}
-          icon={<TbNews/>}
+          icon={<GrMoney/>}
           text="Yêu cầu rút tiền"
+          isOpen={isOpen}
+        />
+
+        <NavInfo isOpen={isOpen}>
+          Tài khoản
+        </NavInfo>
+
+        <NavbarLink
+          href={routes.logout}
+          icon={<TbLogout/>}
+          text="Đăng xuất"
           isOpen={isOpen}
         />
       </ul>

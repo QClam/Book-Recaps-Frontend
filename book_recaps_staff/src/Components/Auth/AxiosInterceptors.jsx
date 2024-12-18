@@ -55,46 +55,4 @@ api.interceptors.request.use(
   }
 );
 
-axios.interceptors.response.use(
-  (response) => {
-    // Nếu phản hồi thành công, trả về dữ liệu như bình thường
-    return response;
-  },
-  async (error) => {
-    const originalRequest = error.config;
-
-    // Kiểm tra xem lỗi có phải là 401 (Unauthorized) và request chưa được retry
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
-      console.log("Token hết hạn, đang gọi refreshAccessToken...");
-
-      originalRequest._retry = true;
-
-      try {
-        // Gọi hàm refreshAccessToken để lấy token mới
-        const newAccessToken = await refreshAccessToken();
-
-        console.log("Token đã được làm mới:", newAccessToken);
-
-        // Cập nhật header của request với token mới
-        axios.defaults.headers.common["Authorization"] = `Bearer ${newAccessToken}`;
-        originalRequest.headers["Authorization"] = `Bearer ${newAccessToken}`;
-
-        // Thử gửi lại request với token mới
-        return axios(originalRequest);
-      } catch (refreshError) {
-        console.error("Làm mới token thất bại:", refreshError);
-
-        // Nếu làm mới token thất bại, xóa token và điều hướng đến trang login
-        localStorage.removeItem("access_token");
-        localStorage.removeItem("refresh_token");
-        window.location.href = "/login";
-      }
-    }
-
-    return Promise.reject(error);
-  }
-);
-
-
-
 export default api ;

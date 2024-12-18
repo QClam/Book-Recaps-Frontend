@@ -4,7 +4,7 @@ export const routes = {
   logout: '/logout',
   recaps: '/recaps',
   users: "/users",
-  withdrawals: "/withdrawl",
+  withdrawals: "/withdrawals",
   appeals: "/appeals",
   reports:"/reports",
   reviewVersion: "/review/content_version/:id",

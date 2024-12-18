@@ -1,14 +1,17 @@
-import { Outlet, useNavigation } from 'react-router-dom';
+import { Outlet, useMatch, useNavigation } from 'react-router-dom';
 import { Suspense } from "react";
 import Spinner from "./Spinner";
 import { NavBar } from "./NavBar";
 import { HeadBar } from "./HeadBar";
 import { cn } from "../utils/cn";
+import { routes } from "../routes";
 
 // import Sidebar from '../SidebarNavigation/Sidebar';
 
 function MainLayout() {
   const navigation = useNavigation();
+
+  const matchRecapDetails = useMatch(routes.reviewVersion);
 
   return (
     <div className="flex flex-row h-screen">
@@ -29,7 +32,9 @@ function MainLayout() {
               </p>
             </div>
           }>
-            <div className={cn("min-w-[1024px] pb-8 px-6 h-fit")}>
+            <div className={cn("min-w-[1024px] pb-6 px-6 h-fit", {
+              "mt-10": !matchRecapDetails
+            })}>
               <Outlet/>
             </div>
           </Suspense>
