@@ -199,7 +199,7 @@ const ContractDetail = () => {
               'Tiêu đề',
               'ISBN-10',
               'ISBN-13',
-              'Hành động'
+              ''
             ]}/>
             <Table.Body
               when={books && books.length > 0}
@@ -244,14 +244,14 @@ const ContractDetail = () => {
                   <Table.Cell>
                     <div className="min-w-28 max-w-64">
                       <p className="min-w-full line-clamp-2 break-words">
-                        {book.isbn10 || "N/A"}
+                        {book.isbN_10 || "N/A"}
                       </p>
                     </div>
                   </Table.Cell>
                   <Table.Cell>
                     <div className="min-w-28 max-w-64">
                       <p className="min-w-full line-clamp-2 break-words">
-                        {book.isbn13 || "N/A"}
+                        {book.isbN_13 || "N/A"}
                       </p>
                     </div>
                   </Table.Cell>
@@ -260,7 +260,7 @@ const ContractDetail = () => {
                       to={generatePath(routes.bookDetails, { bookId: book.id })}
                       className="flex justify-center items-center gap-1 px-5 py-2 font-semibold bg-indigo-600 text-white rounded hover:bg-indigo-800"
                     >
-                      Chi tiết
+                      Chi&nbsp;tiết
                     </Link>
                   </Table.Cell>
                 </Table.Row>

@@ -277,10 +277,10 @@ function BooksTable() {
                 {book.title} ({book.publicationYear})
               </Link>
               <p className="min-w-full line-clamp-2 break-words">
-                <strong>ISBN-10:</strong> {book.isbn10 || "N/A"}
+                <strong>ISBN-10:</strong> {book.isbN_10 || "N/A"}
               </p>
               <p className="min-w-full line-clamp-2 break-words">
-                <strong>ISBN-13:</strong> {book.isbn13 || "N/A"}
+                <strong>ISBN-13:</strong> {book.isbN_13 || "N/A"}
               </p>
             </div>
           </Table.Cell>
