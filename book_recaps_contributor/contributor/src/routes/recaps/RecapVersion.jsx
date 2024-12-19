@@ -359,14 +359,14 @@ const RecapVersionDetails = () => {
     const controller = new AbortController();
     let isRequestActive = false; // Flag to track active requests
 
-    if (recapVersion.transcriptStatus === 1) {
+    if (recapVersion.transcriptStatus === 1 || recapVersion.transcriptStatus === 3 || recapVersion.transcriptStatus === 4) {
       interval = setInterval(async () => {
         if (!isRequestActive) {
           isRequestActive = true;
           try {
             const result = await getRecapVersion(recapVersion.id, controller);
 
-            if (result.transcriptStatus !== 1) {
+            if (result.transcriptStatus !== 1 && result.transcriptStatus !== 3 && recapVersion.transcriptStatus !== 4) {
               setRecapVersion({ ...result });
               clearInterval(interval);
             }
@@ -562,7 +562,7 @@ const RecapVersionDetails = () => {
     }
   }
 
-  const loading = uploadingAudio || updatingName;
+  const loading = uploadingAudio || updatingName || recapVersion.transcriptStatus === 3;
 
   return (
     <>
@@ -575,7 +575,7 @@ const RecapVersionDetails = () => {
               <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
                                fill="var(--surface-ground)" animationDuration=".5s"/>
             </div>
-            <p>Updating...</p>
+            <p>Updating {uploadingAudio || recapVersion.transcriptStatus === 3 ? "audio" : "name"}...</p>
           </div>
         </Show>
       </div>
@@ -787,9 +787,9 @@ const ListKeyIdeas = () => {
                 </li>
                 <li>
                   Nền tảng khuyến khích Contributor chủ động sử dụng tính năng <strong
-                  className="hover:text-blue-500 underline cursor-pointer" onClick={() => setActiveIndex(2)}>&#34;Kiểm tra trùng
-                  lặp&#34;</strong> trước khi gửi xét duyệt. Các bài viết tóm tắt trùng lặp đáng kể với bài viết hiện có
-                  có thể bị từ chối.
+                  className="hover:text-blue-500 underline cursor-pointer" onClick={() => setActiveIndex(2)}>&#34;Kiểm
+                  tra trùng lặp&#34;</strong> trước khi gửi xét duyệt. Các bài viết tóm tắt trùng lặp đáng kể với bài
+                  viết hiện có có thể bị từ chối.
                 </li>
               </ul>
             </div>
