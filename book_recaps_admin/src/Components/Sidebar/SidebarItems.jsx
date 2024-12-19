@@ -8,7 +8,10 @@ import {
     MenuBook,
     CurrencyExchange,
     People,
-    Summarize
+    Summarize,
+    SystemSecurityUpdate,
+    Settings,
+    AllInbox
 } from "@mui/icons-material";
 
 export const SidebarItems = [
@@ -51,5 +54,15 @@ export const SidebarItems = [
         title: "Quản lý Hợp đồng",
         icon: <LibraryBooks />,
         link: "/contracts",
+    },
+    {
+        title: "Quản lý Gói Premium",
+        icon: <AllInbox />,
+        link: "/packages",
+    },
+    {
+        title: "Hệ Thống",
+        icon: <Settings />,
+        link: "/systems",
     },
 ];

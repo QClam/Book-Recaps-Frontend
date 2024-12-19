@@ -30,6 +30,8 @@ import ContractDetail from './Components/Contracts/ContractDetail';
 import CreateContract from './Components/Contracts/CreateContract';
 import Users from './Components/Users/Users';
 import TestGetAvaliableBook from './Components/Books/TestGetAvaliableBook';
+import SystemSetting from './Components/SystemSettings/SystemSetting';
+import PremiumPackages from './Components/PremiumPackages/PremiumPackages';
 
 function App() {
 
@@ -71,6 +73,8 @@ function App() {
                 <Route path="/auth/confirm-email" element={<ConfirmEmail />} />
 
                 <Route path="/test" element={<TestGetAvaliableBook />} />
+                <Route path="/packages" element={<PrivateRoute> <PremiumPackages /> </PrivateRoute>} />
+                <Route path="/systems" element={<PrivateRoute> <SystemSetting /> </PrivateRoute>} />
             </Routes>
         </main>
     )
