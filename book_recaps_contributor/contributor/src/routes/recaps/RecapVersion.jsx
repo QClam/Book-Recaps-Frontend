@@ -375,7 +375,7 @@ const RecapVersionDetails = () => {
             showToast({
               severity: 'error',
               summary: 'Error',
-              detail: 'Error polling for transcript status. Please try upload audio again.',
+              detail: 'Lỗi khi kiểm tra trạng thái transcript. Vui lòng thử tải lên audio lại.',
             });
             clearInterval(interval);
           } finally {
@@ -427,7 +427,7 @@ const RecapVersionDetails = () => {
       showToast({
         severity: 'success',
         summary: 'Success',
-        detail: 'Audio uploaded successfully',
+        detail: 'Audio đã được tải lên thành công',
       });
 
     } catch (error) {
@@ -458,6 +458,8 @@ const RecapVersionDetails = () => {
       setUploadingAudio(true);
       await axiosInstance.put('/generate-audio', {
         recapVersionId: recapVersion.id
+      }, {
+        timeout: 0 // Disable timeout
       });
 
       const controller = new AbortController();
@@ -467,7 +469,7 @@ const RecapVersionDetails = () => {
       showToast({
         severity: 'success',
         summary: 'Success',
-        detail: 'Audio generated successfully',
+        detail: 'Audio đã được tạo thành công',
       });
 
     } catch (error) {
@@ -484,7 +486,7 @@ const RecapVersionDetails = () => {
       showToast({
         severity: 'error',
         summary: 'Error',
-        detail: 'Version name cannot be empty',
+        detail: 'Tên phiên bản không được để trống',
       });
       return;
     }
@@ -502,7 +504,7 @@ const RecapVersionDetails = () => {
       showToast({
         severity: 'success',
         summary: 'Success',
-        detail: 'Version name updated successfully',
+        detail: 'Tên phiên bản đã được cập nhật thành công',
       });
 
     } catch (error) {
@@ -537,7 +539,6 @@ const RecapVersionDetails = () => {
       showToast({
         severity: 'success',
         summary: 'Success',
-        // detail: 'Version submitted for review successfully',
         detail: 'Phiên bản đã được gửi để xét duyệt',
       });
 
@@ -971,7 +972,7 @@ const KeyIdeaItem = ({ keyIdea, recapVersionStatus }) => {
       showToast({
         severity: 'success',
         summary: 'Success',
-        detail: 'Key idea deleted successfully',
+        detail: "Ý chính đã được xóa thành công",
       });
     } catch (error) {
       console.error(error);
