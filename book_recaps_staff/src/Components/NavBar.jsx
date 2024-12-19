@@ -64,7 +64,7 @@ export const NavBar = () => {
         <NavbarLink
           href={routes.reports}
           icon={<TbMessageReport/>}
-          text="Khiếu nại"
+          text="Báo cáo"
           isOpen={isOpen}
         />
 

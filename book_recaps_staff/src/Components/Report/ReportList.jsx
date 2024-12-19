@@ -354,7 +354,7 @@ function ReportList() {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={closeDialog} color="secondary">Đóng</Button>
-                    <Button color="primary" onClick={() => handleResponse(selectedReport?.id)}>Gửi Phản hồi</Button>
+                    <Button color="primary" onClick={() => handleResponse(selectedReport?.supportTicketId)}>Gửi Phản hồi</Button>
                 </DialogActions>
             </Dialog>
 

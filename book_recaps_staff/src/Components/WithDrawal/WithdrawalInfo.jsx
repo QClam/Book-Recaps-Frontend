@@ -55,7 +55,7 @@ function WithdrawalInfo({ open, onClose, drawalId }) {
                                     Rút về:
                                 </Typography>
                                 <Typography>
-                                    <strong>Nhận trực tiếp</strong>
+                                    <strong>Chuyển Khoản</strong>
                                 </Typography>
                             </Box>
 
