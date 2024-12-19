@@ -275,7 +275,7 @@ const RecapInfoSection = () => {
 
 const AudioAndTranscriptSection = () => {
   const { recap, promisedTranscript } = useLoaderData();
-  const { user } = useAuth();
+  const { user, refetchProfileInfo } = useAuth();
   const hasSubscription = user?.profileData.subscriptions.$values.some((sub) => sub.status === 0);
 
   // Create view tracking when the transcript is loaded. Delayed by 3 seconds
@@ -283,7 +283,8 @@ const AudioAndTranscriptSection = () => {
     recap.id,
     user?.id,
     promisedTranscript,
-    recap.isPublished && ((recap.isPremium && hasSubscription) || !recap.isPremium) && recap.currentVersion?.status === 2
+    recap.isPublished && ((recap.isPremium && hasSubscription) || !recap.isPremium) && recap.currentVersion?.status === 2,
+    refetchProfileInfo
   );
 
   return (
@@ -516,7 +517,7 @@ const SvgIcons = () => (
   </svg>
 )
 
-const useViewTracking = (recapId, userId, promisedTranscript, shouldCreate) => {
+const useViewTracking = (recapId, userId, promisedTranscript, shouldCreate, callback) => {
   const currentViewTrackingId = useRef(null);
   const startTime = useRef(new Date().getTime());
   const mounted = useRef(false);
@@ -566,6 +567,8 @@ const useViewTracking = (recapId, userId, promisedTranscript, shouldCreate) => {
       // console.log('View tracking response:', response.data.data);
 
       currentViewTrackingId.current = response.data.data?.id;
+
+      callback();
     } catch (error) {
       const err = handleFetchError(error);
       console.log('Error tracking view:', err);
