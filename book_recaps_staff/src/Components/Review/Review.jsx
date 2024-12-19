@@ -498,18 +498,6 @@ function Review() {
       <div className='audio-grid'>
          <div className='transcript-section-container'>
             <h1>{contentItem.recapVersion?.versionName}</h1>
-            <Box display='flex' gap={1}>
-               <Typography> Trạng thái: </Typography>
-               {contentItem.recapVersion?.status === 1 ? (
-                  <Typography color="primary" >Đang xử lý</Typography>
-               ) : contentItem.recapVersion?.status === 2 ? (
-                  <Typography color="success" >Đã Chấp thuận</Typography>
-               ) : contentItem.recapVersion?.status === 3 ? (
-                  <Typography color="error" >Đã Từ chối</Typography>
-               ) : (
-                  <Typography color="error" >Lỗi</Typography>
-               )}
-            </Box>
             <Box display="flex" gap={1}>
                <Typography>Nhân viên Review:</Typography>
                <Typography color='success'>{contentItem.staffName}</Typography>
@@ -665,6 +653,18 @@ function Review() {
                         value={summaryNote}
                         onChange={handleInputChange}
                         onBlur={handleSaveComment} />
+                     <Box display='flex' gap={1}>
+                        <Typography> Trạng thái: </Typography>
+                        {contentItem.recapVersion?.status === 1 ? (
+                           <Typography color="primary" >Đang xử lý</Typography>
+                        ) : contentItem.recapVersion?.status === 2 ? (
+                           <Typography color="success" >Đã Chấp thuận</Typography>
+                        ) : contentItem.recapVersion?.status === 3 ? (
+                           <Typography color="error" >Đã Từ chối</Typography>
+                        ) : (
+                           <Typography color="error" >Lỗi</Typography>
+                        )}
+                     </Box>
                      <div className="status-buttons">
                         <Chip
                            label='Từ Chối'
@@ -673,6 +673,7 @@ function Review() {
                            onMouseEnter={handleMouseEnter}
                            onMouseLeave={handleMouseLeave}
                            onClick={confirmReject}
+                           disabled={contentItem.recapVersion?.status === 3}
                         />
                         {/* <Chip 
                                 label="Lưu ghi chú"
@@ -685,6 +686,7 @@ function Review() {
                            onMouseEnter={handleMouseApproveEnter}
                            onMouseLeave={handleMouseApproveLeave}
                            onClick={confirmApprove}
+                           disabled={contentItem.recapVersion?.status === 2}
                         />
                      </div>
                   </div>
