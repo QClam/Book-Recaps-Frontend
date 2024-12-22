@@ -366,7 +366,7 @@ const RecapVersionDetails = () => {
           try {
             const result = await getRecapVersion(recapVersion.id, controller);
 
-            if (result.transcriptStatus !== 1 && result.transcriptStatus !== 3 && recapVersion.transcriptStatus !== 4) {
+            if (result.transcriptStatus !== 1 && result.transcriptStatus !== 3) {
               setRecapVersion({ ...result });
               clearInterval(interval);
             }
@@ -466,11 +466,11 @@ const RecapVersionDetails = () => {
       const result = await getRecapVersion(recapVersion.id, controller);
       setRecapVersion({ ...result });
 
-      showToast({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Audio đã được tạo thành công',
-      });
+      // showToast({
+      //   severity: 'success',
+      //   summary: 'Success',
+      //   detail: 'Audio đã được tạo thành công',
+      // });
 
     } catch (error) {
       console.error('Error generating audio:', error);
@@ -562,7 +562,7 @@ const RecapVersionDetails = () => {
     }
   }
 
-  const loading = uploadingAudio || updatingName || recapVersion.transcriptStatus === 3;
+  const loading = uploadingAudio || updatingName || recapVersion.transcriptStatus === 3 || recapVersion.transcriptStatus === 4;
 
   return (
     <>
@@ -575,7 +575,7 @@ const RecapVersionDetails = () => {
               <ProgressSpinner style={{ width: '20px', height: '20px' }} strokeWidth="8"
                                fill="var(--surface-ground)" animationDuration=".5s"/>
             </div>
-            <p>Updating {uploadingAudio || recapVersion.transcriptStatus === 3 ? "audio" : "name"}...</p>
+            <p>Updating...</p>
           </div>
         </Show>
       </div>
@@ -643,7 +643,9 @@ const RecapVersionDetails = () => {
               readOnly
             />
           </div>
-          <Show when={recapVersion.transcriptStatus === 1} fallback={
+          <Show when={
+            recapVersion.transcriptStatus === 1 || recapVersion.transcriptStatus === 4
+          } fallback={
             recapVersion.transcriptStatus === 0 ? (
               <p className="text-xs mt-1 text-red-500">
                 Transcript generation failed. Please try uploading the audio again.
